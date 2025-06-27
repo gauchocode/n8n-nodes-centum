@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="cc87f179-f928-43d7-aeb1-af30491da7f8" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/nodes/Centum/Centum.node.ts" beforeDir="false" afterPath="$PROJECT_DIR$/nodes/Centum/Centum.node.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="/bin/php" />
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="2uu44RQaHs1V2lHqJsZv0nZqGzT" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;cdb-node-update&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/broobe/Documents/Projects/plugins/blocky-smart-importer-cdb-addon&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/home/broobe/Documents/Projects/plugins/blocky-nodes-n8n/node_modules/prettier&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/home/broobe/Documents/Projects/plugins/blocky-nodes-n8n/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-PS-243.22562.233" />
+        <option value="bundled-php-predefined-a98d8de5180a-7980c7aaca61-com.jetbrains.php.sharedIndexes-PS-243.22562.233" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="cc87f179-f928-43d7-aeb1-af30491da7f8" name="Changes" comment="" />
+      <created>1743084933937</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1743084933937</updated>
+      <workItem from="1743084935121" duration="969000" />
+      <workItem from="1743164526738" duration="1899000" />
+      <workItem from="1743188219552" duration="609000" />
+      <workItem from="1743204841439" duration="1199000" />
+      <workItem from="1744037727659" duration="662000" />
+      <workItem from="1744130684909" duration="1215000" />
+      <workItem from="1745522224617" duration="735000" />
+      <workItem from="1745595521718" duration="600000" />
+      <workItem from="1745611009971" duration="433000" />
+      <workItem from="1747743836144" duration="2690000" />
+      <workItem from="1747768232564" duration="148000" />
+      <workItem from="1747768396518" duration="120000" />
+      <workItem from="1747768807187" duration="2037000" />
+      <workItem from="1747837438946" duration="7745000" />
+      <workItem from="1747858380606" duration="2300000" />
+      <workItem from="1747919997557" duration="3285000" />
+      <workItem from="1748002054897" duration="6956000" />
+      <workItem from="1748264792848" duration="6010000" />
+      <workItem from="1748375390469" duration="2668000" />
+      <workItem from="1748455700192" duration="5154000" />
+      <workItem from="1748877209140" duration="2354000" />
+      <workItem from="1749148929576" duration="4778000" />
+      <workItem from="1749490097652" duration="1986000" />
+      <workItem from="1749560195821" duration="5753000" />
+      <workItem from="1749655479305" duration="521000" />
+      <workItem from="1750166489216" duration="12000" />
+      <workItem from="1750705990197" duration="6148000" />
+      <workItem from="1750788972352" duration="7306000" />
+      <workItem from="1750855439676" duration="1357000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

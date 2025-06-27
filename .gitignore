@@ -1,0 +1,13 @@
+node_modules
+.DS_Store
+.tmp
+tmp
+
+npm-debug.log*
+yarn.lock
+.vscode/launch.json
+modelo-datos.json
+
+cdb-class-json-property-advanced.php
+
+!dist/node_modules
