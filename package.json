@@ -6,13 +6,13 @@
 		"n8n-community-node-package"
 	],
 	"license": "MIT",
-	"homepage": "",
+	"homepage": "https://github.com/gauchocode/n8n-nodes-centum#readme",
 	"author": {
 		"name": "BlockyCodes"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/gauchocode/n8n-nodes-centum"
+		"url": "git+https://github.com/gauchocode/n8n-nodes-centum.git"
 	},
 	"main": "index.js",
 	"scripts": {
