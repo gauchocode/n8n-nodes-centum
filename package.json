@@ -1,7 +1,7 @@
 {
 	"name": "n8n-nodes-centum",
 	"version": "0.1.1",
-	"description": "",
+	"description": "Centum es un nodo para n8n que te da acceso directo a la API de Centum sin necesidad de librerías extra: buscá clientes por criterios, creá nuevos registros y automatizá tu gestión de usuarios en un par de clics. Diseñado bajo las guidelines oficiales de n8n, cumple con no tener dependencias externas y se instala en un segundo. Ideal para mantener tus flujos limpios y eficientes",
 	"keywords": [
 		"n8n-community-node-package"
 	],
@@ -16,8 +16,8 @@
 	},
 	"main": "index.js",
 	"scripts": {
-    "clean": "rm -rf dist",
-		"build": "npm run clean && tsc && gulp build:icons",
+		"clean": "rm -rf dist",
+    "build": "npm run clean && tsc && gulp build:icons",
     "build:automate": "cd dist && npm install --omit=dev",
 		"dev": "tsc --watch",
 		"format": "prettier nodes credentials --write",
@@ -47,10 +47,5 @@
 		"n8n-workflow": "*",
 		"prettier": "^2.7.1",
 		"typescript": "~4.8.4"
-	},
-	"dependencies": {
-		"axios": "^1.4.0",
-		"iconv-lite": "^0.6.3",
-		"remove-accents": "^0.5.0"
 	}
 }

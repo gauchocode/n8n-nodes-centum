@@ -1,12 +1,11 @@
-import { IExecuteFunctions } from 'n8n-core';
 import {
+	IExecuteFunctions,
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
 	NodeParameterValue,
 } from 'n8n-workflow';
 import { apiRequest } from './helpers/api';
-// import axios from 'axios';
 import { CentumOperations, CentumFields } from './CentumDescription';
 import {
 	IArticulos,
@@ -77,18 +76,11 @@ export class Centum implements INodeType {
 		switch (resource) {
 			case 'activity':
 				try {
-					// const { data: dataActividad } = await axios.get<getActividad>(
-					// 	`${centumUrl}/Actividades`,
-					// 	{
-					// 		headers,
-					// 	},
-					// );
 					const dataActividad = await apiRequest<getActividad>(
 						`${centumUrl}/PedidosVenta/27231`,
 						{headers},
 						this,
 					);
-					// console.log(dataActividad);
 					return [this.helpers.returnJsonArray(dataActividad)];
 				} catch (error) {
 					console.log(error);
@@ -98,8 +90,6 @@ export class Centum implements INodeType {
 			case 'article':
 				const clientId = this.getNodeParameter('clientId', 0);
 				const documentDate: any = this.getNodeParameter('documentDate', 0);
-				// const enabled = this.getNodeParameter('enabled', 0);
-				// const activeWeb = this.getNodeParameter('activeWeb', 0);
 				const IdsRubro = this.getNodeParameter('idsRubros', 0);
 				const completeMigration = this.getNodeParameter('migracionCompleta', 0);
 				const IdsSubRubro = this.getNodeParameter('idsSubRubros', 0);
@@ -110,8 +100,6 @@ export class Centum implements INodeType {
 				const bodyToSend = {
 					idCliente: clientId,
 					FechaDocumento: formattedDocumentDate,
-					// Habilitado: enabled,
-					// ActivoWeb: activeWeb,
 					incluirAtributosArticulos: true,
 					IdsRubro: IdsRubro ? [IdsRubro] : [],
 					IdsSubRubro: IdsSubRubro ? [IdsSubRubro] : [''],
@@ -199,9 +187,7 @@ export class Centum implements INodeType {
 				}
 
 			case 'stockArticle':
-				// const activeWebStock = this.getNodeParameter('activeWeb', 0);
 				const branchOfficeIds = String(this.getNodeParameter('branchOfficeIds', 0));
-				// const enabledStock = this.getNodeParameter('enabled', 0);
 				try {
 					const dataArticulosExistencias = await apiRequest<IArticulosExistencias>(
 						`${centumUrl}/ArticulosExistencias`,
@@ -209,8 +195,6 @@ export class Centum implements INodeType {
 							headers,
 							queryParams: {
 								idsSucursalesFisicas: branchOfficeIds,
-								// habilitado: enabledStock,
-								// activoWeb: activeWebStock,
 							},
 						},
 					);
@@ -221,10 +205,9 @@ export class Centum implements INodeType {
 				}
 
 			case 'stockArticleByPhysicalBranch':
-				// Atención: este parámetro espera una lista de ids separados por comas (no sé si es array o un string)
+				// Atención: este parámetro espera una lista de ids separados por comas
 				const IdSucursalFisica = this.getNodeParameter('IdSucursalFisica', 0) as string;
 
-				// Crear objeto de parámetros
 				const queryParams: { Codigo: string; idsSucursalesFisicas?: string } = {
 					Codigo: 'R06SR0601P00010007',
 				};
@@ -247,34 +230,6 @@ export class Centum implements INodeType {
 					console.log(error);
 					return [this.helpers.returnJsonArray([])];
 				}
-
-			// Tob Note: WIP - Search Article By SKU
-			// case 'searchArticleBySku':
-			// 	const IdSucursalFisica = this.getNodeParameter('IdSucursalFisica', 0);
-			//
-			// 	// Construir la URL base
-			// 	let url = `${centumUrl}/ArticulosSucursalesFisicas`;
-			//
-			// 	// Agregar IdSucursalFisica si tiene valor
-			// 	if (IdSucursalFisica) {
-			// 		url += `?idsSucursalesFisicas=${IdSucursalFisica}`;
-			// 	}
-			//
-			//
-			// 	console.log(url);
-			//
-			// 	try {
-			// 		const { data: dataArticulosExistencias } = await axios.get<any>(
-			// 			url,
-			// 			{
-			// 				headers,
-			// 			},
-			// 		);
-			// 		return [this.helpers.returnJsonArray(dataArticulosExistencias.Items as any)];
-			// 	} catch (error) {
-			// 		console.log(error);
-			// 		return [this.helpers.returnJsonArray([])];
-			// 	}
 
 			case 'priceArticle':
 				const paramsPrice: Record<string, string | number> = {
@@ -314,7 +269,6 @@ export class Centum implements INodeType {
 				const requestUrl = `${centumUrl}/ArticulosImagenes`;
 
 				for (let i = 0; i < inputData.length; i++) {
-					// for (let i = 0; i < 10; i++) {
 					const element = inputData[i];
 					const dataObj: { idArticulo: number; images: any[] | null; infoImages: any[] } = {
 						idArticulo: element.json.IdArticulo as number,
