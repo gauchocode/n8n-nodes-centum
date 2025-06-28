@@ -8,8 +8,8 @@ class Centum {
     constructor() {
         this.description = {
             displayName: 'Centum',
-            name: 'Centum',
-            icon: 'file:centum.png',
+            name: 'centum',
+            icon: 'file:centum.svg',
             group: ['transform'],
             version: 1,
             subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
@@ -69,11 +69,11 @@ class Centum {
                     fechaPrecioActualizadoDesde: priceDateModified,
                 };
                 try {
-                    const dataArticulos = await (0, api_1.apiRequest)(`${centumUrl}/Articulos/Venta?tipoOrdenArticulos=Codigo`, {
+                    const dataArticulos = await (0, api_1.apiRequest)(`${centumUrl}/Articulos/Venta`, {
                         method: 'POST',
                         body: bodyToSend,
-                        responseType: 'json',
                         headers,
+                        queryParams: { tipoOrdenArticulos: 'Codigo' }
                     }, this);
                     if (dataArticulos.Articulos.Items.length > 0) {
                         const items = dataArticulos.Articulos.Items;
@@ -359,7 +359,6 @@ class Centum {
                 const cuit = this.getNodeParameter('cuit', 0, '');
                 const razonSocial = String(this.getNodeParameter('razonSocial', 0));
                 try {
-                    console.log("SEARCH CUSTOMER RESULT: ", razonSocial, customerEmail, dni);
                     const searches = [
                         { queryParams: { email: customerEmail }, description: 'email' },
                         ...(tipoDocumento === 'dni' && dni
@@ -408,7 +407,7 @@ class Centum {
                     return [this.helpers.returnJsonArray(result)];
                 }
                 catch (error) {
-                    console.log('💥 Error general en búsqueda de cliente:', error);
+                    console.log('Error general en búsqueda de cliente:', error);
                     return [this.helpers.returnJsonArray(error.response?.data?.Items || [])];
                 }
             case 'listBranches':

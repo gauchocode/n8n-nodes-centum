@@ -4,13 +4,13 @@ exports.AtributoArticuloNombre = exports.Abreviatura = exports.SubRubroNombre = 
 var CategoriaImpuestoIVANombre;
 (function (CategoriaImpuestoIVANombre) {
     CategoriaImpuestoIVANombre["Iva2100"] = "IVA 21.00";
-})(CategoriaImpuestoIVANombre = exports.CategoriaImpuestoIVANombre || (exports.CategoriaImpuestoIVANombre = {}));
+})(CategoriaImpuestoIVANombre || (exports.CategoriaImpuestoIVANombre = CategoriaImpuestoIVANombre = {}));
 var Detalle;
 (function (Detalle) {
     Detalle["AlfombraRhoneDib"] = "ALFOMBRA RHONE DIB";
     Detalle["Empty"] = "";
     Detalle["R01Sr0108"] = "R01SR0108";
-})(Detalle = exports.Detalle || (exports.Detalle = {}));
+})(Detalle || (exports.Detalle = Detalle = {}));
 var Codigo;
 (function (Codigo) {
     Codigo["Captor"] = "Captor";
@@ -24,12 +24,12 @@ var Codigo;
     Codigo["Muresco"] = "Muresco";
     Codigo["Rielamericano"] = "Rielamericano";
     Codigo["Wepel"] = "Wepel";
-})(Codigo = exports.Codigo || (exports.Codigo = {}));
+})(Codigo || (exports.Codigo = Codigo = {}));
 var NombreFantasia;
 (function (NombreFantasia) {
     NombreFantasia["Empty"] = "";
     NombreFantasia["Nordic"] = "NORDIC";
-})(NombreFantasia = exports.NombreFantasia || (exports.NombreFantasia = {}));
+})(NombreFantasia || (exports.NombreFantasia = NombreFantasia = {}));
 var RubroCodigo;
 (function (RubroCodigo) {
     RubroCodigo["R01"] = "R01";
@@ -38,7 +38,7 @@ var RubroCodigo;
     RubroCodigo["R04"] = "R04";
     RubroCodigo["R05"] = "R05";
     RubroCodigo["R06"] = "R06";
-})(RubroCodigo = exports.RubroCodigo || (exports.RubroCodigo = {}));
+})(RubroCodigo || (exports.RubroCodigo = RubroCodigo = {}));
 var RubroNombre;
 (function (RubroNombre) {
     RubroNombre["Alfombras"] = "ALFOMBRAS";
@@ -47,11 +47,11 @@ var RubroNombre;
     RubroNombre["ManoDeObra"] = "MANO DE OBRA";
     RubroNombre["Revestimientos"] = "REVESTIMIENTOS";
     RubroNombre["Telas"] = "TELAS";
-})(RubroNombre = exports.RubroNombre || (exports.RubroNombre = {}));
+})(RubroNombre || (exports.RubroNombre = RubroNombre = {}));
 var SociedadArticuloNombre;
 (function (SociedadArticuloNombre) {
     SociedadArticuloNombre["SociedadDeArt\u00EDculoDefecto"] = "Sociedad de Art\u00EDculo Defecto";
-})(SociedadArticuloNombre = exports.SociedadArticuloNombre || (exports.SociedadArticuloNombre = {}));
+})(SociedadArticuloNombre || (exports.SociedadArticuloNombre = SociedadArticuloNombre = {}));
 var SubRubroCodigo;
 (function (SubRubroCodigo) {
     SubRubroCodigo["Sr0101"] = "SR0101";
@@ -78,7 +78,7 @@ var SubRubroCodigo;
     SubRubroCodigo["Sr0503"] = "SR0503";
     SubRubroCodigo["Sr0601"] = "SR0601";
     SubRubroCodigo["Sr0603"] = "SR0603";
-})(SubRubroCodigo = exports.SubRubroCodigo || (exports.SubRubroCodigo = {}));
+})(SubRubroCodigo || (exports.SubRubroCodigo = SubRubroCodigo = {}));
 var SubRubroNombre;
 (function (SubRubroNombre) {
     SubRubroNombre["Adhesivos"] = "ADHESIVOS";
@@ -104,15 +104,15 @@ var SubRubroNombre;
     SubRubroNombre["RevestimientosVarios"] = "REVESTIMIENTOS VARIOS";
     SubRubroNombre["SistemasYMecanismos"] = "SISTEMAS Y MECANISMOS";
     SubRubroNombre["TelasParaCortinas"] = "TELAS PARA CORTINAS";
-})(SubRubroNombre = exports.SubRubroNombre || (exports.SubRubroNombre = {}));
+})(SubRubroNombre || (exports.SubRubroNombre = SubRubroNombre = {}));
 var Abreviatura;
 (function (Abreviatura) {
     Abreviatura["Col"] = "COL";
     Abreviatura["Med"] = "MED";
-})(Abreviatura = exports.Abreviatura || (exports.Abreviatura = {}));
+})(Abreviatura || (exports.Abreviatura = Abreviatura = {}));
 var AtributoArticuloNombre;
 (function (AtributoArticuloNombre) {
     AtributoArticuloNombre["Color"] = "COLOR ";
     AtributoArticuloNombre["Medidas"] = "MEDIDAS";
-})(AtributoArticuloNombre = exports.AtributoArticuloNombre || (exports.AtributoArticuloNombre = {}));
+})(AtributoArticuloNombre || (exports.AtributoArticuloNombre = AtributoArticuloNombre = {}));
 //# sourceMappingURL=articulos.js.map

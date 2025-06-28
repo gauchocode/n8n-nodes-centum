@@ -5,6 +5,8 @@ import {
 	INodeTypeDescription,
 	NodeParameterValue,
 } from 'n8n-workflow';
+import { NodeConnectionType } from 'n8n-workflow';
+
 import { apiRequest } from './helpers/api';
 import { CentumOperations, CentumFields } from './CentumDescription';
 import {
@@ -37,9 +39,8 @@ type getActividad = {
 export class Centum implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Centum',
-		name: 'Centum',
-		// eslint-disable-next-line n8n-nodes-base/node-class-description-icon-not-svg
-		icon: 'file:centum.png',
+		name: 'centum',
+		icon: 'file:centum.svg',
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
@@ -47,8 +48,8 @@ export class Centum implements INodeType {
 		defaults: {
 			name: 'Centum',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: ['main'] as [NodeConnectionType],
+		outputs: ['main'] as [NodeConnectionType],
 		credentials: [
 			{
 				name: 'centumApi',
@@ -110,12 +111,12 @@ export class Centum implements INodeType {
 
 				try {
 					const dataArticulos = await apiRequest<IArticulos>(
-						`${centumUrl}/Articulos/Venta?tipoOrdenArticulos=Codigo`,
+						`${centumUrl}/Articulos/Venta`,
 						{
 							method: 'POST',
 							body: bodyToSend,
-							responseType: 'json',
 							headers,
+							queryParams: { tipoOrdenArticulos: 'Codigo'}
 						},
 						this,
 					);
@@ -233,7 +234,7 @@ export class Centum implements INodeType {
 
 			case 'priceArticle':
 				const paramsPrice: Record<string, string | number> = {
-					Cantidad: this.getNodeParameter('quantity', 0) as number, // No se está tipando como un numero entero, pero debería serlo segun la doc de la API
+					Cantidad: this.getNodeParameter('quantity', 0) as number,
 					FechaDocumento: this.getNodeParameter('documentDate', 0) as string,
 				};
 
@@ -526,7 +527,6 @@ export class Centum implements INodeType {
 				}
 
 				try {
-					console.log("SEARCH CUSTOMER RESULT: ", razonSocial, customerEmail, dni);
 					const searches: Search[] = [
 						{ queryParams: { email: customerEmail }, description: 'email' },
 						...(tipoDocumento === 'dni' && dni
@@ -583,7 +583,7 @@ export class Centum implements INodeType {
 					const result = user && user.CantidadTotalItems === 1 ? user.Items : [];
 					return [this.helpers.returnJsonArray(result as any)];
 				} catch (error) {
-					console.log('💥 Error general en búsqueda de cliente:', error);
+					console.log('Error general en búsqueda de cliente:', error);
 					return [this.helpers.returnJsonArray((error as any).response?.data?.Items || [])];
 				}
 

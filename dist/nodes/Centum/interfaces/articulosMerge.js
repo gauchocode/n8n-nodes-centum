@@ -5,18 +5,18 @@ var AbreviaturaMerge;
 (function (AbreviaturaMerge) {
     AbreviaturaMerge["Col"] = "COL";
     AbreviaturaMerge["Med"] = "MED";
-})(AbreviaturaMerge = exports.AbreviaturaMerge || (exports.AbreviaturaMerge = {}));
+})(AbreviaturaMerge || (exports.AbreviaturaMerge = AbreviaturaMerge = {}));
 var AtributosArticuloNombreMerge;
 (function (AtributosArticuloNombreMerge) {
     AtributosArticuloNombreMerge["Color"] = "COLOR ";
     AtributosArticuloNombreMerge["Medidas"] = "MEDIDAS";
-})(AtributosArticuloNombreMerge = exports.AtributosArticuloNombreMerge || (exports.AtributosArticuloNombreMerge = {}));
+})(AtributosArticuloNombreMerge || (exports.AtributosArticuloNombreMerge = AtributosArticuloNombreMerge = {}));
 var DetalleMerge;
 (function (DetalleMerge) {
     DetalleMerge["AlfombraRhoneDib"] = "ALFOMBRA RHONE DIB";
     DetalleMerge["Empty"] = "";
     DetalleMerge["R01Sr0108"] = "R01SR0108";
-})(DetalleMerge = exports.DetalleMerge || (exports.DetalleMerge = {}));
+})(DetalleMerge || (exports.DetalleMerge = DetalleMerge = {}));
 var CodigoMerge;
 (function (CodigoMerge) {
     CodigoMerge["Captor"] = "Captor";
@@ -30,7 +30,7 @@ var CodigoMerge;
     CodigoMerge["Muresco"] = "Muresco";
     CodigoMerge["Rielamericano"] = "Rielamericano";
     CodigoMerge["Wepel"] = "Wepel";
-})(CodigoMerge = exports.CodigoMerge || (exports.CodigoMerge = {}));
+})(CodigoMerge || (exports.CodigoMerge = CodigoMerge = {}));
 var RubroCodigoMerge;
 (function (RubroCodigoMerge) {
     RubroCodigoMerge["R01"] = "R01";
@@ -40,7 +40,7 @@ var RubroCodigoMerge;
     RubroCodigoMerge["R05"] = "R05";
     RubroCodigoMerge["R06"] = "R06";
     RubroCodigoMerge["R07"] = "R07";
-})(RubroCodigoMerge = exports.RubroCodigoMerge || (exports.RubroCodigoMerge = {}));
+})(RubroCodigoMerge || (exports.RubroCodigoMerge = RubroCodigoMerge = {}));
 var RubroNombreMerge;
 (function (RubroNombreMerge) {
     RubroNombreMerge["Alfombras"] = "ALFOMBRAS";
@@ -50,11 +50,11 @@ var RubroNombreMerge;
     RubroNombreMerge["ManoDeObra"] = "MANO DE OBRA";
     RubroNombreMerge["Revestimientos"] = "REVESTIMIENTOS";
     RubroNombreMerge["Telas"] = "TELAS";
-})(RubroNombreMerge = exports.RubroNombreMerge || (exports.RubroNombreMerge = {}));
+})(RubroNombreMerge || (exports.RubroNombreMerge = RubroNombreMerge = {}));
 var SociedadArticuloNombreMerge;
 (function (SociedadArticuloNombreMerge) {
     SociedadArticuloNombreMerge["SociedadDeArt\u00EDculoDefecto"] = "Sociedad de Art\u00EDculo Defecto";
-})(SociedadArticuloNombreMerge = exports.SociedadArticuloNombreMerge || (exports.SociedadArticuloNombreMerge = {}));
+})(SociedadArticuloNombreMerge || (exports.SociedadArticuloNombreMerge = SociedadArticuloNombreMerge = {}));
 var SubRubroNombreMerge;
 (function (SubRubroNombreMerge) {
     SubRubroNombreMerge["Adhesivos"] = "ADHESIVOS";
@@ -82,5 +82,5 @@ var SubRubroNombreMerge;
     SubRubroNombreMerge["SistemasYMecanismos"] = "SISTEMAS Y MECANISMOS";
     SubRubroNombreMerge["TelasParaCortinas"] = "TELAS PARA CORTINAS";
     SubRubroNombreMerge["Textiles"] = "TEXTILES";
-})(SubRubroNombreMerge = exports.SubRubroNombreMerge || (exports.SubRubroNombreMerge = {}));
+})(SubRubroNombreMerge || (exports.SubRubroNombreMerge = SubRubroNombreMerge = {}));
 //# sourceMappingURL=articulosMerge.js.map

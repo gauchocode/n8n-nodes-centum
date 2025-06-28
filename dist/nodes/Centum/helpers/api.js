@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.apiRequest = void 0;
+exports.apiRequest = apiRequest;
 async function apiRequest(url, options = {}, context) {
     const { method = 'GET', headers = {}, body, queryParams, responseType = 'json' } = options;
     let finalUrl = url;
@@ -45,5 +45,4 @@ async function apiRequest(url, options = {}, context) {
         throw error;
     }
 }
-exports.apiRequest = apiRequest;
 //# sourceMappingURL=api.js.map

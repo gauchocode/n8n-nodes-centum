@@ -11,6 +11,7 @@ class CentumApi {
                 displayName: 'Public Access Key',
                 name: 'publicAccessKey',
                 type: 'string',
+                typeOptions: { password: true },
                 default: '',
             },
             {

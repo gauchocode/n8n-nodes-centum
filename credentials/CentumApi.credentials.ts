@@ -9,6 +9,7 @@ export class CentumApi implements ICredentialType {
 			displayName: 'Public Access Key',
 			name: 'publicAccessKey',
 			type: 'string',
+			typeOptions: { password: true },
 			default: '',
 		},
 		{

@@ -4,63 +4,63 @@ exports.CodigoCustomer = exports.VendedorNombre = exports.VendedorCodigo = expor
 var BonificacionCodigo;
 (function (BonificacionCodigo) {
     BonificacionCodigo["The01"] = "01 ";
-})(BonificacionCodigo = exports.BonificacionCodigo || (exports.BonificacionCodigo = {}));
+})(BonificacionCodigo || (exports.BonificacionCodigo = BonificacionCodigo = {}));
 var CanalClienteCodigo;
 (function (CanalClienteCodigo) {
     CanalClienteCodigo["Gcy"] = "GCY";
     CanalClienteCodigo["Kio"] = "KIO";
     CanalClienteCodigo["Otr"] = "OTR";
-})(CanalClienteCodigo = exports.CanalClienteCodigo || (exports.CanalClienteCodigo = {}));
+})(CanalClienteCodigo || (exports.CanalClienteCodigo = CanalClienteCodigo = {}));
 var CanalClienteNombre;
 (function (CanalClienteNombre) {
     CanalClienteNombre["Grocery"] = "Grocery";
     CanalClienteNombre["Kiosco"] = "Kiosco";
     CanalClienteNombre["Otros"] = "Otros";
-})(CanalClienteNombre = exports.CanalClienteNombre || (exports.CanalClienteNombre = {}));
+})(CanalClienteNombre || (exports.CanalClienteNombre = CanalClienteNombre = {}));
 var CigarreraClienteCodigo;
 (function (CigarreraClienteCodigo) {
     CigarreraClienteCodigo["Msp"] = "MSP";
-})(CigarreraClienteCodigo = exports.CigarreraClienteCodigo || (exports.CigarreraClienteCodigo = {}));
+})(CigarreraClienteCodigo || (exports.CigarreraClienteCodigo = CigarreraClienteCodigo = {}));
 var CigarreraClienteNombre;
 (function (CigarreraClienteNombre) {
     CigarreraClienteNombre["MassalinParticulares"] = "Massalin Particulares";
-})(CigarreraClienteNombre = exports.CigarreraClienteNombre || (exports.CigarreraClienteNombre = {}));
+})(CigarreraClienteNombre || (exports.CigarreraClienteNombre = CigarreraClienteNombre = {}));
 var ClaseClienteCodigo;
 (function (ClaseClienteCodigo) {
     ClaseClienteCodigo["ClaseDefecto"] = "ClaseDefecto";
-})(ClaseClienteCodigo = exports.ClaseClienteCodigo || (exports.ClaseClienteCodigo = {}));
+})(ClaseClienteCodigo || (exports.ClaseClienteCodigo = ClaseClienteCodigo = {}));
 var ClaseClienteNombre;
 (function (ClaseClienteNombre) {
     ClaseClienteNombre["ClaseDefecto"] = "Clase Defecto";
-})(ClaseClienteNombre = exports.ClaseClienteNombre || (exports.ClaseClienteNombre = {}));
+})(ClaseClienteNombre || (exports.ClaseClienteNombre = ClaseClienteNombre = {}));
 var CondicionIIBBCodigo;
 (function (CondicionIIBBCodigo) {
     CondicionIIBBCodigo["ConvenioMultilatera"] = "Convenio Multilatera";
     CondicionIIBBCodigo["Exento"] = "Exento";
     CondicionIIBBCodigo["ResponsableInscript"] = "Responsable Inscript";
-})(CondicionIIBBCodigo = exports.CondicionIIBBCodigo || (exports.CondicionIIBBCodigo = {}));
+})(CondicionIIBBCodigo || (exports.CondicionIIBBCodigo = CondicionIIBBCodigo = {}));
 var CondicionIVACodigo;
 (function (CondicionIVACodigo) {
     CondicionIVACodigo["CF"] = "CF";
     CondicionIVACodigo["Exe"] = "EXE";
     CondicionIVACodigo["Mtb"] = "MTB";
     CondicionIVACodigo["Ri"] = "RI";
-})(CondicionIVACodigo = exports.CondicionIVACodigo || (exports.CondicionIVACodigo = {}));
+})(CondicionIVACodigo || (exports.CondicionIVACodigo = CondicionIVACodigo = {}));
 var CondicionIVANombre;
 (function (CondicionIVANombre) {
     CondicionIVANombre["ConsumidorFinal"] = "Consumidor Final";
     CondicionIVANombre["Exento"] = "Exento";
     CondicionIVANombre["Monotributo"] = "Monotributo";
     CondicionIVANombre["ResponsableInscripto"] = "Responsable Inscripto";
-})(CondicionIVANombre = exports.CondicionIVANombre || (exports.CondicionIVANombre = {}));
+})(CondicionIVANombre || (exports.CondicionIVANombre = CondicionIVANombre = {}));
 var CondicionVentaCodigo;
 (function (CondicionVentaCodigo) {
     CondicionVentaCodigo["Vta1"] = "VTA1";
-})(CondicionVentaCodigo = exports.CondicionVentaCodigo || (exports.CondicionVentaCodigo = {}));
+})(CondicionVentaCodigo || (exports.CondicionVentaCodigo = CondicionVentaCodigo = {}));
 var CondicionVentaNombre;
 (function (CondicionVentaNombre) {
     CondicionVentaNombre["Contado"] = "Contado";
-})(CondicionVentaNombre = exports.CondicionVentaNombre || (exports.CondicionVentaNombre = {}));
+})(CondicionVentaNombre || (exports.CondicionVentaNombre = CondicionVentaNombre = {}));
 var ProvinciaNombre;
 (function (ProvinciaNombre) {
     ProvinciaNombre["BuenosAires"] = "Buenos Aires";
@@ -87,37 +87,37 @@ var ProvinciaNombre;
     ProvinciaNombre["SantiagoDelEstero"] = "Santiago del Estero";
     ProvinciaNombre["TierraDelFuego"] = "Tierra del Fuego";
     ProvinciaNombre["Tucum\u00E1n"] = "Tucum\u00E1n";
-})(ProvinciaNombre = exports.ProvinciaNombre || (exports.ProvinciaNombre = {}));
+})(ProvinciaNombre || (exports.ProvinciaNombre = ProvinciaNombre = {}));
 var DiasAtencionClienteCodigo;
 (function (DiasAtencionClienteCodigo) {
     DiasAtencionClienteCodigo["LV"] = "LV";
     DiasAtencionClienteCodigo["Ld"] = "LD";
-})(DiasAtencionClienteCodigo = exports.DiasAtencionClienteCodigo || (exports.DiasAtencionClienteCodigo = {}));
+})(DiasAtencionClienteCodigo || (exports.DiasAtencionClienteCodigo = DiasAtencionClienteCodigo = {}));
 var DiasAtencionClienteNombre;
 (function (DiasAtencionClienteNombre) {
     DiasAtencionClienteNombre["LunesADomingo"] = "Lunes a Domingo";
     DiasAtencionClienteNombre["LunesAViernes"] = "Lunes a Viernes";
-})(DiasAtencionClienteNombre = exports.DiasAtencionClienteNombre || (exports.DiasAtencionClienteNombre = {}));
+})(DiasAtencionClienteNombre || (exports.DiasAtencionClienteNombre = DiasAtencionClienteNombre = {}));
 var EdadesPromedioConsumidoresClienteNombre;
 (function (EdadesPromedioConsumidoresClienteNombre) {
     EdadesPromedioConsumidoresClienteNombre["HayIgualCantidadDeConsumidores"] = "Hay igual cantidad de consumidores";
-})(EdadesPromedioConsumidoresClienteNombre = exports.EdadesPromedioConsumidoresClienteNombre || (exports.EdadesPromedioConsumidoresClienteNombre = {}));
+})(EdadesPromedioConsumidoresClienteNombre || (exports.EdadesPromedioConsumidoresClienteNombre = EdadesPromedioConsumidoresClienteNombre = {}));
 var FrecuenciaClienteNombre;
 (function (FrecuenciaClienteNombre) {
     FrecuenciaClienteNombre["FrecuenciaDefecto"] = "Frecuencia Defecto";
-})(FrecuenciaClienteNombre = exports.FrecuenciaClienteNombre || (exports.FrecuenciaClienteNombre = {}));
+})(FrecuenciaClienteNombre || (exports.FrecuenciaClienteNombre = FrecuenciaClienteNombre = {}));
 var HorarioAtencionClienteCodigo;
 (function (HorarioAtencionClienteCodigo) {
     HorarioAtencionClienteCodigo["D"] = "D";
-})(HorarioAtencionClienteCodigo = exports.HorarioAtencionClienteCodigo || (exports.HorarioAtencionClienteCodigo = {}));
+})(HorarioAtencionClienteCodigo || (exports.HorarioAtencionClienteCodigo = HorarioAtencionClienteCodigo = {}));
 var HorarioAtencionClienteNombre;
 (function (HorarioAtencionClienteNombre) {
     HorarioAtencionClienteNombre["Diurno"] = "Diurno";
-})(HorarioAtencionClienteNombre = exports.HorarioAtencionClienteNombre || (exports.HorarioAtencionClienteNombre = {}));
+})(HorarioAtencionClienteNombre || (exports.HorarioAtencionClienteNombre = HorarioAtencionClienteNombre = {}));
 var LimiteCreditoNombre;
 (function (LimiteCreditoNombre) {
     LimiteCreditoNombre["L\u00EDmiteCredito1"] = "L\u00EDmite Credito 1";
-})(LimiteCreditoNombre = exports.LimiteCreditoNombre || (exports.LimiteCreditoNombre = {}));
+})(LimiteCreditoNombre || (exports.LimiteCreditoNombre = LimiteCreditoNombre = {}));
 var ListaPrecioCodigo;
 (function (ListaPrecioCodigo) {
     ListaPrecioCodigo["Exitoweb"] = "EXITOWEB";
@@ -125,7 +125,7 @@ var ListaPrecioCodigo;
     ListaPrecioCodigo["Mlenvios"] = "MLENVIOS";
     ListaPrecioCodigo["Mlpremium"] = "MLPREMIUM";
     ListaPrecioCodigo["Mostrador"] = "MOSTRADOR";
-})(ListaPrecioCodigo = exports.ListaPrecioCodigo || (exports.ListaPrecioCodigo = {}));
+})(ListaPrecioCodigo || (exports.ListaPrecioCodigo = ListaPrecioCodigo = {}));
 var Descripcion;
 (function (Descripcion) {
     Descripcion["MercadolibrePublicacionClasica"] = "MERCADOLIBRE - PUBLICACION CLASICA";
@@ -133,31 +133,31 @@ var Descripcion;
     Descripcion["MercadolibrePublicacionesEnviosGratis"] = "MERCADOLIBRE - PUBLICACIONES ENVIOS GRATIS";
     Descripcion["TiendaOnLineExito"] = "TIENDA ON LINE EXITO.COM.AR";
     Descripcion["TiendasFisicas"] = "TIENDAS FISICAS";
-})(Descripcion = exports.Descripcion || (exports.Descripcion = {}));
+})(Descripcion || (exports.Descripcion = Descripcion = {}));
 var TransporteCodigo;
 (function (TransporteCodigo) {
     TransporteCodigo["Tra1"] = "TRA1";
-})(TransporteCodigo = exports.TransporteCodigo || (exports.TransporteCodigo = {}));
+})(TransporteCodigo || (exports.TransporteCodigo = TransporteCodigo = {}));
 var RazonSocial;
 (function (RazonSocial) {
     RazonSocial["TransporteDefecto"] = "Transporte Defecto";
-})(RazonSocial = exports.RazonSocial || (exports.RazonSocial = {}));
+})(RazonSocial || (exports.RazonSocial = RazonSocial = {}));
 var TipoDocumentoCodigo;
 (function (TipoDocumentoCodigo) {
     TipoDocumentoCodigo["Dni"] = "DNI";
-})(TipoDocumentoCodigo = exports.TipoDocumentoCodigo || (exports.TipoDocumentoCodigo = {}));
+})(TipoDocumentoCodigo || (exports.TipoDocumentoCodigo = TipoDocumentoCodigo = {}));
 var TipoDocumentoNombre;
 (function (TipoDocumentoNombre) {
     TipoDocumentoNombre["DocumentoNacionalDeIdentidad"] = "Documento Nacional de Identidad";
-})(TipoDocumentoNombre = exports.TipoDocumentoNombre || (exports.TipoDocumentoNombre = {}));
+})(TipoDocumentoNombre || (exports.TipoDocumentoNombre = TipoDocumentoNombre = {}));
 var UbicacionClienteCodigo;
 (function (UbicacionClienteCodigo) {
     UbicacionClienteCodigo["Bar"] = "BAR";
-})(UbicacionClienteCodigo = exports.UbicacionClienteCodigo || (exports.UbicacionClienteCodigo = {}));
+})(UbicacionClienteCodigo || (exports.UbicacionClienteCodigo = UbicacionClienteCodigo = {}));
 var UbicacionClienteNombre;
 (function (UbicacionClienteNombre) {
     UbicacionClienteNombre["ZonaDeBaresYBoliches"] = "Zona de Bares y Boliches";
-})(UbicacionClienteNombre = exports.UbicacionClienteNombre || (exports.UbicacionClienteNombre = {}));
+})(UbicacionClienteNombre || (exports.UbicacionClienteNombre = UbicacionClienteNombre = {}));
 var VendedorCodigo;
 (function (VendedorCodigo) {
     VendedorCodigo["V01"] = "V01";
@@ -166,7 +166,7 @@ var VendedorCodigo;
     VendedorCodigo["V06"] = "V06";
     VendedorCodigo["V09"] = "V09";
     VendedorCodigo["V10"] = "V10";
-})(VendedorCodigo = exports.VendedorCodigo || (exports.VendedorCodigo = {}));
+})(VendedorCodigo || (exports.VendedorCodigo = VendedorCodigo = {}));
 var VendedorNombre;
 (function (VendedorNombre) {
     VendedorNombre["AndreaMaidana"] = "ANDREA MAIDANA";
@@ -175,7 +175,7 @@ var VendedorNombre;
     VendedorNombre["JuanManuelValenzuela"] = "JUAN MANUEL VALENZUELA";
     VendedorNombre["Mercadolibre"] = "MERCADOLIBRE";
     VendedorNombre["The00Exito"] = "00 Exito";
-})(VendedorNombre = exports.VendedorNombre || (exports.VendedorNombre = {}));
+})(VendedorNombre || (exports.VendedorNombre = VendedorNombre = {}));
 var CodigoCustomer;
 (function (CodigoCustomer) {
     CodigoCustomer["AGonzalezChavez"] = "A. GONZALEZ CHAVEZ";
@@ -222,5 +222,5 @@ var CodigoCustomer;
     CodigoCustomer["TresDeFebrero"] = "TRES DE FEBRERO";
     CodigoCustomer["VicenteLopez"] = "VICENTE LOPEZ";
     CodigoCustomer["Zarate"] = "ZARATE";
-})(CodigoCustomer = exports.CodigoCustomer || (exports.CodigoCustomer = {}));
+})(CodigoCustomer || (exports.CodigoCustomer = CodigoCustomer = {}));
 //# sourceMappingURL=customers.js.map

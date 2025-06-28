@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.centumImageName = exports.centumGetArticleImages = exports.createJsonProducts = exports.createChargeJson = exports.createOrderSaleJson = exports.createCustomerJson = exports.createHash = void 0;
+exports.centumImageName = exports.createJsonProducts = exports.createChargeJson = exports.createOrderSaleJson = exports.createCustomerJson = exports.createHash = void 0;
+exports.centumGetArticleImages = centumGetArticleImages;
 const crypto_1 = require("crypto");
 const constants_1 = require("../constants");
 const interfaces_1 = require("../interfaces");
@@ -528,7 +529,6 @@ async function centumGetArticleImages(orderNumber, articleId, requestHeaders, re
         return e;
     }
 }
-exports.centumGetArticleImages = centumGetArticleImages;
 const centumImageName = (name, size, numberImage, fileExtension) => {
     return `${name.split(' ').join('').replace('.', '').toLocaleLowerCase()}${numberImage}_${size
         .split(' ')

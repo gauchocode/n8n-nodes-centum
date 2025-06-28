@@ -115,7 +115,6 @@ const getArticulo = [
         name: 'idSucursalFisica',
         type: 'number',
         default: '',
-        required: false,
         displayOptions: {
             show: {
                 resource: ['searchArticleBySKU'],
