@@ -18,11 +18,6 @@ export const CentumOperations: INodeProperties[] = [
 				action: 'Perform an Artículo request',
 			},
 			{
-				name: 'Articulo - ArticulosSucursalesFisica',
-				value: 'stockArticleByPhysicalBranch',
-				action: 'Perform an Artículo request',
-			},
-			{
 				name: 'Articulo - Existencia',
 				value: 'stockArticle',
 				action: 'Perform an Artículo request',
@@ -36,6 +31,21 @@ export const CentumOperations: INodeProperties[] = [
 				name: 'Articulo - Precio',
 				value: 'priceArticle',
 				action: 'Perform an Artículo request',
+			},
+			{
+				name: 'Artículo - Sucursal Física',
+				value: 'stockArticleByPhysicalBranch',
+				action: 'Perform an Artículo request',
+			},
+			{
+				name: 'Buscar Articulo Por SKU',
+				value: 'searchArticleBySKU',
+			},
+			{
+				name: 'Buscar Contribuyente',
+				value: 'buscarContribuyente',
+				description: 'Buscar contribuyente por CUIT y/o razón social',
+				action: 'Buscar contribuyente',
 			},
 			{
 				displayName: 'Cliente - Búsqueda',
@@ -63,16 +73,16 @@ export const CentumOperations: INodeProperties[] = [
 				value: 'charge',
 			},
 			{
-				name: 'Get Every Product',
-				value: 'productList',
-			},
-			{
 				name: 'JSON Producto',
 				value: 'json',
 			},
 			{
-				name: 'Lista Sucursale',
+				name: 'Lista Sucursal',
 				value: 'listBranches',
+			},
+			{
+				name: 'Obtener Productos Lista',
+				value: 'productList',
 			},
 			{
 				name: 'Pedido De Venta - Nuevo',
@@ -86,11 +96,7 @@ export const CentumOperations: INodeProperties[] = [
 			{
 				name: 'Proceso Binario a Imagen',
 				value: 'processImage',
-			},
-			{
-				name: 'Search Article By SKU',
-				value: 'searchArticleBySKU',
-			},
+			}
 		],
 		default: 'activity',
 	},
@@ -111,7 +117,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'The SKU (product code) to search for',
 	},
 	{
-		displayName: 'Physical Branch ID',
+		displayName: 'ID Sucursal Física',
 		name: 'idSucursalFisica',
 		type: 'number',
 		default: '',
@@ -123,7 +129,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'The ID of the physical branch to filter stock (optional)',
 	},
 	{
-		displayName: 'Data Imagenes',
+		displayName: 'Datos Imagen',
 		type: 'json',
 		required: true,
 		name: 'dataImg',
@@ -147,8 +153,8 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'IdCliente',
-		name: 'clientId',
+		displayName: 'Cliente ID',
+		name: 'z',
 		type: 'number',
 		required: true,
 		typeOptions: {
@@ -165,7 +171,7 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'IdsRubros',
+		displayName: 'Rubros IDs',
 		name: 'idsRubros',
 		type: 'string',
 		default: '',
@@ -177,7 +183,7 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'IdsSubRubros',
+		displayName: 'Sub-Rubros IDs',
 		name: 'idsSubRubros',
 		type: 'string',
 		default: '',
@@ -222,7 +228,7 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'FechaDocumento',
+		displayName: 'Fecha Documento',
 		name: 'documentDate',
 		type: 'dateTime',
 		required: true,
@@ -235,7 +241,7 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'migracionCompleta',
+		displayName: 'Migración Completa',
 		name: 'migracionCompleta',
 		type: 'boolean',
 		default: false,
@@ -275,7 +281,7 @@ const getArticulo: INodeProperties[] = [
 	// 	},
 	// },
 	{
-		displayName: 'idsSucursalesFisicas',
+		displayName: 'Sucursales Físicas IDs',
 		name: 'branchOfficeIds',
 		type: 'string',
 		required: true,
@@ -289,7 +295,7 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Shipping',
+		displayName: 'Información De Envío',
 		name: 'shipping',
 		required: true,
 		type: 'json',
@@ -302,7 +308,7 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'CobroId',
+		displayName: 'ID De Cobro',
 		name: 'cobroId',
 		required: true,
 		type: 'number',
@@ -339,50 +345,14 @@ const getArticulo: INodeProperties[] = [
 			},
 		},
 	},
-	// {
-	// 	displayName: 'DNI/CUIT Campo',
-	// 	name: 'dni',
-	// 	// required: true, // Uncomment if email required is needed
-	// 	type: 'string',
-	// 	default: '',
-	// 	displayOptions: {
-	// 		show: {
-	// 			resource: ['newCustomer', 'searchCustomer'],
-	// 		},
-	// 	},
-	// },
-	{
-		displayName: 'Tipo De Documento',
-		name: 'tipoDocumento',
-		type: 'options',
-		default: 'dni',
-		options: [
-			{
-				name: 'DNI',
-				value: 'dni',
-			},
-			{
-				name: 'CUIT',
-				value: 'cuit',
-			},
-		],
-		displayOptions: {
-			show: {
-				resource: ['newCustomer','searchCustomer'],
-			},
-		},
-		required: true,
-	},
 	{
 		displayName: 'DNI',
 		name: 'dni',
 		type: 'string',
 		default: '',
-		placeholder: 'Ingresá el DNI...',
 		displayOptions: {
 			show: {
 				resource: ['newCustomer', 'searchCustomer'],
-				tipoDocumento: ['dni'],
 			},
 		},
 	},
@@ -394,15 +364,13 @@ const getArticulo: INodeProperties[] = [
 		placeholder: 'Ingresá el CUIT...',
 		displayOptions: {
 			show: {
-				resource: ['newCustomer', 'searchCustomer'],
-				tipoDocumento: ['cuit'],
+				resource: ['newCustomer', 'searchCustomer', 'buscarContribuyente'],
 			},
 		},
 	},
 	{
 		displayName: 'Email',
 		name: 'email',
-		// required: true, // Uncomment if email required is needed
 		type: 'string',
 		placeholder: 'name@email.com',
 		default: 'example@example.com',
@@ -420,7 +388,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Razón social del cliente para buscar',
 		displayOptions: {
 			show: {
-				resource: ['searchCustomer'],
+				resource: ['searchCustomer', 'buscarContribuyente'],
 			},
 		},
 	},

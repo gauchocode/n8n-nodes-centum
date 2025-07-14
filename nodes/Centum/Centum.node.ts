@@ -1,4 +1,4 @@
-import {
+import type {
 	IExecuteFunctions,
 	INodeExecutionData,
 	INodeType,
@@ -59,7 +59,6 @@ export class Centum implements INodeType {
 		properties: [...CentumOperations, ...CentumFields],
 	};
 
-	// The execute method will go here
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const centumApiCredentials = await this.getCredentials('centumApi');
 		let centumUrl: any = centumApiCredentials.centumUrl;
@@ -105,12 +104,12 @@ export class Centum implements INodeType {
 					IdsRubro: IdsRubro ? [IdsRubro] : [],
 					IdsSubRubro: IdsSubRubro ? [IdsSubRubro] : [''],
 					fechaModificacionDesde: dateModified ? dateModified : '',
-					fechaModificacionImagenesDEsde: dateModifiedImage ? dateModifiedImage : '',
+					fechaModificacionImagenesDesde: dateModifiedImage ? dateModifiedImage : '',
 					fechaPrecioActualizadoDesde: priceDateModified,
 				}
 
 				try {
-					const dataArticulos = await apiRequest<IArticulos>(
+					const response = await apiRequest<IArticulos>(
 						`${centumUrl}/Articulos/Venta`,
 						{
 							method: 'POST',
@@ -121,8 +120,8 @@ export class Centum implements INodeType {
 						this,
 					);
 
-					if (dataArticulos.Articulos.Items.length > 0) {
-						const items = dataArticulos.Articulos.Items;
+					if (response.Articulos.Items.length > 0) {
+						const items = response.Articulos.Items;
 						if(!completeMigration){
 							const acc = [];
 							for (const item of items) {
@@ -155,7 +154,7 @@ export class Centum implements INodeType {
 											body,
 											queryParams: { tipoOrdenArticulos: 'Codigo' },
 										},
-										this,
+										this
 									);
 
 									if (data.Articulos.Items.length > 0) {
@@ -206,7 +205,7 @@ export class Centum implements INodeType {
 				}
 
 			case 'stockArticleByPhysicalBranch':
-				// Atención: este parámetro espera una lista de ids separados por comas
+				// Important: This endpoint returns all articles in the physical branch, separated by commas.
 				const IdSucursalFisica = this.getNodeParameter('IdSucursalFisica', 0) as string;
 
 				const queryParams: { Codigo: string; idsSucursalesFisicas?: string } = {
@@ -280,12 +279,12 @@ export class Centum implements INodeType {
 					const allArticleImages = await centumGetArticleImages(
 						1,
 						element.json.IdArticulo as NodeParameterValue,
-						{ consumerApiPublicId, publicAccessKey: String(centumApiCredentials.publicAccessKey) },
+						{ consumerApiPublicId, publicAccessKey: String(centumApiCredentials.publicAccessKey as string) },
 						requestUrl,
 					);
 
 					if (allArticleImages instanceof Error) {
-						console.error(`Falló la descarga de imágenes para artículo ${element.json.IdArticulo}`, allArticleImages);
+						console.error(`Failed to download images for article ${element.json.IdArticulo}`, allArticleImages);
 						continue;
 					}
 
@@ -431,7 +430,7 @@ export class Centum implements INodeType {
 				const formattedDate = date.replace(/\..+/, '');
 
 				try {
-					// Primer request: obtener artículos
+					// First request: get articles for the sales order
 					const arrArticles = await apiRequest<IArticulos>(
 						`${centumUrl}/Articulos/Venta`,
 						{
@@ -447,7 +446,7 @@ export class Centum implements INodeType {
 						this,
 					);
 
-					// Crear cuerpo del pedido
+					// Create the body for the sales order
 					const bodyPedidoVenta = createOrderSaleJson(
 						arrArticles.Articulos.Items,
 						customerSalesOrder as any,
@@ -456,17 +455,15 @@ export class Centum implements INodeType {
 						cobroId as CobroId
 					);
 
-					// Nuevo token para el pedido
-					const centumSuiteAccessTokenSalesOrder = createHash(
-						centumApiCredentials.publicAccessKey as string,
-					);
+					// New hash for sales order
+					const centumSuiteAccessTokenSalesOrder = createHash(centumApiCredentials.publicAccessKey as string);
 
 					const headersSalesOrder = {
 						CentumSuiteConsumidorApiPublicaId: consumerApiPublicId,
 						CentumSuiteAccessToken: centumSuiteAccessTokenSalesOrder,
 					};
 
-					// Segundo request: crear el pedido
+					// Second request: create sales order
 					const dataPedidosVenta = await apiRequest<any>(
 						`${centumUrl}/PedidosVenta`,
 						{
@@ -477,12 +474,12 @@ export class Centum implements INodeType {
 						this,
 					);
 
-					// Agregar ID de cobro antes de retornar
+					// Add charge ID to the order
 					dataPedidosVenta.IdCobro = cobroId;
 
 					return [this.helpers.returnJsonArray(dataPedidosVenta)];
 				} catch (error) {
-					console.log('Error en creación de pedido de venta:', error);
+					console.log('Error creating sales order:', error);
 					return [this.helpers.returnJsonArray([])];
 				}
 			}
@@ -514,79 +511,83 @@ export class Centum implements INodeType {
 					return [this.helpers.returnJsonArray([])];
 				}
 
-			case 'searchCustomer':
-				const customerEmail = String(this.getNodeParameter('email', 0));
-				const tipoDocumento = this.getNodeParameter('tipoDocumento', 0) as 'dni' | 'cuit';
+
+			case 'searchCustomer': {
+				const customerEmail = this.getNodeParameter('email', 0, '') as string;
 				const dni = this.getNodeParameter('dni', 0, '') as string;
 				const cuit = this.getNodeParameter('cuit', 0, '') as string;
-				const razonSocial = String(this.getNodeParameter('razonSocial', 0));
+				const razonSocial = this.getNodeParameter('razonSocial', 0, '') as string;
 
 				interface Search {
 					queryParams: Record<string, string>;
 					description: string;
 				}
 
+				const searches: Search[] = [
+					{
+						queryParams: customerEmail ? { Email: customerEmail } : {},
+						description: 'email',
+					},
+					{
+						queryParams: dni ? { Codigo: `web-${dni}` } : {},
+						description: 'DNI',
+					},
+					{
+						queryParams: cuit ? { Cuit: cuit } : {},
+						description: 'CUIT',
+					},
+					{
+						queryParams: razonSocial ? { razonSocial } : {},
+						description: 'razón social',
+					},
+				];
+
+				let user: IResponseCustomer | null = null;
+
 				try {
-					const searches: Search[] = [
-						{ queryParams: { email: customerEmail }, description: 'email' },
-						...(tipoDocumento === 'dni' && dni
-						? [{ queryParams: { Codigo: `web-${dni}` }, description: 'DNI (Código)' }]
-						: tipoDocumento === 'cuit' && cuit
-						? [{ queryParams: { CUIT: cuit }, description: 'CUIT' }]
-						: []),
-						...(razonSocial ? [{ queryParams: { RazonSocial: razonSocial }, description: 'razón social' }] : []),
-					];
-
-					let user: IResponseCustomer | null = null;
-
-					for (const search of searches) {
-						const prepareHeaders: Record<string, string> = {
-							CentumSuiteConsumidorApiPublicaId: consumerApiPublicId,
-							CentumSuiteAccessToken: centumSuiteAccessToken,
-						};
-
-						const paramValue = Object.values(search.queryParams)[0];
-						if (!paramValue || paramValue === 'undefined') {
-							console.log(`Saltando búsqueda por ${search.description}: parámetro no válido`, search.queryParams);
+					for (const { queryParams, description } of searches) {
+						if (Object.keys(queryParams).length === 0) {
+							console.log(`Skipping search by ${description}: no parameter provided`);
 							continue;
 						}
 
-						console.log(`Intentando búsqueda por ${search.description}`, {
+						const requestDetails = {
 							url: `${centumUrl}/Clientes`,
-							headers: prepareHeaders,
-							queryParams: search.queryParams,
-						});
+							headers,
+							queryParams,
+						};
 
 						try {
+							console.log(`[${description}] Request Details:`, JSON.stringify(requestDetails, null, 2));
+
 							const response = await apiRequest<IResponseCustomer>(
-								`${centumUrl}/Clientes`,
-								{ headers: prepareHeaders, queryParams: search.queryParams },
+								requestDetails.url,
+								{
+									headers: requestDetails.headers,
+									queryParams: requestDetails.queryParams,
+								},
 								this,
 							);
-							console.log(`Resultado búsqueda por ${search.description}`, {
-								CantidadTotalItems: response.CantidadTotalItems,
-							});
+
+							console.log(`[${description}] Response:`, JSON.stringify(response, null, 2));
+
 							if (response.CantidadTotalItems === 1) {
 								user = response;
 								break;
 							}
 						} catch (error) {
-							console.log(`Error en búsqueda de cliente por ${search.description}`, {
-								error,
-								headers: prepareHeaders,
-								queryParams: search.queryParams,
-							});
+							console.log(`[${description}] Error during API request:`, { error, requestDetails });
 							continue;
 						}
-        	}
+					}
 
-					const result = user && user.CantidadTotalItems === 1 ? user.Items : [];
+					const result = user?.Items || [];
 					return [this.helpers.returnJsonArray(result as any)];
 				} catch (error) {
-					console.log('Error general en búsqueda de cliente:', error);
-					return [this.helpers.returnJsonArray((error as any).response?.data?.Items || [])];
+					console.log('General error during customer search:', error);
+					return [this.helpers.returnJsonArray([])];
 				}
-
+			}
 
 			case 'listBranches':
 				try {
@@ -615,8 +616,8 @@ export class Centum implements INodeType {
 
 				try {
 					const payload = {
-						"IdCliente": 47924, // Id del cliente de Mauri Dev Broobe
-						"FechaDocumento": "2024-05-31", //Fecha desde donde traer productos
+						"IdCliente": 47924, // ID of the client from Mauri Dev Broobe
+						"FechaDocumento": "2024-05-31", // Date from which to fetch products
 						"Habilitado": true,
 						"ActivoWeb": true
 					};

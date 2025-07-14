@@ -21,7 +21,7 @@ This node uses authenticated requests to the Centum API, ensuring secure and eff
 To use this node, ensure you have the following installed on your development machine:
 
 - **n8n**: Version 1.75.2 or higher (latest version recommended for compatibility).
-- **Node.js**: Version 18.x or higher.
+- **Node.js**: Version 20.x or higher.
 - **npm**: Required for installing and building the plugin.
 - **Git**: For cloning the repository.
 - **Centum API Access**: Valid credentials (`centumUrl`, `consumerApiPublicId`, `publicAccessKey`) provided by your Centum provider.

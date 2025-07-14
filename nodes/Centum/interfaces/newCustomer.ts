@@ -28,7 +28,7 @@ export interface INewCustomer {
 	RazonSocial: string;
 	Telefono?: string;
 	Transporte: Transporte;
-	UbicacionCLiente: UbicacionCliente;
+	UbicacionCliente: UbicacionCliente;
 	Vendedor: VendedorNewCustomer;
 	Zona: Zona;
 	Email: string;

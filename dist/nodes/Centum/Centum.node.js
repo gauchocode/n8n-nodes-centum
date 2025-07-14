@@ -65,18 +65,18 @@ class Centum {
                     IdsRubro: IdsRubro ? [IdsRubro] : [],
                     IdsSubRubro: IdsSubRubro ? [IdsSubRubro] : [''],
                     fechaModificacionDesde: dateModified ? dateModified : '',
-                    fechaModificacionImagenesDEsde: dateModifiedImage ? dateModifiedImage : '',
+                    fechaModificacionImagenesDesde: dateModifiedImage ? dateModifiedImage : '',
                     fechaPrecioActualizadoDesde: priceDateModified,
                 };
                 try {
-                    const dataArticulos = await (0, api_1.apiRequest)(`${centumUrl}/Articulos/Venta`, {
+                    const response = await (0, api_1.apiRequest)(`${centumUrl}/Articulos/Venta`, {
                         method: 'POST',
                         body: bodyToSend,
                         headers,
                         queryParams: { tipoOrdenArticulos: 'Codigo' }
                     }, this);
-                    if (dataArticulos.Articulos.Items.length > 0) {
-                        const items = dataArticulos.Articulos.Items;
+                    if (response.Articulos.Items.length > 0) {
+                        const items = response.Articulos.Items;
                         if (!completeMigration) {
                             const acc = [];
                             for (const item of items) {
@@ -202,7 +202,7 @@ class Centum {
                     };
                     const allArticleImages = await (0, functions_1.centumGetArticleImages)(1, element.json.IdArticulo, { consumerApiPublicId, publicAccessKey: String(centumApiCredentials.publicAccessKey) }, requestUrl);
                     if (allArticleImages instanceof Error) {
-                        console.error(`Falló la descarga de imágenes para artículo ${element.json.IdArticulo}`, allArticleImages);
+                        console.error(`Failed to download images for article ${element.json.IdArticulo}`, allArticleImages);
                         continue;
                     }
                     if (allArticleImages.length > 0) {
@@ -332,7 +332,7 @@ class Centum {
                     return [this.helpers.returnJsonArray(dataPedidosVenta)];
                 }
                 catch (error) {
-                    console.log('Error en creación de pedido de venta:', error);
+                    console.log('Error creating sales order:', error);
                     return [this.helpers.returnJsonArray([])];
                 }
             }
@@ -352,64 +352,66 @@ class Centum {
                     console.log(error);
                     return [this.helpers.returnJsonArray([])];
                 }
-            case 'searchCustomer':
-                const customerEmail = String(this.getNodeParameter('email', 0));
-                const tipoDocumento = this.getNodeParameter('tipoDocumento', 0);
+            case 'searchCustomer': {
+                const customerEmail = this.getNodeParameter('email', 0, '');
                 const dni = this.getNodeParameter('dni', 0, '');
                 const cuit = this.getNodeParameter('cuit', 0, '');
-                const razonSocial = String(this.getNodeParameter('razonSocial', 0));
+                const razonSocial = this.getNodeParameter('razonSocial', 0, '');
+                const searches = [
+                    {
+                        queryParams: customerEmail ? { Email: customerEmail } : {},
+                        description: 'email',
+                    },
+                    {
+                        queryParams: dni ? { Codigo: `web-${dni}` } : {},
+                        description: 'DNI',
+                    },
+                    {
+                        queryParams: cuit ? { Cuit: cuit } : {},
+                        description: 'CUIT',
+                    },
+                    {
+                        queryParams: razonSocial ? { razonSocial } : {},
+                        description: 'razón social',
+                    },
+                ];
+                let user = null;
                 try {
-                    const searches = [
-                        { queryParams: { email: customerEmail }, description: 'email' },
-                        ...(tipoDocumento === 'dni' && dni
-                            ? [{ queryParams: { Codigo: `web-${dni}` }, description: 'DNI (Código)' }]
-                            : tipoDocumento === 'cuit' && cuit
-                                ? [{ queryParams: { CUIT: cuit }, description: 'CUIT' }]
-                                : []),
-                        ...(razonSocial ? [{ queryParams: { RazonSocial: razonSocial }, description: 'razón social' }] : []),
-                    ];
-                    let user = null;
-                    for (const search of searches) {
-                        const prepareHeaders = {
-                            CentumSuiteConsumidorApiPublicaId: consumerApiPublicId,
-                            CentumSuiteAccessToken: centumSuiteAccessToken,
-                        };
-                        const paramValue = Object.values(search.queryParams)[0];
-                        if (!paramValue || paramValue === 'undefined') {
-                            console.log(`Saltando búsqueda por ${search.description}: parámetro no válido`, search.queryParams);
+                    for (const { queryParams, description } of searches) {
+                        if (Object.keys(queryParams).length === 0) {
+                            console.log(`Skipping search by ${description}: no parameter provided`);
                             continue;
                         }
-                        console.log(`Intentando búsqueda por ${search.description}`, {
+                        const requestDetails = {
                             url: `${centumUrl}/Clientes`,
-                            headers: prepareHeaders,
-                            queryParams: search.queryParams,
-                        });
+                            headers,
+                            queryParams,
+                        };
                         try {
-                            const response = await (0, api_1.apiRequest)(`${centumUrl}/Clientes`, { headers: prepareHeaders, queryParams: search.queryParams }, this);
-                            console.log(`Resultado búsqueda por ${search.description}`, {
-                                CantidadTotalItems: response.CantidadTotalItems,
-                            });
+                            console.log(`[${description}] Request Details:`, JSON.stringify(requestDetails, null, 2));
+                            const response = await (0, api_1.apiRequest)(requestDetails.url, {
+                                headers: requestDetails.headers,
+                                queryParams: requestDetails.queryParams,
+                            }, this);
+                            console.log(`[${description}] Response:`, JSON.stringify(response, null, 2));
                             if (response.CantidadTotalItems === 1) {
                                 user = response;
                                 break;
                             }
                         }
                         catch (error) {
-                            console.log(`Error en búsqueda de cliente por ${search.description}`, {
-                                error,
-                                headers: prepareHeaders,
-                                queryParams: search.queryParams,
-                            });
+                            console.log(`[${description}] Error during API request:`, { error, requestDetails });
                             continue;
                         }
                     }
-                    const result = user && user.CantidadTotalItems === 1 ? user.Items : [];
+                    const result = user?.Items || [];
                     return [this.helpers.returnJsonArray(result)];
                 }
                 catch (error) {
-                    console.log('Error general en búsqueda de cliente:', error);
-                    return [this.helpers.returnJsonArray(error.response?.data?.Items || [])];
+                    console.log('🚨 General error during customer search:', error);
+                    return [this.helpers.returnJsonArray([])];
                 }
+            }
             case 'listBranches':
                 try {
                     const dataListBranches = await (0, api_1.apiRequest)(`${centumUrl}/SucursalesFisicas`, {

@@ -19,11 +19,6 @@ exports.CentumOperations = [
                 action: 'Perform an Artículo request',
             },
             {
-                name: 'Articulo - ArticulosSucursalesFisica',
-                value: 'stockArticleByPhysicalBranch',
-                action: 'Perform an Artículo request',
-            },
-            {
                 name: 'Articulo - Existencia',
                 value: 'stockArticle',
                 action: 'Perform an Artículo request',
@@ -37,6 +32,17 @@ exports.CentumOperations = [
                 name: 'Articulo - Precio',
                 value: 'priceArticle',
                 action: 'Perform an Artículo request',
+            },
+            {
+                name: 'Artículo - Sucursal Física',
+                value: 'stockArticleByPhysicalBranch',
+                action: 'Perform an Artículo request',
+            },
+            {
+                name: 'Buscar Contribuyente',
+                value: 'buscarContribuyente',
+                description: 'Buscar contribuyente por CUIT y/o razón social',
+                action: 'Buscar contribuyente',
             },
             {
                 displayName: 'Cliente - Búsqueda',
@@ -64,7 +70,7 @@ exports.CentumOperations = [
                 value: 'charge',
             },
             {
-                name: 'Get Every Product',
+                name: 'Obtener Productos Lista',
                 value: 'productList',
             },
             {
@@ -72,7 +78,7 @@ exports.CentumOperations = [
                 value: 'json',
             },
             {
-                name: 'Lista Sucursale',
+                name: 'Lista Sucursal',
                 value: 'listBranches',
             },
             {
@@ -89,9 +95,9 @@ exports.CentumOperations = [
                 value: 'processImage',
             },
             {
-                name: 'Search Article By SKU',
+                name: 'Buscar Articulo Por SKU',
                 value: 'searchArticleBySKU',
-            },
+            }
         ],
         default: 'activity',
     },
@@ -111,7 +117,7 @@ const getArticulo = [
         description: 'The SKU (product code) to search for',
     },
     {
-        displayName: 'Physical Branch ID',
+        displayName: 'ID Sucursal Física',
         name: 'idSucursalFisica',
         type: 'number',
         default: '',
@@ -123,7 +129,7 @@ const getArticulo = [
         description: 'The ID of the physical branch to filter stock (optional)',
     },
     {
-        displayName: 'Data Imagenes',
+        displayName: 'Datos Imagen',
         type: 'json',
         required: true,
         name: 'dataImg',
@@ -147,8 +153,8 @@ const getArticulo = [
         },
     },
     {
-        displayName: 'IdCliente',
-        name: 'clientId',
+        displayName: 'Cliente ID',
+        name: 'z',
         type: 'number',
         required: true,
         typeOptions: {
@@ -165,7 +171,7 @@ const getArticulo = [
         },
     },
     {
-        displayName: 'IdsRubros',
+        displayName: 'Rubros IDs',
         name: 'idsRubros',
         type: 'string',
         default: '',
@@ -177,7 +183,7 @@ const getArticulo = [
         },
     },
     {
-        displayName: 'IdsSubRubros',
+        displayName: 'Sub-Rubros IDs',
         name: 'idsSubRubros',
         type: 'string',
         default: '',
@@ -222,7 +228,7 @@ const getArticulo = [
         },
     },
     {
-        displayName: 'FechaDocumento',
+        displayName: 'Fecha Documento',
         name: 'documentDate',
         type: 'dateTime',
         required: true,
@@ -235,7 +241,7 @@ const getArticulo = [
         },
     },
     {
-        displayName: 'migracionCompleta',
+        displayName: 'Migración Completa',
         name: 'migracionCompleta',
         type: 'boolean',
         default: false,
@@ -247,7 +253,7 @@ const getArticulo = [
         },
     },
     {
-        displayName: 'idsSucursalesFisicas',
+        displayName: 'Sucursales Físicas IDs',
         name: 'branchOfficeIds',
         type: 'string',
         required: true,
@@ -260,7 +266,7 @@ const getArticulo = [
         },
     },
     {
-        displayName: 'Shipping',
+        displayName: 'Información De Envío',
         name: 'shipping',
         required: true,
         type: 'json',
@@ -273,7 +279,7 @@ const getArticulo = [
         },
     },
     {
-        displayName: 'CobroId',
+        displayName: 'ID De Cobro',
         name: 'cobroId',
         required: true,
         type: 'number',
@@ -311,37 +317,13 @@ const getArticulo = [
         },
     },
     {
-        displayName: 'Tipo De Documento',
-        name: 'tipoDocumento',
-        type: 'options',
-        default: 'dni',
-        options: [
-            {
-                name: 'DNI',
-                value: 'dni',
-            },
-            {
-                name: 'CUIT',
-                value: 'cuit',
-            },
-        ],
-        displayOptions: {
-            show: {
-                resource: ['newCustomer', 'searchCustomer'],
-            },
-        },
-        required: true,
-    },
-    {
         displayName: 'DNI',
         name: 'dni',
         type: 'string',
         default: '',
-        placeholder: 'Ingresá el DNI...',
         displayOptions: {
             show: {
                 resource: ['newCustomer', 'searchCustomer'],
-                tipoDocumento: ['dni'],
             },
         },
     },
@@ -353,8 +335,7 @@ const getArticulo = [
         placeholder: 'Ingresá el CUIT...',
         displayOptions: {
             show: {
-                resource: ['newCustomer', 'searchCustomer'],
-                tipoDocumento: ['cuit'],
+                resource: ['newCustomer', 'searchCustomer', 'buscarContribuyente'],
             },
         },
     },
@@ -378,7 +359,7 @@ const getArticulo = [
         description: 'Razón social del cliente para buscar',
         displayOptions: {
             show: {
-                resource: ['searchCustomer'],
+                resource: ['searchCustomer', 'buscarContribuyente'],
             },
         },
     },

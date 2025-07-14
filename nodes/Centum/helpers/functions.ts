@@ -142,7 +142,7 @@ export const createCustomerJson = (respWoo: IWoo, dni: string) => {
 			},
 			ZonaEntrega: null,
 		},
-		UbicacionCLiente: {
+		UbicacionCliente: {
 			Codigo: 'BAR',
 			IdUbicacionCliente: 6942,
 			Nombre: 'Zona de Bares y Boliches',
