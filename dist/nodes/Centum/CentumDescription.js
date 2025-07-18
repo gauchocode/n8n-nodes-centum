@@ -39,6 +39,10 @@ exports.CentumOperations = [
                 action: 'Perform an Artículo request',
             },
             {
+                name: 'Buscar Articulo Por SKU',
+                value: 'searchArticleBySKU',
+            },
+            {
                 name: 'Buscar Contribuyente',
                 value: 'buscarContribuyente',
                 description: 'Buscar contribuyente por CUIT y/o razón social',
@@ -70,16 +74,16 @@ exports.CentumOperations = [
                 value: 'charge',
             },
             {
-                name: 'Obtener Productos Lista',
-                value: 'productList',
-            },
-            {
                 name: 'JSON Producto',
                 value: 'json',
             },
             {
                 name: 'Lista Sucursal',
                 value: 'listBranches',
+            },
+            {
+                name: 'Obtener Productos Lista',
+                value: 'productList',
             },
             {
                 name: 'Pedido De Venta - Nuevo',
@@ -93,10 +97,6 @@ exports.CentumOperations = [
             {
                 name: 'Proceso Binario a Imagen',
                 value: 'processImage',
-            },
-            {
-                name: 'Buscar Articulo Por SKU',
-                value: 'searchArticleBySKU',
             }
         ],
         default: 'activity',

@@ -5,7 +5,7 @@ import type {
 	INodeTypeDescription,
 	NodeParameterValue,
 } from 'n8n-workflow';
-import { NodeConnectionType } from 'n8n-workflow';
+import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
 
 import { apiRequest } from './helpers/api';
 import { CentumOperations, CentumFields } from './CentumDescription';
@@ -510,6 +510,45 @@ export class Centum implements INodeType {
 					console.log(error);
 					return [this.helpers.returnJsonArray([])];
 				}
+
+			case 'BuscarContribuyente': {
+				const cuit = this.getNodeParameter('cuit', 0, '') as string;
+				const razonSocial = this.getNodeParameter('razonSocial', 0, '') as string;
+
+				if (!cuit && !razonSocial) {
+					throw new NodeOperationError(this.getNode(), 'Debe proporcionar al menos CUIT o Razón Social para buscar contribuyentes.');
+				}
+
+				const queryParams: Record<string, string> = {};
+				if (cuit) queryParams.CUIT = cuit;
+				if (razonSocial) queryParams.razonSocial = razonSocial;
+
+				const requestDetails = {
+					url: `${centumUrl}/Clientes/BuscarContribuyente`,
+					headers,
+					queryParams,
+				};
+
+				try {
+					console.log(`[BuscarContribuyente] Request:`, JSON.stringify(requestDetails, null, 2));
+
+					const response = await apiRequest<IResponseCustomer>(
+						requestDetails.url,
+						{
+							headers: requestDetails.headers,
+							queryParams: requestDetails.queryParams,
+						},
+						this,
+					);
+
+					console.log(`[BuscarContribuyente] Response:`, JSON.stringify(response, null, 2));
+					return [this.helpers.returnJsonArray(response.Items as any)];
+
+				} catch (error) {
+					console.log(`[BuscarContribuyente] Error:`, error);
+					return [this.helpers.returnJsonArray([])];
+				}
+			}
 
 
 			case 'searchCustomer': {

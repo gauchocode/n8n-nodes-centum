@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Centum = void 0;
+const n8n_workflow_1 = require("n8n-workflow");
 const api_1 = require("./helpers/api");
 const CentumDescription_1 = require("./CentumDescription");
 const functions_1 = require("./helpers/functions");
@@ -352,6 +353,36 @@ class Centum {
                     console.log(error);
                     return [this.helpers.returnJsonArray([])];
                 }
+            case 'buscarContribuyente': {
+                const cuit = this.getNodeParameter('cuit', 0, '');
+                const razonSocial = this.getNodeParameter('razonSocial', 0, '');
+                if (!cuit && !razonSocial) {
+                    throw new n8n_workflow_1.NodeOperationError(this.getNode(), 'Debe proporcionar al menos CUIT o Razón Social para buscar contribuyentes.');
+                }
+                const queryParams = {};
+                if (cuit)
+                    queryParams.CUIT = cuit;
+                if (razonSocial)
+                    queryParams.razonSocial = razonSocial;
+                const requestDetails = {
+                    url: `${centumUrl}/Clientes`,
+                    headers,
+                    queryParams,
+                };
+                try {
+                    console.log(`[buscarContribuyente] Request:`, JSON.stringify(requestDetails, null, 2));
+                    const response = await (0, api_1.apiRequest)(requestDetails.url, {
+                        headers: requestDetails.headers,
+                        queryParams: requestDetails.queryParams,
+                    }, this);
+                    console.log(`[buscarContribuyente] Response:`, JSON.stringify(response, null, 2));
+                    return [this.helpers.returnJsonArray(response.Items)];
+                }
+                catch (error) {
+                    console.log(`[buscarContribuyente] Error:`, error);
+                    return [this.helpers.returnJsonArray([])];
+                }
+            }
             case 'searchCustomer': {
                 const customerEmail = this.getNodeParameter('email', 0, '');
                 const dni = this.getNodeParameter('dni', 0, '');
@@ -408,7 +439,7 @@ class Centum {
                     return [this.helpers.returnJsonArray(result)];
                 }
                 catch (error) {
-                    console.log('🚨 General error during customer search:', error);
+                    console.log('General error during customer search:', error);
                     return [this.helpers.returnJsonArray([])];
                 }
             }

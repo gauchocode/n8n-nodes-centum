@@ -43,7 +43,7 @@ export const CentumOperations: INodeProperties[] = [
 			},
 			{
 				name: 'Buscar Contribuyente',
-				value: 'buscarContribuyente',
+				value: 'BuscarContribuyente',
 				description: 'Buscar contribuyente por CUIT y/o razón social',
 				action: 'Buscar contribuyente',
 			},
