@@ -1,4 +1,4 @@
-import { BonificacionNewCustomer, INewCustomer, VendedorNewCustomer } from './newCustomer';
+import { BonificacionNewCustomer, INewCustomer, VendedorNewCustomer } from './nuevoCliente';
 import { CobroId } from './woocommerce';
 
 export interface INewPedidoVenta {

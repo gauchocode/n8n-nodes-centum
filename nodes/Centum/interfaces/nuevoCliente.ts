@@ -1,5 +1,4 @@
-import { ListaPrecio } from './customers';
-
+import { ListaPrecio } from './clientes';
 export interface INewCustomer {
 	TarifaServicio: TarifaServicio,
 	Bonificacion: BonificacionNewCustomer;
@@ -62,12 +61,24 @@ interface Zona {
 	CostoEntrega: number;
 }
 
-interface CondicionIVA {
-	IdCondicionIVA: 1892;
-	Codigo: 'CF';
-	Nombre: 'Consumidor Final';
+type CondicionIVANombre = 'Responsable Inscripto' | 'Monotributo' | 'Exento' | 'Consumidor Final';
+export interface IContribuyenteBodyInput {
+	RazonSocial: string;
+	Email: string;
+	Telefono: string;
+	CondicionIVA: {
+		Nombre: CondicionIVANombre
+	};
+	CondicionIIBB?: {
+		Codigo: string;
+	};
 }
 
+interface CondicionIVA {
+	IdCondicionIVA?: number; // si opcional
+	Codigo?: string; // opcional también
+	Nombre: CondicionIVANombre;
+}
 interface CondicionVenta {
 	IdCondicionVenta: 1;
 	Codigo: 'VTA1';
