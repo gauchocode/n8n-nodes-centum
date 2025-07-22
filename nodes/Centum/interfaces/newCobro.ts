@@ -1,4 +1,4 @@
-import { Cliente, Moneda } from './customers';
+import { Cliente, Moneda } from './clientes';
 
 export interface INewCobro {
 	Cliente: Cliente;

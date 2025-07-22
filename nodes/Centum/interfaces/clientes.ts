@@ -422,8 +422,8 @@ export enum VendedorNombre {
 
 export interface Zona {
 	IdZona: number;
-	Codigo: CodigoCustomer;
-	Nombre: CodigoCustomer;
+	Codigo: CodigoCliente;
+	Nombre: CodigoCliente;
 	Activo: boolean;
 	EntregaLunes: boolean;
 	EntregaMartes: boolean;
@@ -436,7 +436,7 @@ export interface Zona {
 	CostoEntrega: number;
 }
 
-export enum CodigoCustomer {
+export enum CodigoCliente {
 	AGonzalezChavez = 'A. GONZALEZ CHAVEZ',
 	Alberti = 'ALBERTI',
 	Avellaneda = 'AVELLANEDA',
