@@ -11,3 +11,4 @@ modelo-datos.json
 cdb-class-json-property-advanced.php
 
 !dist/node_modules
+dist/
