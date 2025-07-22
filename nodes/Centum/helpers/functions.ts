@@ -1,7 +1,7 @@
 import { randomUUID, createHash as cryptoCreateHash } from 'crypto';
 import { constantProvincias, constantsZonas } from '../constants';
-// import { TextDecoder } from 'util';
 
+// import { TextDecoder } from 'util';
 import {
 	IWoo,
 	INewCustomer,
@@ -19,8 +19,9 @@ import {
 	IGroupWoo,
 	IWooArticle,
 	ShippingLine, CobroId,
+	IContribuyenteBodyInput
 } from '../interfaces';
-import { NodeParameterValue } from 'n8n-workflow';
+import { NodeParameterValue, IExecuteFunctions, NodeOperationError } from 'n8n-workflow';
 
 export const createHash = (publicAccessKey: string): string => {
 	const uuid = randomUUID().replace(/-/gi, '');
@@ -192,20 +193,41 @@ export const createCustomerJson = (respWoo: IWoo, dni: string) => {
 		},
 	};
 
+	console.log(respWoo)
 	return customerObj;
 };
+
+
+export const createContribuyenteJson = (
+	body: IContribuyenteBodyInput,
+	cuit: string
+): Partial<INewCustomer> => {
+	return {
+		IdCliente: -1,
+		CUIT: cuit,
+		Codigo: `web-${cuit}`,
+		RazonSocial: body.RazonSocial,
+		Email: body.Email,
+		Telefono: body.Telefono,
+		CondicionIVA: {
+			Nombre: body.CondicionIVA.Nombre,
+		},
+		...(body.CondicionIIBB ? { CondicionIIBB: { Codigo: body.CondicionIIBB.Codigo } } : {}),
+	};
+};
+
 
 export const createOrderSaleJson = (
 	articles: Item[],
 	client: INewCustomer,
 	articlesOrder: LineItem[],
 	shippingSalesOrder: ShippingLine[],
-	cobroId: CobroId
+	idCobro: CobroId
 ) => {
 	let dbArticle: Item | undefined;
 	const saleOrderObj: INewPedidoVenta = {
 		Cliente: client,
-		IdCobro: cobroId,
+		IdCobro: idCobro,
 		FechaEntrega: new Date().toISOString(),
 		Vendedor: client.Vendedor,
 		Bonificacion: client.Bonificacion,
@@ -496,6 +518,11 @@ export const createJsonProducts = (arrArticles: IMergeArticulos[]) => {
 
 	for (const article of arrArticles) {
 		const obj: any = {};
+		// Nueva validación para continuar si el articulo no es json
+		if (!article?.json) {
+			console.warn('Artículo sin propiedad json:', article);
+			continue;
+		}
 
 		obj.dimensions = {
 			height: article.json.Alto * 100,
@@ -504,18 +531,20 @@ export const createJsonProducts = (arrArticles: IMergeArticulos[]) => {
 			weight: article.json.Masa,
 		};
 		obj.regular_price = article.json.Precio;
-		const description = article.json.Detalle;
+		// Actualización de description para no hacer match sobre undefined
+		const description = article?.json?.Detalle || '';
+
 		const pattern = /\/{2,}/g;
 		const matches = (description.match(pattern) || []).length;
 
 		if (matches > 0) {
 			const parts = description.split(pattern);
-
 			obj.short_description = parts[0].replace(/<[^>]+>/g, '');
 			obj.description = parts[1].replace(/^<\/\w+>/, '');
 		} else {
-			obj.description = article.json.Detalle;
+			obj.description = description;
 		}
+		// fin actualización
 
 		// obj.categories = [
 		// 	{
@@ -669,3 +698,273 @@ export const centumImageName = (
 		.replace('.', '_')
 		.toLocaleLowerCase()}.${fileExtension}`;
 };
+
+export function getEndpoint(this: IExecuteFunctions): string {
+	const endpoint = this.getNodeParameter('endpoint', 0) as string;
+
+	if (!endpoint?.trim()) {
+		throw new NodeOperationError(this.getNode(), 'El campo "Endpoint" es obligatorio.');
+	}
+
+	return endpoint;
+}
+
+export interface HttpSettings {
+	method: 'GET' | 'POST';
+	pagination: 'all' | 'default' | 'custom';
+	cantidadItemsPorPagina?: number;
+}
+
+export function getHttpSettings(this: IExecuteFunctions): HttpSettings {
+	const httpSettings = this.getNodeParameter('httpSettings', 0, {}) as HttpSettings;
+
+	console.log(httpSettings)
+	// Validación simple por si alguien lo borra desde el editor del nodo
+	if (!httpSettings.method || !['GET', 'POST'].includes(httpSettings.method)) {
+		throw new NodeOperationError(this.getNode(), 'El campo "Método HTTP" es obligatorio y debe ser GET o POST.');
+	}
+
+	if (!httpSettings.pagination || !['all', 'default', 'custom'].includes(httpSettings.pagination)) {
+		throw new NodeOperationError(this.getNode(), 'El campo "Paginación" es obligatorio y debe tener un valor válido.');
+	}
+
+	if (httpSettings.pagination === 'custom' && (!httpSettings.cantidadItemsPorPagina || httpSettings.cantidadItemsPorPagina < 1)) {
+		throw new NodeOperationError(this.getNode(), 'Debe especificar la cantidad de ítems por página en modo personalizado.');
+	}
+
+	return httpSettings;
+}
+
+export interface FetchOptions {
+	method?: 'GET' | 'POST';
+	headers?: Record<string, string>;
+	queryParams?: Record<string, string | number | boolean>;
+	body?: any; // <-- explícito
+	cantidadItemsPorPagina?: number;
+	itemsField?: string;
+	numeroPagina?: number;
+	context?: IExecuteFunctions;
+	pagination?: 'all' | 'default'| 'custom';
+	responseType?: 'json' | 'arraybuffer';
+}
+
+function safeThrow(context: IExecuteFunctions | undefined, message: string): never {
+	if (!context || !context.getNode()) {
+		throw new Error(message);
+	}
+	throw new NodeOperationError(context.getNode(), message);
+}
+
+function buildUrl(baseUrl: string, queryParams: Record<string, any> = {}): string {
+	const params = new URLSearchParams();
+	Object.entries(queryParams).forEach(([key, value]) => {
+		if (value !== undefined && value !== null) {
+			params.append(key, value.toString());
+		}
+	});
+	return params.toString() ? `${baseUrl}?${params}` : baseUrl;
+}
+
+function extractItems<T>(data: any, itemsField?: string): T[] {
+	if (itemsField && data[itemsField] && Array.isArray(data[itemsField])) {
+		return data[itemsField];
+	}
+	if (Array.isArray(data)) {
+		return data;
+	}
+	if (typeof data === 'object') {
+		const arrayField = Object.values(data).find(Array.isArray);
+		return arrayField || [data];
+	}
+	safeThrow(undefined, 'Respuesta inválida: no se encontraron items.');
+}
+
+export async function apiGetRequest<T = any>(
+	url: string,
+	options: FetchOptions = {},
+): Promise<T[]> {
+	const {
+		headers = {},
+		method = 'GET',
+		queryParams = {},
+		cantidadItemsPorPagina,
+		itemsField = 'items',
+		numeroPagina,
+		pagination = 'all',
+		context,
+	} = options;
+
+	if (!url.trim()) safeThrow(context, 'El Endpoint es obligatorio.');
+
+	const fetchOptions: RequestInit = {
+		method,
+		headers: { 'Content-Type': 'application/json', ...headers },
+	};
+
+	// Datos sin paginar si no se pasan parametros
+	if (pagination === 'default' || (!cantidadItemsPorPagina && !numeroPagina)) {
+		const finalUrl = buildUrl(url, queryParams);
+		const response = await fetch(finalUrl, fetchOptions);
+
+		if (!response.ok) {
+			const errorText = await response.text();
+			safeThrow(context, `Error GET: ${response.status} - ${errorText}`);
+		}
+
+		const data = await response.json();
+		return extractItems<T>(data, itemsField);
+	}
+
+	// Paginación automática
+	const allItems: T[] = [];
+	let currentPage = numeroPagina || 1;
+	const itemsPerPage = cantidadItemsPorPagina || 100;
+
+	while (true) {
+	const paginatedParams = {
+		...queryParams,
+		numeroPagina: currentPage,
+		cantidadItemsPorPagina: itemsPerPage,
+	};
+
+	const finalUrl = buildUrl(url, paginatedParams);
+
+	const requestHeaders = buildCentumHeaders(headers);
+
+	const response = await fetch(finalUrl, {
+		method,
+		headers: { 'Content-Type': 'application/json', ...requestHeaders },
+	});
+
+	if (!response.ok) {
+		const errorText = await response.text();
+		safeThrow(context, `Error GET (pág ${currentPage}): ${response.status} - ${errorText}`);
+	}
+
+	const data = await response.json();
+	const pageItems = extractItems<T>(data, itemsField);
+
+	allItems.push(...pageItems);
+	if (pageItems.length < itemsPerPage) break;
+
+	currentPage++;
+}
+
+
+	return allItems;
+}
+
+// POST sin paginación (con validación explícita)
+export async function apiPostRequest<T = any>(
+	url: string,
+	options: FetchOptions = {},
+): Promise<T[]> {
+	const { headers = {}, body, queryParams = {}, itemsField = 'items', context } = options;
+
+	if (!url || url.trim() === '') {
+		safeThrow(context, 'El campo "Endpoint" es obligatorio.');
+	}
+
+	if (!body) {
+		safeThrow(context, 'El cuerpo (body) de la solicitud POST es obligatorio.');
+	}
+
+	const finalUrl = buildUrl(url, queryParams);
+	const fetchOptions: RequestInit = {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json', ...headers },
+		body: JSON.stringify(body),
+	};
+
+	const response = await fetch(finalUrl, fetchOptions);
+	if (!response.ok) {
+		const errorText = await response.text();
+		safeThrow(context, `Error en la solicitud POST: ${response.status} - ${errorText}`);
+	}
+
+	const data = await response.json();
+	return extractItems<T>(data, itemsField);
+}
+
+function buildCentumHeaders(headers: Record<string, string>): Record<string, string> {
+	const newHeaders = { ...headers };
+
+	if (newHeaders.publicAccessKey) {
+		newHeaders.CentumSuiteAccessToken = createHash(newHeaders.publicAccessKey);
+		delete newHeaders.publicAccessKey;
+	}
+
+	return newHeaders;
+}
+
+
+export async function apiRequest<T>(
+  url: string,
+  options: FetchOptions = {},
+  context?: IExecuteFunctions,
+): Promise<T> {
+	// Por defecto las peticiones se hacen con el método GET y respuesta en formato JSON
+  const { method = 'GET', headers = {}, body, queryParams, responseType } = options;
+
+  let finalUrl = buildUrl(url, queryParams)
+	console.log('beforeFetch -> FINAL URL: ', finalUrl )
+
+	const requestHeaders = buildCentumHeaders(headers);
+  const fetchOptions: RequestInit = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      ...requestHeaders,
+    },
+  };
+
+  if (body) {
+    fetchOptions.body = JSON.stringify(body);
+  }
+
+  try {
+    const response = await fetch(finalUrl, fetchOptions);
+		console.log('fetch->get: ', response)
+    if (!response.ok) {
+      const errorText = await response.text();
+      const error = new Error(`Request failed with status ${response.status}: ${errorText}`);
+      if (context) {
+				console.log( "status:", response.status, errorText);
+        context.logger.error(error.message, { status: response.status, errorText });
+      }
+      throw error;
+    }
+
+    if (responseType === 'arraybuffer') {
+      return await response.arrayBuffer() as any;
+    }
+
+    return await response.json() as T;
+  } catch (error) {
+    if (context) {
+			console.log('API request failed', error );
+      context.logger.error('API request failed', { error });
+    }
+    throw error;
+  }
+}
+
+
+
+// // Método dinámico para GET o POST
+// export async function apiRequest<T = any>(
+// 	url: string,
+// 	options: FetchOptions = {},
+// ): Promise<T[]> {
+// 	const { method = 'GET', context } = options;
+
+// 	if (!['GET', 'POST'].includes(method)) {
+// 		safeThrow(context, `Método HTTP no soportado: ${method}. Use GET o POST.`);
+// 	}
+
+// 	if (method === 'GET') {
+// 		return apiGetRequest<T>(url, options);
+// 	}
+// 	return apiPostRequest<T>(url, options);
+// }
+
