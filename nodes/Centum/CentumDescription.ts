@@ -11,82 +11,96 @@ export const CentumOperations: INodeProperties[] = [
 				name: 'Actividad',
 				value: 'activity',
 				action: 'Perform an Actividad request',
+				description: 'Retorna la actividad de un pedido en especifico'
 			},
 			{
 				name: 'Artículo',
-				value: 'article',
+				value: 'articulo',
 				action: 'Perform an Artículo request',
+				description: 'Retorna un listado de artículos para vender en base a ciertos filtros'
 			},
 			{
 				name: 'Articulo - Existencia',
-				value: 'stockArticle',
+				value: 'articulosExistencia',
 				action: 'Perform an Artículo request',
+				description: 'Retorna un listado de las existencias de los artículos en base a ciertos filtros'
 			},
 			{
 				name: 'Articulo - Imagen',
-				value: 'articleImg',
-				action: 'Perform an Artículo request',
+				value: 'articulosImagenes',
+				action: 'Solicitud de las imagenes de un articulo',
+				description: 'Retorna la imagen (binario) de un artículo'
 			},
 			{
 				name: 'Articulo - Precio',
-				value: 'priceArticle',
+				value: 'precioArticulo',
 				action: 'Perform an Artículo request',
+				description: 'Retorna el valor decimal que representa el precio del artículo pidiendo una cantidad determinada en una fecha específica'
 			},
 			{
 				name: 'Artículo - Sucursal Física',
-				value: 'stockArticleByPhysicalBranch',
+				value: 'articulosSucursalesFisicas',
 				action: 'Perform an Artículo request',
-			},
-			{
-				name: 'Buscar Articulo Por SKU',
-				value: 'searchArticleBySKU',
+				description: 'Stock de articulos en la sucursal física'
 			},
 			{
 				name: 'Buscar Contribuyente',
-				value: 'BuscarContribuyente',
-				description: 'Buscar contribuyente por CUIT y/o razón social',
+				value: 'buscarContribuyente',
+				description: 'Retorna los datos del contribuyente por medio de una búsqueda por CUIT',
 				action: 'Buscar contribuyente',
+			},
+			{
+				name: 'Cliente - Actualizar',
+				value: 'clientesActualizar',
+				action: 'Actualizar un cliente',
+				description: 'Actualiza un cliente y retorna su información con la URL para acceder al recurso'
 			},
 			{
 				displayName: 'Cliente - Búsqueda',
 				name: 'Cliente - Búsqueda',
-				value: 'searchCustomer',
-				action: 'Search for a customer',
+				value: 'clientesBusqueda',
+				action: 'Buscar un cliente',
+				description: 'Retorna un listado de clientes en base a ciertos filtros'
 			},
-			{
-				name: 'Cliente - Lista',
-				value: 'customers',
-				action: 'Perform an Artículo request',
-			},
+			// DESHABILITADO TEMPORALMENTE - EN DESARROLLO
+			// {
+			// 	name: 'Cliente - Lista',
+			// 	value: 'clientes',
+			// 	action: 'Obtener lista de clientes',
+			// 	description: 'Retorna una lista con todos los clientes registrados'
+			// },
 			{
 				name: 'Cliente - Nuevo',
-				value: 'newCustomer',
-				action: 'Add new customer',
-			},
-			{
-				name: 'Cliente- Actualizar',
-				value: 'putCustomer',
-				action: 'Update a customer',
+				value: 'clienteNuevo',
+				action: 'Agregar un nuevo cliente',
+				description: 'Da de alta un cliente. Retornará el cliente creado (con su ID cargado) y la URL para acceder al nuevo recurso.'
 			},
 			{
 				name: 'Cobro - Nuevo',
-				value: 'charge',
-			},
-			{
-				name: 'JSON Producto',
-				value: 'json',
+				value: 'cobros',
+				action: 'Efectuar alta de comprobante y retornar datos.',
+				description: 'Da de alta el comprobante. Retornará el comprobante creado con su información y una URL.'
 			},
 			{
 				name: 'Lista Sucursal',
-				value: 'listBranches',
+				value: 'sucursalesFisicas',
 			},
+			// DESHABILITADO TEMPORALMENTE - EN DESARROLLO
+			// {
+			// 	name: 'Nuevo Cliente Contribuyente',
+			// 	value: 'contribuyenteNuevo',
+			// 	action: 'Agregar un nuevo cliente',
+			// 	description: 'Da de alta un cliente con los datos solicitados para una Factura A'
+			// },
 			{
-				name: 'Obtener Productos Lista',
-				value: 'productList',
+				name: 'Obtener Todos Los Producto',
+				value: 'obtenerProductos',
+				description: 'Obtener una lista con todos los productos utilizando Cliente ID'
 			},
 			{
 				name: 'Pedido De Venta - Nuevo',
-				value: 'salesOrder',
+				value: 'crearPedidoVenta',
+				description: 'Realizar pedidos de venta de los articulos'
 			},
 			{
 				name: 'Precios De Producto',
@@ -95,14 +109,38 @@ export const CentumOperations: INodeProperties[] = [
 			},
 			{
 				name: 'Proceso Binario a Imagen',
-				value: 'processImage',
-			}
+				value: 'procesarImagenes',
+			},
+			{
+				name: 'Productos WooCommerce - Generar (JSON Producto)',
+				value: 'generarProductosWoo',
+				description: 'Generar JSON estructurado para productos WooCommerce a partir de artículos Centum',
+			},
 		],
 		default: 'activity',
 	},
 ];
 
 const getArticulo: INodeProperties[] = [
+	{
+		displayName: 'Endpoint',
+		name: 'endpoint',
+		type: 'string',
+		default: '/Clientes',
+		required: true,
+		displayOptions: {
+			show: {
+				resource: [
+					'activity',
+					'clientesBusqueda',
+					'searchArticleBySKU',
+					'productPriceList'
+				],
+			},
+		},
+		placeholder: '/Clientes, /Articulos/Venta, etc.',
+		description: 'Ruta del endpoint a utilizar',
+	},
 	{
 		displayName: 'SKU',
 		name: 'sku',
@@ -136,7 +174,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['processImage'],
+				resource: ['procesarImagenes'],
 			},
 		},
 	},
@@ -148,13 +186,13 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['processImage'],
+				resource: ['procesarImagenes'],
 			},
 		},
 	},
 	{
 		displayName: 'Cliente ID',
-		name: 'z',
+		name: 'clienteId',
 		type: 'number',
 		required: true,
 		typeOptions: {
@@ -166,7 +204,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Client ID used to search the articles',
 		displayOptions: {
 			show: {
-				resource: ['article'],
+				resource: ['articulo'],
 			},
 		},
 	},
@@ -178,7 +216,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'ID Rubros used to search the articles',
 		displayOptions: {
 			show: {
-				resource: ['article'],
+				resource: ['articulo'],
 			},
 		},
 	},
@@ -190,7 +228,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Client ID used to search the articles',
 		displayOptions: {
 			show: {
-				resource: ['article'],
+				resource: ['articulo'],
 			},
 		},
 	},
@@ -201,7 +239,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['article'],
+				resource: ['articulo'],
 			},
 		},
 	},
@@ -212,7 +250,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['article'],
+				resource: ['articulo'],
 			},
 		},
 	},
@@ -223,7 +261,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['article'],
+				resource: ['articulo'],
 			},
 		},
 	},
@@ -233,10 +271,10 @@ const getArticulo: INodeProperties[] = [
 		type: 'dateTime',
 		required: true,
 		default: undefined,
-		description: 'Date for request body',
+		description: 'Parametro fecha del body para las solicitudes',
 		displayOptions: {
 			show: {
-				resource: ['article', 'priceArticle'],
+				resource: ['articulo', 'precioArticulo'],
 			},
 		},
 	},
@@ -248,7 +286,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Whether complete articles migration or partial',
 		displayOptions: {
 			show: {
-				resource: ['article', 'priceArticle'],
+				resource: ['articulo', 'precioArticulo'],
 			},
 		},
 	},
@@ -262,7 +300,7 @@ const getArticulo: INodeProperties[] = [
 	// 	description: 'Select the items that are enabled',
 	// 	displayOptions: {
 	// 		show: {
-	// 			resource: ['article', 'stockArticle'],
+	// 			resource: ['articulo', 'articulosExistencia'],
 	// 		},
 	// 	},
 	// },
@@ -276,7 +314,7 @@ const getArticulo: INodeProperties[] = [
 	// 	description: 'Select the items that are active on the web',
 	// 	displayOptions: {
 	// 		show: {
-	// 			resource: ['article', 'stockArticle'],
+	// 			resource: ['articulo', 'articulosExistencia'],
 	// 		},
 	// 	},
 	// },
@@ -290,60 +328,61 @@ const getArticulo: INodeProperties[] = [
 			'Physical branch IDs separated by comma to be able to fetch only the specified branches',
 		displayOptions: {
 			show: {
-				resource: ['stockArticle'],
+				resource: ['articulosExistencia'],
 			},
 		},
 	},
 	{
 		displayName: 'Información De Envío',
-		name: 'shipping',
+		name: 'envio',
 		required: true,
 		type: 'json',
 		default: {},
 		description: 'Shipping info from the order',
 		displayOptions: {
 			show: {
-				resource: ['charge', 'salesOrder'],
+				resource: ['cobros', 'crearPedidoVenta'],
 			},
 		},
 	},
 	{
 		displayName: 'ID De Cobro',
-		name: 'cobroId',
+		name: 'idCobro',
 		required: true,
 		type: 'number',
 		default: 0,
 		description: 'ID del cobro',
 		displayOptions: {
 			show: {
-				resource: ['salesOrder'],
+				resource: ['crearPedidoVenta'],
 			},
 		},
 	},
 	{
 		displayName: 'Cantidad',
-		name: 'quantity',
+		name: 'articuloCantidad',
 		type: 'string',
 		required: true,
 		default: '1',
-		description: 'Quantity of the same item',
+		description: 'Cantidad para este articulo',
 		displayOptions: {
 			show: {
-				resource: ['priceArticle'],
+				resource: ['precioArticulo'],
 			},
 		},
 	},
 	{
-		displayName: 'Body',
-		name: 'body',
-		required: true,
+		displayName: 'Cuerpo Del Pedido',
+		name: 'cuerpoHTTP',
 		type: 'json',
-		default: {},
+		required: true,
+		default: "",
 		displayOptions: {
 			show: {
-				resource: ['newCustomer', 'putCustomer'],
+				resource: ['clienteNuevo', 'clientesActualizar', 'contribuyenteNuevo'],
 			},
 		},
+		description: 'Información en formato JSON para crear o actualizar un cliente',
 	},
 	{
 		displayName: 'DNI',
@@ -352,7 +391,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['newCustomer', 'searchCustomer'],
+				resource: ['clienteNuevo', 'clientesBusqueda'],
 			},
 		},
 	},
@@ -364,7 +403,7 @@ const getArticulo: INodeProperties[] = [
 		placeholder: 'Ingresá el CUIT...',
 		displayOptions: {
 			show: {
-				resource: ['newCustomer', 'searchCustomer', 'buscarContribuyente'],
+				resource: ['clienteNuevo', 'clientesBusqueda', 'buscarContribuyente', 'contribuyenteNuevo'],
 			},
 		},
 	},
@@ -376,7 +415,7 @@ const getArticulo: INodeProperties[] = [
 		default: 'example@example.com',
 		displayOptions: {
 			show: {
-				resource: ['searchCustomer'],
+				resource: ['clientesBusqueda'],
 			},
 		},
 	},
@@ -388,31 +427,31 @@ const getArticulo: INodeProperties[] = [
 		description: 'Razón social del cliente para buscar',
 		displayOptions: {
 			show: {
-				resource: ['searchCustomer', 'buscarContribuyente'],
+				resource: ['buscarContribuyente'],
 			},
 		},
 	},
 	{
 		displayName: 'Cliente',
-		name: 'customer',
+		name: 'cliente',
 		required: true,
 		type: 'json',
 		default: {},
 		displayOptions: {
 			show: {
-				resource: ['salesOrder', 'charge'],
+				resource: ['crearPedidoVenta', 'cobros'],
 			},
 		},
 	},
 	{
 		displayName: 'Articulos',
-		name: 'article',
+		name: 'articulo',
 		required: true,
 		type: 'json',
 		default: {},
 		displayOptions: {
 			show: {
-				resource: ['salesOrder', 'charge'],
+				resource: ['crearPedidoVenta', 'cobros'],
 			},
 		},
 	},
@@ -424,7 +463,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['articleImg'],
+				resource: ['articulosImagenes'],
 			},
 		},
 	},
@@ -435,10 +474,79 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['stockArticleByPhysicalBranch'],
+				resource: ['articulosSucursalesFisicas'],
 			},
 		},
 	}
 ];
 
 export const CentumFields: INodeProperties[] = [...getArticulo];
+
+export const HttpOptions: INodeProperties[] = [
+	{
+		displayName: 'Ajustes HTTP',
+		name: 'httpSettings',
+		type: 'collection',
+		placeholder: 'Configuración avanzada',
+		default: {},
+		options: [
+			{
+				displayName: 'Método HTTP',
+				name: 'method',
+				type: 'options',
+				default: 'GET',
+				options: [
+					{ name: 'GET', value: 'GET' },
+					{ name: 'POST', value: 'POST' },
+				],
+				description: 'Método de solicitud HTTP a usar',
+			},
+			{
+				displayName: 'Paginación',
+				name: 'pagination',
+				type: 'options',
+				options: [
+					{
+						name: 'Default',
+						value: 'default',
+						description: 'Hace múltiples solicitudes de a 100 ítems por página',
+					},
+					{
+						name: 'Paginación Personalizada',
+						value: 'custom',
+						description: 'Permite definir la cantidad de ítems por página',
+					},
+					{
+						name: 'All',
+						value: 'all',
+						description: 'Hace una sola solicitud sin paginación',
+					},
+				],
+				default: 'default',
+				description: 'Controla cómo se solicita la información paginada',
+			},
+			{
+				displayName: 'Ítems Por Página',
+				name: 'cantidadItemsPorPagina',
+				type: 'number',
+				default: 100,
+				typeOptions: {
+					minValue: 1,
+				},
+				displayOptions: {
+					show: {
+						pagination: ['custom'],
+					},
+				},
+				description: 'Cantidad de ítems a solicitar por página (solo para modo personalizado)',
+			},
+		],
+		displayOptions: {
+			show: {
+				resource: [
+					'clientes',
+				],
+			},
+		},
+	},
+];
