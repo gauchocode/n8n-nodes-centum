@@ -1,4 +1,3 @@
-
 export interface IProvincias {
     IdProvincia: number;
     Codigo:      string;
