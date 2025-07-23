@@ -80,7 +80,7 @@ export class Centum implements INodeType {
 		const resource = this.getNodeParameter('resource', 0);
 
 		switch (resource) {
-			case 'activity':
+			case 'pedidoVentaActividad':
 				const pedidoID = this.getNodeParameter('id', 0)
 				try {
 					const dataActividad = await apiRequest<getActividad>(

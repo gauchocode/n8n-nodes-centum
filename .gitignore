@@ -12,3 +12,5 @@ cdb-class-json-property-advanced.php
 
 !dist/node_modules
 dist/
+
+n8n-nodes-centum-*.tgz

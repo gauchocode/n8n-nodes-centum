@@ -837,6 +837,7 @@ export async function apiGetRequest<T = any>(
 	console.log(`Pagination: ${options.pagination}`);
 	console.log(`Items por página: ${itemsPerPage}`);
 	console.log(`Intervalo entre requests: ${intervaloMs}ms`);
+	console.log('EADERS ANTES DE FETCH:', options.headers);
 
 	while (true) {
 		const pageStartTime = Date.now();

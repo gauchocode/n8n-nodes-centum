@@ -471,7 +471,7 @@ const getArticulo: INodeProperties[] = [
 		required: true,
 		type: 'string',
 		default: '',
-		placeholder:'',
+		placeholder:'Ej. 27231',
 		description: 'Identificador unico con el cual hacer solicitudes a la API',
 		displayOptions: {
 			show: {
