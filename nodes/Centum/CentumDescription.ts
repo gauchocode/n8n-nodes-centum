@@ -8,37 +8,31 @@ export const CentumOperations: INodeProperties[] = [
 		noDataExpression: true,
 		options: [
 			{
-				name: 'Actividad',
-				value: 'activity',
-				action: 'Perform an Actividad request',
-				description: 'Retorna la actividad de un pedido en especifico'
-			},
-			{
-				name: 'Artículo',
-				value: 'articulo',
-				action: 'Perform an Artículo request',
-				description: 'Retorna un listado de artículos para vender en base a ciertos filtros'
-			},
-			{
-				name: 'Articulo - Existencia',
+				name: 'Articulos - Existencia',
 				value: 'articulosExistencia',
 				action: 'Perform an Artículo request',
 				description: 'Retorna un listado de las existencias de los artículos en base a ciertos filtros'
 			},
 			{
-				name: 'Articulo - Imagen',
+				name: 'Articulos - Filtrado',
+				value: 'articulo',
+				action: 'Perform an Artículo request',
+				description: 'Retorna un listado de artículos para vender en base a ciertos filtros'
+			},
+			{
+				name: 'Articulos - Imagen',
 				value: 'articulosImagenes',
 				action: 'Solicitud de las imagenes de un articulo',
 				description: 'Retorna la imagen (binario) de un artículo'
 			},
 			{
-				name: 'Articulo - Precio',
+				name: 'Articulos - Precio',
 				value: 'precioArticulo',
 				action: 'Perform an Artículo request',
 				description: 'Retorna el valor decimal que representa el precio del artículo pidiendo una cantidad determinada en una fecha específica'
 			},
 			{
-				name: 'Artículo - Sucursal Física',
+				name: 'Articulos - Sucursal Física',
 				value: 'articulosSucursalesFisicas',
 				action: 'Perform an Artículo request',
 				description: 'Stock de articulos en la sucursal física'
@@ -46,7 +40,7 @@ export const CentumOperations: INodeProperties[] = [
 			{
 				name: 'Buscar Contribuyente',
 				value: 'buscarContribuyente',
-				description: 'Retorna los datos del contribuyente por medio de una búsqueda por CUIT',
+				description: 'Retorna los datos del contribuyente por medio de una búsqueda por CUIT o Razon Social',
 				action: 'Buscar contribuyente',
 			},
 			{
@@ -63,12 +57,12 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Retorna un listado de clientes en base a ciertos filtros'
 			},
 			// DESHABILITADO TEMPORALMENTE - EN DESARROLLO
-			// {
-			// 	name: 'Cliente - Lista',
-			// 	value: 'clientes',
-			// 	action: 'Obtener lista de clientes',
-			// 	description: 'Retorna una lista con todos los clientes registrados'
-			// },
+			{
+				name: 'Cliente - Lista',
+				value: 'clientes',
+				action: 'Obtener lista de clientes',
+				description: 'Retorna una lista con todos los clientes registrados'
+			},
 			{
 				name: 'Cliente - Nuevo',
 				value: 'clienteNuevo',
@@ -82,20 +76,15 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Da de alta el comprobante. Retornará el comprobante creado con su información y una URL.'
 			},
 			{
-				name: 'Lista Sucursal',
-				value: 'sucursalesFisicas',
-			},
-			// DESHABILITADO TEMPORALMENTE - EN DESARROLLO
-			// {
-			// 	name: 'Nuevo Cliente Contribuyente',
-			// 	value: 'contribuyenteNuevo',
-			// 	action: 'Agregar un nuevo cliente',
-			// 	description: 'Da de alta un cliente con los datos solicitados para una Factura A'
-			// },
-			{
-				name: 'Obtener Todos Los Producto',
+				name: 'Obtener Productos - Lista',
 				value: 'obtenerProductos',
 				description: 'Obtener una lista con todos los productos utilizando Cliente ID'
+			},
+			{
+				name: 'Pedido De Venta - Actividad',
+				value: 'pedidoVentaActividad',
+				action: 'Perform an Actividad request',
+				description: 'Traer un pedido de venta por un identificador único'
 			},
 			{
 				name: 'Pedido De Venta - Nuevo',
@@ -103,7 +92,7 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Realizar pedidos de venta de los articulos'
 			},
 			{
-				name: 'Precios De Producto',
+				name: 'Precios De Productos - Lista',
 				value: 'productPriceList',
 				action: 'Retrieves the all of the products prices'
 			},
@@ -116,8 +105,17 @@ export const CentumOperations: INodeProperties[] = [
 				value: 'generarProductosWoo',
 				description: 'Generar JSON estructurado para productos WooCommerce a partir de artículos Centum',
 			},
+			{
+				name: 'Provincias - Lista',
+				value: 'provinciasLista',
+				description: 'Generar JSON estructurado para productos WooCommerce a partir de artículos Centum',
+			},
+			{
+				name: 'Sucursales Físicas - Lista',
+				value: 'sucursalesFisicas',
+			},
 		],
-		default: 'activity',
+		default: 'pedidoVentaActividad',
 	},
 ];
 
@@ -131,10 +129,10 @@ const getArticulo: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: [
-					'activity',
-					'clientesBusqueda',
-					'searchArticleBySKU',
-					'productPriceList'
+					// 'activity',
+					// 'clientesBusqueda',
+					// 'searchArticleBySKU',
+					// 'productPriceList'
 				],
 			},
 		},
@@ -319,7 +317,7 @@ const getArticulo: INodeProperties[] = [
 	// 	},
 	// },
 	{
-		displayName: 'Sucursales Físicas IDs',
+		displayName: 'Sucursales Físicas - IDs Lista',
 		name: 'branchOfficeIds',
 		type: 'string',
 		required: true,
@@ -456,7 +454,7 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'idArticulo',
+		displayName: 'ID Articulo',
 		name: 'articleId',
 		required: true,
 		type: 'string',
@@ -468,7 +466,33 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'IdSucursalFisica',
+		displayName: 'ID',
+		name: 'id',
+		required: true,
+		type: 'string',
+		default: '',
+		placeholder:'',
+		description: 'Identificador unico con el cual hacer solicitudes a la API',
+		displayOptions: {
+			show: {
+				resource: ['pedidoVentaActividad'],
+			},
+		},
+	},
+	{
+		displayName: 'ID País (Opcional)',
+		name: 'idPais',
+		type: 'string',
+		default: '',
+		description: "ID del país por la cual se buscarán las provincias",
+		displayOptions: {
+			show: {
+				resource: ['provinciasLista'],
+			},
+		},
+	},
+	{
+		displayName: 'ID Sucursal Física',
 		name: 'IdSucursalFisica',
 		type: 'string',
 		default: '',
@@ -489,58 +513,68 @@ export const HttpOptions: INodeProperties[] = [
 		type: 'collection',
 		placeholder: 'Configuración avanzada',
 		default: {},
+options: [
+	{
+		displayName: 'Método HTTP',
+		name: 'method',
+		type: 'options',
+		default: 'GET',
+		options: [
+			{ name: 'GET', value: 'GET' },
+			{ name: 'POST', value: 'POST' },
+		],
+		description: 'Método de solicitud HTTP a usar',
+	},
+	{
+		displayName: 'Paginación',
+		name: 'pagination',
+		type: 'options',
 		options: [
 			{
-				displayName: 'Método HTTP',
-				name: 'method',
-				type: 'options',
-				default: 'GET',
-				options: [
-					{ name: 'GET', value: 'GET' },
-					{ name: 'POST', value: 'POST' },
-				],
-				description: 'Método de solicitud HTTP a usar',
+				name: 'Paginación Personalizada',
+				value: 'custom',
+				description: 'Permite definir la cantidad de ítems por página',
 			},
 			{
-				displayName: 'Paginación',
-				name: 'pagination',
-				type: 'options',
-				options: [
-					{
-						name: 'Default',
-						value: 'default',
-						description: 'Hace múltiples solicitudes de a 100 ítems por página',
-					},
-					{
-						name: 'Paginación Personalizada',
-						value: 'custom',
-						description: 'Permite definir la cantidad de ítems por página',
-					},
-					{
-						name: 'All',
-						value: 'all',
-						description: 'Hace una sola solicitud sin paginación',
-					},
-				],
-				default: 'default',
-				description: 'Controla cómo se solicita la información paginada',
-			},
-			{
-				displayName: 'Ítems Por Página',
-				name: 'cantidadItemsPorPagina',
-				type: 'number',
-				default: 100,
-				typeOptions: {
-					minValue: 1,
-				},
-				displayOptions: {
-					show: {
-						pagination: ['custom'],
-					},
-				},
-				description: 'Cantidad de ítems a solicitar por página (solo para modo personalizado)',
+				name: 'All',
+				value: 'all',
+				description: 'Trae todos los ítems paginando internamente sin opción de modificar cantidad por página ni intervalo',
 			},
 		],
+		default: 'custom',
+		description: 'Controla cómo se solicita la información paginada',
+	},
+	{
+		displayName: 'Ítems Por Página',
+		name: 'cantidadItemsPorPagina',
+		type: 'number',
+		default: 100,
+		typeOptions: {
+			minValue: 1,
+		},
+		displayOptions: {
+			show: {
+				pagination: ['custom'],
+			},
+		},
+		description: 'Cantidad de ítems a solicitar por página (solo para modo personalizado)',
+	},
+	{
+		displayName: 'Intervalo Por Pagina(ms)',
+		name: 'intervaloPagina',
+		type: 'number',
+		default: 1000,
+		typeOptions: {
+			minValue: 500,
+		},
+		displayOptions: {
+			show: {
+				pagination: ['custom'],
+			},
+		},
+		description: 'Intervalo de tiempo entre cada solicitud (En milisegundos)',
+	},
+],
 		displayOptions: {
 			show: {
 				resource: [

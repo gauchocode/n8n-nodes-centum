@@ -19,6 +19,7 @@ import {
 	IMergeArticulos,
 	ShippingLine, CobroId,
 	IContribuyenteBodyInput,
+	IProvincias
 } from './interfaces';
 
 import {
@@ -80,10 +81,10 @@ export class Centum implements INodeType {
 
 		switch (resource) {
 			case 'activity':
-
+				const pedidoID = this.getNodeParameter('id', 0)
 				try {
 					const dataActividad = await apiRequest<getActividad>(
-						`${centumUrl}/PedidosVenta/27231`,
+						`${centumUrl}/PedidosVenta/${pedidoID}`,
 						{headers},
 					);
 					return [this.helpers.returnJsonArray(dataActividad)];
@@ -364,7 +365,7 @@ export class Centum implements INodeType {
 			case 'clientes':
 				try {
 					const ajustesHTTP = getHttpSettings.call(this);
-
+					const clientesURL = `${centumUrl}/Clientes`;
 					const fetchOptions: FetchOptions = {
 						method: ajustesHTTP.method,
 						pagination: ajustesHTTP.pagination,
@@ -373,17 +374,17 @@ export class Centum implements INodeType {
 						context: this,
 						headers,
 					};
-					console.log(fetchOptions)
-					const clientes = await apiGetRequest<IResponseCustomer>(
-						`${centumUrl}/Clientes`,
-						fetchOptions,
-					);
+
+					let clientes: IResponseCustomer | IResponseCustomer[] = [];
+					const paginated = await apiGetRequest<IResponseCustomer>(clientesURL, fetchOptions);
+					clientes = paginated;
 
 					return [this.helpers.returnJsonArray(clientes as any)];
 				} catch (error) {
 					console.error('Error al obtener clientes:', error);
 					return [this.helpers.returnJsonArray([])];
 				}
+
 			case 'contribuyenteNuevo': {
 				const bodyJson = this.getNodeParameter('cuerpoHTTP', 0) as IContribuyenteBodyInput;
 				const cuit = this.getNodeParameter('cuit', 0) as string;
@@ -672,7 +673,7 @@ export class Centum implements INodeType {
 				}
 
 
-			case 'sucursalesLista':
+			case 'sucursalesFisicas':
 				try {
 					const dataListBranches = await apiRequest<any>(
 						`${centumUrl}/SucursalesFisicas`,
@@ -751,6 +752,32 @@ export class Centum implements INodeType {
 					console.log(error)
 					return [this.helpers.returnJsonArray([])];
 				}
+
+			case "provinciasLista": {
+				const idPais = this.getNodeParameter('idPais', 0, '') as string;
+
+				try {
+					const queryParams: Record<string, string | number | boolean> = {};
+
+					if (idPais) {
+						queryParams.idPais = idPais;
+					}
+
+					const provincias = await apiRequest<IProvincias[]>(
+						`${centumUrl}/Provincias`,
+						{
+							method: 'GET',
+							headers,
+							queryParams,
+						}
+					);
+
+					return [this.helpers.returnJsonArray(provincias.map(p => ({ ...p })))];
+				} catch (error) {
+					console.log(error);
+					return [this.helpers.returnJsonArray([])];
+				}
+			}
 
 			default:
 				return [this.helpers.returnJsonArray([])];

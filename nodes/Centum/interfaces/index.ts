@@ -7,3 +7,4 @@ export * from './nuevoPedidoVenta';
 export * from './newCobro';
 export * from './articulosMerge';
 export * from './wooArticle';
+export * from './provincias'

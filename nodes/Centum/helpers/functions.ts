@@ -715,9 +715,19 @@ export interface HttpSettings {
 	cantidadItemsPorPagina?: number;
 }
 
-export function getHttpSettings(this: IExecuteFunctions): HttpSettings {
-	const httpSettings = this.getNodeParameter('httpSettings', 0, {}) as HttpSettings;
+export function buildCentumHeaders(headers: Record<string, string>): Record<string, string> {
+	const newHeaders = { ...headers };
 
+	if (newHeaders.publicAccessKey) {
+		newHeaders.CentumSuiteAccessToken = createHash(newHeaders.publicAccessKey);
+		delete newHeaders.publicAccessKey;
+	}
+
+	return newHeaders;
+}
+
+export function getHttpSettings(this: IExecuteFunctions): HttpSettings & { intervaloPagina?: number } {
+	const httpSettings = this.getNodeParameter('httpSettings', 0, {}) as HttpSettings & { intervaloPagina?: number };
 	console.log(httpSettings)
 	// Validación simple por si alguien lo borra desde el editor del nodo
 	if (!httpSettings.method || !['GET', 'POST'].includes(httpSettings.method)) {
@@ -742,6 +752,7 @@ export interface FetchOptions {
 	body?: any; // <-- explícito
 	cantidadItemsPorPagina?: number;
 	itemsField?: string;
+	intervaloPagina?: number;
 	numeroPagina?: number;
 	context?: IExecuteFunctions;
 	pagination?: 'all' | 'default'| 'custom';
@@ -790,69 +801,84 @@ export async function apiGetRequest<T = any>(
 		cantidadItemsPorPagina,
 		itemsField = 'items',
 		numeroPagina,
-		pagination = 'all',
 		context,
+		pagination = 'all',
+		intervaloPagina,
 	} = options;
 
 	if (!url.trim()) safeThrow(context, 'El Endpoint es obligatorio.');
 
-	const fetchOptions: RequestInit = {
-		method,
-		headers: { 'Content-Type': 'application/json', ...headers },
-	};
 
-	// Datos sin paginar si no se pasan parametros
-	if (pagination === 'default' || (!cantidadItemsPorPagina && !numeroPagina)) {
-		const finalUrl = buildUrl(url, queryParams);
-		const response = await fetch(finalUrl, fetchOptions);
+	// const fetchOptions: RequestInit = {
+	// 	method,
+	// 	headers: { 'Content-Type': 'application/json', ...headers },
+	// };
+
+	// // Sin paginación (aún en desarrollo actualmente se usa otro metodo)
+	// if (pagination === 'default' || (!cantidadItemsPorPagina && !numeroPagina)) {
+	// 	const finalUrl = buildUrl(url, queryParams);
+	// 	const response = await fetch(finalUrl, fetchOptions);
+
+	// 	if (!response.ok) {
+	// 		const errorText = await response.text();
+	// 		safeThrow(context, `Error GET: ${response.status} - ${errorText}`);
+	// 	}
+
+	// 	const data = await response.json();
+	// 	return extractItems<T>(data, itemsField);
+	// }
+
+	console.log(options)
+	const allItems: T[] = [];
+	let currentPage = numeroPagina || 1;
+	const itemsPerPage = pagination === 'all' ? 1000 : cantidadItemsPorPagina || 100;
+	const intervaloMs = pagination === 'all' ? 200 : intervaloPagina ?? 1000;
+
+	console.log(`Pagination: ${options.pagination}`);
+	console.log(`Items por página: ${itemsPerPage}`);
+	console.log(`Intervalo entre requests: ${intervaloMs}ms`);
+
+	while (true) {
+		const pageStartTime = Date.now();
+		const paginatedParams = {
+			...queryParams,
+			numeroPagina: currentPage,
+			cantidadItemsPorPagina: itemsPerPage,
+		};
+
+		const finalUrl = buildUrl(url, paginatedParams);
+		const requestHeaders = buildCentumHeaders(headers);
+
+		const response = await fetch(finalUrl, {
+			method,
+			headers: { 'Content-Type': 'application/json', ...requestHeaders },
+		});
 
 		if (!response.ok) {
 			const errorText = await response.text();
-			safeThrow(context, `Error GET: ${response.status} - ${errorText}`);
+			safeThrow(context, `Error GET (pág ${currentPage}): ${response.status} - ${errorText}`);
 		}
 
 		const data = await response.json();
-		return extractItems<T>(data, itemsField);
+		const pageItems = extractItems<T>(data, itemsField);
+		allItems.push(...pageItems);
+
+		const durationPage = Date.now() - pageStartTime;
+
+		const logMsg = `[paginación] página: ${currentPage} - Items recibidos: ${pageItems.length} (${durationPage}ms)`;
+		context?.logger ? context.logger.info(logMsg) : console.log(logMsg);
+
+		if (pageItems.length < itemsPerPage) break;
+
+		await new Promise((resolve) => setTimeout(resolve, intervaloMs));
+		currentPage++;
 	}
 
-	// Paginación automática
-	const allItems: T[] = [];
-	let currentPage = numeroPagina || 1;
-	const itemsPerPage = cantidadItemsPorPagina || 100;
-
-	while (true) {
-	const paginatedParams = {
-		...queryParams,
-		numeroPagina: currentPage,
-		cantidadItemsPorPagina: itemsPerPage,
-	};
-
-	const finalUrl = buildUrl(url, paginatedParams);
-
-	const requestHeaders = buildCentumHeaders(headers);
-
-	const response = await fetch(finalUrl, {
-		method,
-		headers: { 'Content-Type': 'application/json', ...requestHeaders },
-	});
-
-	if (!response.ok) {
-		const errorText = await response.text();
-		safeThrow(context, `Error GET (pág ${currentPage}): ${response.status} - ${errorText}`);
-	}
-
-	const data = await response.json();
-	const pageItems = extractItems<T>(data, itemsField);
-
-	allItems.push(...pageItems);
-	if (pageItems.length < itemsPerPage) break;
-
-	currentPage++;
-}
 
 
 	return allItems;
 }
+
 
 // POST sin paginación (con validación explícita)
 export async function apiPostRequest<T = any>(
@@ -885,18 +911,6 @@ export async function apiPostRequest<T = any>(
 	const data = await response.json();
 	return extractItems<T>(data, itemsField);
 }
-
-function buildCentumHeaders(headers: Record<string, string>): Record<string, string> {
-	const newHeaders = { ...headers };
-
-	if (newHeaders.publicAccessKey) {
-		newHeaders.CentumSuiteAccessToken = createHash(newHeaders.publicAccessKey);
-		delete newHeaders.publicAccessKey;
-	}
-
-	return newHeaders;
-}
-
 
 export async function apiRequest<T>(
   url: string,
