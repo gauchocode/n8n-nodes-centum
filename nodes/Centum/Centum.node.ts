@@ -19,7 +19,8 @@ import {
 	IMergeArticulos,
 	ShippingLine, CobroId,
 	IContribuyenteBodyInput,
-	IProvincias
+	IProvincias,
+	INewCustomer
 } from './interfaces';
 
 import {
@@ -32,6 +33,7 @@ import {
 	getHttpSettings,
 	apiRequest, FetchOptions,
 	apiGetRequest, createContribuyenteJson
+
 } from './helpers/functions';
 
 type Actividad = {
@@ -80,17 +82,30 @@ export class Centum implements INodeType {
 		const resource = this.getNodeParameter('resource', 0);
 
 		switch (resource) {
+			case 'generarToken':
+
+				try {
+					const tokenGenerado = createHash(headers.publicAccessKey);
+
+					return [this.helpers.returnJsonArray(tokenGenerado as any)];
+				} catch (error) {
+					console.log(error);
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
+				}
+
 			case 'pedidoVentaActividad':
 				const pedidoID = this.getNodeParameter('id', 0)
 				try {
 					const dataActividad = await apiRequest<getActividad>(
 						`${centumUrl}/PedidosVenta/${pedidoID}`,
-						{headers},
+						{...headers},
 					);
 					return [this.helpers.returnJsonArray(dataActividad)];
 				} catch (error) {
-					console.log(error);
-					return [this.helpers.returnJsonArray([])];
+						console.log(error);
+						const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+						throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 
 			case 'articulo':
@@ -165,6 +180,8 @@ export class Centum implements INodeType {
 									}
 								} catch (error) {
 										console.log('Error en solicitud de grupo de artículos', { error });
+										const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+										throw new NodeOperationError(this.getNode(), errorMessage);
 								}
 							}
 
@@ -186,7 +203,8 @@ export class Centum implements INodeType {
 					}
 				} catch (error) {
 						console.log('Error en solicitud de artículos', error);
-					return [this.helpers.returnJsonArray([])];
+						const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+						throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 
 			case 'articulosExistencia':
@@ -204,8 +222,9 @@ export class Centum implements INodeType {
 
 					return [this.helpers.returnJsonArray(dataArticulosExistencia.Items as any)];
 				} catch (error) {
-					console.log(error);
-					return [this.helpers.returnJsonArray([])];
+						console.log('ArticulosExistencias error: ',error);
+						const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+						throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 
 			case 'articulosSucursalesFisicas':
@@ -230,8 +249,9 @@ export class Centum implements INodeType {
 					);
 					return [this.helpers.returnJsonArray(dataArticulosExistencias.Items as any)];
 				} catch (error) {
-					console.log(error);
-					return [this.helpers.returnJsonArray([])];
+						console.log(error);
+						const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+						throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 
 			case 'precioArticulo':
@@ -261,7 +281,8 @@ export class Centum implements INodeType {
 					return [this.helpers.returnJsonArray(dataArticulosPrecios as any)];
 				} catch (error) {
 					console.log(error);
-					return [this.helpers.returnJsonArray([])];
+						const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+						throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 
 			case 'articulosImagenes':
@@ -363,17 +384,21 @@ export class Centum implements INodeType {
 				return [this.helpers.returnJsonArray(result)];
 
 			case 'clientes':
+
 				try {
 					const ajustesHTTP = getHttpSettings.call(this);
 					const clientesURL = `${centumUrl}/Clientes`;
+
 					const fetchOptions: FetchOptions = {
-						method: ajustesHTTP.method,
+						method: 'GET',
 						pagination: ajustesHTTP.pagination,
 						cantidadItemsPorPagina: ajustesHTTP.cantidadItemsPorPagina,
+						intervaloPagina: ajustesHTTP.intervaloPagina,
 						itemsField: 'Items',
 						context: this,
 						headers,
 					};
+
 
 					let clientes: IResponseCustomer | IResponseCustomer[] = [];
 					const paginated = await apiGetRequest<IResponseCustomer>(clientesURL, fetchOptions);
@@ -381,18 +406,28 @@ export class Centum implements INodeType {
 
 					return [this.helpers.returnJsonArray(clientes as any)];
 				} catch (error) {
-					console.error('Error al obtener clientes:', error);
-					return [this.helpers.returnJsonArray([])];
+						const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+						throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 
-			case 'contribuyenteNuevo': {
+			case 'nuevoContribuyente': {
 				const bodyJson = this.getNodeParameter('cuerpoHTTP', 0) as IContribuyenteBodyInput;
 				const cuit = this.getNodeParameter('cuit', 0) as string;
+				console.log(bodyJson)
+				const esCUITValido = (cuit: string): boolean => {
+					return /^\d{11}$/.test(cuit);
+				};
+
+				if (!esCUITValido(cuit)) {
+					throw new NodeOperationError(this.getNode(), 'Para que el CUIT sea válido debe contener un total de 11 caracteres numéricos.');
+				}
+
 
 				const contribuyenteJSON = createContribuyenteJson(bodyJson, cuit);
-
+				console.log('ContribuyenteJSON::::::::::::::::::::::::::: ')
+				console.dir(contribuyenteJSON, { depth: null });
 				try {
-					const crearCliente = await apiRequest<any>(
+					const crearCliente = await apiRequest<Partial<INewCustomer>>(
 						`${centumUrl}/Clientes`,
 						{
 							method: 'POST',
@@ -406,7 +441,6 @@ export class Centum implements INodeType {
 					console.log(error);
 					const obj = {
 						...error.response?.data,
-						IdCliente: -1,
 					};
 					return [this.helpers.returnJsonArray([obj])];
 				}
@@ -511,7 +545,8 @@ export class Centum implements INodeType {
 					return [this.helpers.returnJsonArray(dataPedidosVenta)];
 				} catch (error) {
 					console.log('Error creating sales order:', error);
-					return [this.helpers.returnJsonArray([])];
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 			}
 
@@ -538,7 +573,8 @@ export class Centum implements INodeType {
 					return [this.helpers.returnJsonArray(dataCobros)];
 				} catch (error) {
 					console.log(error);
-					return [this.helpers.returnJsonArray([])];
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 
 			case 'buscarContribuyente': {
@@ -580,7 +616,8 @@ export class Centum implements INodeType {
 
 				} catch (error) {
 					console.log(`[BuscarContribuyente] Error:`, error);
-					return [this.helpers.returnJsonArray([])];
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 			}
 
@@ -592,7 +629,6 @@ export class Centum implements INodeType {
 						valor ? { [campo]: valor } : {};
 
 					let clientResponse: IResponseCustomer | null = null;
-
 					try {
 						// 1. Buscar por Email si se proporcionó
 						if (customerEmail) {
@@ -668,7 +704,7 @@ export class Centum implements INodeType {
 
 					} catch (error) {
 						console.log('General error during customer search:', error);
-						return [this.helpers.returnJsonArray([{ error: 'Búsqueda fallida', detalle: error }])];
+						throw new NodeOperationError(this.getNode(), `Búsqueda fallida: ${JSON.stringify(error)}`);
 					}
 				}
 
@@ -686,7 +722,8 @@ export class Centum implements INodeType {
 					return [this.helpers.returnJsonArray(dataListBranches)];
 				} catch (error) {
 					console.log(error);
-					return [this.helpers.returnJsonArray(error.response.data)];
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 
 			case 'generarProductosWoo':
@@ -750,7 +787,8 @@ export class Centum implements INodeType {
 
 				} catch (error) {
 					console.log(error)
-					return [this.helpers.returnJsonArray([])];
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 
 			case "provinciasLista": {
@@ -775,7 +813,8 @@ export class Centum implements INodeType {
 					return [this.helpers.returnJsonArray(provincias.map(p => ({ ...p })))];
 				} catch (error) {
 					console.log(error);
-					return [this.helpers.returnJsonArray([])];
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 			}
 

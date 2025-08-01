@@ -1,7 +1,6 @@
 import { randomUUID, createHash as cryptoCreateHash } from 'crypto';
-import { constantProvincias, constantsZonas } from '../constants';
+import { constantProvincias, constantsZonas, CondicionesIVA, CondicionesIIBB, CategoriasIIBB } from '../constants';
 
-// import { TextDecoder } from 'util';
 import {
 	IWoo,
 	INewCustomer,
@@ -19,7 +18,8 @@ import {
 	IGroupWoo,
 	IWooArticle,
 	ShippingLine, CobroId,
-	IContribuyenteBodyInput
+	IContribuyenteBodyInput,
+	CondicionIIBBCodigo
 } from '../interfaces';
 import { NodeParameterValue, IExecuteFunctions, NodeOperationError } from 'n8n-workflow';
 
@@ -55,8 +55,8 @@ export const createCustomerJson = (respWoo: IWoo, dni: string) => {
 			IdPais: 4657,
 			Nombre: 'Argentina',
 		},
-		DireccionEntrega: respWoo.shipping.address_1,
 		Telefono: respWoo.billing.phone,
+		DireccionEntrega: respWoo.shipping.address_1,
 		CigarreraCliente: {
 			Codigo: 'MSP',
 			IdCigarreraCliente: 6972,
@@ -201,18 +201,178 @@ export const createCustomerJson = (respWoo: IWoo, dni: string) => {
 export const createContribuyenteJson = (
 	body: IContribuyenteBodyInput,
 	cuit: string
-): Partial<INewCustomer> => {
+)  => {
 	return {
 		IdCliente: -1,
 		CUIT: cuit,
-		Codigo: `web-${cuit}`,
-		RazonSocial: body.RazonSocial,
-		Email: body.Email,
-		Telefono: body.Telefono,
-		CondicionIVA: {
-			Nombre: body.CondicionIVA.Nombre,
-		},
-		...(body.CondicionIIBB ? { CondicionIIBB: { Codigo: body.CondicionIIBB.Codigo } } : {}),
+    Codigo: `web-${cuit.slice(2, 10)}`,
+    RazonSocial: body.RazonSocial,
+    Email: body.Email || '',
+    Telefono: body.Telefono || '',
+    CodigoPostal: body.CodigoPostal,
+    Localidad: body.Localidad,
+		Direccion: `${body.Direccion} ${body.NroDireccion}${body.PisoDepartamento ? ' ' + body.PisoDepartamento : ''}`,
+    Provincia:
+      constantProvincias.find(
+        (prov) => prov.Nombre.toLocaleLowerCase() === (body.Provincia?.Nombre ?? '').toLocaleLowerCase()
+      ) || constantProvincias[5],
+    Zona:
+      constantsZonas.find(
+        (zone) => zone.Nombre.toLocaleLowerCase() === (body.Zona?.Nombre ?? '').toLocaleLowerCase()
+      ) || constantsZonas[0],
+    Pais: {
+      Codigo: 'ARG',
+      IdPais: 4657,
+      Nombre: 'Argentina',
+    },
+    CondicionIVA:
+      CondicionesIVA.find(
+        (condicion) => condicion.Nombre.toLocaleLowerCase() === 'responsable inscripto'
+      ) || {
+        IdCondicionIVA: 1895,
+        Codigo: 'RI',
+        Nombre: 'Responsable Inscripto',
+      },
+    CondicionIIBB:
+      CondicionesIIBB.find(
+        (condicion) => condicion.Codigo.toLocaleLowerCase() === (body.CondicionIIBB?.Codigo ?? '').toLocaleLowerCase()
+      ) || {
+        IdCondicionIIBB: 6051,
+        Codigo: 'Responsable Inscripto' as CondicionIIBBCodigo
+      },
+		CategoriaIIBB:
+		CategoriasIIBB.find(
+			(categoria) => categoria.Codigo.toLowerCase() ===  (body.CategoriaIIBB?.Codigo ?? '').toLocaleLowerCase()
+		)|| {
+        IdCondicionIIBB: 6054,
+        Codigo: 'Cosas Muebles'
+      }
+		,
+    NumeroIIBB: body.NumeroIIBB,
+    DireccionEntrega: body.Direccion,
+    CigarreraCliente: {
+      Codigo: 'MSP',
+      IdCigarreraCliente: 6972,
+      Nombre: 'Massalin Particulares',
+    },
+    Bonificacion: {
+      Calculada: 0,
+      Codigo: '01',
+      IdBonificacion: 6235,
+    },
+    ClaseCliente: {
+      IdClaseCliente: 6087,
+      Codigo: 'ClaseDefecto',
+      Nombre: 'Clase Defecto',
+    },
+    CadenaCliente: {
+      Codigo: '365',
+      IdCadenaCliente: 6920,
+      Nombre: '365',
+    },
+    CondicionVenta: {
+      Codigo: 'VTA1',
+      IdCondicionVenta: 1,
+      Nombre: 'Contado',
+    },
+    DiasAtencionCliente: {
+      Codigo: 'LD',
+      IdDiasAtencionCliente: 6969,
+      Nombre: 'Lunes a Domingo',
+    },
+    EdadesPromedioConsumidoresCliente: {
+      Codigo: '111',
+      IdEdadesPromedioConsumidoresCliente: 6951,
+      Nombre: 'Hay igual cantidad de consumidores',
+    },
+    FrecuenciaCliente: {
+      IdFrecuenciaCliente: 6891,
+      Nombre: 'Frecuencia Defecto',
+    },
+    GeneroPromedioConsumidoresCliente: {
+      Codigo: '11',
+      IdGeneroPromedioConsumidoresCliente: 6964,
+      Nombre: 'Hay igual cantidad de consumidores',
+    },
+    HorarioAtencionCliente: {
+      Codigo: 'D',
+      IdHorarioAtencionCliente: 6970,
+      Nombre: 'Diurno',
+    },
+    LimiteCredito: {
+      IdLimiteCredito: 46002,
+      Nombre: 'Límite Credito 1',
+      Valor: 1000000,
+    },
+    Transporte: {
+      Codigo: 'TRA1',
+      CodigoPostal: null,
+      CodigoPostalEntrega: null,
+      Direccion: null,
+      DireccionEntrega: null,
+      Email: null,
+      IdTransporte: 1,
+      Localidad: null,
+      LocalidadEntrega: null,
+      NumeroDocumento: '00000000',
+      Pais: {
+        Codigo: 'ARG',
+        IdPais: 4657,
+        Nombre: 'Argentina',
+      },
+      PaisEntrega: null,
+      Provincia: {
+        Codigo: 'BSAS',
+        IdProvincia: 4876,
+        Nombre: 'Buenos Aires',
+      },
+      ProvinciaEntrega: null,
+      RazonSocial: 'Transporte Defecto',
+      Telefono: '',
+      TipoDocumento: {
+        Codigo: 'DNI',
+        IdTipoDocumento: 6028,
+        Nombre: 'Documento Nacional de Identidad',
+      },
+      ZonaEntrega: null,
+    },
+    UbicacionCliente: {
+      Codigo: 'BAR',
+      IdUbicacionCliente: 6942,
+      Nombre: 'Zona de Bares y Boliches',
+    },
+    Vendedor: {
+      IdVendedor: 12,
+      Codigo: 'V11',
+      Nombre: 'EXITOWEB',
+      CUIT: null,
+      Direccion: null,
+      Localidad: null,
+      Telefono: null,
+      Mail: null,
+      EsSupervisor: false,
+    },
+    CanalCliente: {
+      Codigo: 'OTR',
+      IdCanalCliente: 6904,
+      Nombre: 'Otros',
+    },
+    ListaPrecio: {
+      Codigo: ListaPrecioCodigo.Exitoweb,
+      Descripcion: Descripcion.TiendaOnLineExito,
+      FechaDesde: null,
+      FechaHasta: null,
+      Habilitado: true,
+      IdListaPrecio: 3,
+      ListaPrecioAlternativa: null,
+      Moneda: {
+        Codigo: 'ARS',
+        Cotizacion: 1,
+        IdMoneda: 1,
+        Nombre: 'Peso Argentino',
+      },
+      PorcentajePrecioSugerido: 0,
+    },
 	};
 };
 
@@ -710,29 +870,25 @@ export function getEndpoint(this: IExecuteFunctions): string {
 }
 
 export interface HttpSettings {
-	method: 'GET' | 'POST';
+	method?: 'GET' | 'POST';
 	pagination: 'all' | 'default' | 'custom';
 	cantidadItemsPorPagina?: number;
 }
 
-export function buildCentumHeaders(headers: Record<string, string>): Record<string, string> {
-	const newHeaders = { ...headers };
-
-	if (newHeaders.publicAccessKey) {
-		newHeaders.CentumSuiteAccessToken = createHash(newHeaders.publicAccessKey);
-		delete newHeaders.publicAccessKey;
-	}
-
-	return newHeaders;
+export function buildCentumHeaders(consumerId: string, publicKey: string): Record<string, string> {
+  return {
+    CentumSuiteConsumidorApiPublicaId: consumerId,
+    CentumSuiteAccessToken: createHash(publicKey),
+  };
 }
 
 export function getHttpSettings(this: IExecuteFunctions): HttpSettings & { intervaloPagina?: number } {
 	const httpSettings = this.getNodeParameter('httpSettings', 0, {}) as HttpSettings & { intervaloPagina?: number };
-	console.log(httpSettings)
+	console.log('http settings: ', httpSettings)
 	// Validación simple por si alguien lo borra desde el editor del nodo
-	if (!httpSettings.method || !['GET', 'POST'].includes(httpSettings.method)) {
-		throw new NodeOperationError(this.getNode(), 'El campo "Método HTTP" es obligatorio y debe ser GET o POST.');
-	}
+	// if (!httpSettings.method || !['GET', 'POST'].includes(httpSettings.method)) {
+	// 	throw new NodeOperationError(this.getNode(), 'El campo "Método HTTP" es obligatorio y debe ser GET o POST.');
+	// }
 
 	if (!httpSettings.pagination || !['all', 'default', 'custom'].includes(httpSettings.pagination)) {
 		throw new NodeOperationError(this.getNode(), 'El campo "Paginación" es obligatorio y debe tener un valor válido.');
@@ -806,9 +962,10 @@ export async function apiGetRequest<T = any>(
 		intervaloPagina,
 	} = options;
 
+	console.log('options getRequest: ', options)
 	if (!url.trim()) safeThrow(context, 'El Endpoint es obligatorio.');
 
-
+	if( !options.method || options.method === 'POST') safeThrow(context, 'Se está intentando hacer una solicitud GET sin un metodo asignado o se asignó el metodo equivocado.');
 	// const fetchOptions: RequestInit = {
 	// 	method,
 	// 	headers: { 'Content-Type': 'application/json', ...headers },
@@ -828,19 +985,14 @@ export async function apiGetRequest<T = any>(
 	// 	return extractItems<T>(data, itemsField);
 	// }
 
-	console.log(options)
+	console.log('apiGetRequest => options:  ', options)
 	const allItems: T[] = [];
 	let currentPage = numeroPagina || 1;
 	const itemsPerPage = pagination === 'all' ? 1000 : cantidadItemsPorPagina || 100;
 	const intervaloMs = pagination === 'all' ? 200 : intervaloPagina ?? 1000;
 
-	console.log(`Pagination: ${options.pagination}`);
-	console.log(`Items por página: ${itemsPerPage}`);
-	console.log(`Intervalo entre requests: ${intervaloMs}ms`);
-	console.log('EADERS ANTES DE FETCH:', options.headers);
-
 	while (true) {
-		const pageStartTime = Date.now();
+		const totalStart = Date.now();
 		const paginatedParams = {
 			...queryParams,
 			numeroPagina: currentPage,
@@ -848,11 +1000,11 @@ export async function apiGetRequest<T = any>(
 		};
 
 		const finalUrl = buildUrl(url, paginatedParams);
-		const requestHeaders = buildCentumHeaders(headers);
+		const requestHeaders = buildCentumHeaders(headers.CentumSuiteConsumidorApiPublicaId, headers.publicAccessKey);
 
 		const response = await fetch(finalUrl, {
 			method,
-			headers: { 'Content-Type': 'application/json', ...requestHeaders },
+			headers: {...requestHeaders}
 		});
 
 		if (!response.ok) {
@@ -864,18 +1016,17 @@ export async function apiGetRequest<T = any>(
 		const pageItems = extractItems<T>(data, itemsField);
 		allItems.push(...pageItems);
 
-		const durationPage = Date.now() - pageStartTime;
+		const processingDuration = Date.now() - totalStart;
+		const nextPage = pageItems.length >= itemsPerPage;
 
-		const logMsg = `[paginación] página: ${currentPage} - Items recibidos: ${pageItems.length} (${durationPage}ms)`;
+		const logMsg = `[paginación] página: ${currentPage} - Items recibidos: ${pageItems.length} (sincronia: ${processingDuration}ms${nextPage ? '  espera ' + intervaloMs + 'ms' : ''})`;
 		context?.logger ? context.logger.info(logMsg) : console.log(logMsg);
 
-		if (pageItems.length < itemsPerPage) break;
+		if (!nextPage) break;
 
 		await new Promise((resolve) => setTimeout(resolve, intervaloMs));
 		currentPage++;
 	}
-
-
 
 	return allItems;
 }
@@ -892,14 +1043,20 @@ export async function apiPostRequest<T = any>(
 		safeThrow(context, 'El campo "Endpoint" es obligatorio.');
 	}
 
+	if( !options.method || options.method === 'GET'){
+		safeThrow(context, 'Se está intentando hacer una solicitud POST sin un metodo asignado o se asignó el metodo equivocado.');
+	}
+
 	if (!body) {
 		safeThrow(context, 'El cuerpo (body) de la solicitud POST es obligatorio.');
 	}
+	const requestHeaders = buildCentumHeaders(headers.CentumSuiteConsumidorApiPublicaId, headers.publicAccessKey);
+
 
 	const finalUrl = buildUrl(url, queryParams);
 	const fetchOptions: RequestInit = {
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json', ...headers },
+		headers: { 'Content-Type': 'application/json', ...requestHeaders},
 		body: JSON.stringify(body),
 	};
 
@@ -913,56 +1070,54 @@ export async function apiPostRequest<T = any>(
 	return extractItems<T>(data, itemsField);
 }
 
-export async function apiRequest<T>(
-  url: string,
-  options: FetchOptions = {},
-  context?: IExecuteFunctions,
-): Promise<T> {
-	// Por defecto las peticiones se hacen con el método GET y respuesta en formato JSON
-  const { method = 'GET', headers = {}, body, queryParams, responseType } = options;
+	export async function apiRequest<T>(
+		url: string,
+		options: FetchOptions = {},
+		context?: IExecuteFunctions,
+	): Promise<T> {
+		// Por defecto las peticiones se hacen con el método GET y respuesta en formato JSON
+		const { method = 'GET', headers = {}, body, queryParams, responseType } = options;
+		console.log(options)
+		let finalUrl = buildUrl(url, queryParams)
 
-  let finalUrl = buildUrl(url, queryParams)
-	console.log('beforeFetch -> FINAL URL: ', finalUrl )
+		console.log('fetch url: ',finalUrl)
+		const requestHeaders = buildCentumHeaders(headers.CentumSuiteConsumidorApiPublicaId, headers.publicAccessKey);
+		const fetchOptions: RequestInit = {
+			method,
+			headers: {...requestHeaders},
+		};
 
-	const requestHeaders = buildCentumHeaders(headers);
-  const fetchOptions: RequestInit = {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-      ...requestHeaders,
-    },
-  };
+		if (body) {
+			fetchOptions.body = JSON.stringify(body);
+		}
 
-  if (body) {
-    fetchOptions.body = JSON.stringify(body);
-  }
+		try {
 
-  try {
-    const response = await fetch(finalUrl, fetchOptions);
-		console.log('fetch->get: ', response)
-    if (!response.ok) {
-      const errorText = await response.text();
-      const error = new Error(`Request failed with status ${response.status}: ${errorText}`);
-      if (context) {
-				console.log( "status:", response.status, errorText);
-        context.logger.error(error.message, { status: response.status, errorText });
-      }
-      throw error;
-    }
+			const response = await fetch(finalUrl, fetchOptions);
+			console.log(`apiRequest(): fetch method:${method}`, response)
+			if (!response.ok) {
+				const errorText = await response.text();
+				const error = new Error(`Request failed with status ${response.status}: ${errorText}`);
+				if (context) {
+					console.log( "status:", response.status, errorText);
+					context.logger.error(error.message, { status: response.status, errorText });
+				}
+				throw error;
+			}
 
-    if (responseType === 'arraybuffer') {
-      return await response.arrayBuffer() as any;
-    }
+			if (responseType === 'arraybuffer') {
+				return await response.arrayBuffer() as any;
+			}
 
-    return await response.json() as T;
-  } catch (error) {
-    if (context) {
-			console.log('API request failed', error );
-      context.logger.error('API request failed', { error });
-    }
-    throw error;
-  }
-}
+			return await response.json() as T;
+		} catch (error) {
+			if (context) {
+				console.log('API request failed', error );
+				context.logger.error('API request failed', { error });
+			}
+			throw error;
+		}
+	}
 
 
 

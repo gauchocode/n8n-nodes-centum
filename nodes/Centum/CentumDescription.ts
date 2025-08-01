@@ -8,6 +8,12 @@ export const CentumOperations: INodeProperties[] = [
 		noDataExpression: true,
 		options: [
 			{
+				name: '_Token De Acceso - Generación',
+				value: 'generarToken',
+				action: 'Genera un nuevo token',
+				description: 'Genera un nuevo token para utilizarlo con una herramienta externa como postman'
+			},
+			{
 				name: 'Articulos - Existencia',
 				value: 'articulosExistencia',
 				action: 'Perform an Artículo request',
@@ -38,12 +44,6 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Stock de articulos en la sucursal física'
 			},
 			{
-				name: 'Buscar Contribuyente',
-				value: 'buscarContribuyente',
-				description: 'Retorna los datos del contribuyente por medio de una búsqueda por CUIT o Razon Social',
-				action: 'Buscar contribuyente',
-			},
-			{
 				name: 'Cliente - Actualizar',
 				value: 'clientesActualizar',
 				action: 'Actualizar un cliente',
@@ -56,7 +56,6 @@ export const CentumOperations: INodeProperties[] = [
 				action: 'Buscar un cliente',
 				description: 'Retorna un listado de clientes en base a ciertos filtros'
 			},
-			// DESHABILITADO TEMPORALMENTE - EN DESARROLLO
 			{
 				name: 'Cliente - Lista',
 				value: 'clientes',
@@ -68,6 +67,18 @@ export const CentumOperations: INodeProperties[] = [
 				value: 'clienteNuevo',
 				action: 'Agregar un nuevo cliente',
 				description: 'Da de alta un cliente. Retornará el cliente creado (con su ID cargado) y la URL para acceder al nuevo recurso.'
+			},
+			{
+				name: 'Cliente Contribuyente - Busqueda',
+				value: 'buscarContribuyente',
+				description: 'Retorna los datos del contribuyente por medio de una búsqueda por CUIT o Razon Social',
+				action: 'Buscar contribuyente',
+			},
+			{
+				name: 'Cliente Contribuyente - Nuevo',
+				value: 'nuevoContribuyente',
+				description: 'Da de alta un cliente contribuyente nuevo. Retornará al cliente creado (con su ID cargado) y la URL para acceder al nuevo recurso.',
+				action: 'Crear nuevo contribuyente',
 			},
 			{
 				name: 'Cobro - Nuevo',
@@ -377,7 +388,7 @@ const getArticulo: INodeProperties[] = [
 		default: "",
 		displayOptions: {
 			show: {
-				resource: ['clienteNuevo', 'clientesActualizar', 'contribuyenteNuevo'],
+				resource: ['clienteNuevo', 'clientesActualizar', 'nuevoContribuyente'],
 			},
 		},
 		description: 'Información en formato JSON para crear o actualizar un cliente',
@@ -401,7 +412,7 @@ const getArticulo: INodeProperties[] = [
 		placeholder: 'Ingresá el CUIT...',
 		displayOptions: {
 			show: {
-				resource: ['clienteNuevo', 'clientesBusqueda', 'buscarContribuyente', 'contribuyenteNuevo'],
+				resource: ['clienteNuevo', 'clientesBusqueda', 'buscarContribuyente', 'nuevoContribuyente'],
 			},
 		},
 	},
@@ -513,68 +524,57 @@ export const HttpOptions: INodeProperties[] = [
 		type: 'collection',
 		placeholder: 'Configuración avanzada',
 		default: {},
-options: [
-	{
-		displayName: 'Método HTTP',
-		name: 'method',
-		type: 'options',
-		default: 'GET',
-		options: [
-			{ name: 'GET', value: 'GET' },
-			{ name: 'POST', value: 'POST' },
-		],
-		description: 'Método de solicitud HTTP a usar',
-	},
-	{
-		displayName: 'Paginación',
-		name: 'pagination',
-		type: 'options',
 		options: [
 			{
-				name: 'Paginación Personalizada',
-				value: 'custom',
-				description: 'Permite definir la cantidad de ítems por página',
+				displayName: 'Paginación',
+				name: 'pagination',
+				type: 'options',
+				options: [
+					{
+						name: 'Paginación Personalizada',
+						value: 'custom',
+						description: 'Permite definir la cantidad de ítems por página',
+					},
+					{
+						name: 'All',
+						value: 'all',
+						description: 'Trae todos los ítems paginando internamente sin opción de modificar cantidad por página ni intervalo',
+					},
+				],
+				default: 'custom',
+				description: 'Controla cómo se solicita la información paginada',
 			},
 			{
-				name: 'All',
-				value: 'all',
-				description: 'Trae todos los ítems paginando internamente sin opción de modificar cantidad por página ni intervalo',
+				displayName: 'Ítems Por Página',
+				name: 'cantidadItemsPorPagina',
+				type: 'number',
+				default: 100,
+				typeOptions: {
+					minValue: 1,
+				},
+				displayOptions: {
+					show: {
+						pagination: ['custom'],
+					},
+				},
+				description: 'Cantidad de ítems a solicitar por página (solo para modo personalizado)',
+			},
+			{
+				displayName: 'Intervalo Por Pagina(ms)',
+				name: 'intervaloPagina',
+				type: 'number',
+				default: 1000,
+				typeOptions: {
+					minValue: 500,
+				},
+				displayOptions: {
+					show: {
+						pagination: ['custom'],
+					},
+				},
+				description: 'Intervalo de tiempo entre cada solicitud (En milisegundos)',
 			},
 		],
-		default: 'custom',
-		description: 'Controla cómo se solicita la información paginada',
-	},
-	{
-		displayName: 'Ítems Por Página',
-		name: 'cantidadItemsPorPagina',
-		type: 'number',
-		default: 100,
-		typeOptions: {
-			minValue: 1,
-		},
-		displayOptions: {
-			show: {
-				pagination: ['custom'],
-			},
-		},
-		description: 'Cantidad de ítems a solicitar por página (solo para modo personalizado)',
-	},
-	{
-		displayName: 'Intervalo Por Pagina(ms)',
-		name: 'intervaloPagina',
-		type: 'number',
-		default: 1000,
-		typeOptions: {
-			minValue: 500,
-		},
-		displayOptions: {
-			show: {
-				pagination: ['custom'],
-			},
-		},
-		description: 'Intervalo de tiempo entre cada solicitud (En milisegundos)',
-	},
-],
 		displayOptions: {
 			show: {
 				resource: [

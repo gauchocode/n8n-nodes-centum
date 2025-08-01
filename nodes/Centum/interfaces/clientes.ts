@@ -167,6 +167,11 @@ export enum CondicionIVANombre {
 	ResponsableInscripto = 'Responsable Inscripto',
 }
 
+export interface CondicionIIBB {
+	IdCondicionIIBB: number,
+	Codigo: CondicionIIBBCodigo
+}
+
 export interface CondicionVenta {
 	IdCondicionVenta: number;
 	Codigo: CondicionVentaCodigo;

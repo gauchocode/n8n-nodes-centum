@@ -1,4 +1,4 @@
-import { ListaPrecio } from './clientes';
+import { CondicionIIBB, ListaPrecio } from './clientes';
 export interface INewCustomer {
 	TarifaServicio: TarifaServicio,
 	Bonificacion: BonificacionNewCustomer;
@@ -61,19 +61,29 @@ interface Zona {
 	CostoEntrega: number;
 }
 
-type CondicionIVANombre = 'Responsable Inscripto' | 'Monotributo' | 'Exento' | 'Consumidor Final';
 export interface IContribuyenteBodyInput {
 	RazonSocial: string;
-	Email: string;
-	Telefono: string;
-	CondicionIVA: {
-		Nombre: CondicionIVANombre
-	};
-	CondicionIIBB?: {
-		Codigo: string;
-	};
+	Email?: string;
+	Telefono?: string;
+	CodigoPostal: string;
+	CondicionIVA: CondicionIVA;
+	CondicionIIBB?: CondicionIIBB;
+	CategoriaIIBB?: CategoriaIIBB;
+	Localidad: string;
+	Provincia: Provincia;
+	Direccion: string;
+	NroDireccion: string;
+	PisoDepartamento?: string;
+	NumeroIIBB: string;
+	Zona: Zona;
 }
 
+interface CategoriaIIBB {
+	IdCondicionIIBB?: number,
+	Codigo?: string
+}
+
+type CondicionIVANombre = 'Responsable Inscripto' | 'Monotributo' | 'Exento' | 'Consumidor Final';
 interface CondicionIVA {
 	IdCondicionIVA?: number; // si opcional
 	Codigo?: string; // opcional también
