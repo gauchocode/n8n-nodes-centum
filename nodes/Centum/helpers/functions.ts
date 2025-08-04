@@ -1,5 +1,5 @@
 import { randomUUID, createHash as cryptoCreateHash } from 'crypto';
-import { constantProvincias, constantsZonas, CondicionesIVA, CondicionesIIBB, CategoriasIIBB } from '../constants';
+import { constantProvincias, wooToCentumProvinciaMap, constantsZonas, CondicionesIVA, CondicionesIIBB, CategoriasIIBB } from '../constants';
 
 import {
 	IWoo,
@@ -19,7 +19,8 @@ import {
 	IWooArticle,
 	ShippingLine, CobroId,
 	IContribuyenteBodyInput,
-	CondicionIIBBCodigo
+	CondicionIIBBCodigo,
+	IProvincias
 } from '../interfaces';
 import { NodeParameterValue, IExecuteFunctions, NodeOperationError } from 'n8n-workflow';
 
@@ -197,29 +198,36 @@ export const createCustomerJson = (respWoo: IWoo, dni: string) => {
 	return customerObj;
 };
 
+function getProvinciaCentumFromWoo(wooCode: string): IProvincias | null {
+  return wooToCentumProvinciaMap[wooCode] ?? null;
+}
 
 export const createContribuyenteJson = (
 	body: IContribuyenteBodyInput,
 	cuit: string
 )  => {
+	const provinciaCentum = getProvinciaCentumFromWoo(body.Provincia ?? '') ??
+		constantProvincias.find(
+			(prov) => prov.Nombre.toLowerCase() === (body.Provincia ?? '').toLowerCase()
+		) ??
+		constantProvincias[5]; // fallback a Buenos Aires
+
+		const cuitStr = String(cuit)
+		const fullAddress = `${body.Direccion} ${body.NroDireccion}${body.PisoDepartamento ? ' ' + body.PisoDepartamento : ''}`;
+
+		console.log(fullAddress);
 	return {
 		IdCliente: -1,
 		CUIT: cuit,
-    Codigo: `web-${cuit.slice(2, 10)}`,
+    Codigo: `web-${cuitStr.slice(2, 10)}`,
     RazonSocial: body.RazonSocial,
     Email: body.Email || '',
     Telefono: body.Telefono || '',
     CodigoPostal: body.CodigoPostal,
     Localidad: body.Localidad,
-		Direccion: `${body.Direccion} ${body.NroDireccion}${body.PisoDepartamento ? ' ' + body.PisoDepartamento : ''}`,
-    Provincia:
-      constantProvincias.find(
-        (prov) => prov.Nombre.toLocaleLowerCase() === (body.Provincia?.Nombre ?? '').toLocaleLowerCase()
-      ) || constantProvincias[5],
-    Zona:
-      constantsZonas.find(
-        (zone) => zone.Nombre.toLocaleLowerCase() === (body.Zona?.Nombre ?? '').toLocaleLowerCase()
-      ) || constantsZonas[0],
+		Direccion: fullAddress,
+    Provincia: provinciaCentum,
+    Zona: constantsZonas[0],
     Pais: {
       Codigo: 'ARG',
       IdPais: 4657,
@@ -227,7 +235,7 @@ export const createContribuyenteJson = (
     },
     CondicionIVA:
       CondicionesIVA.find(
-        (condicion) => condicion.Nombre.toLocaleLowerCase() === 'responsable inscripto'
+        (condicion) => condicion.Nombre.toLocaleLowerCase() === (body.CondicionIVA ?? 'Responsable Inscripto').toLocaleLowerCase()
       ) || {
         IdCondicionIVA: 1895,
         Codigo: 'RI',
@@ -235,21 +243,21 @@ export const createContribuyenteJson = (
       },
     CondicionIIBB:
       CondicionesIIBB.find(
-        (condicion) => condicion.Codigo.toLocaleLowerCase() === (body.CondicionIIBB?.Codigo ?? '').toLocaleLowerCase()
+        (condicion) => condicion.Codigo.toLocaleLowerCase() === (body.CondicionIIBB ?? 'Responsable Inscript').toLocaleLowerCase()
       ) || {
         IdCondicionIIBB: 6051,
-        Codigo: 'Responsable Inscripto' as CondicionIIBBCodigo
+        Codigo: 'Responsable Inscript' as CondicionIIBBCodigo
       },
 		CategoriaIIBB:
 		CategoriasIIBB.find(
-			(categoria) => categoria.Codigo.toLowerCase() ===  (body.CategoriaIIBB?.Codigo ?? '').toLocaleLowerCase()
+			(categoria) => categoria.Codigo.toLowerCase() ===  (body.CategoriaIIBB ?? 'Cosas Muebles').toLocaleLowerCase()
 		)|| {
         IdCondicionIIBB: 6054,
         Codigo: 'Cosas Muebles'
       }
 		,
     NumeroIIBB: body.NumeroIIBB,
-    DireccionEntrega: body.Direccion,
+    DireccionEntrega: fullAddress,
     CigarreraCliente: {
       Codigo: 'MSP',
       IdCigarreraCliente: 6972,
@@ -1037,7 +1045,7 @@ export async function apiPostRequest<T = any>(
 	url: string,
 	options: FetchOptions = {},
 ): Promise<T[]> {
-	const { headers = {}, body, queryParams = {}, itemsField = 'items', context } = options;
+	const { headers = {}, body, queryParams = {}, itemsField = 'Items', context } = options;
 
 	if (!url || url.trim() === '') {
 		safeThrow(context, 'El campo "Endpoint" es obligatorio.');
@@ -1065,10 +1073,13 @@ export async function apiPostRequest<T = any>(
 		const errorText = await response.text();
 		safeThrow(context, `Error en la solicitud POST: ${response.status} - ${errorText}`);
 	}
+			console.log(`apiPostRequest(): fetch method: `, response)
 
 	const data = await response.json();
-	return extractItems<T>(data, itemsField);
+	return [data];
 }
+
+//-----------------------------------------------------------------------
 
 	export async function apiRequest<T>(
 		url: string,
@@ -1077,7 +1088,7 @@ export async function apiPostRequest<T = any>(
 	): Promise<T> {
 		// Por defecto las peticiones se hacen con el método GET y respuesta en formato JSON
 		const { method = 'GET', headers = {}, body, queryParams, responseType } = options;
-		console.log(options)
+		// console.log(options)
 		let finalUrl = buildUrl(url, queryParams)
 
 		console.log('fetch url: ',finalUrl)
@@ -1088,9 +1099,15 @@ export async function apiPostRequest<T = any>(
 		};
 
 		if (body) {
+			if (typeof body !== 'object') {
+				throw new Error('El body debe ser un objeto válido y no una cadena');
+			}
+
 			fetchOptions.body = JSON.stringify(body);
 		}
 
+		console.log('FETCH OPTIONS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<')
+		console.log(fetchOptions);
 		try {
 
 			const response = await fetch(finalUrl, fetchOptions);
@@ -1111,6 +1128,7 @@ export async function apiPostRequest<T = any>(
 
 			return await response.json() as T;
 		} catch (error) {
+
 			if (context) {
 				console.log('API request failed', error );
 				context.logger.error('API request failed', { error });

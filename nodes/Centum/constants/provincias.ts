@@ -1,3 +1,5 @@
+import { IProvincias } from '../interfaces/provincias'
+
 export const constantProvincias = [
 	{
 		IdProvincia: 4667,
@@ -125,3 +127,30 @@ export const constantProvincias = [
 		Nombre: 'Tucumán',
 	},
 ];
+
+export const wooToCentumProvinciaMap: Record<string, IProvincias> = {
+  C: constantProvincias.find(p => p.Nombre.toLowerCase().includes('capital'))!,
+  B: constantProvincias.find(p => p.Nombre.toLowerCase().includes('buenos'))!,
+  K: constantProvincias.find(p => p.Nombre.toLowerCase().includes('catamarca'))!,
+  H: constantProvincias.find(p => p.Nombre.toLowerCase().includes('chaco'))!,
+  U: constantProvincias.find(p => p.Nombre.toLowerCase().includes('chubut'))!,
+  X: constantProvincias.find(p => p.Nombre.toLowerCase().includes('cordoba'))!,
+  W: constantProvincias.find(p => p.Nombre.toLowerCase().includes('corrientes'))!,
+  E: constantProvincias.find(p => p.Nombre.toLowerCase().includes('entr'))!,
+  P: constantProvincias.find(p => p.Nombre.toLowerCase().includes('formosa'))!,
+  Y: constantProvincias.find(p => p.Nombre.toLowerCase().includes('jujuy'))!,
+  L: constantProvincias.find(p => p.Nombre.toLowerCase().includes('pampa'))!,
+  F: constantProvincias.find(p => p.Nombre.toLowerCase().includes('rioja'))!,
+  M: constantProvincias.find(p => p.Nombre.toLowerCase().includes('mendoza'))!,
+  N: constantProvincias.find(p => p.Nombre.toLowerCase().includes('misiones'))!,
+  Q: constantProvincias.find(p => p.Nombre.toLowerCase().includes('neuqu'))!,
+  R: constantProvincias.find(p => p.Nombre.toLowerCase().includes('río negro'))!,
+  A: constantProvincias.find(p => p.Nombre.toLowerCase().includes('salta'))!,
+  J: constantProvincias.find(p => p.Nombre.toLowerCase().includes('san juan'))!,
+  D: constantProvincias.find(p => p.Nombre.toLowerCase().includes('san luis'))!,
+  Z: constantProvincias.find(p => p.Nombre.toLowerCase().includes('santa cruz'))!,
+  S: constantProvincias.find(p => p.Nombre.toLowerCase().includes('santa fe'))!,
+  G: constantProvincias.find(p => p.Nombre.toLowerCase().includes('santiago'))!,
+  V: constantProvincias.find(p => p.Nombre.toLowerCase().includes('fuego'))!,
+  T: constantProvincias.find(p => p.Nombre.toLowerCase().includes('tucum'))!,
+};

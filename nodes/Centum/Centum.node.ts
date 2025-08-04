@@ -20,7 +20,6 @@ import {
 	ShippingLine, CobroId,
 	IContribuyenteBodyInput,
 	IProvincias,
-	INewCustomer
 } from './interfaces';
 
 import {
@@ -32,7 +31,8 @@ import {
 	centumGetArticleImages,
 	getHttpSettings,
 	apiRequest, FetchOptions,
-	apiGetRequest, createContribuyenteJson
+	apiGetRequest, createContribuyenteJson,
+	apiPostRequest
 
 } from './helpers/functions';
 
@@ -412,22 +412,21 @@ export class Centum implements INodeType {
 
 			case 'nuevoContribuyente': {
 				const bodyJson = this.getNodeParameter('cuerpoHTTP', 0) as IContribuyenteBodyInput;
-				const cuit = this.getNodeParameter('cuit', 0) as string;
+				const cuit = this.getNodeParameter('cuit', 0);
 				console.log(bodyJson)
-				const esCUITValido = (cuit: string): boolean => {
-					return /^\d{11}$/.test(cuit);
-				};
 
-				if (!esCUITValido(cuit)) {
-					throw new NodeOperationError(this.getNode(), 'Para que el CUIT sea válido debe contener un total de 11 caracteres numéricos.');
+				if (typeof cuit !== 'string' || !/^\d{11}$/.test(cuit)) {
+					throw new NodeOperationError(
+						this.getNode(),
+						'El CUIT debe ser una cadena de 11 dígitos numéricos.'
+					);
 				}
 
 
 				const contribuyenteJSON = createContribuyenteJson(bodyJson, cuit);
-				console.log('ContribuyenteJSON::::::::::::::::::::::::::: ')
-				console.dir(contribuyenteJSON, { depth: null });
+
 				try {
-					const crearCliente = await apiRequest<Partial<INewCustomer>>(
+					const crearCliente = await apiPostRequest(
 						`${centumUrl}/Clientes`,
 						{
 							method: 'POST',
@@ -435,14 +434,28 @@ export class Centum implements INodeType {
 							headers,
 						},
 					);
-					return [this.helpers.returnJsonArray([crearCliente])];
+
+					console.log('Contribuyente creado:', crearCliente);
+					return [this.helpers.returnJsonArray([crearCliente as any])];
 
 				} catch (error: any) {
-					console.log(error);
-					const obj = {
-						...error.response?.data,
-					};
-					return [this.helpers.returnJsonArray([obj])];
+					console.error('Error al crear contribuyente:', error);
+
+					const statusCode = error?.response?.status;
+					const responseData = error?.response?.data;
+					const errorMessage =
+						responseData?.Message ||
+						responseData?.message ||
+						error?.message ||
+						'Error desconocido al crear el contribuyente.';
+
+					const fullMessage = statusCode
+						? `Error ${statusCode}: ${errorMessage}`
+						: errorMessage;
+
+					throw new NodeOperationError(this.getNode(), fullMessage, {
+						description: responseData?.Detail || 'Ocurrió un error inesperado al llamar a la API de Centum.',
+					});
 				}
 			}
 
