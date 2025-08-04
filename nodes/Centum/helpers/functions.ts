@@ -213,9 +213,13 @@ export const createContribuyenteJson = (
 		constantProvincias[5]; // fallback a Buenos Aires
 
 		const cuitStr = String(cuit)
-		const fullAddress = `${body.Direccion} ${body.NroDireccion}${body.PisoDepartamento ? ' ' + body.PisoDepartamento : ''}`;
+		const fullAddress = [
+			body.Direccion || '',
+			body.NroDireccion || '',
+			body.PisoDepartamento || ''
+		].filter(Boolean).join(' ');
 
-		console.log(fullAddress);
+		console.log('FULL ADDRESS: ',fullAddress);
 	return {
 		IdCliente: -1,
 		CUIT: cuit,
@@ -1045,7 +1049,7 @@ export async function apiPostRequest<T = any>(
 	url: string,
 	options: FetchOptions = {},
 ): Promise<T[]> {
-	const { headers = {}, body, queryParams = {}, itemsField = 'Items', context } = options;
+	const { headers = {}, body, queryParams = {}, context } = options;
 
 	if (!url || url.trim() === '') {
 		safeThrow(context, 'El campo "Endpoint" es obligatorio.');
