@@ -67,14 +67,14 @@ export interface IContribuyenteBodyInput {
 	Telefono?: string;
 	CodigoPostal: string;
 	CondicionIVA: string;
-	CondicionIIBB?: string;
-	CategoriaIIBB?: string;
+	CondicionIIBB: string;
+	CategoriaIIBB: string;
 	Localidad: string;
 	Provincia: string;
 	Direccion: string;
 	NroDireccion: string;
 	PisoDepartamento?: string;
-	NumeroIIBB?: string;
+	NumeroIIBB: string;
 	Zona: string;
 }
 

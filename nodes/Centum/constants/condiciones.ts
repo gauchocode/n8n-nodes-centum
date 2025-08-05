@@ -46,10 +46,19 @@ export const CondicionesIVA = [
 
 // Solamente se est
 export const CondicionesIIBB: CondicionIIBB[] = [
-	{
-		IdCondicionIIBB: 6051,
-		Codigo: CondicionIIBBCodigo.ResponsableInscript
-	}
+
+	  {
+        IdCondicionIIBB: 6051,
+        Codigo: CondicionIIBBCodigo.ResponsableInscript
+    },
+    {
+        IdCondicionIIBB: 6052,
+        Codigo: CondicionIIBBCodigo.ConvenioMultilatera
+    },
+    {
+        IdCondicionIIBB: 6053,
+        Codigo: CondicionIIBBCodigo.Exento
+    },
 ];
 
 export const CategoriasIIBB = [
