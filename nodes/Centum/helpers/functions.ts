@@ -20,7 +20,8 @@ import {
 	ShippingLine, CobroId,
 	IContribuyenteBodyInput,
 	CondicionIIBBCodigo,
-	IProvincias
+	IProvincias,
+	CondicionIVANombre
 } from '../interfaces';
 import { NodeParameterValue, IExecuteFunctions, NodeOperationError } from 'n8n-workflow';
 
@@ -239,26 +240,27 @@ export const createContribuyenteJson = (
     },
     CondicionIVA:
       CondicionesIVA.find(
-        (condicion) => condicion.Nombre.toLocaleLowerCase() === (body.CondicionIVA ?? 'Responsable Inscripto').toLocaleLowerCase()
+        (condicion) => condicion.Nombre.toLocaleLowerCase() === (body.CondicionIVA ?? '').toLocaleLowerCase()
       ) || {
         IdCondicionIVA: 1895,
         Codigo: 'RI',
-        Nombre: 'Responsable Inscripto',
+        Nombre: 'Responsable Inscripto' as CondicionIVANombre,
       },
     CondicionIIBB:
       CondicionesIIBB.find(
-        (condicion) => condicion.Codigo.toLocaleLowerCase() === (body.CondicionIIBB ?? 'Responsable Inscript').toLocaleLowerCase()
+        (condicion) => condicion.Codigo.toLocaleLowerCase() === (body.CondicionIIBB ?? '').toLocaleLowerCase()
       ) || {
         IdCondicionIIBB: 6051,
-        Codigo: 'Responsable Inscript' as CondicionIIBBCodigo
+        Codigo: 'Exento' as CondicionIIBBCodigo
       },
 		CategoriaIIBB:
 		CategoriasIIBB.find(
-			(categoria) => categoria.Codigo.toLowerCase() ===  (body.CategoriaIIBB ?? 'Cosas Muebles').toLocaleLowerCase()
-		)|| {
-        IdCondicionIIBB: 6054,
-        Codigo: 'Cosas Muebles'
-      }
+			(categoria) => categoria.Codigo.toLowerCase() ===  (body.CategoriaIIBB ?? '').toLocaleLowerCase()
+		)
+		// || {
+    //     IdCondicionIIBB: 6054,
+    //     Codigo: 'Cosas Muebles'
+    //   }
 		,
     NumeroIIBB: body.NumeroIIBB,
     DireccionEntrega: fullAddress,
@@ -388,7 +390,6 @@ export const createContribuyenteJson = (
 	};
 };
 
-
 export const createOrderSaleJson = (
 	articles: Item[],
 	client: INewCustomer,
@@ -503,6 +504,7 @@ export const createOrderSaleJson = (
 
 	return saleOrderObj;
 };
+
 export const createChargeJson = (customer: Cliente, articlesOrder: LineItem[], 	shippingChargeOrder: ShippingLine[]) => {
 	if (shippingChargeOrder.length > 0) {
 		const shipping = shippingChargeOrder[0]; // WooCommerce generalmente solo tiene uno
@@ -857,7 +859,6 @@ export async function centumGetArticleImages(
 	}
 }
 
-
 export const centumImageName = (
 	name: string,
 	size: string,
@@ -897,18 +898,6 @@ export function buildCentumHeaders(consumerId: string, publicKey: string): Recor
 export function getHttpSettings(this: IExecuteFunctions): HttpSettings & { intervaloPagina?: number } {
 	const httpSettings = this.getNodeParameter('httpSettings', 0, {}) as HttpSettings & { intervaloPagina?: number };
 	console.log('http settings: ', httpSettings)
-	// Validación simple por si alguien lo borra desde el editor del nodo
-	// if (!httpSettings.method || !['GET', 'POST'].includes(httpSettings.method)) {
-	// 	throw new NodeOperationError(this.getNode(), 'El campo "Método HTTP" es obligatorio y debe ser GET o POST.');
-	// }
-
-	if (!httpSettings.pagination || !['all', 'default', 'custom'].includes(httpSettings.pagination)) {
-		throw new NodeOperationError(this.getNode(), 'El campo "Paginación" es obligatorio y debe tener un valor válido.');
-	}
-
-	if (httpSettings.pagination === 'custom' && (!httpSettings.cantidadItemsPorPagina || httpSettings.cantidadItemsPorPagina < 1)) {
-		throw new NodeOperationError(this.getNode(), 'Debe especificar la cantidad de ítems por página en modo personalizado.');
-	}
 
 	return httpSettings;
 }
@@ -927,11 +916,12 @@ export interface FetchOptions {
 	responseType?: 'json' | 'arraybuffer';
 }
 
-function safeThrow(context: IExecuteFunctions | undefined, message: string): never {
-	if (!context || !context.getNode()) {
-		throw new Error(message);
+export function safeThrow(context: IExecuteFunctions | undefined, mensaje: string): never {
+	if (context) {
+		throw new NodeOperationError(context.getNode(), mensaje);
+	} else {
+		throw new Error(mensaje);
 	}
-	throw new NodeOperationError(context.getNode(), message);
 }
 
 function buildUrl(baseUrl: string, queryParams: Record<string, any> = {}): string {
@@ -1001,7 +991,7 @@ export async function apiGetRequest<T = any>(
 	const allItems: T[] = [];
 	let currentPage = numeroPagina || 1;
 	const itemsPerPage = pagination === 'all' ? 1000 : cantidadItemsPorPagina || 100;
-	const intervaloMs = pagination === 'all' ? 200 : intervaloPagina ?? 1000;
+	const intervaloMs = pagination === 'all' ? 1000 : intervaloPagina ?? 1000;
 
 	while (true) {
 		const totalStart = Date.now();
@@ -1077,7 +1067,8 @@ export async function apiPostRequest<T = any>(
 		const errorText = await response.text();
 		safeThrow(context, `Error en la solicitud POST: ${response.status} - ${errorText}`);
 	}
-			console.log(`apiPostRequest(): fetch method: `, response)
+
+	console.log(`apiPostRequest(): fetch method: `, response)
 
 	const data = await response.json();
 	return [data];
@@ -1085,78 +1076,163 @@ export async function apiPostRequest<T = any>(
 
 //-----------------------------------------------------------------------
 
-	export async function apiRequest<T>(
-		url: string,
-		options: FetchOptions = {},
-		context?: IExecuteFunctions,
-	): Promise<T> {
-		// Por defecto las peticiones se hacen con el método GET y respuesta en formato JSON
-		const { method = 'GET', headers = {}, body, queryParams, responseType } = options;
-		// console.log(options)
-		let finalUrl = buildUrl(url, queryParams)
+	// export async function apiRequest<T>(
+	// 	url: string,
+	// 	options: FetchOptions = {},
+	// 	context?: IExecuteFunctions,
+	// ): Promise<T> {
+	// 	// Por defecto las peticiones se hacen con el método GET y respuesta en formato JSON
+	// 	const { method = 'GET', headers = {}, body, queryParams, responseType } = options;
+	// 	// console.log(options)
+	// 	let finalUrl = buildUrl(url, queryParams)
 
-		console.log('fetch url: ',finalUrl)
-		const requestHeaders = buildCentumHeaders(headers.CentumSuiteConsumidorApiPublicaId, headers.publicAccessKey);
-		const fetchOptions: RequestInit = {
-			method,
-			headers: {...requestHeaders},
-		};
+	// 	console.log('fetch url: ',finalUrl)
+	// 	const requestHeaders = buildCentumHeaders(headers.CentumSuiteConsumidorApiPublicaId, headers.publicAccessKey);
+	// 	const fetchOptions: RequestInit = {
+	// 		method,
+	// 		headers: {...requestHeaders},
+	// 	};
 
-		if (body) {
-			if (typeof body !== 'object') {
-				throw new Error('El body debe ser un objeto válido y no una cadena');
-			}
+	// 	if (body) {
+	// 		if (typeof body !== 'object') {
+	// 			throw new Error('El body debe ser un objeto válido y no una cadena');
+	// 		}
 
-			fetchOptions.body = JSON.stringify(body);
+	// 		fetchOptions.body = JSON.stringify(body);
+	// 	}
+
+	// 	console.log('FETCH OPTIONS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<')
+	// 	console.log(fetchOptions);
+	// 	try {
+
+	// 		const response = await fetch(finalUrl, fetchOptions);
+	// 		console.log(`apiRequest(): fetch method:${method}`, response)
+	// 		if (!response.ok) {
+	// 			const errorText = await response.text();
+	// 			const error = new Error(`Request failed with status ${response.status}: ${errorText}`);
+	// 			if (context) {
+	// 				console.log( "status:", response.status, errorText);
+	// 				context.logger.error(error.message, { status: response.status, errorText });
+	// 			}
+	// 			throw error;
+	// 		}
+
+	// 		if (responseType === 'arraybuffer') {
+	// 			return await response.arrayBuffer() as any;
+	// 		}
+
+	// 		return await response.json() as T;
+	// 	} catch (error) {
+
+	// 		if (context) {
+	// 			console.log('API request failed', error );
+	// 			context.logger.error('API request failed', { error });
+	// 		}
+	// 		throw error;
+	// 	}
+	// }
+
+export async function apiRequest<T>(
+	url: string,
+	options: FetchOptions = {},
+	context?: IExecuteFunctions,
+): Promise<T> {
+	const {
+		method = 'GET',
+		headers = {},
+		body,
+		queryParams,
+		responseType,
+	} = options;
+
+	const finalUrl = buildUrl(url, queryParams);
+	const requestHeaders = buildCentumHeaders(
+		headers.CentumSuiteConsumidorApiPublicaId,
+		headers.publicAccessKey
+	);
+
+	const fetchOptions: RequestInit = {
+		method,
+		headers: {
+			'Content-Type': 'application/json',
+			...requestHeaders,
+		},
+	};
+
+	if (body) {
+		if (typeof body !== 'object') {
+			safeThrow(context, 'El body debe ser un objeto válido (no una cadena u otro tipo)');
 		}
-
-		console.log('FETCH OPTIONS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<')
-		console.log(fetchOptions);
-		try {
-
-			const response = await fetch(finalUrl, fetchOptions);
-			console.log(`apiRequest(): fetch method:${method}`, response)
-			if (!response.ok) {
-				const errorText = await response.text();
-				const error = new Error(`Request failed with status ${response.status}: ${errorText}`);
-				if (context) {
-					console.log( "status:", response.status, errorText);
-					context.logger.error(error.message, { status: response.status, errorText });
-				}
-				throw error;
-			}
-
-			if (responseType === 'arraybuffer') {
-				return await response.arrayBuffer() as any;
-			}
-
-			return await response.json() as T;
-		} catch (error) {
-
-			if (context) {
-				console.log('API request failed', error );
-				context.logger.error('API request failed', { error });
-			}
-			throw error;
-		}
+		fetchOptions.body = JSON.stringify(body);
 	}
 
+	// Logging útil para debugging
+	console.log('Fetch URL:', finalUrl);
+	console.log('Fetch Options:', fetchOptions);
+
+	try {
+		const response = await fetch(finalUrl, fetchOptions);
+
+		// Mostrar headers y status
+		console.log(`[${method}] Response Status:`, response.status);
+		const headersObj: Record<string, string> = {};
+		response.headers.forEach((value, key) => {
+			headersObj[key] = value;
+		});
+		console.log('Response Headers:', headersObj);
 
 
-// // Método dinámico para GET o POST
-// export async function apiRequest<T = any>(
-// 	url: string,
-// 	options: FetchOptions = {},
-// ): Promise<T[]> {
-// 	const { method = 'GET', context } = options;
+		// Capturar texto plano (por si no es JSON)
+		const rawText = await response.text();
 
-// 	if (!['GET', 'POST'].includes(method)) {
-// 		safeThrow(context, `Método HTTP no soportado: ${method}. Use GET o POST.`);
-// 	}
+		if (!response.ok) {
+			const contentType = response.headers.get('content-type') || '';
+			const status = response.status;
 
-// 	if (method === 'GET') {
-// 		return apiGetRequest<T>(url, options);
-// 	}
-// 	return apiPostRequest<T>(url, options);
-// }
+			// Intentar parsear JSON si aplica
+			let errorData: any = rawText;
+			if (contentType.includes('application/json')) {
+				try {
+					errorData = JSON.parse(rawText);
+				} catch {
+					// No es JSON válido
+					console.log('No se pudo parsear el cuerpo de error como JSON:', rawText);
+				}
+			}
 
+			const mensaje =
+				typeof errorData === 'object'
+					? errorData.message || errorData.Message || 'Sin mensaje en body'
+					: rawText || 'Sin cuerpo de respuesta';
+
+			const descripcion =
+				typeof errorData === 'object'
+					? errorData.detail || errorData.Detail || 'Sin detalles adicionales'
+					: 'Texto plano sin JSON';
+
+			const errorMessage = `Error ${status} - ${mensaje}\n${descripcion}`;
+			console.error('ERROR EN API REQUEST:', errorMessage);
+
+			safeThrow(context, errorMessage);
+
+		}
+
+		// Si la respuesta fue correcta
+		if (responseType === 'arraybuffer') {
+			return (await response.arrayBuffer()) as any;
+		}
+
+		// Volver a parsear rawText como JSON
+		return JSON.parse(rawText) as T;
+
+	} catch (error: any) {
+		console.error('EXCEPCIÓN NO CAPTURADA EN FETCH:', error);
+
+		if (context) {
+			context.logger?.error?.('API request failed', { error });
+		}
+
+		const mensaje = error.message || 'Error desconocido en fetch';
+		safeThrow(context, mensaje);
+	}
+}
