@@ -66,15 +66,15 @@ export interface IContribuyenteBodyInput {
 	Email?: string;
 	Telefono?: string;
 	CodigoPostal: string;
-	CondicionIVA: string;
-	CondicionIIBB: string;
-	CategoriaIIBB: string;
+	CondicionIVA?: string;
+	CondicionIIBB?: string;
+	CategoriaIIBB?: string;
+	NumeroIIBB?: string;
 	Localidad: string;
 	Provincia: string;
 	Direccion: string;
 	NroDireccion: string;
 	PisoDepartamento?: string;
-	NumeroIIBB: string;
 	Zona: string;
 }
 
