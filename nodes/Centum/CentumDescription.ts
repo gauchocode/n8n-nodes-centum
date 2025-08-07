@@ -412,7 +412,7 @@ const getArticulo: INodeProperties[] = [
 		placeholder: 'Ingresá el CUIT...',
 		displayOptions: {
 			show: {
-				resource: ['clienteNuevo', 'clientesBusqueda', 'buscarContribuyente', 'nuevoContribuyente'],
+				resource: ['clienteNuevo', 'buscarContribuyente', 'nuevoContribuyente'],
 			},
 		},
 	},
