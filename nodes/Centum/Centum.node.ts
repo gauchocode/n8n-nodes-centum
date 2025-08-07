@@ -7,7 +7,6 @@ import type {
 } from 'n8n-workflow';
 import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
 
-// import { apiRequest, FetchOptions } from './helpers/api';
 import { CentumOperations, CentumFields, HttpOptions} from './CentumDescription';
 import {
 	IArticulos,
@@ -426,7 +425,7 @@ export class Centum implements INodeType {
 				const contribuyenteJSON = createContribuyenteJson(bodyJson, cuit);
 
 				try {
-					const crearCliente = await apiPostRequest(
+					const crearCliente = await apiRequest(
 						`${centumUrl}/Clientes`,
 						{
 							method: 'POST',
@@ -634,93 +633,62 @@ export class Centum implements INodeType {
 				}
 			}
 
-			case 'clientesBusqueda': {
-					const customerEmail = this.getNodeParameter('email', 0, '') as string;
-					const dni = this.getNodeParameter('dni', 0, '') as string;
+		case 'clientesBusqueda': {
+				const customerEmail = this.getNodeParameter('email', 0, '') as string;
+				const dni = this.getNodeParameter('dni', 0, '') as string;
 
-					const buildQuery = (campo: 'Email' | 'Codigo', valor: string) =>
-						valor ? { [campo]: valor } : {};
+				const buildQuery = (campo: 'Email' | 'Codigo', valor: string) =>
+					valor ? { [campo]: valor } : {};
 
-					let clientResponse: IResponseCustomer | null = null;
+				const trySearch = async (
+					campo: 'Email' | 'Codigo',
+					valor: string,
+					label: string
+				): Promise<IResponseCustomer | null> => {
+					if (!valor) return null;
 					try {
-						// 1. Buscar por Email si se proporcionó
-						if (customerEmail) {
-							try {
-								console.log('[email] Buscando cliente por email...');
-								const response = await apiRequest<IResponseCustomer>(
-									`${centumUrl}/Clientes`,
-									{
-										method: 'GET',
-										headers,
-										queryParams: buildQuery('Email', customerEmail),
-									},
-								);
-								console.log('[email] Resultado:', response);
-
-								clientResponse = response;
-								if (response.CantidadTotalItems === 1) {
-									return [this.helpers.returnJsonArray(response.Items as any)];
-								}
-							} catch (error) {
-								console.log('[email] Error en búsqueda por email:', error);
-							}
-						}
-
-						// 2. Buscar por Código "web-{dni}"
-						if (!clientResponse && dni) {
-							try {
-								console.log('[dni] Buscando cliente por Código: web-{dni}...');
-								const response = await apiRequest<IResponseCustomer>(
-									`${centumUrl}/Clientes`,
-									{
-										method: 'GET',
-										headers,
-										queryParams: buildQuery('Codigo', `web-${dni}`),
-									},
-								);
-								console.log('[dni] Resultado:', response);
-
-								clientResponse = response;
-								if (response.CantidadTotalItems === 1) {
-									return [this.helpers.returnJsonArray(response.Items as any)];
-								}
-							} catch (error) {
-								console.log('[dni] Error con Código web-{dni}:', error);
-							}
-						}
-
-						// 3. Buscar por Código sin "web-"
-						if (!clientResponse && dni) {
-							try {
-								console.log('[dni-alt] Buscando cliente por Código simple (dni sin "web-")...');
-								const response = await apiRequest<IResponseCustomer>(
-									`${centumUrl}/Clientes`,
-									{
-										method: 'GET',
-										headers,
-										queryParams: buildQuery('Codigo', dni),
-									},
-								);
-								console.log('[dni-alt] Resultado:', response);
-
-								clientResponse = response;
-								if (response.CantidadTotalItems === 1) {
-									return [this.helpers.returnJsonArray(response.Items as any)];
-								}
-							} catch (error) {
-								console.log('[dni-alt] Error con Código sin "web-":', error);
-							}
-						}
-
-						// Si llegamos hasta acá, devolver la última respuesta completa (aunque tenga Items vacíos)
-						return [this.helpers.returnJsonArray(clientResponse as any)];
-
+						console.log(`[${label}] Buscando cliente por ${campo}: ${valor}`);
+						const response = await apiRequest<IResponseCustomer>(
+							`${centumUrl}/Clientes`,
+							{
+								method: 'GET',
+								headers,
+								queryParams: buildQuery(campo, valor),
+							},
+							this,
+						);
+						console.log(`[${label}] Resultado:`, response);
+						return response;
 					} catch (error) {
-						console.log('General error during customer search:', error);
-						throw new NodeOperationError(this.getNode(), `Búsqueda fallida: ${JSON.stringify(error)}`);
+						console.error(`[${label}] Error:`, error);
+						return null;
 					}
-				}
+				};
 
+				try {
+					let response: IResponseCustomer | null = null;
+
+					if (customerEmail) {
+						response = await trySearch('Email', customerEmail, 'email');
+					}
+
+					if (!response && dni) {
+						response = await trySearch('Codigo', `web-${dni}`, 'dni-web');
+					}
+
+					if (!response && dni) {
+						response = await trySearch('Codigo', `${dni}`, 'dni');
+					}
+					console.log('Búsqueda finalizada. Resultado:', response);
+
+					// Siempre regresa un objeto, aunque sea vacío
+					return [this.helpers.returnJsonArray(response as any)];
+
+				} catch (error) {
+					console.error('Error general durante la búsqueda de cliente:', error);
+					throw new NodeOperationError(this.getNode(), `Búsqueda fallida: ${JSON.stringify(error)}`);
+				}
+			}
 
 			case 'sucursalesFisicas':
 				try {
