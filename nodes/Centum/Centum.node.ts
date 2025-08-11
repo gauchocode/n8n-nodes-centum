@@ -31,9 +31,10 @@ import {
 	getHttpSettings,
 	apiRequest, FetchOptions,
 	apiGetRequest, createContribuyenteJson,
-	apiPostRequest
+	// apiPostRequest
 
 } from './helpers/functions';
+import { IDepartamentos } from './interfaces/departamentos';
 
 type Actividad = {
 	IdActividad: number;
@@ -792,6 +793,33 @@ export class Centum implements INodeType {
 					);
 
 					return [this.helpers.returnJsonArray(provincias.map(p => ({ ...p })))];
+				} catch (error) {
+					console.log(error);
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
+				}
+			}
+
+			case "departamentosLista": {
+				const idProvincia = this.getNodeParameter('idProvincia', 0, '') as string;
+
+				try {
+					const queryParams: Record<string, string | number | boolean> = {};
+
+					if (idProvincia) {
+						queryParams.idProvincia = idProvincia;
+					}
+
+					const departamentos = await apiRequest<IDepartamentos[]>(
+						`${centumUrl}/Departamentos`,
+						{
+							method: 'GET',
+							headers,
+							queryParams,
+						}
+					);
+
+					return [this.helpers.returnJsonArray(departamentos.map(d => ({ ...d })))];
 				} catch (error) {
 					console.log(error);
 					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';

@@ -87,6 +87,11 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Da de alta el comprobante. Retornará el comprobante creado con su información y una URL.'
 			},
 			{
+				name: 'Departamentos - Lista',
+				value: 'departamentosLista',
+				description: 'Generar JSON estructurado para productos WooCommerce a partir de artículos Centum',
+			},
+			{
 				name: 'Obtener Productos - Lista',
 				value: 'obtenerProductos',
 				description: 'Obtener una lista con todos los productos utilizando Cliente ID'
@@ -499,6 +504,18 @@ const getArticulo: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['provinciasLista'],
+			},
+		},
+	},
+	{
+		displayName: 'ID Provincia (Opcional)',
+		name: 'idProvincia',
+		type: 'string',
+		default: '',
+		description: "ID de la provincia por la cual se buscarán los departamentos",
+		displayOptions: {
+			show: {
+				resource: ['departamentosLista'],
 			},
 		},
 	},
