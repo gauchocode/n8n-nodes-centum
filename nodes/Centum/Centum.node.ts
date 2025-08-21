@@ -145,46 +145,45 @@ export class Centum implements INodeType {
 						if(!completeMigration){
 							const acc = [];
 							for (const item of items) {
-
 								const groupArticle = item.GrupoArticulo;
-								if(!groupArticle) continue;
+								if (!groupArticle) continue;
 
-								const centumSuiteAccessToken = createHash(centumApiCredentials.publicAccessKey as string);
-								const requestHeaders: any = {
-									CentumSuiteConsumidorApiPublicaId: consumerApiPublicId,
-									CentumSuiteAccessToken: centumSuiteAccessToken,
-								};
+								// const centumSuiteAccessToken = createHash(
+								// 	centumApiCredentials.publicAccessKey as string,
+								// );
+								// const requestHeaders: any = {
+								// 	CentumSuiteConsumidorApiPublicaId: consumerApiPublicId,
+								// 	CentumSuiteAccessToken: centumSuiteAccessToken,
+								// };
 
 								const body = {
-									IdCliente: clientId,
+									idCliente: clientId,
 									FechaDocumento: formattedDocumentDate,
-									IncluirAtributosArticulos: true,
+									incluirAtributosArticulos: true,
 									IdsRubro: IdsRubro ? [IdsRubro] : [],
 									IdsSubRubro: IdsSubRubro ? [IdsSubRubro] : [''],
 									NombreGrupoArticulo: groupArticle.Nombre,
-									IdGrupoArticulo:groupArticle.IdGrupoArticulo
-								}
-								try {
+									IdGrupoArticulo: groupArticle.IdGrupoArticulo,
+								};
 
-									const response = await apiRequest<IArticulos>(
-										`${centumUrl}/Articulos/Venta`,
-										{
-											method: 'POST',
-											headers:requestHeaders,
-											body,
-											queryParams: { tipoOrdenArticulos: 'Codigo' },
-										},
-									);
+								try {
+									const response = await apiRequest<IArticulos>(`${centumUrl}/Articulos/Venta`, {
+										method: 'POST',
+										headers: { ...headers }, // reusar headers de la primera request
+										body,
+										queryParams: { tipoOrdenArticulos: 'Codigo' },
+									});
+
 									if (response.Articulos.Items.length > 0) {
 										acc.push(...response.Articulos.Items);
 									}
 								} catch (error) {
-										console.log('Error en solicitud de grupo de artículos', { error });
-										const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
-										throw new NodeOperationError(this.getNode(), errorMessage);
+									console.log('Error en solicitud de grupo de artículos', { error });
+									const errorMessage =
+										error?.response?.data?.Message || error.message || 'Error desconocido';
+									throw new NodeOperationError(this.getNode(), errorMessage);
 								}
 							}
-
 							const combinedArrays = [...acc, ...items];
 							const filteredArray = Array.from(
 								new Map(combinedArrays.map(obj => [obj.IdArticulo, obj])).values()
@@ -818,7 +817,6 @@ export class Centum implements INodeType {
 							queryParams,
 						}
 					);
-
 					return [this.helpers.returnJsonArray(departamentos.map(d => ({ ...d })))];
 				} catch (error) {
 					console.log(error);
