@@ -14,12 +14,6 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Genera un nuevo token para utilizarlo con una herramienta externa como postman'
 			},
 			{
-				name: 'Articulos - Datos Generales',
-				value: 'articulosDatosGenerales',
-				action: 'Perform an Artículo Data request',
-				description: 'Retorna un listado de los artículos y sus datos generales'
-			},
-			{
 				name: 'Articulos - Existencia',
 				value: 'articulosExistencia',
 				action: 'Perform an Artículo request',
@@ -36,6 +30,12 @@ export const CentumOperations: INodeProperties[] = [
 				value: 'articulosImagenes',
 				action: 'Solicitud de las imagenes de un articulo',
 				description: 'Retorna la imagen (binario) de un artículo'
+			},
+			{
+				name: 'Articulos - Informacion',
+				value: 'articulosDatosGenerales',
+				action: 'Perform an Artículo Data request',
+				description: 'Retorna un listado de los artículos y sus datos generales'
 			},
 			{
 				name: 'Articulos - Precio',
