@@ -108,6 +108,24 @@ export class Centum implements INodeType {
 						throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 
+			case 'articulosDatosGenerales':
+				try {
+					const response  = await apiRequest<IArticulos>(
+						`${centumUrl}/Articulos/DatosGenerales`,
+						{
+							method: 'POST',
+							headers,
+							body: {},
+							queryParams: { tipoOrdenArticulos: 'Nombre'}
+						},
+					);
+					return [this.helpers.returnJsonArray(response as any)];
+				} catch (error) {
+					console.log('Error en solicitud de artículos', error);
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
+				}
+
 			case 'articulo':
 				const clientId = this.getNodeParameter('clienteId', 0);
 				const documentDate: any = this.getNodeParameter('documentDate', 0);
