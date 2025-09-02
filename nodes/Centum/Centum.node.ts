@@ -1053,6 +1053,57 @@ export class Centum implements INodeType {
 				}
 			}
 
+			case 'promocionesCliente': {
+				const clientIdParam = this.getNodeParameter('clienteId', 0);
+				const documentDate = this.getNodeParameter('documentDate', 0) as string;
+				const diaSemana = this.getNodeParameter('diaSemana', 0);
+				// Validación de parámetros
+				const clientId = Number(clientIdParam);
+				if (isNaN(clientId) || clientId <= 0) {
+					throw new NodeOperationError(this.getNode(), 'clienteId debe ser un número positivo');
+				}
+
+				if (!documentDate) {
+					throw new NodeOperationError(this.getNode(), 'documentDate es requerido');
+				}
+
+				// Formatear la fecha eliminando milisegundos
+				const formattedDocumentDate = String(documentDate).split("T")[0];
+
+				try {
+					const body = {
+						FechaDocumento: formattedDocumentDate,
+						IdCliente: clientId,
+						DiaSemana: diaSemana || ''
+					};
+
+					const response = await apiRequest<any>(
+						`${centumUrl}/PromocionesComerciales/FiltrosPromocionComercial`,
+						{
+							method: 'POST',
+							headers,
+							body
+						}
+					);
+
+					// Validación de la respuesta
+					if (!response || typeof response !== 'object') {
+						throw new NodeOperationError(this.getNode(), 'Respuesta inválida del servidor');
+					}
+
+					// Si la respuesta tiene un campo Items, devolver solo ese array
+					if (response.Items && Array.isArray(response.Items)) {
+						return [this.helpers.returnJsonArray(response.Items)];
+					}
+
+					return [this.helpers.returnJsonArray(response)];
+				} catch (error) {
+					console.log('Error en solicitud de promociones para el cliente:', error);
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), `Error obteniendo promociones para el cliente ${clientId}: \n ${errorMessage}`);
+				}
+			}
+
 			default:
 				return [this.helpers.returnJsonArray([])];
 		}

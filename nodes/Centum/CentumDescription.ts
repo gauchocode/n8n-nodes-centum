@@ -98,6 +98,12 @@ export const CentumOperations: INodeProperties[] = [
 				action: 'Obtener la facturacion de los pedidos de ventas'
 			},
 			{
+				name: 'Cliente - Obtener Promocion',
+				value: 'promocionesCliente',
+				description: 'Obtiene las promociones aplicadas a un cliente desde una fecha seleccionada',
+				action: 'Obtener las promociones aplicadas a un cliente.'
+			},
+			{
 				name: 'Cliente - Obtener Saldo',
 				value: 'obtenerSaldoCliente',
 				description: 'Obtiene el saldo del cliente especificado',
@@ -253,7 +259,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Client ID used to search the articles',
 		displayOptions: {
 			show: {
-				resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente', 'obtenerFacturasPedidosVentas', 'obtenerFacturasCobros'],
+				resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente', 'obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'promocionesCliente'],
 			},
 		},
 	},
@@ -345,7 +351,19 @@ const getArticulo: INodeProperties[] = [
 		description: 'Parametro fecha del body para las solicitudes',
 		displayOptions: {
 			show: {
-				resource: ['articulo', 'precioArticulo'],
+				resource: ['articulo', 'precioArticulo', 'promocionesCliente'],
+			},
+		},
+	},
+	{
+		displayName: 'Dia De La Semana',
+		name: 'diaSemana',
+		type: 'number',
+		default: 0,
+		description: 'Numero de la semana por el cual filtrar promociones aplicadas (0 es Lunes)',
+		displayOptions: {
+			show: {
+				resource: ['promocionesCliente'],
 			},
 		},
 	},
