@@ -14,6 +14,12 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Genera un nuevo token para utilizarlo con una herramienta externa como postman'
 			},
 			{
+				name: 'Articulo - Por ID',
+				value: 'articuloPorId',
+				action: 'Buscar artículo por ID',
+				description: 'Retorna un artículo específico basado en su ID único'
+			},
+			{
 				name: 'Articulos - Existencia',
 				value: 'articulosExistencia',
 				action: 'Perform an Artículo request',
@@ -56,7 +62,6 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Actualiza un cliente y retorna su información con la URL para acceder al recurso'
 			},
 			{
-				displayName: 'Cliente - Búsqueda',
 				name: 'Cliente - Búsqueda',
 				value: 'clientesBusqueda',
 				action: 'Buscar un cliente',
@@ -75,6 +80,30 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Da de alta un cliente. Retornará el cliente creado (con su ID cargado) y la URL para acceder al nuevo recurso.'
 			},
 			{
+				name: 'Cliente - Obtener Composición Del Saldo',
+				value: 'composicionSaldoCliente',
+				description: 'Obtiene la composición del saldo de la cuenta corriente del cliente especificado',
+				action: 'Obtener la composición del saldo'
+			},
+			{
+				name: 'Cliente - Obtener Facturas De Cobro',
+				value: 'obtenerFacturasCobros',
+				description: 'Obtiene la totalidad de las facturas de los cobros del cliente especificado',
+				action: 'Obtener la facturacion de los cobros'
+			},
+			{
+				name: 'Cliente - Obtener Facturas De Venta',
+				value: 'obtenerFacturasPedidosVentas',
+				description: 'Obtiene la totalidad de las facturas de los pedido de ventas del cliente especificado',
+				action: 'Obtener la facturacion de los pedidos de ventas'
+			},
+			{
+				name: 'Cliente - Obtener Saldo',
+				value: 'obtenerSaldoCliente',
+				description: 'Obtiene el saldo del cliente especificado',
+				action: 'Obtener saldo del cliente',
+			},
+			{
 				name: 'Cliente Contribuyente - Busqueda',
 				value: 'buscarContribuyente',
 				description: 'Retorna los datos del contribuyente por medio de una búsqueda por CUIT o Razon Social',
@@ -85,24 +114,6 @@ export const CentumOperations: INodeProperties[] = [
 				value: 'nuevoContribuyente',
 				description: 'Da de alta un cliente contribuyente nuevo. Retornará al cliente creado (con su ID cargado) y la URL para acceder al nuevo recurso.',
 				action: 'Crear nuevo contribuyente',
-			},
-			{
-				name: 'Cliente - Obtener Saldo',
-				value: 'obtenerSaldoCliente',
-				description: 'Obtiene el saldo del cliente especificado. ',
-				action: 'Obtener saldo del cliente',
-			},
-			{
-				name: 'Cliente - Obtener Composición del saldo',
-				value: 'composicionSaldoCliente',
-				description: 'Obtiene la composición del saldo de la cuenta corriente del cliente especificado',
-				action: 'Obtener la composición del saldo'
-			},
-			{
-				name: 'Cliente - Obtener facturas ventas',
-				value: 'obtenerFacturasPedidosVentas',
-				description: 'Obtiene la totalidad de las facturas de los pedido de ventas del cliente especificado',
-				action: 'Obtener la facturacion de los pedidos de ventas'
 			},
 			{
 				name: 'Cobro - Nuevo',
@@ -153,13 +164,7 @@ export const CentumOperations: INodeProperties[] = [
 			{
 				name: 'Sucursales Físicas - Lista',
 				value: 'sucursalesFisicas',
-			},
-			{
-				name: 'Articulo - Por ID',
-				value: 'articuloPorId',
-				action: 'Buscar artículo por ID',
-				description: 'Retorna un artículo específico basado en su ID único'
-			},
+			}
 		],
 		default: 'pedidoVentaActividad',
 	},
@@ -248,7 +253,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Client ID used to search the articles',
 		displayOptions: {
 			show: {
-				resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente', 'obtenerFacturasPedidosVentas'],
+				resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente', 'obtenerFacturasPedidosVentas', 'obtenerFacturasCobros'],
 			},
 		},
 	},
@@ -294,18 +299,29 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente', 'obtenerFacturasPedidosVentas'],
+				resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente'],
 			},
 		},
 	},
 	{
-		displayName: 'Fecha Precio Actualizado Hasta',
-		name: 'priceDateModifiedSince',
+		displayName: 'Fecha Desde',
+		name: 'balanceStartDate',
 		type: 'dateTime',
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['obtenerFacturasPedidosVentas'],
+				resource: ['obtenerFacturasPedidosVentas', 'obtenerFacturasCobros'],
+			},
+		},
+	},
+	{
+		displayName: 'Fecha Hasta',
+		name: 'balanceEndDate',
+		type: 'dateTime',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['obtenerFacturasPedidosVentas', 'obtenerFacturasCobros'],
 			},
 		},
 	},
