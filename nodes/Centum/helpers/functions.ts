@@ -1074,6 +1074,71 @@ export async function apiPostRequest<T = any>(
 	return [data];
 }
 
+// POST paginado (igual que GET pero usando body)
+export async function apiPostRequestPaginated<T = any>(
+  url: string,
+  options: FetchOptions = {},
+): Promise<T[]> {
+  const {
+    headers = {},
+    body,
+    queryParams = {},
+    cantidadItemsPorPagina,
+    itemsField = 'Items',
+    numeroPagina,
+    context,
+    pagination = 'all',
+    intervaloPagina,
+  } = options;
+
+  if (!url || url.trim() === '') {
+    safeThrow(context, 'El campo "Endpoint" es obligatorio.');
+  }
+  if (!options.method || options.method === 'GET') {
+    safeThrow(context, 'Se está intentando hacer una solicitud POST sin un metodo asignado o se asignó el metodo equivocado.');
+  }
+  if (!body) {
+    safeThrow(context, 'El cuerpo (body) de la solicitud POST es obligatorio.');
+  }
+
+  const requestHeaders = buildCentumHeaders(headers.CentumSuiteConsumidorApiPublicaId, headers.publicAccessKey);
+  const allItems: T[] = [];
+  let currentPage = numeroPagina || 1;
+  const itemsPerPage = pagination === 'all' ? 1000 : cantidadItemsPorPagina || 100;
+  const intervaloMs = pagination === 'all' ? 1000 : intervaloPagina ?? 1000;
+
+  while (true) {
+    const totalStart = Date.now();
+    const paginatedParams = {
+      ...queryParams,
+      numeroPagina: currentPage,
+      cantidadItemsPorPagina: itemsPerPage,
+    };
+    const finalUrl = buildUrl(url, paginatedParams);
+    const fetchOptions: RequestInit = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...requestHeaders },
+      body: JSON.stringify(body),
+    };
+    const response = await fetch(finalUrl, fetchOptions);
+    if (!response.ok) {
+      const errorText = await response.text();
+      safeThrow(context, `Error POST (pág ${currentPage}): ${response.status} - ${errorText}`);
+    }
+    const data = await response.json();
+    const pageItems = extractItems<T>(data, itemsField);
+    allItems.push(...pageItems);
+    const processingDuration = Date.now() - totalStart;
+    const nextPage = pageItems.length >= itemsPerPage;
+    const logMsg = `[paginación POST] página: ${currentPage} - Items recibidos: ${pageItems.length} (sincronia: ${processingDuration}ms${nextPage ? '  espera ' + intervaloMs + 'ms' : ''})`;
+    context?.logger ? context.logger.info(logMsg) : console.log(logMsg);
+    if (!nextPage) break;
+    await new Promise((resolve) => setTimeout(resolve, intervaloMs));
+    currentPage++;
+  }
+  return allItems;
+}
+
 //-----------------------------------------------------------------------
 
 	// export async function apiRequest<T>(

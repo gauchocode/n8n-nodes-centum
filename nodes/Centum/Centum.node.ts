@@ -31,7 +31,7 @@ import {
 	getHttpSettings,
 	apiRequest, FetchOptions,
 	apiGetRequest, createContribuyenteJson,
-	// apiPostRequest
+	apiPostRequestPaginated,
 
 } from './helpers/functions';
 import { IDepartamentos } from './interfaces/departamentos';
@@ -110,16 +110,27 @@ export class Centum implements INodeType {
 
 			case 'articulosDatosGenerales':
 				try {
-					const response  = await apiRequest<IArticulos>(
-						`${centumUrl}/Articulos/DatosGenerales`,
-						{
-							method: 'POST',
-							headers,
-							body: {},
-							queryParams: { tipoOrdenArticulos: 'Nombre'}
-						},
-					);
-					return [this.helpers.returnJsonArray(response as any)];
+					// const numeroPagina = Number(this.getNodeParameter('numeroPagina', 0, 1) ?? 1);
+					// const cantidadItemsPorPagina = Number(this.getNodeParameter('cantidadItemsPorPagina', 0, 100) ?? 100);
+					// const pagination = (this.getNodeParameter('pagination', 0, 'all') ?? 'all') as 'all' | 'default' | 'custom';
+					const ajustesHTTP = getHttpSettings.call(this);
+					const articulosURL = `${centumUrl}/Articulos/DatosGenerales`;
+
+					const fetchOptions: FetchOptions = {
+						method: 'POST',
+						headers,
+						body: {},
+						queryParams: { tipoOrdenArticulos: 'Nombre' },
+						pagination: ajustesHTTP.pagination,
+						cantidadItemsPorPagina: ajustesHTTP.cantidadItemsPorPagina,
+						intervaloPagina: ajustesHTTP.intervaloPagina,
+						itemsField: 'Items', // Ajusta si la respuesta es diferente
+						context: this,
+					};
+					//let articulos: IArticulos | IArticulos[] = [];
+					const paginated = await apiPostRequestPaginated<IArticulos>(articulosURL, fetchOptions);
+					//articulos = paginated;
+					return [this.helpers.returnJsonArray(paginated as any)];
 				} catch (error) {
 					console.log('Error en solicitud de artículos', error);
 					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
@@ -136,6 +147,8 @@ export class Centum implements INodeType {
 				const dateModified = this.getNodeParameter('dateModified', 0);
 				const dateModifiedImage = this.getNodeParameter('dateModifiedImage', 0);
 				const priceDateModified = this.getNodeParameter('priceDateModified', 0);
+				const numeroPagina = this.getNodeParameter('numeroPagina', 0);
+				const cantidadPorPagina = this.getNodeParameter('cantidadPorPagina', 0);
 				const bodyToSend = {
 					idCliente: clientId,
 					FechaDocumento: formattedDocumentDate,
@@ -145,6 +158,8 @@ export class Centum implements INodeType {
 					fechaModificacionDesde: dateModified ? dateModified : '',
 					fechaModificacionImagenesDesde: dateModifiedImage ? dateModifiedImage : '',
 					fechaPrecioActualizadoDesde: priceDateModified,
+					numeroPagina,
+					cantidadPorPagina,
 				}
 
 				try {
@@ -474,7 +489,7 @@ export class Centum implements INodeType {
 						description: responseData?.Detail || 'Ocurrió un error inesperado al llamar a la API de Centum.',
 					});
 				}
-			}
+				}
 
 			case 'clienteNuevo':
 				const datosCliente = this.getNodeParameter('cuerpoHTTP', 0);
@@ -578,7 +593,7 @@ export class Centum implements INodeType {
 					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
 					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
-			}
+				}
 
 			case 'cobros':
 				const ordenCliente = this.getNodeParameter('cliente', 0);
@@ -649,7 +664,7 @@ export class Centum implements INodeType {
 					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
 					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
-			}
+				}
 
 		case 'clientesBusqueda': {
 				const customerEmail = this.getNodeParameter('email', 0, '') as string;
@@ -706,7 +721,7 @@ export class Centum implements INodeType {
 					console.error('Error general durante la búsqueda de cliente:', error);
 					throw new NodeOperationError(this.getNode(), `Búsqueda fallida: ${JSON.stringify(error)}`);
 				}
-			}
+				}
 
 			case 'sucursalesFisicas':
 				try {
@@ -815,7 +830,7 @@ export class Centum implements INodeType {
 					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
 					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
-			}
+				}
 
 			case "departamentosLista": {
 				const idProvincia = this.getNodeParameter('idProvincia', 0, '') as string;
@@ -841,7 +856,55 @@ export class Centum implements INodeType {
 					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
 					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
+				}
+
+			case 'articuloPorId': {
+				const codigo = this.getNodeParameter('codigo', 0) as string;
+
+				try {
+					const articulo = await apiRequest<any>(
+						`${centumUrl}/Articulos/DatosGenerales`,
+						{
+							method: 'POST',
+							headers,
+							body: {CodigoExacto: codigo}
+						}
+					);
+
+					return [this.helpers.returnJsonArray(articulo)];
+				} catch (error) {
+					console.log('Error en solicitud de artículo por ID:', error);
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
+				}
 			}
+
+			case 'obtenerSaldoCliente': {
+				const clientId = this.getNodeParameter('clienteId', 0);
+				const desdeSaldoFecha = this.getNodeParameter('priceDateModified', 0);
+				const soloFecha = String(desdeSaldoFecha).split("T")[0];
+
+				try {
+					let url = `${centumUrl}/SaldosCuentasCorrientes/${clientId}`;
+					if (soloFecha) {
+						url += `?fechaVencimientoHasta=${soloFecha}`;
+					}
+
+					const response = await apiRequest<any>(
+						url,
+						{
+							method: 'GET',
+							headers
+						}
+					);
+
+					return [this.helpers.returnJsonArray(response)];
+				} catch (error) {
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
+				}
+			}
+
 
 			default:
 				return [this.helpers.returnJsonArray([])];

@@ -87,6 +87,12 @@ export const CentumOperations: INodeProperties[] = [
 				action: 'Crear nuevo contribuyente',
 			},
 			{
+				name: 'Cliente - Obtener Saldo',
+				value: 'obtenerSaldoCliente',
+				description: 'Obtiene el saldo del cliente especificado. ',
+				action: 'Obtener saldo del cliente',
+			},
+			{
 				name: 'Cobro - Nuevo',
 				value: 'cobros',
 				action: 'Efectuar alta de comprobante y retornar datos.',
@@ -135,6 +141,12 @@ export const CentumOperations: INodeProperties[] = [
 			{
 				name: 'Sucursales Físicas - Lista',
 				value: 'sucursalesFisicas',
+			},
+			{
+				name: 'Articulo - Por ID',
+				value: 'articuloPorId',
+				action: 'Buscar artículo por ID',
+				description: 'Retorna un artículo específico basado en su ID único'
 			},
 		],
 		default: 'pedidoVentaActividad',
@@ -216,7 +228,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'number',
 		required: true,
 		typeOptions: {
-			maxValue: 99999,
+			maxValue: 9999999,
 			minValue: 0,
 			numberStepSize: 1,
 		},
@@ -224,7 +236,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Client ID used to search the articles',
 		displayOptions: {
 			show: {
-				resource: ['articulo'],
+				resource: ['articulo', 'obtenerSaldoCliente'],
 			},
 		},
 	},
@@ -270,7 +282,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['articulo'],
+				resource: ['articulo', 'obtenerSaldoCliente'],
 			},
 		},
 	},
@@ -535,7 +547,48 @@ const getArticulo: INodeProperties[] = [
 				resource: ['articulosSucursalesFisicas'],
 			},
 		},
-	}
+	},
+	{
+		displayName: 'Número De Página',
+		name: 'numeroPagina',
+		type: 'number',
+		default: 1,
+		description: 'Número de página para la paginación de artículos',
+		displayOptions: {
+			show: {
+				resource: ['articulo'],
+			},
+		},
+	},
+	{
+		displayName: 'Cantidad Por Página',
+		name: 'cantidadPorPagina',
+		type: 'number',
+		default: 50,
+		description: 'Cantidad de artículos por página',
+		displayOptions: {
+			show: {
+				resource: ['articulo'],
+			},
+		},
+	},
+	{
+		displayName: 'Codigo',
+		name: 'codigo',
+		type: 'number',
+		required: true,
+		default: 0,
+		typeOptions: {
+			minValue: 1,
+		},
+		placeholder: 'Ej. 1507',
+		description: 'Codigo del articulo a buscar',
+		displayOptions: {
+			show: {
+				resource: ['articuloPorId'],
+			},
+		},
+	},
 ];
 
 export const CentumFields: INodeProperties[] = [...getArticulo];
@@ -602,7 +655,7 @@ export const HttpOptions: INodeProperties[] = [
 			show: {
 				resource: [
 					'clientes',
-					// 'articulosDatosGenerales'
+					'articulosDatosGenerales'
 				],
 			},
 		},
