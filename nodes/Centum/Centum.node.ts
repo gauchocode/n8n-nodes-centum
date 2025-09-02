@@ -666,7 +666,7 @@ export class Centum implements INodeType {
 				}
 				}
 
-		case 'clientesBusqueda': {
+			case 'clientesBusqueda': {
 				const customerEmail = this.getNodeParameter('email', 0, '') as string;
 				const dni = this.getNodeParameter('dni', 0, '') as string;
 
@@ -880,9 +880,15 @@ export class Centum implements INodeType {
 			}
 
 			case 'obtenerSaldoCliente': {
-				const clientId = this.getNodeParameter('clienteId', 0);
+				const clientIdParam = this.getNodeParameter('clienteId', 0);
 				const desdeSaldoFecha = this.getNodeParameter('priceDateModified', 0);
 				const soloFecha = String(desdeSaldoFecha).split("T")[0];
+
+				// Validación de parámetros
+				const clientId = Number(clientIdParam);
+				if (isNaN(clientId) || clientId <= 0) {
+					throw new NodeOperationError(this.getNode(), 'clienteId debe ser un número positivo');
+				}
 
 				try {
 					let url = `${centumUrl}/SaldosCuentasCorrientes/${clientId}`;
@@ -898,13 +904,104 @@ export class Centum implements INodeType {
 						}
 					);
 
+					// Validación de la respuesta
+					if (!response || typeof response !== 'object') {
+						throw new NodeOperationError(this.getNode(), 'Respuesta inválida del servidor');
+					}
+
 					return [this.helpers.returnJsonArray(response)];
 				} catch (error) {
 					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
-					throw new NodeOperationError(this.getNode(), errorMessage);
+					throw new NodeOperationError(this.getNode(), `Error obteniendo saldo para cliente ${clientId}: ${errorMessage}`);
+				}
+			}
+			
+			case 'composicionSaldoCliente': {
+				const clientIdParam = this.getNodeParameter('clienteId', 0);
+				const desdeSaldoFecha = this.getNodeParameter('priceDateModified', 0);
+				const separarFecha = String(desdeSaldoFecha).split("T")[0];
+
+				// Validación de parámetros
+				const clientId = Number(clientIdParam);
+				if (isNaN(clientId) || clientId <= 0) {
+					throw new NodeOperationError(this.getNode(), 'clienteId debe ser un número positivo');
+				}
+
+				try {
+					let url = `${centumUrl}/SaldosCuentasCorrientes/Composicion/${clientId}`;
+					if (separarFecha) {
+						url += `?fechaVencimientoHasta=${separarFecha}`;
+					}
+
+					const response = await apiRequest<any>(
+						url,
+						{
+							method: 'GET',
+							headers
+						}
+					);
+
+					// Validación de la respuesta
+					if (!response || typeof response !== 'object') {
+						throw new NodeOperationError(this.getNode(), 'Respuesta inválida del servidor');
+					}
+
+					return [this.helpers.returnJsonArray(response)];
+				} catch (error) {
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), `Error obteniendo composición de saldo para cliente ${clientId}: ${errorMessage}`);
 				}
 			}
 
+			case 'obtenerFacturasPedidosVentas': {
+				const clientIdParam = this.getNodeParameter('clienteId', 0);
+				const desdeSaldoFecha = this.getNodeParameter('priceDateModified', 0);
+				const hastaSaldoFecha = this.getNodeParameter('priceDateModifiedSince', 0);
+				const separarFechaDesde = String(desdeSaldoFecha).split("T")[0];
+				const separarFechaHasta = String(hastaSaldoFecha).split("T")[0];
+
+				// Validación de parámetros
+				const clientId = Number(clientIdParam);
+				if (isNaN(clientId) || clientId <= 0) {
+					throw new NodeOperationError(this.getNode(), 'clienteId debe ser un número positivo');
+				}
+
+				if (!desdeSaldoFecha) {
+					throw new NodeOperationError(this.getNode(), 'priceDateModified (fecha desde) es requerido');
+				}
+
+				if (!hastaSaldoFecha) {
+					throw new NodeOperationError(this.getNode(), 'priceDateModifiedSince (fecha hasta) es requerido');
+				}
+
+				try {
+					const body = {
+						fechaDocumentoDesde: separarFechaDesde,
+						fechaDocumentoHasta: separarFechaHasta,
+						IdCliente: clientId
+					};
+
+					const response = await apiRequest<any>(
+						`${centumUrl}/Ventas/FiltrosVenta`,
+						{
+							method: 'POST',
+							headers,
+							body
+						}
+					);
+
+					// Validación de la respuesta
+					if (!response || typeof response !== 'object') {
+						throw new NodeOperationError(this.getNode(), 'Respuesta inválida del servidor');
+					}
+
+					return [this.helpers.returnJsonArray(response)];
+				} catch (error) {
+					console.log('Error en solicitud de facturas pedidos ventas:', error);
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), `Error obteniendo facturas pedidos ventas para cliente ${clientId}: ${errorMessage}`);
+				}
+			}
 
 			default:
 				return [this.helpers.returnJsonArray([])];

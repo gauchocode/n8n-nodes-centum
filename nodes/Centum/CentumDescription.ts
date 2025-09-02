@@ -93,6 +93,18 @@ export const CentumOperations: INodeProperties[] = [
 				action: 'Obtener saldo del cliente',
 			},
 			{
+				name: 'Cliente - Obtener Composición del saldo',
+				value: 'composicionSaldoCliente',
+				description: 'Obtiene la composición del saldo de la cuenta corriente del cliente especificado',
+				action: 'Obtener la composición del saldo'
+			},
+			{
+				name: 'Cliente - Obtener facturas ventas',
+				value: 'obtenerFacturasPedidosVentas',
+				description: 'Obtiene la totalidad de las facturas de los pedido de ventas del cliente especificado',
+				action: 'Obtener la facturacion de los pedidos de ventas'
+			},
+			{
 				name: 'Cobro - Nuevo',
 				value: 'cobros',
 				action: 'Efectuar alta de comprobante y retornar datos.',
@@ -236,7 +248,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Client ID used to search the articles',
 		displayOptions: {
 			show: {
-				resource: ['articulo', 'obtenerSaldoCliente'],
+				resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente', 'obtenerFacturasPedidosVentas'],
 			},
 		},
 	},
@@ -282,7 +294,18 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['articulo', 'obtenerSaldoCliente'],
+				resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente', 'obtenerFacturasPedidosVentas'],
+			},
+		},
+	},
+	{
+		displayName: 'Fecha Precio Actualizado Hasta',
+		name: 'priceDateModifiedSince',
+		type: 'dateTime',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['obtenerFacturasPedidosVentas'],
 			},
 		},
 	},
