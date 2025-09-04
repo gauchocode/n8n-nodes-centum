@@ -22,49 +22,61 @@ export const CentumOperations: INodeProperties[] = [
 			{
 				name: 'Articulos - Existencia',
 				value: 'articulosExistencia',
-				action: 'Perform an Artículo request',
+				action: 'Obtener existencias de artículos',
 				description: 'Retorna un listado de las existencias de los artículos en base a ciertos filtros'
 			},
 			{
 				name: 'Articulos - Filtrado',
 				value: 'articulo',
-				action: 'Perform an Artículo request',
+				action: 'Buscar artículos con filtros',
 				description: 'Retorna un listado de artículos para vender en base a ciertos filtros'
 			},
 			{
 				name: 'Articulos - Imagen',
 				value: 'articulosImagenes',
-				action: 'Solicitud de las imagenes de un articulo',
+				action: 'Obtener imagen de artículo',
 				description: 'Retorna la imagen (binario) de un artículo'
 			},
 			{
 				name: 'Articulos - Informacion',
 				value: 'articulosDatosGenerales',
-				action: 'Perform an Artículo Data request',
+				action: 'Obtener datos generales de artículos',
 				description: 'Retorna un listado de los artículos y sus datos generales'
 			},
 			{
 				name: 'Articulos - Precio',
 				value: 'precioArticulo',
-				action: 'Perform an Artículo request',
+				action: 'Obtener precio de artículo',
 				description: 'Retorna el valor decimal que representa el precio del artículo pidiendo una cantidad determinada en una fecha específica'
 			},
 			{
-				name: 'Articulos - Sucursal Física',
+				name: 'Articulos - Precio Por Lista',
+				value: 'articulosPrecioPorLista',
+				action: 'Obten el precio de un articulo segun la lista',
+				description: 'Devuelve el valor de un articulo, segun la lista indicada'
+			},
+			{
+				name: 'Articulos - Stock Sucursal Física',
 				value: 'articulosSucursalesFisicas',
-				action: 'Perform an Artículo request',
-				description: 'Stock de articulos en la sucursal física'
+				action: 'Obtener stock por sucursal física',
+				description: 'Retorna el stock de artículos en una sucursal física específica'
+			},
+			{
+				name: 'Articulos - Stock Sucursal Física Por ID Articulo',
+				value: 'articuloSucursalFisica',
+				action: 'Obtener el stock por articulo individiual por sucursal física',
+				description: 'Retorn el stock de un articulo en especifico de una sucursal fisica'
 			},
 			{
 				name: 'Cliente - Actualizar',
 				value: 'clientesActualizar',
-				action: 'Actualizar un cliente',
+				action: 'Actualizar cliente',
 				description: 'Actualiza un cliente y retorna su información con la URL para acceder al recurso'
 			},
 			{
 				name: 'Cliente - Búsqueda',
 				value: 'clientesBusqueda',
-				action: 'Buscar un cliente',
+				action: 'Buscar cliente',
 				description: 'Retorna un listado de clientes en base a ciertos filtros'
 			},
 			{
@@ -76,100 +88,105 @@ export const CentumOperations: INodeProperties[] = [
 			{
 				name: 'Cliente - Nuevo',
 				value: 'clienteNuevo',
-				action: 'Agregar un nuevo cliente',
+				action: 'Crear nuevo cliente',
 				description: 'Da de alta un cliente. Retornará el cliente creado (con su ID cargado) y la URL para acceder al nuevo recurso.'
 			},
 			{
 				name: 'Cliente - Obtener Composición Del Saldo',
 				value: 'composicionSaldoCliente',
 				description: 'Obtiene la composición del saldo de la cuenta corriente del cliente especificado',
-				action: 'Obtener la composición del saldo'
+				action: 'Obtener composición del saldo del cliente'
 			},
 			{
 				name: 'Cliente - Obtener Facturas De Cobro',
 				value: 'obtenerFacturasCobros',
 				description: 'Obtiene la totalidad de las facturas de los cobros del cliente especificado',
-				action: 'Obtener la facturacion de los cobros'
+				action: 'Obtener facturas de cobros del cliente'
 			},
 			{
 				name: 'Cliente - Obtener Facturas De Venta',
 				value: 'obtenerFacturasPedidosVentas',
 				description: 'Obtiene la totalidad de las facturas de los pedido de ventas del cliente especificado',
-				action: 'Obtener la facturacion de los pedidos de ventas'
+				action: 'Obtener facturas de pedidos de ventas del cliente'
 			},
 			{
 				name: 'Cliente - Obtener Promocion',
 				value: 'promocionesCliente',
 				description: 'Obtiene las promociones aplicadas a un cliente desde una fecha seleccionada',
-				action: 'Obtener las promociones aplicadas a un cliente.'
+				action: 'Obtener promociones aplicadas a un cliente'
 			},
 			{
 				name: 'Cliente - Obtener Saldo',
 				value: 'obtenerSaldoCliente',
 				description: 'Obtiene el saldo del cliente especificado',
-				action: 'Obtener saldo del cliente',
+				action: 'Obtener saldo del cliente'
 			},
 			{
 				name: 'Cliente Contribuyente - Busqueda',
 				value: 'buscarContribuyente',
 				description: 'Retorna los datos del contribuyente por medio de una búsqueda por CUIT o Razon Social',
-				action: 'Buscar contribuyente',
+				action: 'Buscar cliente contribuyente'
 			},
 			{
 				name: 'Cliente Contribuyente - Nuevo',
 				value: 'nuevoContribuyente',
 				description: 'Da de alta un cliente contribuyente nuevo. Retornará al cliente creado (con su ID cargado) y la URL para acceder al nuevo recurso.',
-				action: 'Crear nuevo contribuyente',
+				action: 'Crear nuevo cliente contribuyente'
 			},
 			{
 				name: 'Cobro - Nuevo',
 				value: 'cobros',
-				action: 'Efectuar alta de comprobante y retornar datos.',
+				action: 'Registrar nuevo cobro',
 				description: 'Da de alta el comprobante. Retornará el comprobante creado con su información y una URL.'
 			},
 			{
 				name: 'Departamentos - Lista',
 				value: 'departamentosLista',
-				description: 'Generar JSON estructurado para productos WooCommerce a partir de artículos Centum',
+				description: 'Obtiene un listado de departamentos, normalmente filtrado por provincia'
 			},
 			{
 				name: 'Obtener Productos - Lista',
 				value: 'obtenerProductos',
-				description: 'Obtener una lista con todos los productos utilizando Cliente ID'
+				description: 'Obtiene una lista con todos los productos utilizando Cliente ID'
 			},
 			{
 				name: 'Pedido De Venta - Actividad',
 				value: 'pedidoVentaActividad',
-				action: 'Perform an Actividad request',
-				description: 'Traer un pedido de venta por un identificador único'
+				action: 'Obtener actividad de pedido de venta',
+				description: 'Trae un pedido de venta por un identificador único'
 			},
 			{
 				name: 'Pedido De Venta - Nuevo',
 				value: 'crearPedidoVenta',
-				description: 'Realizar pedidos de venta de los articulos'
+				action: 'Crear nuevo pedido de venta',
+				description: 'Realiza pedidos de venta de los artículos'
 			},
 			{
 				name: 'Precios De Productos - Lista',
-				value: 'productPriceList',
-				action: 'Retrieves the all of the products prices'
+				value: 'listaPrecios',
+				action: 'Obtener lista de precios de productos',
+				description: 'Obtiene una lista con los listado de los precios sugeridos'
 			},
 			{
 				name: 'Proceso Binario a Imagen',
 				value: 'procesarImagenes',
+				action: 'Procesar imágenes binarias',
+				description: 'Procesa datos binarios de imágenes para su uso en WooCommerce'
 			},
 			{
 				name: 'Productos WooCommerce - Generar (JSON Producto)',
 				value: 'generarProductosWoo',
-				description: 'Generar JSON estructurado para productos WooCommerce a partir de artículos Centum',
+				description: 'Genera un JSON estructurado para productos WooCommerce a partir de artículos Centum',
 			},
 			{
 				name: 'Provincias - Lista',
 				value: 'provinciasLista',
-				description: 'Generar JSON estructurado para productos WooCommerce a partir de artículos Centum',
+				description: 'Obtiene un listado de provincias, normalmente filtrado por país'
 			},
 			{
 				name: 'Sucursales Físicas - Lista',
 				value: 'sucursalesFisicas',
+				description: 'Obtiene un listado de las sucursales físicas disponibles',
 			}
 		],
 		default: 'pedidoVentaActividad',
@@ -216,7 +233,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['searchArticleBySKU'],
+				resource: ['searchArticleBySKU', 'articuloSucursalFisica'],
 			},
 		},
 		description: 'The ID of the physical branch to filter stock (optional)',
@@ -435,6 +452,18 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'Lista ID',
+		name: 'idList',
+		type: 'number',
+		default: '',
+		description: 'ID de la lista para buscar los precios de los articulos',
+		displayOptions: {
+			show: {
+				resource: ['articulosPrecioPorLista'],
+			},
+		},
+	},
+	{
 		displayName: 'ID De Cobro',
 		name: 'idCobro',
 		required: true,
@@ -547,12 +576,11 @@ const getArticulo: INodeProperties[] = [
 	{
 		displayName: 'ID Articulo',
 		name: 'articleId',
-		required: true,
 		type: 'string',
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['articulosImagenes'],
+				resource: ['articulosImagenes', 'articuloPorId'],
 			},
 		},
 	},
@@ -632,9 +660,8 @@ const getArticulo: INodeProperties[] = [
 	{
 		displayName: 'Codigo',
 		name: 'codigo',
-		type: 'number',
-		required: true,
-		default: 0,
+		type: 'string',
+		default: '',
 		typeOptions: {
 			minValue: 1,
 		},
@@ -642,7 +669,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Codigo del articulo a buscar',
 		displayOptions: {
 			show: {
-				resource: ['articuloPorId'],
+				resource: ['articuloPorId', 'articulosPrecioPorLista', 'articuloSucursalFisica'],
 			},
 		},
 	},
