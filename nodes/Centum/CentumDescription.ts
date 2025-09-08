@@ -80,6 +80,12 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Retorna un listado de clientes en base a ciertos filtros'
 			},
 			{
+				name: 'Cliente - Búsqueda por CUIT',
+				value: 'clientesBusquedaPorCuit',
+				action: 'Buscar clientes por CUIT',
+				description: 'Retorna un listado de clientes basado en el CUIT proporcionado'
+			},
+			{
 				name: 'Cliente - Lista',
 				value: 'clientes',
 				action: 'Obtener lista de clientes',
@@ -521,7 +527,7 @@ const getArticulo: INodeProperties[] = [
 		placeholder: 'Ingresá el CUIT...',
 		displayOptions: {
 			show: {
-				resource: ['clienteNuevo', 'buscarContribuyente', 'nuevoContribuyente'],
+				resource: ['clienteNuevo', 'buscarContribuyente', 'nuevoContribuyente', 'clientesBusquedaPorCuit'],
 			},
 		},
 	},

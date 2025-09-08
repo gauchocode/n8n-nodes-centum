@@ -423,12 +423,19 @@ export class Centum implements INodeType {
 						'Debe proporcionar al menos CUIT o Razón Social para buscar contribuyentes.',
 					);
 				}
+
+				let url = `${centumUrl}/Clientes/BuscarContribuyente`;
 				const queryParams: Record<string, string> = {};
-				if (cuit) queryParams.Cuit = cuit;
-				if (razonSocial) queryParams.razonSocial = razonSocial;
+
+				if (cuit && !razonSocial) {
+					url += `/${cuit}`;
+				} else {
+					if (cuit) queryParams.Cuit = cuit;
+					if (razonSocial) queryParams.razonSocial = razonSocial;
+				}
 
 				const requestDetails = {
-					url: `${centumUrl}/Clientes`,
+					url,
 					headers,
 					queryParams,
 				};
@@ -576,6 +583,37 @@ export class Centum implements INodeType {
 						this.getNode(),
 						`Búsqueda fallida: ${JSON.stringify(error)}`,
 					);
+				}
+			}
+
+			case 'clientesBusquedaPorCuit': {
+				const cuit = this.getNodeParameter('cuit', 0, '') as string;
+
+				if (!cuit) {
+					throw new NodeOperationError(
+						this.getNode(),
+						'Debe proporcionar CUIT para buscar clientes.',
+					);
+				}
+
+				const queryParams: Record<string, string> = { Cuit: cuit };
+
+				try {
+					const response = await apiRequest<IResponseCustomer>(
+						`${centumUrl}/Clientes`,
+						{
+							method: 'GET',
+							headers,
+							queryParams,
+						},
+					);
+
+					return [this.helpers.returnJsonArray(response.Items as any)];
+				} catch (error) {
+					console.log(`[ClientesBusquedaPorCuit] Error:`, error);
+					const errorMessage =
+						error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 			}
 
