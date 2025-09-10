@@ -80,7 +80,7 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Retorna un listado de clientes en base a ciertos filtros'
 			},
 			{
-				name: 'Cliente - Búsqueda por CUIT',
+				name: 'Cliente - Búsqueda Por CUIT',
 				value: 'clientesBusquedaPorCuit',
 				action: 'Buscar clientes por CUIT',
 				description: 'Retorna un listado de clientes basado en el CUIT proporcionado'
