@@ -1045,11 +1045,6 @@ export class Centum implements INodeType {
 						headers,
 					});
 
-					// Validación de la respuesta
-					if (!response || typeof response !== 'object') {
-						throw new NodeOperationError(this.getNode(), 'Respuesta inválida del servidor');
-					}
-
 					return [this.helpers.returnJsonArray(response)];
 				} catch (error) {
 					const errorMessage =
@@ -1078,37 +1073,93 @@ export class Centum implements INodeType {
 			}
 
 			case 'precioArticulo': {
-				const paramsPrice: Record<string, string | number> = {
-					Cantidad: this.getNodeParameter('articuloCantidad', 0) as number,
-					FechaDocumento: this.getNodeParameter('documentDate', 0) as string,
-				};
+				const rawFecha = (this.getNodeParameter('documentDate', 0) as string) || '';
+				const fechaDecod = decodeURIComponent(rawFecha);
+				const fechaYYYYMMDD = fechaDecod.slice(0, 10); // e.g. "2025-09-11"
+
+				const cantidadParam = this.getNodeParameter('articuloCantidad', 0) as number;
+				const cantidadNum = Number.isFinite(cantidadParam as any) ? Number(cantidadParam) : 1;
+				const cantidad = Math.max(1, Math.floor(cantidadNum));
+
+				const codigo = (this.getNodeParameter('codigo', 0) as string) || '';
+				const articleId = (this.getNodeParameter('articleId', 0) as string) || '';
+
+				if (!codigo && !articleId) {
+					throw new NodeOperationError(this.getNode(), 'El id o código del artículo es obligatorio');
+				}
+
+				let item: any;
+				try {
+					// Armar body correcto
+					const bodyDatos: Record<string, any> = {};
+					if (articleId) {
+						bodyDatos.Ids = Array.isArray(articleId) ? articleId : [articleId];
+					} else {
+						bodyDatos.CodigoExacto = codigo;
+					}
+
+					const articulo = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
+					method: 'POST',
+					headers,
+					body: bodyDatos,
+					});
+
+					const items =
+					articulo?.Items ??
+					articulo?.Articulos?.Items ??
+					articulo?.Articulos ??
+					[];
+
+					if (Array.isArray(items) && items.length > 0) {
+					// Si llegaron varios y pasaste ID, buscá el match exacto
+					if (articleId) {
+						item = items.find((i: any) => String(i.IdArticulo) === String(articleId)) ?? items[0];
+					} else {
+						// por código exacto debería venir 1
+						item = items[0];
+					}
+					} else {
+					throw new NodeOperationError(this.getNode(), 'No se encontró el artículo con el código/ID provisto.');
+					}
+				} catch (error: any) {
+					console.log('Error en solicitud de artículo por ID/Código:', error);
+					const errorMessage =
+					error?.response?.data?.Message ||
+					error.message ||
+					'Error desconocido al obtener el artículo.';
+					throw new NodeOperationError(this.getNode(), errorMessage);
+				}
 
 				try {
+					const paramsPrice: Record<string, string | number> = { Cantidad: cantidad };
+					if (fechaYYYYMMDD) paramsPrice.FechaDocumento = fechaYYYYMMDD;
+
 					const dataArticulosPrecios = await apiRequest<any>(
-						`${centumUrl}/Articulos/PrecioArticulo`,
-						{
-							method: 'POST',
-							headers,
-							queryParams: paramsPrice,
-							body: {
-								IdArticulo: 1507,
-								Codigo: 'R02SR0206P00070007',
-								CodigoAuxiliar: '',
-								CodigoPropioProveedor: '',
-								Nombre: 'ADHESIVO ACRILICO KEKOL K-645 1 KG',
-								NombreFantasia: '',
-							},
-						},
+					`${centumUrl}/Articulos/PrecioArticulo`,
+					{
+						method: 'POST',
+						headers,
+						queryParams: paramsPrice,
+						body: item,
+					},
 					);
 
-					return [this.helpers.returnJsonArray(dataArticulosPrecios as any)];
-				} catch (error) {
-					console.log(error);
+					// Si la API retorna objeto único, devolver como array; si ya es array, passthrough
+					const payload = Array.isArray(dataArticulosPrecios)
+					? dataArticulosPrecios
+					: [dataArticulosPrecios];
+
+					return [this.helpers.returnJsonArray(payload as any)];
+				} catch (error: any) {
+					console.log('Error al consultar precio de artículo:', error);
 					const errorMessage =
-						error?.response?.data?.Message || error.message || 'Error desconocido';
+					error?.response?.data?.Message ||
+					error.message ||
+					'Error desconocido al consultar el precio.';
 					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 			}
+
 
 			case 'procesarImagenes': {
 				const dataImages = this.getNodeParameter('dataImg', 0) as {

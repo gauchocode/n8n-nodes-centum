@@ -579,17 +579,17 @@ const getArticulo: INodeProperties[] = [
 			},
 		},
 	},
-	{
-		displayName: 'ID Articulo',
-		name: 'articleId',
-		type: 'string',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['articulosImagenes', 'articuloPorId'],
+		{
+			displayName: 'ID Articulo',
+			name: 'articleId',
+			type: 'string',
+			default: '',
+			displayOptions: {
+				show: {
+					resource: ['articulosImagenes', 'articuloPorId', 'precioArticulo'],
+				},
 			},
 		},
-	},
 	{
 		displayName: 'ID',
 		name: 'id',
@@ -663,22 +663,22 @@ const getArticulo: INodeProperties[] = [
 			},
 		},
 	},
-	{
-		displayName: 'Codigo',
-		name: 'codigo',
-		type: 'string',
-		default: '',
-		typeOptions: {
-			minValue: 1,
-		},
-		placeholder: 'Ej. 1507',
-		description: 'Codigo del articulo a buscar',
-		displayOptions: {
-			show: {
-				resource: ['articuloPorId', 'articulosPrecioPorLista', 'articuloSucursalFisica'],
+		{
+			displayName: 'Codigo',
+			name: 'codigo',
+			type: 'string',
+			default: '',
+			typeOptions: {
+				minValue: 1,
+			},
+			placeholder: 'Ej. 1507',
+			description: 'Codigo del articulo a buscar',
+			displayOptions: {
+				show: {
+					resource: ['articuloPorId', 'articulosPrecioPorLista', 'articuloSucursalFisica', 'precioArticulo'],
+				},
 			},
 		},
-	},
 ];
 
 export const CentumFields: INodeProperties[] = [...getArticulo];
