@@ -38,16 +38,10 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Retorna la imagen (binario) de un artículo'
 			},
 			{
-				name: 'Articulos - Informacion',
+				name: 'Articulos - Listado',
 				value: 'articulosDatosGenerales',
 				action: 'Obtener datos generales de artículos',
 				description: 'Retorna un listado de los artículos y sus datos generales'
-			},
-			{
-				name: 'Articulos - Precio',
-				value: 'precioArticulo',
-				action: 'Obtener precio de artículo',
-				description: 'Retorna el valor decimal que representa el precio del artículo pidiendo una cantidad determinada en una fecha específica'
 			},
 			{
 				name: 'Articulos - Precio Por Lista',
@@ -149,11 +143,6 @@ export const CentumOperations: INodeProperties[] = [
 				name: 'Departamentos - Lista',
 				value: 'departamentosLista',
 				description: 'Obtiene un listado de departamentos, normalmente filtrado por provincia'
-			},
-			{
-				name: 'Obtener Productos - Lista',
-				value: 'obtenerProductos',
-				description: 'Obtiene una lista con todos los productos utilizando Cliente ID'
 			},
 			{
 				name: 'Pedido De Venta - Actividad',
@@ -374,7 +363,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Parametro fecha del body para las solicitudes',
 		displayOptions: {
 			show: {
-				resource: ['articulo', 'precioArticulo', 'promocionesCliente'],
+				resource: ['articulo', 'promocionesCliente'],
 			},
 		},
 	},
@@ -398,7 +387,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Whether complete articles migration or partial',
 		displayOptions: {
 			show: {
-				resource: ['articulo', 'precioArticulo'],
+				resource: ['articulo'],
 			},
 		},
 	},
@@ -479,19 +468,6 @@ const getArticulo: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['crearPedidoVenta'],
-			},
-		},
-	},
-	{
-		displayName: 'Cantidad',
-		name: 'articuloCantidad',
-		type: 'string',
-		required: true,
-		default: '1',
-		description: 'Cantidad para este articulo',
-		displayOptions: {
-			show: {
-				resource: ['precioArticulo'],
 			},
 		},
 	},
@@ -586,7 +562,7 @@ const getArticulo: INodeProperties[] = [
 			default: '',
 			displayOptions: {
 				show: {
-					resource: ['articulosImagenes', 'articuloPorId', 'precioArticulo'],
+					resource: ['articulosImagenes', 'articuloPorId'],
 				},
 			},
 		},
@@ -675,7 +651,7 @@ const getArticulo: INodeProperties[] = [
 			description: 'Codigo del articulo a buscar',
 			displayOptions: {
 				show: {
-					resource: ['articuloPorId', 'articulosPrecioPorLista', 'articuloSucursalFisica', 'precioArticulo'],
+					resource: ['articuloPorId', 'articulosPrecioPorLista', 'articuloSucursalFisica'],
 				},
 			},
 		},

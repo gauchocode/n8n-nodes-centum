@@ -213,9 +213,6 @@ export class Centum implements INodeType {
 
 			case 'articulosDatosGenerales': {
 				try {
-					// const numeroPagina = Number(this.getNodeParameter('numeroPagina', 0, 1) ?? 1);
-					// const cantidadItemsPorPagina = Number(this.getNodeParameter('cantidadItemsPorPagina', 0, 100) ?? 100);
-					// const pagination = (this.getNodeParameter('pagination', 0, 'all') ?? 'all') as 'all' | 'default' | 'custom';
 					const ajustesHTTP = getHttpSettings.call(this);
 					const articulosURL = `${centumUrl}/Articulos/DatosGenerales`;
 
@@ -230,9 +227,7 @@ export class Centum implements INodeType {
 						itemsField: 'Items', // Ajusta si la respuesta es diferente
 						context: this,
 					};
-					//let articulos: IArticulos | IArticulos[] = [];
 					const paginated = await apiPostRequestPaginated<IArticulos>(articulosURL, fetchOptions);
-					//articulos = paginated;
 					return [this.helpers.returnJsonArray(paginated as any)];
 				} catch (error) {
 					console.log('Error en solicitud de artículos', error);
@@ -336,7 +331,7 @@ export class Centum implements INodeType {
 					);
 				}
 				try {
-					const articulo = await apiRequest<any>(`${centumUrl}/FiltrosPrecios`, {
+					const articulo = await apiRequest<any>(`${centumUrl}/Articulos/FiltrosPrecios`, {
 						method: 'POST',
 						headers,
 						body: { IdsArticulos: idArticulos, IdLista: idLista },
@@ -345,9 +340,8 @@ export class Centum implements INodeType {
 					return [this.helpers.returnJsonArray(articulo)];
 				} catch (error) {
 					console.log('Error en solicitud de artículo por ID:', error);
-					const errorMessage =
-						error?.response?.data?.Message || error.message || 'Error desconocido';
-					throw new NodeOperationError(this.getNode(), errorMessage);
+					//const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					//throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 			}
 
@@ -960,69 +954,6 @@ export class Centum implements INodeType {
 				}
 			}
 
-			case 'obtenerProductos': {
-				try {
-					const payload = {
-						IdCliente: 47924, // ID of the client from Mauri Dev Broobe
-						FechaDocumento: '2024-05-31', // Date from which to fetch products
-						Habilitado: true,
-						ActivoWeb: true,
-					};
-
-					const dataProductos = await apiRequest<any>(
-						// `${centumUrl}/Articulos/Venta?numeroPagina=1&cantidadItemsPorPagina=100`,
-						`${centumUrl}/Articulos/Venta`,
-						{
-							method: 'POST',
-							body: payload,
-							headers,
-						},
-					);
-
-					const items = dataProductos.Articulos?.Items || [];
-					const formateoObjeto = items.map((item: any) => ({
-						IdArticulo: item.IdArticulo,
-						Codigo: item.Codigo,
-						Nombre: item.Nombre,
-						NombreFantasia: item.NombreFantasia,
-						Habilitado: item.Habilitado,
-						ActivoWeb: item.ActivoWeb,
-						Precio: item.Precio,
-						FechaUltimaActualizacionPrecio: item.FechaUltimaActualizacionPrecio,
-						StockDisponible: item.StockDisponible,
-						Rubro: item.Rubro
-							? {
-									IdRubro: item.Rubro.IdRubro,
-									Codigo: item.Rubro.Codigo,
-									Nombre: item.Rubro.Nombre,
-								}
-							: null,
-						SubRubro: item.SubRubro
-							? {
-									IdSubRubro: item.SubRubro.IdSubRubro,
-									Codigo: item.SubRubro.Codigo,
-									Nombre: item.SubRubro.Nombre,
-									IdRubro: item.SubRubro.IdRubro,
-								}
-							: null,
-						CategoriaArticulo: item.CategoriaArticulo
-							? {
-									IdCategoriaArticulo: item.CategoriaArticulo.IdCategoriaArticulo,
-									Codigo: item.CategoriaArticulo.Codigo,
-									Nombre: item.CategoriaArticulo.Nombre,
-									IdSubRubro: item.CategoriaArticulo.IdSubRubro,
-								}
-							: null,
-					}));
-					return [this.helpers.returnJsonArray(formateoObjeto)];
-				} catch (error) {
-					console.log(error);
-					const errorMessage =
-						error?.response?.data?.Message || error.message || 'Error desconocido';
-					throw new NodeOperationError(this.getNode(), errorMessage);
-				}
-			}
-
 			case 'obtenerSaldoCliente': {
 				const clientIdParam = this.getNodeParameter('clienteId', 0);
 				const desdeSaldoFecha = this.getNodeParameter('priceDateModified', 0);
@@ -1071,95 +1002,6 @@ export class Centum implements INodeType {
 					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 			}
-
-			case 'precioArticulo': {
-				const rawFecha = (this.getNodeParameter('documentDate', 0) as string) || '';
-				const fechaDecod = decodeURIComponent(rawFecha);
-				const fechaYYYYMMDD = fechaDecod.slice(0, 10); // e.g. "2025-09-11"
-
-				const cantidadParam = this.getNodeParameter('articuloCantidad', 0) as number;
-				const cantidadNum = Number.isFinite(cantidadParam as any) ? Number(cantidadParam) : 1;
-				const cantidad = Math.max(1, Math.floor(cantidadNum));
-
-				const codigo = (this.getNodeParameter('codigo', 0) as string) || '';
-				const articleId = (this.getNodeParameter('articleId', 0) as string) || '';
-
-				if (!codigo && !articleId) {
-					throw new NodeOperationError(this.getNode(), 'El id o código del artículo es obligatorio');
-				}
-
-				let item: any;
-				try {
-					// Armar body correcto
-					const bodyDatos: Record<string, any> = {};
-					if (articleId) {
-						bodyDatos.Ids = Array.isArray(articleId) ? articleId : [articleId];
-					} else {
-						bodyDatos.CodigoExacto = codigo;
-					}
-
-					const articulo = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
-					method: 'POST',
-					headers,
-					body: bodyDatos,
-					});
-
-					const items =
-					articulo?.Items ??
-					articulo?.Articulos?.Items ??
-					articulo?.Articulos ??
-					[];
-
-					if (Array.isArray(items) && items.length > 0) {
-					// Si llegaron varios y pasaste ID, buscá el match exacto
-					if (articleId) {
-						item = items.find((i: any) => String(i.IdArticulo) === String(articleId)) ?? items[0];
-					} else {
-						// por código exacto debería venir 1
-						item = items[0];
-					}
-					} else {
-					throw new NodeOperationError(this.getNode(), 'No se encontró el artículo con el código/ID provisto.');
-					}
-				} catch (error: any) {
-					console.log('Error en solicitud de artículo por ID/Código:', error);
-					const errorMessage =
-					error?.response?.data?.Message ||
-					error.message ||
-					'Error desconocido al obtener el artículo.';
-					throw new NodeOperationError(this.getNode(), errorMessage);
-				}
-
-				try {
-					const paramsPrice: Record<string, string | number> = { Cantidad: cantidad };
-					if (fechaYYYYMMDD) paramsPrice.FechaDocumento = fechaYYYYMMDD;
-
-					const dataArticulosPrecios = await apiRequest<any>(
-					`${centumUrl}/Articulos/PrecioArticulo`,
-					{
-						method: 'POST',
-						headers,
-						queryParams: paramsPrice,
-						body: item,
-					},
-					);
-
-					// Si la API retorna objeto único, devolver como array; si ya es array, passthrough
-					const payload = Array.isArray(dataArticulosPrecios)
-					? dataArticulosPrecios
-					: [dataArticulosPrecios];
-
-					return [this.helpers.returnJsonArray(payload as any)];
-				} catch (error: any) {
-					console.log('Error al consultar precio de artículo:', error);
-					const errorMessage =
-					error?.response?.data?.Message ||
-					error.message ||
-					'Error desconocido al consultar el precio.';
-					throw new NodeOperationError(this.getNode(), errorMessage);
-				}
-			}
-
 
 			case 'procesarImagenes': {
 				const dataImages = this.getNodeParameter('dataImg', 0) as {
@@ -1212,10 +1054,6 @@ export class Centum implements INodeType {
 				const diaSemana = this.getNodeParameter('diaSemana', 0);
 				const clientId = Number(clientIdParam);
 
-				if (isNaN(clientId) || clientId <= 0) {
-					throw new NodeOperationError(this.getNode(), 'clienteId debe ser un número positivo');
-				}
-
 				if (!documentDate) {
 					throw new NodeOperationError(this.getNode(), 'documentDate es requerido');
 				}
@@ -1225,7 +1063,7 @@ export class Centum implements INodeType {
 				try {
 					const body = {
 						FechaDocumento: formattedDocumentDate,
-						IdCliente: clientId,
+						IdsCliente: clientId,
 						DiaSemana: diaSemana || '',
 					};
 
