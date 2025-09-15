@@ -379,16 +379,15 @@ export class Centum implements INodeType {
 			case 'articuloSucursalFisica': {
 				const IdSucursalFisica = this.getNodeParameter('idSucursalFisica', 0) as string;
 				const idArticulo = this.getNodeParameter('articleId', 0) as string;
-				const queryParams: { IdSucursalFisica?: string, codigoExacto?: string } = {
+				const codigo = this.getNodeParameter('codigo', 0) as string;
+				const queryParams: { IdSucursalFisica?: string, codigoExacto?: string, idsArticulos: string } = {
 					IdSucursalFisica: IdSucursalFisica,
-					codigoExacto: idArticulo,
+					codigoExacto: codigo,
+					idsArticulos: idArticulo
 				};
 
-				if (!IdSucursalFisica || !idArticulo) {
-					throw new NodeOperationError(
-						this.getNode(),
-						'El id de la sucursal fisica y el id del articulo es obligatorio',
-					);
+				if (!IdSucursalFisica || (!idArticulo && !codigo)) {
+					throw new NodeOperationError( this.getNode(), 'El id de la sucursal fisica y el id del articulo o el codigo son obligatorios');
 				}
 				try {
 					const dataArticulosExistencias = await apiRequest<any>(

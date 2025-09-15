@@ -562,7 +562,7 @@ const getArticulo: INodeProperties[] = [
 			default: '',
 			displayOptions: {
 				show: {
-					resource: ['articulosImagenes', 'articuloPorId'],
+					resource: ['articulosImagenes', 'articuloPorId', 'articuloSucursalFisica'],
 				},
 			},
 		},
