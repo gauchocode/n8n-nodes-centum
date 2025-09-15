@@ -179,6 +179,16 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obtiene un listado de provincias, normalmente filtrado por país'
 			},
 			{
+				name: 'Regimenes Especiales - ID',
+				value: 'regimenesEspecialesPorId',
+				description: 'Trae un listado entero de los regimenes especiales'
+			},
+			{
+				name: 'Regimenes Especiales - Lista',
+				value: 'regimenesEspecialesLista',
+				description: 'Trae un listado entero de los regimenes especiales'
+			},
+			{
 				name: 'Sucursales Físicas - Lista',
 				value: 'sucursalesFisicas',
 				description: 'Obtiene un listado de las sucursales físicas disponibles',
@@ -491,7 +501,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['clienteNuevo', 'clientesBusqueda'],
+				resource: ['clienteNuevo'],
 			},
 		},
 	},
@@ -503,7 +513,7 @@ const getArticulo: INodeProperties[] = [
 		placeholder: 'Ingresá el CUIT...',
 		displayOptions: {
 			show: {
-				resource: ['clienteNuevo', 'buscarContribuyente', 'nuevoContribuyente', 'clientesBusquedaPorCuit'],
+				resource: ['clienteNuevo', 'buscarContribuyente', 'nuevoContribuyente', 'clientesBusquedaPorCuit', 'clientesBusqueda'],
 			},
 		},
 	},
@@ -512,12 +522,8 @@ const getArticulo: INodeProperties[] = [
 		name: 'email',
 		type: 'string',
 		placeholder: 'name@email.com',
-		default: 'example@example.com',
-		displayOptions: {
-			show: {
-				resource: ['clientesBusqueda'],
-			},
-		},
+		default: '',
+		displayOptions: {},
 	},
 	{
 		displayName: 'Razón Social',
@@ -527,7 +533,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Razón social del cliente para buscar',
 		displayOptions: {
 			show: {
-				resource: ['buscarContribuyente'],
+				resource: ['buscarContribuyente', 'clientesBusqueda'],
 			},
 		},
 	},
@@ -576,7 +582,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Identificador unico con el cual hacer solicitudes a la API',
 		displayOptions: {
 			show: {
-				resource: ['pedidoVentaActividad'],
+				resource: ['pedidoVentaActividad', 'regimenesEspecialesPorId'],
 			},
 		},
 	},
@@ -651,7 +657,7 @@ const getArticulo: INodeProperties[] = [
 			description: 'Codigo del articulo a buscar',
 			displayOptions: {
 				show: {
-					resource: ['articuloPorId', 'articulosPrecioPorLista', 'articuloSucursalFisica'],
+					resource: ['articuloPorId', 'articulosPrecioPorLista', 'articuloSucursalFisica', 'clientesBusqueda'],
 				},
 			},
 		},

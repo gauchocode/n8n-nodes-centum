@@ -520,62 +520,36 @@ export class Centum implements INodeType {
 				}
 			}
 
-			case 'clientesBusqueda': {
-				const customerEmail = this.getNodeParameter('email', 0, '') as string;
-				const dni = this.getNodeParameter('dni', 0, '') as string;
+				case 'clientesBusqueda': {
+				const codigo = this.getNodeParameter('codigo', 0, '') as string;
+				const cuit = this.getNodeParameter('cuit', 0, '') as string;
+				const razonSocial = this.getNodeParameter('razonSocial', 0, '') as string;
 
-				const buildQuery = (campo: 'Email' | 'Codigo', valor: string) =>
-					valor ? { [campo]: valor } : {};
+				if (!codigo && !cuit && !razonSocial) {
+					throw new NodeOperationError(this.getNode(), 'Debe proporcionar al menos un campo para la búsqueda (CUIT, Codigo o Razón Social).');
+				}
 
-				const trySearch = async (
-					campo: 'Email' | 'Codigo',
-					valor: string,
-					label: string,
-				): Promise<IResponseCustomer | null> => {
-					if (!valor) return null;
-					try {
-						console.log(`[${label}] Buscando cliente por ${campo}: ${valor}`);
-						const response = await apiRequest<IResponseCustomer>(
-							`${centumUrl}/Clientes`,
-							{
-								method: 'GET',
-								headers,
-								queryParams: buildQuery(campo, valor),
-							},
-							this,
-						);
-						console.log(`[${label}] Resultado:`, response);
-						return response;
-					} catch (error) {
-						console.error(`[${label}] Error:`, error);
-						return null;
-					}
-				};
+				const queryParams: Record<string, string> = {};
+				if (cuit) queryParams.Cuit = cuit;
+				if (codigo) queryParams.Codigo = codigo;
+				if (razonSocial) queryParams.RazonSocial = razonSocial;
 
 				try {
-					let response: IResponseCustomer | null = null;
-
-					if (customerEmail) {
-						response = await trySearch('Email', customerEmail, 'email');
-					}
-
-					if (!response && dni) {
-						response = await trySearch('Codigo', `web-${dni}`, 'dni-web');
-					}
-
-					if (!response && dni) {
-						response = await trySearch('Codigo', `${dni}`, 'dni');
-					}
-					console.log('Búsqueda finalizada. Resultado:', response);
-
-					// Siempre regresa un objeto, aunque sea vacío
-					return [this.helpers.returnJsonArray(response as any)];
-				} catch (error) {
-					console.error('Error general durante la búsqueda de cliente:', error);
-					throw new NodeOperationError(
-						this.getNode(),
-						`Búsqueda fallida: ${JSON.stringify(error)}`,
+					const response = await apiRequest<IResponseCustomer>(
+						`${centumUrl}/Clientes`,
+						{
+							method: 'GET',
+							headers,
+							queryParams,
+						},
 					);
+
+					return [this.helpers.returnJsonArray(response.Items as any)];
+				} catch (error) {
+					console.log(`[ClientesBusqueda] Error:`, error);
+					const errorMessage =
+						error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 			}
 
@@ -1112,6 +1086,40 @@ export class Centum implements INodeType {
 					});
 
 					return [this.helpers.returnJsonArray(provincias.map((p) => ({ ...p })))];
+				} catch (error) {
+					console.log(error);
+					const errorMessage =
+						error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
+				}
+			}
+
+			case 'regimenesEspecialesLista': {
+				try {
+					const dataRegimenesList = await apiRequest<any>(`${centumUrl}/RegimenesEspeciales`, {
+						method: 'GET',
+						headers
+					})
+					return [this.helpers.returnJsonArray(dataRegimenesList)];
+				} catch (error) {
+					console.log(error);
+					const errorMessage =
+						error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
+				}
+			}
+			case 'regimenesEspecialesPorId': {
+				const regimenId = this.getNodeParameter('id', 0);
+				if (!regimenId) {
+					throw new NodeOperationError(this.getNode(), 'El ID del regimen es requerido');
+				}
+				
+				try {
+					const regimen = await apiRequest<any>(`${centumUrl}/RegimenesEspeciales/${regimenId}`, {
+						method: 'GET',
+						headers
+					})
+					return [this.helpers.returnJsonArray(regimen)];
 				} catch (error) {
 					console.log(error);
 					const errorMessage =
