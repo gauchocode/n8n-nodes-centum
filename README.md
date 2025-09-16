@@ -6,15 +6,48 @@ This is a custom node for [n8n](https://n8n.io/), an open-source workflow automa
 
 The node is built to be extensible, allowing for easy addition of new operations to meet specific integration needs with Centum.
 
-## Features
+## Available Operations
 
-The `Centum` node supports the following operations:
+**28 endpoints organized in 5 categories:**
 
-- **Search Customers (`searchCustomer`)**: Search for customers in Centum using parameters like `email`, `Code`, or `Business Name`. Returns customer data if a single match is found.
-- **Create Charges (`charge`)**: Create a new charge in Centum by sending customer details, articles, and shipping information.
-- **Extensibility**: The node is designed to support additional operations (e.g., managing articles, activities, or inventory) as needed.
+### 📦 Articles
+- `articulo`: Filtered search (categories, dates, stock)
+- `articuloPorId`: Query by ID/exact code
+- `articulosExistencia`: Stock by physical branch
+- `articulosImagenes`: Image download and processing
+- `articulosPrecioPorLista`: Prices by price list
+- `articulosSucursalesFisicas`: Articles by physical branch
+- `articuloSucursalFisica`: Specific article by branch
 
-This node uses authenticated requests to the Centum API, ensuring secure and efficient integration with your Centum system.
+### 👤 Customers
+- `clienteNuevo`: Creation from WooCommerce (automatic mapping)
+- `nuevoContribuyente`: Taxpayer registration with CUIT
+- `composicionSaldoCliente`: Detailed account statement
+- `obtenerSaldoCliente`: Current balance query
+- `clientes`: Paginated customer list
+- `clientesActualizar`: Customer data update
+- `clientesBusqueda`: Search by email/DNI
+- `clientesBusquedaPorCuit`: Search by CUIT
+
+### 📦 Orders and Payments
+- `cobros`: Payment registration
+- `crearPedidoVenta`: Sales order creation
+- `obtenerFacturasCobros`: Payment history
+- `obtenerFacturasPedidosVentas`: Sales order history
+- `pedidoVentaActividad`: Order activity tracking
+
+### 🌍 Catalogs
+- `provinciasLista`: Argentine provinces list
+- `departamentosLista`: Departments by province
+- `sucursalesFisicas`: Available physical branches
+- `listaPrecios`: Price lists
+- `promocionesCliente`: Customer promotions
+
+### ⚙️ Utilities
+- `generarProductosWoo`: WooCommerce format transformation
+- `procesarImagenes`: Smart image synchronization
+- `generarToken`: Authentication token generation
+- `buscarContribuyente`: Taxpayer search
 
 ## Prerequisites
 
