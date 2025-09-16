@@ -145,6 +145,11 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obtiene un listado de departamentos, normalmente filtrado por provincia'
 			},
 			{
+				name: 'Obtener Operador Movil',
+				value: 'operadoresMoviles',
+				description: 'Obtiene todos los datos de un operador movil en base a las credenciales'
+			},
+			{
 				name: 'Pedido De Venta - Actividad',
 				value: 'pedidoVentaActividad',
 				action: 'Obtener actividad de pedido de venta',
@@ -517,13 +522,28 @@ const getArticulo: INodeProperties[] = [
 			},
 		},
 	},
-	{
-		displayName: 'Email',
-		name: 'email',
+		{
+		displayName: 'Usuario',
+		name: 'username',
 		type: 'string',
-		placeholder: 'name@email.com',
 		default: '',
-		displayOptions: {},
+		displayOptions: {
+			show: {
+				resource: ['operadoresMoviles'],
+			},
+		},
+	},
+		{
+		displayName: 'Contraseña',
+		name: 'password',
+		type: 'string',
+		typeOptions: { password: true },
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['operadoresMoviles'],
+			},
+		},
 	},
 	{
 		displayName: 'Razón Social',

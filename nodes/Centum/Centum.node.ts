@@ -959,6 +959,24 @@ export class Centum implements INodeType {
 					);
 				}
 			}
+			
+			case 'operadoresMoviles': {
+				const username = this.getNodeParameter('username', 0, '') as string;
+				const password = this.getNodeParameter('password', 0, '') as string;
+
+				try{
+					const operadoresActividad = await apiRequest<any>(`
+						${centumUrl}/OperadoresMoviles/Credenciales?Usuario=${username}&Contrasena=${password}`, {
+							method: 'GET',
+							headers
+						}
+					);
+					return [this.helpers.returnJsonArray(operadoresActividad)];
+				}catch( error ){
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
+				}
+			}
 
 			case 'pedidoVentaActividad': {
 				const pedidoID = this.getNodeParameter('id', 0);
