@@ -39,8 +39,8 @@ export const createHash = (publicAccessKey: string): string => {
 
 export const createCustomerJson = (respWoo: IWoo, dni: string) => {
 	const customerObj: INewCustomer = {
-		TarifaServicio:{
-			IdTarifaServicio:1
+		TarifaServicio: {
+			IdTarifaServicio: 1
 		},
 		CodigoPostal: respWoo.billing.postcode,
 		Direccion: respWoo.billing.address_1,
@@ -200,193 +200,193 @@ export const createCustomerJson = (respWoo: IWoo, dni: string) => {
 };
 
 function getProvinciaCentumFromWoo(wooCode: string): IProvincias | null {
-  return wooToCentumProvinciaMap[wooCode] ?? null;
+	return wooToCentumProvinciaMap[wooCode] ?? null;
 }
 
 export const createContribuyenteJson = (
 	body: IContribuyenteBodyInput,
 	cuit: string
-)  => {
+) => {
 	const provinciaCentum = getProvinciaCentumFromWoo(body.Provincia ?? '') ??
 		constantProvincias.find(
 			(prov) => prov.Nombre.toLowerCase() === (body.Provincia ?? '').toLowerCase()
 		) ??
 		constantProvincias[5]; // fallback a Buenos Aires
 
-		const cuitStr = String(cuit)
-		const fullAddress = [
-			body.Direccion || '',
-			body.NroDireccion || '',
-			body.PisoDepartamento || ''
-		].filter(Boolean).join(' ');
+	const cuitStr = String(cuit)
+	const fullAddress = [
+		body.Direccion || '',
+		body.NroDireccion || '',
+		body.PisoDepartamento || ''
+	].filter(Boolean).join(' ');
 
-		console.log('FULL ADDRESS: ',fullAddress);
+	console.log('FULL ADDRESS: ', fullAddress);
 	return {
 		IdCliente: -1,
 		CUIT: cuit,
-    Codigo: `web-${cuitStr.slice(2, 10)}`,
-    RazonSocial: body.RazonSocial,
-    Email: body.Email || '',
-    Telefono: body.Telefono || '',
-    CodigoPostal: body.CodigoPostal,
-    Localidad: body.Localidad,
+		Codigo: `web-${cuitStr.slice(2, 10)}`,
+		RazonSocial: body.RazonSocial,
+		Email: body.Email || '',
+		Telefono: body.Telefono || '',
+		CodigoPostal: body.CodigoPostal,
+		Localidad: body.Localidad,
 		Direccion: fullAddress,
-    Provincia: provinciaCentum,
-    Zona: constantsZonas[0],
-    Pais: {
-      Codigo: 'ARG',
-      IdPais: 4657,
-      Nombre: 'Argentina',
-    },
-    CondicionIVA:
-      CondicionesIVA.find(
-        (condicion) => condicion.Nombre.toLocaleLowerCase() === (body.CondicionIVA ?? '').toLocaleLowerCase()
-      ) || {
-        IdCondicionIVA: 1895,
-        Codigo: 'RI',
-        Nombre: 'Responsable Inscripto' as CondicionIVANombre,
-      },
-    CondicionIIBB:
-      CondicionesIIBB.find(
-        (condicion) => condicion.Codigo.toLocaleLowerCase() === (body.CondicionIIBB ?? '').toLocaleLowerCase()
-      ) || {
-        IdCondicionIIBB: 6051,
-        Codigo: 'Exento' as CondicionIIBBCodigo
-      },
+		Provincia: provinciaCentum,
+		Zona: constantsZonas[0],
+		Pais: {
+			Codigo: 'ARG',
+			IdPais: 4657,
+			Nombre: 'Argentina',
+		},
+		CondicionIVA:
+			CondicionesIVA.find(
+				(condicion) => condicion.Nombre.toLocaleLowerCase() === (body.CondicionIVA ?? '').toLocaleLowerCase()
+			) || {
+				IdCondicionIVA: 1895,
+				Codigo: 'RI',
+				Nombre: 'Responsable Inscripto' as CondicionIVANombre,
+			},
+		CondicionIIBB:
+			CondicionesIIBB.find(
+				(condicion) => condicion.Codigo.toLocaleLowerCase() === (body.CondicionIIBB ?? '').toLocaleLowerCase()
+			) || {
+				IdCondicionIIBB: 6051,
+				Codigo: 'Exento' as CondicionIIBBCodigo
+			},
 		CategoriaIIBB:
-		CategoriasIIBB.find(
-			(categoria) => categoria.Codigo.toLowerCase() ===  (body.CategoriaIIBB ?? '').toLocaleLowerCase()
-		)
+			CategoriasIIBB.find(
+				(categoria) => categoria.Codigo.toLowerCase() === (body.CategoriaIIBB ?? '').toLocaleLowerCase()
+			)
 		// || {
-    //     IdCondicionIIBB: 6054,
-    //     Codigo: 'Cosas Muebles'
-    //   }
+		//     IdCondicionIIBB: 6054,
+		//     Codigo: 'Cosas Muebles'
+		//   }
 		,
-    NumeroIIBB: body.NumeroIIBB,
-    DireccionEntrega: fullAddress,
-    CigarreraCliente: {
-      Codigo: 'MSP',
-      IdCigarreraCliente: 6972,
-      Nombre: 'Massalin Particulares',
-    },
-    Bonificacion: {
-      Calculada: 0,
-      Codigo: '01',
-      IdBonificacion: 6235,
-    },
-    ClaseCliente: {
-      IdClaseCliente: 6087,
-      Codigo: 'ClaseDefecto',
-      Nombre: 'Clase Defecto',
-    },
-    CadenaCliente: {
-      Codigo: '365',
-      IdCadenaCliente: 6920,
-      Nombre: '365',
-    },
-    CondicionVenta: {
-      Codigo: 'VTA1',
-      IdCondicionVenta: 1,
-      Nombre: 'Contado',
-    },
-    DiasAtencionCliente: {
-      Codigo: 'LD',
-      IdDiasAtencionCliente: 6969,
-      Nombre: 'Lunes a Domingo',
-    },
-    EdadesPromedioConsumidoresCliente: {
-      Codigo: '111',
-      IdEdadesPromedioConsumidoresCliente: 6951,
-      Nombre: 'Hay igual cantidad de consumidores',
-    },
-    FrecuenciaCliente: {
-      IdFrecuenciaCliente: 6891,
-      Nombre: 'Frecuencia Defecto',
-    },
-    GeneroPromedioConsumidoresCliente: {
-      Codigo: '11',
-      IdGeneroPromedioConsumidoresCliente: 6964,
-      Nombre: 'Hay igual cantidad de consumidores',
-    },
-    HorarioAtencionCliente: {
-      Codigo: 'D',
-      IdHorarioAtencionCliente: 6970,
-      Nombre: 'Diurno',
-    },
-    LimiteCredito: {
-      IdLimiteCredito: 46002,
-      Nombre: 'Límite Credito 1',
-      Valor: 1000000,
-    },
-    Transporte: {
-      Codigo: 'TRA1',
-      CodigoPostal: null,
-      CodigoPostalEntrega: null,
-      Direccion: null,
-      DireccionEntrega: null,
-      Email: null,
-      IdTransporte: 1,
-      Localidad: null,
-      LocalidadEntrega: null,
-      NumeroDocumento: '00000000',
-      Pais: {
-        Codigo: 'ARG',
-        IdPais: 4657,
-        Nombre: 'Argentina',
-      },
-      PaisEntrega: null,
-      Provincia: {
-        Codigo: 'BSAS',
-        IdProvincia: 4876,
-        Nombre: 'Buenos Aires',
-      },
-      ProvinciaEntrega: null,
-      RazonSocial: 'Transporte Defecto',
-      Telefono: '',
-      TipoDocumento: {
-        Codigo: 'DNI',
-        IdTipoDocumento: 6028,
-        Nombre: 'Documento Nacional de Identidad',
-      },
-      ZonaEntrega: null,
-    },
-    UbicacionCliente: {
-      Codigo: 'BAR',
-      IdUbicacionCliente: 6942,
-      Nombre: 'Zona de Bares y Boliches',
-    },
-    Vendedor: {
-      IdVendedor: 12,
-      Codigo: 'V11',
-      Nombre: 'EXITOWEB',
-      CUIT: null,
-      Direccion: null,
-      Localidad: null,
-      Telefono: null,
-      Mail: null,
-      EsSupervisor: false,
-    },
-    CanalCliente: {
-      Codigo: 'OTR',
-      IdCanalCliente: 6904,
-      Nombre: 'Otros',
-    },
-    ListaPrecio: {
-      Codigo: ListaPrecioCodigo.Exitoweb,
-      Descripcion: Descripcion.TiendaOnLineExito,
-      FechaDesde: null,
-      FechaHasta: null,
-      Habilitado: true,
-      IdListaPrecio: 3,
-      ListaPrecioAlternativa: null,
-      Moneda: {
-        Codigo: 'ARS',
-        Cotizacion: 1,
-        IdMoneda: 1,
-        Nombre: 'Peso Argentino',
-      },
-      PorcentajePrecioSugerido: 0,
-    },
+		NumeroIIBB: body.NumeroIIBB,
+		DireccionEntrega: fullAddress,
+		CigarreraCliente: {
+			Codigo: 'MSP',
+			IdCigarreraCliente: 6972,
+			Nombre: 'Massalin Particulares',
+		},
+		Bonificacion: {
+			Calculada: 0,
+			Codigo: '01',
+			IdBonificacion: 6235,
+		},
+		ClaseCliente: {
+			IdClaseCliente: 6087,
+			Codigo: 'ClaseDefecto',
+			Nombre: 'Clase Defecto',
+		},
+		CadenaCliente: {
+			Codigo: '365',
+			IdCadenaCliente: 6920,
+			Nombre: '365',
+		},
+		CondicionVenta: {
+			Codigo: 'VTA1',
+			IdCondicionVenta: 1,
+			Nombre: 'Contado',
+		},
+		DiasAtencionCliente: {
+			Codigo: 'LD',
+			IdDiasAtencionCliente: 6969,
+			Nombre: 'Lunes a Domingo',
+		},
+		EdadesPromedioConsumidoresCliente: {
+			Codigo: '111',
+			IdEdadesPromedioConsumidoresCliente: 6951,
+			Nombre: 'Hay igual cantidad de consumidores',
+		},
+		FrecuenciaCliente: {
+			IdFrecuenciaCliente: 6891,
+			Nombre: 'Frecuencia Defecto',
+		},
+		GeneroPromedioConsumidoresCliente: {
+			Codigo: '11',
+			IdGeneroPromedioConsumidoresCliente: 6964,
+			Nombre: 'Hay igual cantidad de consumidores',
+		},
+		HorarioAtencionCliente: {
+			Codigo: 'D',
+			IdHorarioAtencionCliente: 6970,
+			Nombre: 'Diurno',
+		},
+		LimiteCredito: {
+			IdLimiteCredito: 46002,
+			Nombre: 'Límite Credito 1',
+			Valor: 1000000,
+		},
+		Transporte: {
+			Codigo: 'TRA1',
+			CodigoPostal: null,
+			CodigoPostalEntrega: null,
+			Direccion: null,
+			DireccionEntrega: null,
+			Email: null,
+			IdTransporte: 1,
+			Localidad: null,
+			LocalidadEntrega: null,
+			NumeroDocumento: '00000000',
+			Pais: {
+				Codigo: 'ARG',
+				IdPais: 4657,
+				Nombre: 'Argentina',
+			},
+			PaisEntrega: null,
+			Provincia: {
+				Codigo: 'BSAS',
+				IdProvincia: 4876,
+				Nombre: 'Buenos Aires',
+			},
+			ProvinciaEntrega: null,
+			RazonSocial: 'Transporte Defecto',
+			Telefono: '',
+			TipoDocumento: {
+				Codigo: 'DNI',
+				IdTipoDocumento: 6028,
+				Nombre: 'Documento Nacional de Identidad',
+			},
+			ZonaEntrega: null,
+		},
+		UbicacionCliente: {
+			Codigo: 'BAR',
+			IdUbicacionCliente: 6942,
+			Nombre: 'Zona de Bares y Boliches',
+		},
+		Vendedor: {
+			IdVendedor: 12,
+			Codigo: 'V11',
+			Nombre: 'EXITOWEB',
+			CUIT: null,
+			Direccion: null,
+			Localidad: null,
+			Telefono: null,
+			Mail: null,
+			EsSupervisor: false,
+		},
+		CanalCliente: {
+			Codigo: 'OTR',
+			IdCanalCliente: 6904,
+			Nombre: 'Otros',
+		},
+		ListaPrecio: {
+			Codigo: ListaPrecioCodigo.Exitoweb,
+			Descripcion: Descripcion.TiendaOnLineExito,
+			FechaDesde: null,
+			FechaHasta: null,
+			Habilitado: true,
+			IdListaPrecio: 3,
+			ListaPrecioAlternativa: null,
+			Moneda: {
+				Codigo: 'ARS',
+				Cotizacion: 1,
+				IdMoneda: 1,
+				Nombre: 'Peso Argentino',
+			},
+			PorcentajePrecioSugerido: 0,
+		},
 	};
 };
 
@@ -505,7 +505,7 @@ export const createOrderSaleJson = (
 	return saleOrderObj;
 };
 
-export const createChargeJson = (customer: Cliente, articlesOrder: LineItem[], 	shippingChargeOrder: ShippingLine[]) => {
+export const createChargeJson = (customer: Cliente, articlesOrder: LineItem[], shippingChargeOrder: ShippingLine[]) => {
 	if (shippingChargeOrder.length > 0) {
 		const shipping = shippingChargeOrder[0]; // WooCommerce generalmente solo tiene uno
 		const shippingCost = Number(shipping.total || 0);
@@ -599,7 +599,7 @@ export const createChargeJson = (customer: Cliente, articlesOrder: LineItem[], 	
 
 			return object;
 		}),
-		SucursalFisica:  {
+		SucursalFisica: {
 			IdSucursalFisica: 7341,
 			Codigo: 'Moron',
 			Nombre: 'Moron'
@@ -751,7 +751,7 @@ export const createJsonProducts = (arrArticles: IMergeArticulos[]) => {
 							? {
 								id: article.json.CategoriaArticulo.IdCategoriaArticulo,
 								// name: article.json.SubRubro.Nombre +  article.json.CategoriaArticulo.Nombre || CORTINAS AMERICANAS PVC
-								name:  article.json.CategoriaArticulo.Nombre // PVC
+								name: article.json.CategoriaArticulo.Nombre // PVC
 							}
 							: undefined
 					}
@@ -889,10 +889,10 @@ export interface HttpSettings {
 }
 
 export function buildCentumHeaders(consumerId: string, publicKey: string): Record<string, string> {
-  return {
-    CentumSuiteConsumidorApiPublicaId: consumerId,
-    CentumSuiteAccessToken: createHash(publicKey),
-  };
+	return {
+		CentumSuiteConsumidorApiPublicaId: consumerId,
+		CentumSuiteAccessToken: createHash(publicKey),
+	};
 }
 
 export function getHttpSettings(this: IExecuteFunctions): HttpSettings & { intervaloPagina?: number } {
@@ -912,7 +912,7 @@ export interface FetchOptions {
 	intervaloPagina?: number;
 	numeroPagina?: number;
 	context?: IExecuteFunctions;
-	pagination?: 'all' | 'default'| 'custom';
+	pagination?: 'all' | 'default' | 'custom';
 	responseType?: 'json' | 'arraybuffer';
 }
 
@@ -967,7 +967,7 @@ export async function apiGetRequest<T = any>(
 	console.log('options getRequest: ', options)
 	if (!url.trim()) safeThrow(context, 'El Endpoint es obligatorio.');
 
-	if( !options.method || options.method === 'POST') safeThrow(context, 'Se está intentando hacer una solicitud GET sin un metodo asignado o se asignó el metodo equivocado.');
+	if (!options.method || options.method === 'POST') safeThrow(context, 'Se está intentando hacer una solicitud GET sin un metodo asignado o se asignó el metodo equivocado.');
 	// const fetchOptions: RequestInit = {
 	// 	method,
 	// 	headers: { 'Content-Type': 'application/json', ...headers },
@@ -1006,7 +1006,7 @@ export async function apiGetRequest<T = any>(
 
 		const response = await fetch(finalUrl, {
 			method,
-			headers: {...requestHeaders}
+			headers: { ...requestHeaders }
 		});
 
 		if (!response.ok) {
@@ -1045,7 +1045,7 @@ export async function apiPostRequest<T = any>(
 		safeThrow(context, 'El campo "Endpoint" es obligatorio.');
 	}
 
-	if( !options.method || options.method === 'GET'){
+	if (!options.method || options.method === 'GET') {
 		safeThrow(context, 'Se está intentando hacer una solicitud POST sin un metodo asignado o se asignó el metodo equivocado.');
 	}
 
@@ -1058,7 +1058,7 @@ export async function apiPostRequest<T = any>(
 	const finalUrl = buildUrl(url, queryParams);
 	const fetchOptions: RequestInit = {
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json', ...requestHeaders},
+		headers: { 'Content-Type': 'application/json', ...requestHeaders },
 		body: JSON.stringify(body),
 	};
 
@@ -1141,61 +1141,61 @@ export async function apiPostRequestPaginated<T = any>(
 
 //-----------------------------------------------------------------------
 
-	// export async function apiRequest<T>(
-	// 	url: string,
-	// 	options: FetchOptions = {},
-	// 	context?: IExecuteFunctions,
-	// ): Promise<T> {
-	// 	// Por defecto las peticiones se hacen con el método GET y respuesta en formato JSON
-	// 	const { method = 'GET', headers = {}, body, queryParams, responseType } = options;
-	// 	// console.log(options)
-	// 	let finalUrl = buildUrl(url, queryParams)
+// export async function apiRequest<T>(
+// 	url: string,
+// 	options: FetchOptions = {},
+// 	context?: IExecuteFunctions,
+// ): Promise<T> {
+// 	// Por defecto las peticiones se hacen con el método GET y respuesta en formato JSON
+// 	const { method = 'GET', headers = {}, body, queryParams, responseType } = options;
+// 	// console.log(options)
+// 	let finalUrl = buildUrl(url, queryParams)
 
-	// 	console.log('fetch url: ',finalUrl)
-	// 	const requestHeaders = buildCentumHeaders(headers.CentumSuiteConsumidorApiPublicaId, headers.publicAccessKey);
-	// 	const fetchOptions: RequestInit = {
-	// 		method,
-	// 		headers: {...requestHeaders},
-	// 	};
+// 	console.log('fetch url: ',finalUrl)
+// 	const requestHeaders = buildCentumHeaders(headers.CentumSuiteConsumidorApiPublicaId, headers.publicAccessKey);
+// 	const fetchOptions: RequestInit = {
+// 		method,
+// 		headers: {...requestHeaders},
+// 	};
 
-	// 	if (body) {
-	// 		if (typeof body !== 'object') {
-	// 			throw new Error('El body debe ser un objeto válido y no una cadena');
-	// 		}
+// 	if (body) {
+// 		if (typeof body !== 'object') {
+// 			throw new Error('El body debe ser un objeto válido y no una cadena');
+// 		}
 
-	// 		fetchOptions.body = JSON.stringify(body);
-	// 	}
+// 		fetchOptions.body = JSON.stringify(body);
+// 	}
 
-	// 	console.log('FETCH OPTIONS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<')
-	// 	console.log(fetchOptions);
-	// 	try {
+// 	console.log('FETCH OPTIONS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<')
+// 	console.log(fetchOptions);
+// 	try {
 
-	// 		const response = await fetch(finalUrl, fetchOptions);
-	// 		console.log(`apiRequest(): fetch method:${method}`, response)
-	// 		if (!response.ok) {
-	// 			const errorText = await response.text();
-	// 			const error = new Error(`Request failed with status ${response.status}: ${errorText}`);
-	// 			if (context) {
-	// 				console.log( "status:", response.status, errorText);
-	// 				context.logger.error(error.message, { status: response.status, errorText });
-	// 			}
-	// 			throw error;
-	// 		}
+// 		const response = await fetch(finalUrl, fetchOptions);
+// 		console.log(`apiRequest(): fetch method:${method}`, response)
+// 		if (!response.ok) {
+// 			const errorText = await response.text();
+// 			const error = new Error(`Request failed with status ${response.status}: ${errorText}`);
+// 			if (context) {
+// 				console.log( "status:", response.status, errorText);
+// 				context.logger.error(error.message, { status: response.status, errorText });
+// 			}
+// 			throw error;
+// 		}
 
-	// 		if (responseType === 'arraybuffer') {
-	// 			return await response.arrayBuffer() as any;
-	// 		}
+// 		if (responseType === 'arraybuffer') {
+// 			return await response.arrayBuffer() as any;
+// 		}
 
-	// 		return await response.json() as T;
-	// 	} catch (error) {
+// 		return await response.json() as T;
+// 	} catch (error) {
 
-	// 		if (context) {
-	// 			console.log('API request failed', error );
-	// 			context.logger.error('API request failed', { error });
-	// 		}
-	// 		throw error;
-	// 	}
-	// }
+// 		if (context) {
+// 			console.log('API request failed', error );
+// 			context.logger.error('API request failed', { error });
+// 		}
+// 		throw error;
+// 	}
+// }
 
 export async function apiRequest<T>(
 	url: string,
