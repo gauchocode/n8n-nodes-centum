@@ -48,6 +48,7 @@ The node is built to be extensible, allowing for easy addition of new operations
 - `procesarImagenes`: Smart image synchronization
 - `generarToken`: Authentication token generation
 - `buscarContribuyente`: Taxpayer search
+- `operadoresMoviles`: Returns the data of a mobile operator based on the provided credentials.
 
 ## Prerequisites
 

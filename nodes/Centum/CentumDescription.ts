@@ -20,46 +20,46 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Retorna un artículo específico basado en su ID único'
 			},
 			{
-				name: 'Articulos - Existencia',
+				name: 'Artículos - Existencia',
 				value: 'articulosExistencia',
 				action: 'Obtener existencias de artículos',
 				description: 'Retorna un listado de las existencias de los artículos en base a ciertos filtros'
 			},
 			{
-				name: 'Articulos - Filtrado',
+				name: 'Artículos - Filtrado',
 				value: 'articulo',
 				action: 'Buscar artículos con filtros',
 				description: 'Retorna un listado de artículos para vender en base a ciertos filtros'
 			},
 			{
-				name: 'Articulos - Imagen',
+				name: 'Artículos - Imagen',
 				value: 'articulosImagenes',
 				action: 'Obtener imagen de artículo',
 				description: 'Retorna la imagen (binario) de un artículo'
 			},
 			{
-				name: 'Articulos - Listado',
+				name: 'Artículos - Listado',
 				value: 'articulosDatosGenerales',
 				action: 'Obtener datos generales de artículos',
 				description: 'Retorna un listado de los artículos y sus datos generales'
 			},
 			{
-				name: 'Articulos - Precio Por Lista',
+				name: 'Artículos - Precio Por Lista',
 				value: 'articulosPrecioPorLista',
-				action: 'Obten el precio de un articulo segun la lista',
-				description: 'Devuelve el valor de un articulo, segun la lista indicada'
+				action: 'Obtén el precio de un artículo según la lista',
+				description: 'Devuelve el valor de un artículo, según la lista indicada'
 			},
 			{
-				name: 'Articulos - Stock Sucursal Física',
+				name: 'Artículos - Stock Sucursal Física',
 				value: 'articulosSucursalesFisicas',
 				action: 'Obtener stock por sucursal física',
 				description: 'Retorna el stock de artículos en una sucursal física específica'
 			},
 			{
-				name: 'Articulos - Stock Sucursal Física Por ID Articulo',
+				name: 'Artículos - Stock Sucursal Física Por ID Artículo',
 				value: 'articuloSucursalFisica',
-				action: 'Obtener el stock por articulo individiual por sucursal física',
-				description: 'Retorn el stock de un articulo en especifico de una sucursal fisica'
+				action: 'Obtener el stock por artículo individual por sucursal física',
+				description: 'Retorna el stock de un artículo en específico de una sucursal física'
 			},
 			{
 				name: 'Cliente - Actualizar',
@@ -110,7 +110,7 @@ export const CentumOperations: INodeProperties[] = [
 				action: 'Obtener facturas de pedidos de ventas del cliente'
 			},
 			{
-				name: 'Cliente - Obtener Promocion',
+				name: 'Cliente - Obtener Promoción',
 				value: 'promocionesCliente',
 				description: 'Obtiene las promociones aplicadas a un cliente desde una fecha seleccionada',
 				action: 'Obtener promociones aplicadas a un cliente'
@@ -122,9 +122,9 @@ export const CentumOperations: INodeProperties[] = [
 				action: 'Obtener saldo del cliente'
 			},
 			{
-				name: 'Cliente Contribuyente - Busqueda',
+				name: 'Cliente Contribuyente - Búsqueda',
 				value: 'buscarContribuyente',
-				description: 'Retorna los datos del contribuyente por medio de una búsqueda por CUIT o Razon Social',
+				description: 'Retorna los datos del contribuyente por medio de una búsqueda por CUIT o Razón Social',
 				action: 'Buscar cliente contribuyente'
 			},
 			{
@@ -140,9 +140,26 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Da de alta el comprobante. Retornará el comprobante creado con su información y una URL.'
 			},
 			{
+				name: 'Cobro - Obtener Listado',
+				value: 'obtenerCobros',
+				action: 'Obtener un listado de cobro',
+				description: 'Obtener un listado de cobros en base a ciertos parametros'
+			},
+			{
+				name: 'Compras - Obtener Listado',
+				value: 'obtenerCompras',
+				action: 'Obtener un listado de las compras',
+				description: 'Obtener un listado de las compras en base a ciertos parametros'
+			},
+			{
 				name: 'Departamentos - Lista',
 				value: 'departamentosLista',
 				description: 'Obtiene un listado de departamentos, normalmente filtrado por provincia'
+			},
+			{
+				name: 'Obtener Operador Móvil',
+				value: 'operadoresMoviles',
+				description: 'Obtiene todos los datos de un operador móvil en base a las credenciales'
 			},
 			{
 				name: 'Pedido De Venta - Actividad',
@@ -157,10 +174,20 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Realiza pedidos de venta de los artículos'
 			},
 			{
+				name: 'Pedidos De Venta - Estado',
+				value: 'obtenerEstadosPedidosDeVenta',
+				description: 'Obtiene todos los estados disponibles de los pedidos de ventas'
+			},
+			{
+				name: 'Pedidos De Venta - Listar',
+				value: 'obtenerPedidosDeVenta',
+				description: 'Obtiene todos los pedidos de ventas en base a ciertos parámetros'
+			},
+			{
 				name: 'Precios De Productos - Lista',
 				value: 'listaPrecios',
 				action: 'Obtener lista de precios de productos',
-				description: 'Obtiene una lista con los listado de los precios sugeridos'
+				description: 'Obtiene una lista con el listado de los precios sugeridos'
 			},
 			{
 				name: 'Proceso Binario a Imagen',
@@ -179,19 +206,24 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obtiene un listado de provincias, normalmente filtrado por país'
 			},
 			{
-				name: 'Regimenes Especiales - ID',
+				name: 'Regímenes Especiales - ID',
 				value: 'regimenesEspecialesPorId',
-				description: 'Trae un listado entero de los regimenes especiales'
+				description: 'Trae un listado entero de los regímenes especiales'
 			},
 			{
-				name: 'Regimenes Especiales - Lista',
+				name: 'Regímenes Especiales - Lista',
 				value: 'regimenesEspecialesLista',
-				description: 'Trae un listado entero de los regimenes especiales'
+				description: 'Trae un listado entero de los regímenes especiales'
 			},
 			{
 				name: 'Sucursales Físicas - Lista',
 				value: 'sucursalesFisicas',
 				description: 'Obtiene un listado de las sucursales físicas disponibles',
+			},
+			{
+				name: 'Tipo De Comprobante - Lista',
+				value: 'tipoComprobante',
+				description: 'Obtiene un listado de todos los tipos de comprobantes'
 			}
 		],
 		default: 'pedidoVentaActividad',
@@ -281,7 +313,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Client ID used to search the articles',
 		displayOptions: {
 			show: {
-				resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente', 'obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'promocionesCliente'],
+				resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente', 'obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'promocionesCliente', 'obtenerPedidosDeVenta', 'obtenerOrdenesCompra', 'obtenerCobros', 'obtenerCompras'],
 			},
 		},
 	},
@@ -333,23 +365,23 @@ const getArticulo: INodeProperties[] = [
 	},
 	{
 		displayName: 'Fecha Desde',
-		name: 'balanceStartDate',
+		name: 'startDate',
 		type: 'dateTime',
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['obtenerFacturasPedidosVentas', 'obtenerFacturasCobros'],
+				resource: ['obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'obtenerPedidosDeVenta', 'obtenerOrdenesCompra', 'obtenerCobros', 'obtenerCompras'],
 			},
 		},
 	},
 	{
 		displayName: 'Fecha Hasta',
-		name: 'balanceEndDate',
+		name: 'endDate',
 		type: 'dateTime',
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['obtenerFacturasPedidosVentas', 'obtenerFacturasCobros'],
+				resource: ['obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'obtenerPedidosDeVenta', 'obtenerOrdenesCompra', 'obtenerCobros', 'obtenerCompras'],
 			},
 		},
 	},
@@ -401,6 +433,18 @@ const getArticulo: INodeProperties[] = [
 			},
 		},
 	},
+		{
+		displayName: 'ID Del Estado',
+		name: 'statusId',
+		type: 'number',
+		default: false,
+		description: 'Número del estado del pedido',
+		displayOptions: {
+			show: {
+				resource: ['obtenerPedidosDeVenta', 'obtenerOrdenesCompra'],
+			},
+		},
+	},
 	// {
 	// 	displayName: 'Habilitado',
 	// 	name: 'enabled',
@@ -429,14 +473,14 @@ const getArticulo: INodeProperties[] = [
 	// 		},
 	// 	},
 	// },
-	{
+		{
 		displayName: 'Sucursales Físicas - IDs Lista',
 		name: 'branchOfficeIds',
 		type: 'string',
 		required: true,
 		default: '7345',
 		description:
-			'Physical branch IDs separated by comma to be able to fetch only the specified branches',
+			'Physical branch ID separated by comma to be able to fetch only the specified branch',
 		displayOptions: {
 			show: {
 				resource: ['articulosExistencia'],
@@ -477,7 +521,18 @@ const getArticulo: INodeProperties[] = [
 		description: 'ID del cobro',
 		displayOptions: {
 			show: {
-				resource: ['crearPedidoVenta'],
+				resource: ['crearPedidoVenta', 'obtenerCobros'],
+			},
+		},
+	},
+		{
+		displayName: 'ID De La Compra',
+		name: 'idCompra',
+		type: 'number',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['obtenerCompras'],
 			},
 		},
 	},
@@ -517,13 +572,28 @@ const getArticulo: INodeProperties[] = [
 			},
 		},
 	},
-	{
-		displayName: 'Email',
-		name: 'email',
+		{
+		displayName: 'Usuario',
+		name: 'username',
 		type: 'string',
-		placeholder: 'name@email.com',
 		default: '',
-		displayOptions: {},
+		displayOptions: {
+			show: {
+				resource: ['operadoresMoviles'],
+			},
+		},
+	},
+		{
+		displayName: 'Contraseña',
+		name: 'password',
+		type: 'string',
+		typeOptions: { password: true },
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['operadoresMoviles'],
+			},
+		},
 	},
 	{
 		displayName: 'Razón Social',

@@ -38,13 +38,13 @@ import {
 } from './helpers/functions';
 import { IDepartamentos } from './interfaces/departamentos';
 
-type Actividad = {
-	IdActividad: number;
-	Nombre: string;
-};
-type getActividad = {
-	data: Actividad;
-};
+// type Actividad = {
+// 	IdActividad: number;
+// 	Nombre: string;
+// };
+// type getActividad = {
+// 	data: Actividad;
+// };
 
 export class Centum implements INodeType {
 	description: INodeTypeDescription = {
@@ -387,7 +387,7 @@ export class Centum implements INodeType {
 				};
 
 				if (!IdSucursalFisica || (!idArticulo && !codigo)) {
-					throw new NodeOperationError( this.getNode(), 'El id de la sucursal fisica y el id del articulo o el codigo son obligatorios');
+					throw new NodeOperationError(this.getNode(), 'El id de la sucursal fisica y el id del articulo o el codigo son obligatorios');
 				}
 				try {
 					const dataArticulosExistencias = await apiRequest<any>(
@@ -520,7 +520,7 @@ export class Centum implements INodeType {
 				}
 			}
 
-				case 'clientesBusqueda': {
+			case 'clientesBusqueda': {
 				const codigo = this.getNodeParameter('codigo', 0, '') as string;
 				const cuit = this.getNodeParameter('cuit', 0, '') as string;
 				const razonSocial = this.getNodeParameter('razonSocial', 0, '') as string;
@@ -813,10 +813,88 @@ export class Centum implements INodeType {
 				}
 			}
 
+			case 'obtenerCobros': {
+				const idCliente = this.getNodeParameter('clienteId', 0);
+				const idCobro = this.getNodeParameter('idCobro', 0);
+				const fechaDesde = this.getNodeParameter('startDate', 0, '') as string;
+				const fechaHasta = this.getNodeParameter('endDate', 0, '') as string;
+				const separarFechaDesde = String(fechaDesde).split('T')[0];
+				const separarFechaHasta = String(fechaHasta).split('T')[0];
+				if(!idCliente && !separarFechaDesde && !separarFechaHasta && !idCobro){
+					throw new NodeOperationError(this.getNode(), 'Debes ingresar almenos un parametro para realizar la búsqueda.');
+				}
+
+				const body = {
+					idCliente,
+					fechaDocumentoDesde: separarFechaDesde,
+					fechaDocumentoHasta: separarFechaHasta,
+					idCobro
+				}
+
+				try{
+					const response = await apiRequest<any>(`${centumUrl}/Cobros/FiltrosCobro`, {
+						method: 'POST',
+						headers,
+						body
+					})
+					return [this.helpers.returnJsonArray(response)];
+				}catch(error){
+					console.log('Error en obtener el listado de cobros:', error);
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError( this.getNode(), `Error en obtener el listado de cobros para cliente ${idCliente}: ${errorMessage}`);
+				}
+			}
+
+			case 'obtenerCompras': {
+				const idCliente = this.getNodeParameter('clienteId', 0);
+				const idCompra = this.getNodeParameter('idCompra', 0);
+				const fechaDesde = this.getNodeParameter('startDate', 0, '') as string;
+				const fechaHasta = this.getNodeParameter('endDate', 0, '') as string;
+				const separarFechaDesde = String(fechaDesde).split('T')[0];
+				const separarFechaHasta = String(fechaHasta).split('T')[0];
+				if(!idCliente && !separarFechaDesde && !separarFechaHasta && !idCompra){
+					throw new NodeOperationError(this.getNode(), 'Debes ingresar almenos un parametro para realizar la búsqueda.');
+				}
+
+				const body = {
+					idCliente,
+					fechaDocumentoDesde: separarFechaDesde,
+					fechaDocumentoHasta: separarFechaHasta,
+					idCompra
+				}
+
+				try{
+					const response = await apiRequest<any>(`${centumUrl}/Compras/FiltrosCompra`, {
+						method: 'POST',
+						headers,
+						body
+					})
+					return [this.helpers.returnJsonArray(response)];
+				}catch(error){
+					console.log('Error en obtener el listado de cobros:', error);
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError( this.getNode(), `Error en obtener el listado de cobros para cliente ${idCliente}: ${errorMessage}`);
+				}
+			}
+
+			case 'obtenerEstadosPedidosDeVenta': {
+				try{
+					const response = await apiRequest<any>(`${centumUrl}/EstadosPedidoVenta?bIncluirTodosEstados=true`, {
+						method: 'GET',
+						headers
+					})
+					return [this.helpers.returnJsonArray(response)];
+				}catch(error){
+					console.log(error);
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
+				}
+			}
+
 			case 'obtenerFacturasCobros': {
 				const clientIdParam = this.getNodeParameter('clienteId', 0);
-				const desdeSaldoFecha = this.getNodeParameter('balanceStartDate', 0);
-				const hastaSaldoFecha = this.getNodeParameter('balanceEndDate', 0);
+				const desdeSaldoFecha = this.getNodeParameter('startDate', 0);
+				const hastaSaldoFecha = this.getNodeParameter('endDate', 0);
 				const separarFechaDesde = String(desdeSaldoFecha).split('T')[0];
 				const separarFechaHasta = String(hastaSaldoFecha).split('T')[0];
 
@@ -872,8 +950,8 @@ export class Centum implements INodeType {
 
 			case 'obtenerFacturasPedidosVentas': {
 				const clientIdParam = this.getNodeParameter('clienteId', 0);
-				const desdeSaldoFecha = this.getNodeParameter('balanceStartDate', 0);
-				const hastaSaldoFecha = this.getNodeParameter('balanceEndDate', 0);
+				const desdeSaldoFecha = this.getNodeParameter('startDate', 0);
+				const hastaSaldoFecha = this.getNodeParameter('endDate', 0);
 				const separarFechaDesde = String(desdeSaldoFecha).split('T')[0];
 				const separarFechaHasta = String(hastaSaldoFecha).split('T')[0];
 
@@ -927,6 +1005,38 @@ export class Centum implements INodeType {
 				}
 			}
 
+			case 'obtenerPedidosDeVenta': {
+				const idCliente = this.getNodeParameter('clienteId', 0);
+				const idsEstado = this.getNodeParameter('statusId', 0);
+				const fechaDesde = this.getNodeParameter('startDate', 0, '') as string;
+				const fechaHasta = this.getNodeParameter('endDate', 0, '') as string;
+				const separarFechaDesde = String(fechaDesde).split('T')[0];
+				const separarFechaHasta = String(fechaHasta).split('T')[0];
+				if(!idCliente && !idsEstado && !separarFechaDesde && !separarFechaHasta){
+					throw new NodeOperationError(this.getNode(), 'Debes ingresar almenos un parametro para realizar la búsqueda.');
+				}
+
+				const body = {
+					idCliente,
+					fechaDocumentoDesde: separarFechaDesde,
+					fechaDocumentoHasta: separarFechaHasta,
+					idsEstado
+				}
+
+				try{
+					const response = await apiRequest<any>(`${centumUrl}/PedidosVenta/FiltrosPedidoVenta`, {
+						method: 'POST',
+						headers,
+						body
+					})
+					return [this.helpers.returnJsonArray(response)];
+				}catch(error){
+					console.log('Error en solicitud de facturas pedidos ventas:', error);
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError( this.getNode(), `Error obteniendo los pedidos ventas para cliente ${idCliente}: ${errorMessage}`);
+				}
+			}
+
 			case 'obtenerSaldoCliente': {
 				const clientIdParam = this.getNodeParameter('clienteId', 0);
 				const desdeSaldoFecha = this.getNodeParameter('priceDateModified', 0);
@@ -960,12 +1070,31 @@ export class Centum implements INodeType {
 				}
 			}
 
+			case 'operadoresMoviles': {
+				const username = this.getNodeParameter('username', 0, '') as string;
+				const password = this.getNodeParameter('password', 0, '') as string;
+
+				try {
+					const operadoresActividad = await apiRequest<any>(`
+						${centumUrl}/OperadoresMoviles/Credenciales?Usuario=${username}&Contrasena=${password}`, {
+						method: 'GET',
+						headers
+					}
+					);
+					return [this.helpers.returnJsonArray(operadoresActividad)];
+				} catch (error) {
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
+				}
+			}
+
 			case 'pedidoVentaActividad': {
 				const pedidoID = this.getNodeParameter('id', 0);
 				try {
-					const dataActividad = await apiRequest<getActividad>(
-						`${centumUrl}/PedidosVenta/${pedidoID}`,
-						{ ...headers },
+					const dataActividad = await apiRequest<any>(`${centumUrl}/PedidosVenta/${pedidoID}`,{
+						method: 'GET',
+						headers
+						}
 					);
 					return [this.helpers.returnJsonArray(dataActividad)];
 				} catch (error) {
@@ -1108,12 +1237,13 @@ export class Centum implements INodeType {
 					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 			}
+
 			case 'regimenesEspecialesPorId': {
 				const regimenId = this.getNodeParameter('id', 0);
 				if (!regimenId) {
 					throw new NodeOperationError(this.getNode(), 'El ID del regimen es requerido');
 				}
-				
+
 				try {
 					const regimen = await apiRequest<any>(`${centumUrl}/RegimenesEspeciales/${regimenId}`, {
 						method: 'GET',
@@ -1136,6 +1266,22 @@ export class Centum implements INodeType {
 					});
 
 					return [this.helpers.returnJsonArray(dataListBranches)];
+				} catch (error) {
+					console.log(error);
+					const errorMessage =
+						error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
+				}
+			}
+
+			case 'tipoComprobante': {
+				try {
+					const comprobanteList = await apiRequest<any>(`${centumUrl}/TiposComprobante`, {
+						method: 'GET',
+						headers,
+					});
+
+					return [this.helpers.returnJsonArray(comprobanteList)];
 				} catch (error) {
 					console.log(error);
 					const errorMessage =

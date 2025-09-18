@@ -69,6 +69,7 @@ Requiere 3 parámetros en la credencial **Centum API**:
 - `procesarImagenes`: Sincronización inteligente de imágenes
 - `generarToken`: Generación de token de autenticación
 - `buscarContribuyente`: Búsqueda de contribuyentes
+- `operadoresMoviles`: Retorna los datos de un operador móvil en base a las credenciales proporcionadas.
 
 ## Notas técnicas importantes
 
