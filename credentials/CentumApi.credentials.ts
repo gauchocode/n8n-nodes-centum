@@ -22,7 +22,6 @@ export class CentumApi implements ICredentialType {
 			displayName: 'Centum URL',
 			name: 'centumUrl',
 			type: 'string',
-			// default: 'https://plataforma1.centum.com.ar:23990/BL2/MirandaDiegoYFacundoSH',
 			default: 'https://plataforma1.centum.com.ar:23990/BL2',
 		},
 	];
