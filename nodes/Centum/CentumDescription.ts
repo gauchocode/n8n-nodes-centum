@@ -296,7 +296,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Client ID used to search the articles',
 		displayOptions: {
 			show: {
-				resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente', 'obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'promocionesCliente', 'obtenerPedidosDeVenta'],
+				resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente', 'obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'promocionesCliente', 'obtenerPedidosDeVenta', 'obtenerOrdenesCompra'],
 			},
 		},
 	},
@@ -353,7 +353,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'obtenerPedidosDeVenta'],
+				resource: ['obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'obtenerPedidosDeVenta', 'obtenerOrdenesCompra'],
 			},
 		},
 	},
@@ -364,7 +364,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'obtenerPedidosDeVenta'],
+				resource: ['obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'obtenerPedidosDeVenta', 'obtenerOrdenesCompra'],
 			},
 		},
 	},
@@ -424,7 +424,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Numero del estado del pedido',
 		displayOptions: {
 			show: {
-				resource: ['obtenerPedidosDeVenta'],
+				resource: ['obtenerPedidosDeVenta', 'obtenerOrdenesCompra'],
 			},
 		},
 	},
