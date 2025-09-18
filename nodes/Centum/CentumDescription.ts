@@ -156,6 +156,16 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Trae un pedido de venta por un identificador único'
 			},
 			{
+				name: 'Pedidos De Venta - Estados',
+				value: 'obtenerEstadosPedidosDeVenta',
+				description: 'Obtiene todos los estados disponibles de los pedidos de ventas'
+			},
+			{
+				name: 'Pedidos De Venta - Listar',
+				value: 'obtenerPedidosDeVenta',
+				description: 'Obtiene todos los pedidos de ventas en base a ciertos parametros'
+			},
+			{
 				name: 'Pedido De Venta - Nuevo',
 				value: 'crearPedidoVenta',
 				action: 'Crear nuevo pedido de venta',
@@ -286,7 +296,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Client ID used to search the articles',
 		displayOptions: {
 			show: {
-				resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente', 'obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'promocionesCliente'],
+				resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente', 'obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'promocionesCliente', 'obtenerPedidosDeVenta'],
 			},
 		},
 	},
@@ -338,23 +348,23 @@ const getArticulo: INodeProperties[] = [
 	},
 	{
 		displayName: 'Fecha Desde',
-		name: 'balanceStartDate',
+		name: 'startDate',
 		type: 'dateTime',
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['obtenerFacturasPedidosVentas', 'obtenerFacturasCobros'],
+				resource: ['obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'obtenerPedidosDeVenta'],
 			},
 		},
 	},
 	{
 		displayName: 'Fecha Hasta',
-		name: 'balanceEndDate',
+		name: 'endDate',
 		type: 'dateTime',
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['obtenerFacturasPedidosVentas', 'obtenerFacturasCobros'],
+				resource: ['obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'obtenerPedidosDeVenta'],
 			},
 		},
 	},
@@ -403,6 +413,18 @@ const getArticulo: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['articulo'],
+			},
+		},
+	},
+		{
+		displayName: 'ID Del Estado',
+		name: 'statusId',
+		type: 'number',
+		default: false,
+		description: 'Numero del estado del pedido',
+		displayOptions: {
+			show: {
+				resource: ['obtenerPedidosDeVenta'],
 			},
 		},
 	},
