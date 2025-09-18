@@ -219,6 +219,11 @@ export const CentumOperations: INodeProperties[] = [
 				name: 'Sucursales Físicas - Lista',
 				value: 'sucursalesFisicas',
 				description: 'Obtiene un listado de las sucursales físicas disponibles',
+			},
+			{
+				name: 'Tipo De Comprobante - Lista',
+				value: 'tipoComprobante',
+				description: 'Obtiene un listado de todos los tipos de comprobantes'
 			}
 		],
 		default: 'pedidoVentaActividad',

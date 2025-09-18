@@ -1274,6 +1274,22 @@ export class Centum implements INodeType {
 				}
 			}
 
+			case 'tipoComprobante': {
+				try {
+					const comprobanteList = await apiRequest<any>(`${centumUrl}/TiposComprobante`, {
+						method: 'GET',
+						headers,
+					});
+
+					return [this.helpers.returnJsonArray(comprobanteList)];
+				} catch (error) {
+					console.log(error);
+					const errorMessage =
+						error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
+				}
+			}
+
 			default: {
 				throw new NodeOperationError(this.getNode(), `Operación no implementada: ${resource}`);
 			}
