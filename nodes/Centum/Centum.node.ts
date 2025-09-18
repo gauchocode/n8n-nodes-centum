@@ -38,13 +38,13 @@ import {
 } from './helpers/functions';
 import { IDepartamentos } from './interfaces/departamentos';
 
-type Actividad = {
-	IdActividad: number;
-	Nombre: string;
-};
-type getActividad = {
-	data: Actividad;
-};
+// type Actividad = {
+// 	IdActividad: number;
+// 	Nombre: string;
+// };
+// type getActividad = {
+// 	data: Actividad;
+// };
 
 export class Centum implements INodeType {
 	description: INodeTypeDescription = {
@@ -813,6 +813,84 @@ export class Centum implements INodeType {
 				}
 			}
 
+			case 'obtenerCobros': {
+				const idCliente = this.getNodeParameter('clienteId', 0);
+				const idCobro = this.getNodeParameter('idCobro', 0);
+				const fechaDesde = this.getNodeParameter('startDate', 0, '') as string;
+				const fechaHasta = this.getNodeParameter('endDate', 0, '') as string;
+				const separarFechaDesde = String(fechaDesde).split('T')[0];
+				const separarFechaHasta = String(fechaHasta).split('T')[0];
+				if(!idCliente && !separarFechaDesde && !separarFechaHasta && !idCobro){
+					throw new NodeOperationError(this.getNode(), 'Debes ingresar almenos un parametro para realizar la búsqueda.');
+				}
+
+				const body = {
+					idCliente,
+					fechaDocumentoDesde: separarFechaDesde,
+					fechaDocumentoHasta: separarFechaHasta,
+					idCobro
+				}
+
+				try{
+					const response = await apiRequest<any>(`${centumUrl}/Cobros/FiltrosCobro`, {
+						method: 'POST',
+						headers,
+						body
+					})
+					return [this.helpers.returnJsonArray(response)];
+				}catch(error){
+					console.log('Error en obtener el listado de cobros:', error);
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError( this.getNode(), `Error en obtener el listado de cobros para cliente ${idCliente}: ${errorMessage}`);
+				}
+			}
+
+			case 'obtenerCompras': {
+				const idCliente = this.getNodeParameter('clienteId', 0);
+				const idCompra = this.getNodeParameter('idCompra', 0);
+				const fechaDesde = this.getNodeParameter('startDate', 0, '') as string;
+				const fechaHasta = this.getNodeParameter('endDate', 0, '') as string;
+				const separarFechaDesde = String(fechaDesde).split('T')[0];
+				const separarFechaHasta = String(fechaHasta).split('T')[0];
+				if(!idCliente && !separarFechaDesde && !separarFechaHasta && !idCompra){
+					throw new NodeOperationError(this.getNode(), 'Debes ingresar almenos un parametro para realizar la búsqueda.');
+				}
+
+				const body = {
+					idCliente,
+					fechaDocumentoDesde: separarFechaDesde,
+					fechaDocumentoHasta: separarFechaHasta,
+					idCompra
+				}
+
+				try{
+					const response = await apiRequest<any>(`${centumUrl}/Compras/FiltrosCompra`, {
+						method: 'POST',
+						headers,
+						body
+					})
+					return [this.helpers.returnJsonArray(response)];
+				}catch(error){
+					console.log('Error en obtener el listado de cobros:', error);
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError( this.getNode(), `Error en obtener el listado de cobros para cliente ${idCliente}: ${errorMessage}`);
+				}
+			}
+
+			case 'obtenerEstadosPedidosDeVenta': {
+				try{
+					const response = await apiRequest<any>(`${centumUrl}/EstadosPedidoVenta?bIncluirTodosEstados=true`, {
+						method: 'GET',
+						headers
+					})
+					return [this.helpers.returnJsonArray(response)];
+				}catch(error){
+					console.log(error);
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
+				}
+			}
+
 			case 'obtenerFacturasCobros': {
 				const clientIdParam = this.getNodeParameter('clienteId', 0);
 				const desdeSaldoFecha = this.getNodeParameter('startDate', 0);
@@ -927,17 +1005,35 @@ export class Centum implements INodeType {
 				}
 			}
 
-			case 'obtenerEstadosPedidosDeVenta': {
+			case 'obtenerPedidosDeVenta': {
+				const idCliente = this.getNodeParameter('clienteId', 0);
+				const idsEstado = this.getNodeParameter('statusId', 0);
+				const fechaDesde = this.getNodeParameter('startDate', 0, '') as string;
+				const fechaHasta = this.getNodeParameter('endDate', 0, '') as string;
+				const separarFechaDesde = String(fechaDesde).split('T')[0];
+				const separarFechaHasta = String(fechaHasta).split('T')[0];
+				if(!idCliente && !idsEstado && !separarFechaDesde && !separarFechaHasta){
+					throw new NodeOperationError(this.getNode(), 'Debes ingresar almenos un parametro para realizar la búsqueda.');
+				}
+
+				const body = {
+					idCliente,
+					fechaDocumentoDesde: separarFechaDesde,
+					fechaDocumentoHasta: separarFechaHasta,
+					idsEstado
+				}
+
 				try{
-					const response = await apiRequest<any>(`${centumUrl}/EstadosPedidoVenta`, {
-						method: 'GET',
-						headers
+					const response = await apiRequest<any>(`${centumUrl}/PedidosVenta/FiltrosPedidoVenta`, {
+						method: 'POST',
+						headers,
+						body
 					})
 					return [this.helpers.returnJsonArray(response)];
 				}catch(error){
-					console.log(error);
+					console.log('Error en solicitud de facturas pedidos ventas:', error);
 					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
-					throw new NodeOperationError(this.getNode(), errorMessage);
+					throw new NodeOperationError( this.getNode(), `Error obteniendo los pedidos ventas para cliente ${idCliente}: ${errorMessage}`);
 				}
 			}
 
@@ -974,37 +1070,6 @@ export class Centum implements INodeType {
 				}
 			}
 
-			case 'obtenerPedidosDeVenta': {
-				const idCliente = this.getNodeParameter('clienteId', 0);
-				const idsEstado = this.getNodeParameter('statusId', 0);
-				const fechaDesde = this.getNodeParameter('startDate', 0, '') as string;
-				const fechaHasta = this.getNodeParameter('endDate', 0, '') as string;
-
-				if(!idCliente && !idsEstado && !fechaDesde && !fechaHasta){
-					throw new NodeOperationError(this.getNode(), 'Debes ingresar almenos un parametro para realizar la búsqueda.');
-				}
-
-				const body = {
-					idCliente,
-					fechaDocumentoDesde: fechaDesde,
-					fechaDocumentoHasta: fechaHasta,
-					idsEstado
-				}
-
-				try{
-					const response = await apiRequest<any>(`${centumUrl}/PedidosVenta/FiltrosPedidoVenta`, {
-						method: 'POST',
-						headers,
-						body
-					})
-					return [this.helpers.returnJsonArray(response)];
-				}catch(error){
-					console.log('Error en solicitud de facturas pedidos ventas:', error);
-					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
-					throw new NodeOperationError( this.getNode(), `Error obteniendo los pedidos ventas para cliente ${idCliente}: ${errorMessage}`);
-				}
-			}
-
 			case 'operadoresMoviles': {
 				const username = this.getNodeParameter('username', 0, '') as string;
 				const password = this.getNodeParameter('password', 0, '') as string;
@@ -1026,9 +1091,10 @@ export class Centum implements INodeType {
 			case 'pedidoVentaActividad': {
 				const pedidoID = this.getNodeParameter('id', 0);
 				try {
-					const dataActividad = await apiRequest<getActividad>(
-						`${centumUrl}/PedidosVenta/${pedidoID}`,
-						{ ...headers },
+					const dataActividad = await apiRequest<any>(`${centumUrl}/PedidosVenta/${pedidoID}`,{
+						method: 'GET',
+						headers
+						}
 					);
 					return [this.helpers.returnJsonArray(dataActividad)];
 				} catch (error) {
