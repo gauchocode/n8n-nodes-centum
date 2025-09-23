@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-centum",
-	"version": "0.2.15",
+	"version": "0.2.16",
 	"description": "Centum es un nodo para n8n que te da acceso directo a la API de Centum sin necesidad de librerías extra: buscá clientes por criterios, creá nuevos registros y automatizá tu gestión de usuarios en un par de clics. Diseñado bajo las guidelines oficiales de n8n, cumple con no tener dependencias externas y se instala en un segundo. Ideal para mantener tus flujos limpios y eficientes",
 	"keywords": [
 		"n8n-community-node-package"
