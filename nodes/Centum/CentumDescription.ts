@@ -831,32 +831,9 @@ const getArticulo: INodeProperties[] = [
 		{
     displayName: 'Articulos',
     name: 'articlesCollection',
-    type: 'fixedCollection',
+    type: 'json',
     placeholder: 'Agregar artículo',
-    typeOptions: {
-      multipleValues: true,
-    },
     default: {},
-    options: [
-      {
-        displayName: 'Campo',
-        name: 'campo',
-        values: [
-          {
-            displayName: 'ID Del Artículo',
-            name: 'articleCollectionId',
-            type: 'string',
-            default: '',
-          },
-          {
-            displayName: 'Cantidad',
-            name: 'articleCollectionQuantity',
-            type: 'string',
-            default: '',
-          },
-        ],
-      },
-    ],
   }
 		
 ];
