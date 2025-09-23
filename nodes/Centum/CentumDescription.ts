@@ -146,7 +146,7 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obtener un listado de cobros en base a ciertos parametros'
 			},
 			{
-				name: 'Compras- Generar Compra',
+				name: 'Compras - Generar Compra',
 				value: 'generarCompras',
 				action: 'Genera una compra',
 				description: 'Genera una compra desde los parametros especificados'
@@ -743,7 +743,7 @@ const getArticulo: INodeProperties[] = [
 			type: 'string',
 			default: '',
 			placeholder: 'Factura de compras',
-			description: 'Nombre del tipo de comprobante',
+			description: 'Nombre del tipo de comprobante de la factura',
 			displayOptions:{
 				show:{
 					resource: ['generarCompras']
@@ -751,7 +751,7 @@ const getArticulo: INodeProperties[] = [
 			}
 		},
 		{
-			displayName: 'Código del Comprobante',
+			displayName: 'Código Del Comprobante',
 			name: 'codigoComprobante',
 			type: 'string',
 			default: '',
@@ -769,7 +769,7 @@ const getArticulo: INodeProperties[] = [
 			type: 'number',
 			default: '',
 			placeholder: '1',
-			description: 'ID del tipo de comprobante',
+			description: 'ID del tipo de comprobante de la factura',
 			displayOptions:{
 				show:{
 					resource: ['generarCompras']
@@ -782,7 +782,7 @@ const getArticulo: INodeProperties[] = [
 			type: 'number',
 			default: '',
 			placeholder: '1',
-			description: 'Numero del documento de la compra',
+			description: 'Numero del documento de la compra de la factura',
 			displayOptions:{
 				show:{
 					resource: ['generarCompras']
@@ -790,7 +790,7 @@ const getArticulo: INodeProperties[] = [
 			}
 		},
 		{
-			displayName: 'Punto de venta',
+			displayName: 'Punto De Venta',
 			name: 'puntoDeVenta',
 			type: 'number',
 			default: '',
@@ -803,12 +803,12 @@ const getArticulo: INodeProperties[] = [
 			}
 		},
 		{
-			displayName: 'Letra del documento de la compra',
+			displayName: 'Letra Del Documento De La Compra',
 			name: 'letraDocumento',
 			type: 'string',
 			default: '',
 			placeholder: 'A',
-			description: 'Letra del documento de la compra',
+			description: 'Letra del documento de la compra de la factura',
 			displayOptions:{
 				show:{
 					resource: ['generarCompras']
@@ -821,7 +821,7 @@ const getArticulo: INodeProperties[] = [
 			type: 'number',
 			default: '',
 			placeholder: '2',
-			description: 'ID Del proveedor de la  compra',
+			description: 'ID Del proveedor de la compra',
 			displayOptions: {
 				show:{
 					resource: ['generarCompras']
