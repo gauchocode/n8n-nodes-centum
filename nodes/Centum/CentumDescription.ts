@@ -146,6 +146,12 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obtener un listado de cobros en base a ciertos parametros'
 			},
 			{
+				name: 'Compras- Generar Compra',
+				value: 'generarCompras',
+				action: 'Genera una compra',
+				description: 'Genera una compra desde los parametros especificados'
+			},
+			{
 				name: 'Compras - Obtener Listado',
 				value: 'obtenerCompras',
 				action: 'Obtener un listado de las compras',
@@ -270,7 +276,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['searchArticleBySKU', 'articuloSucursalFisica'],
+				resource: ['searchArticleBySKU', 'articuloSucursalFisica', 'generarCompras'],
 			},
 		},
 		description: 'The ID of the physical branch to filter stock (optional)',
@@ -313,7 +319,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Client ID used to search the articles',
 		displayOptions: {
 			show: {
-				resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente', 'obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'promocionesCliente', 'obtenerPedidosDeVenta', 'obtenerOrdenesCompra', 'obtenerCobros', 'obtenerCompras'],
+				resource: ['generarCompras', 'articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente', 'obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'promocionesCliente', 'obtenerPedidosDeVenta', 'obtenerOrdenesCompra', 'obtenerCobros', 'obtenerCompras'],
 			},
 		},
 	},
@@ -370,7 +376,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'obtenerPedidosDeVenta', 'obtenerOrdenesCompra', 'obtenerCobros', 'obtenerCompras'],
+				resource: ['generarCompras', 'obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'obtenerPedidosDeVenta', 'obtenerOrdenesCompra', 'obtenerCobros', 'obtenerCompras'],
 			},
 		},
 	},
@@ -405,7 +411,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Parametro fecha del body para las solicitudes',
 		displayOptions: {
 			show: {
-				resource: ['articulo', 'promocionesCliente'],
+				resource: ['articulo', 'promocionesCliente', 'generarCompras'],
 			},
 		},
 	},
@@ -638,7 +644,7 @@ const getArticulo: INodeProperties[] = [
 			default: '',
 			displayOptions: {
 				show: {
-					resource: ['articulosImagenes', 'articuloPorId', 'articuloSucursalFisica'],
+					resource: ['generarCompras', 'articulosImagenes', 'articuloPorId', 'articuloSucursalFisica'],
 				},
 			},
 		},
@@ -657,7 +663,7 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'ID País (Opcional)',
+		displayName: 'ID País',
 		name: 'idPais',
 		type: 'string',
 		default: '',
@@ -669,7 +675,7 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'ID Provincia (Opcional)',
+		displayName: 'ID Provincia',
 		name: 'idProvincia',
 		type: 'string',
 		default: '',
@@ -731,6 +737,128 @@ const getArticulo: INodeProperties[] = [
 				},
 			},
 		},
+		{
+			displayName: 'Nombre Del Tipo De Comprobante',
+			name: 'nombreTipoComprobante',
+			type: 'string',
+			default: '',
+			placeholder: 'Factura de compras',
+			description: 'Nombre del tipo de comprobante',
+			displayOptions:{
+				show:{
+					resource: ['generarCompras']
+				}
+			}
+		},
+		{
+			displayName: 'Código del Comprobante',
+			name: 'codigoComprobante',
+			type: 'string',
+			default: '',
+			placeholder: 'Codigo de la compra (FCC)',
+			description: 'Codigo del comprobante de la compra',
+			displayOptions:{
+				show:{
+					resource: ['generarCompras']
+				}
+			}
+		},
+		{
+			displayName: 'ID Del Tipo De Comprobante',
+			name: 'idTipoComprobante',
+			type: 'number',
+			default: '',
+			placeholder: '1',
+			description: 'ID del tipo de comprobante',
+			displayOptions:{
+				show:{
+					resource: ['generarCompras']
+				}
+			}
+		},
+		{
+			displayName: 'Numero Del Documento De La Compra',
+			name: 'numeroFactura',
+			type: 'number',
+			default: '',
+			placeholder: '1',
+			description: 'Numero del documento de la compra',
+			displayOptions:{
+				show:{
+					resource: ['generarCompras']
+				}
+			}
+		},
+		{
+			displayName: 'Punto de venta',
+			name: 'puntoDeVenta',
+			type: 'number',
+			default: '',
+			placeholder: '1',
+			description: 'Numero del punto de venta del documento',
+			displayOptions:{
+				show:{
+					resource: ['generarCompras']
+				}
+			}
+		},
+		{
+			displayName: 'Letra del documento de la compra',
+			name: 'letraDocumento',
+			type: 'string',
+			default: '',
+			placeholder: 'A',
+			description: 'Letra del documento de la compra',
+			displayOptions:{
+				show:{
+					resource: ['generarCompras']
+				}
+			}
+		},
+		{
+			displayName: 'ID Del Proveedor',
+			name: 'idProveedor',
+			type: 'number',
+			default: '',
+			placeholder: '2',
+			description: 'ID Del proveedor de la  compra',
+			displayOptions: {
+				show:{
+					resource: ['generarCompras']
+				}
+			}
+		},
+		{
+    displayName: 'Articulos',
+    name: 'articlesCollection',
+    type: 'fixedCollection',
+    placeholder: 'Agregar artículo',
+    typeOptions: {
+      multipleValues: true,
+    },
+    default: {},
+    options: [
+      {
+        displayName: 'Campo',
+        name: 'campo',
+        values: [
+          {
+            displayName: 'ID Del Artículo',
+            name: 'articleCollectionId',
+            type: 'string',
+            default: '',
+          },
+          {
+            displayName: 'Cantidad',
+            name: 'articleCollectionQuantity',
+            type: 'string',
+            default: '',
+          },
+        ],
+      },
+    ],
+  }
+		
 ];
 
 export const CentumFields: INodeProperties[] = [...getArticulo];

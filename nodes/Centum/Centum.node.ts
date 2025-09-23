@@ -739,6 +739,302 @@ export class Centum implements INodeType {
 				return [this.helpers.returnJsonArray(json as any)];
 			}
 
+			case 'generarCompras': {
+				/* Información del comprobante */
+				const nombreTipoComprobante = this.getNodeParameter('nombreTipoComprobante', 0, '') as string;
+				const codigoComprobante = this.getNodeParameter('codigoComprobante', 0, '') as string;
+				const idTipoComprobante = this.getNodeParameter('idTipoComprobante', 0);
+
+				/* Información del documento */
+				const numeroDocumento = this.getNodeParameter('numeroFactura', 0);
+				const puntoVenta = this.getNodeParameter('puntoDeVenta', 0);
+				const letraDocumento = this.getNodeParameter('letraDocumento', 0, '') as string;
+				const fechaDocumento = this.getNodeParameter('fechaFactura', 0, '') as string;
+
+				const sucursalFisica = this.getNodeParameter('idSucursalFisica', 0);
+
+				// Soporta {campo:[...]} o {items:[...]}
+				const articlesListRaw = this.getNodeParameter('articlesCollection', 0) as any;
+				const lineas: Array<{ articleCollectionId: string; articleCollectionQuantity: string }> =
+					articlesListRaw?.campo ?? articlesListRaw?.items ?? [];
+
+				const idCliente = this.getNodeParameter('clienteId', 0);
+				const idProveedor = this.getNodeParameter('idProveedor', 0);
+				const fechaProducto = this.getNodeParameter('startDate', 0);
+				const separarFecha = String(fechaProducto).split('T')[0];
+
+				// Ids solo con los IDs
+				const articulosIds = lineas.map(a => a.articleCollectionId);
+				// Mapa id -> cantidad para inyectar luego
+				const qtyById: Record<string, number> = Object.fromEntries(
+					lineas.map(a => [a.articleCollectionId, Number(a.articleCollectionQuantity)])
+				);
+
+				let bodyProveedor;
+				const bodyCompraArticulos = {
+					IdCliente: idCliente,
+					FechaDocumento: separarFecha,
+					Ids: articulosIds,
+				};
+
+				try {
+					const fetchProveedor = await apiRequest<any>(`${centumUrl}/Proveedores/${idProveedor}`, {
+						method: 'GET',
+						headers,
+					});
+					bodyProveedor = fetchProveedor;
+				} catch (error) {
+					const errorMessage = (error as any)?.response?.data?.Message || (error as any).message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), `Error obteniendo el proveedor.\n ${errorMessage}`);
+				}
+
+				let articulosVenta: any;
+				try {
+					articulosVenta = await apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
+						method: 'POST',
+						body: bodyCompraArticulos,
+						headers,
+					});
+				} catch (error) {
+					const errorMessage = (error as any)?.response?.data?.Message || (error as any).message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), `Error al obtener la informacion de los articulos ${errorMessage}`);
+				}
+				console.log(articulosVenta.Articulos.Items);
+
+				// Normalizar payload y agregar Cantidad por IdArticulo
+				// Soporta respuesta anidada o stringificada
+				const ventaObj = typeof articulosVenta === 'string' ? JSON.parse(articulosVenta) : articulosVenta;
+
+				const itemsRespuesta: any[] =
+					ventaObj?.Articulos?.Items ??
+					ventaObj?.CompraArticulos ??
+					ventaObj?.Items ??
+					[];
+
+				const compraConCantidad = itemsRespuesta.map((art: any) => ({
+					...art,
+					Cantidad: qtyById[String(art.IdArticulo)] ?? 0,
+				}));
+
+				const finalBody = {
+					TipoComprobanteCompra: {
+						IdTipoComprobanteCompra: idTipoComprobante,
+						Codigo: codigoComprobante,
+						Nombre: nombreTipoComprobante,
+					},
+					SucursalFisica: {
+						IdSucursalFisica: sucursalFisica,
+					},
+					NumeroDocumento: {
+						LetraDocumento: letraDocumento,
+						PuntoVenta: puntoVenta,
+						Numero: numeroDocumento,
+					},
+					FechaDocumento: fechaDocumento,
+					Proveedor: bodyProveedor,
+					CompraArticulos: compraConCantidad,
+				};
+
+				try {
+					const response = await apiRequest<any>(`${centumUrl}/Compras`, {
+						method: 'POST',
+						headers,
+						body: finalBody,
+					});
+					return [this.helpers.returnJsonArray(response)];
+				} catch (error) {
+					const errorMessage = (error as any)?.response?.data?.Message || (error as any).message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), `Error creando la compra.\n ${errorMessage}`);
+				}
+			}
+
+
+			// case 'generarCompras': {
+			// 	/* Información del comprobante */
+			// 	const nombreTipoComprobante = this.getNodeParameter('nombreTipoComprobante', 0, '') as string;
+			// 	const codigoComprobante = this.getNodeParameter('codigoComprobante', 0, '') as string;
+			// 	const idTipoComprobante = this.getNodeParameter('idTipoComprobante', 0);
+
+			// 	/* Información del documento*/
+			// 	const numeroDocumento   = this.getNodeParameter('numeroFactura', 0);
+			// 	const puntoVenta	    = this.getNodeParameter('puntoDeVenta', 0);
+			// 	const letraDocumento    = this.getNodeParameter('letraDocumento', 0, '') as string;
+			// 	const fechaDocumento    = this.getNodeParameter('fechaFactura', 0, '') as string;
+
+			// 	// const proveedor 	    = this.getNodeParameter('proveedorId', 0, '') as string;
+			// 	//const articulos 	    = this.getNodeParameter('articleId', 0, '') as string;
+			// 	const sucursalFisica    = this.getNodeParameter('idSucursalFisica', 0);
+			// 	const articlesList = this.getNodeParameter('articlesCollection', 0) as {
+			// 	items: Array<{ articleCollectionId: string; articleCollectionQuantity: string }>;
+			// 	};
+			// 	console.log(articlesList)
+			// 	const idCliente  		= this.getNodeParameter('clienteId', 0);
+			// 	const idProveedor 		= this.getNodeParameter('idProveedor', 0);
+			// 	const fechaProducto     = this.getNodeParameter('startDate', 0);
+			// 	const separarFecha      = String(fechaProducto).split('T')[0];
+
+			// 	const articulos = articlesList.campo.map(a => a.articleCollectionId);
+			// 	console.log(articulos);
+
+			// 	let bodyProveedor;
+			// 	const bodyCompraArticulos = {
+			// 		IdCliente: idCliente,
+			// 		FechaDocumento: separarFecha,
+			// 		Ids: articulos
+			// 	}
+
+			// 	try{
+			// 		const fetchProveedor = await apiRequest<any>(`${centumUrl}/Proveedores/${idProveedor}`, {
+			// 			method: 'GET',
+			// 			headers
+			// 		})
+			// 		bodyProveedor = fetchProveedor;
+			// 	}catch(error){
+			// 		const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+			// 		throw new NodeOperationError(this.getNode(),`Error obteniendo el proveedor. \n ${errorMessage}`);
+			// 	}
+
+			// 	let articulosVenta;
+			// 	try{
+			// 		articulosVenta = await apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
+			// 			method: 'POST',
+			// 			body: bodyCompraArticulos,
+			// 			headers
+			// 		})
+			// 	}catch(error){
+			// 		const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+			// 		throw new NodeOperationError(this.getNode(),`Error al obtener la informacion de los articulos ${errorMessage}`);
+			// 	}
+
+			// 	 const finalBody = {
+			// 	 	TipoComprobanteCompra: {
+			// 	 		IdTipoComprobanteCompra: idTipoComprobante,
+			// 	 		Codigo: codigoComprobante,
+			// 	 		Nombre: nombreTipoComprobante
+			// 	 	},
+			// 	 	SucursalFisica: {
+			// 	 		IdSucursalFisica: sucursalFisica
+			// 	 	},
+			// 	 	NumeroDocumento: {
+			// 	 		LetraDocumento: letraDocumento,
+			// 	 		PuntoVenta: puntoVenta,
+			// 	 		Numero: numeroDocumento
+			// 	 	},
+			// 	 	FechaDocumento: fechaDocumento,
+			// 	 	Proveedor: bodyProveedor,
+			// 	 	CompraArticulos: [articulosVenta.Articulos.Items[0]]
+			// 	 }
+
+			// 	 try{
+			// 	 	const response = await apiRequest<any>(`${centumUrl}/Compras`, {
+			// 	 		method: 'POST',
+			// 	 		headers,
+			// 	 		body: finalBody
+			// 	 	})
+			// 	 	return [this.helpers.returnJsonArray(response)];
+			// 	 }catch(error){
+			// 	 	console.log('Error al crear un cobro', error);
+			// 	 	const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+			// 	 	throw new NodeOperationError(this.getNode(),`Error obteniendo el listado de precios. \n ${errorMessage}`);
+			// 	 }
+			// }
+
+			// case 'generarCompras': {
+			// /* Información del comprobante */
+			// const nombreTipoComprobante = this.getNodeParameter('nombreTipoComprobante', 0, '') as string;
+			// const codigoComprobante = this.getNodeParameter('codigoComprobante', 0, '') as string;
+			// const idTipoComprobante = this.getNodeParameter('idTipoComprobante', 0);
+
+			// /* Información del documento */
+			// const numeroDocumento   = this.getNodeParameter('numeroFactura', 0);
+			// const puntoVenta        = this.getNodeParameter('puntoDeVenta', 0);
+			// const letraDocumento    = this.getNodeParameter('letraDocumento', 0, '') as string;
+			// const fechaDocumento    = this.getNodeParameter('fechaFactura', 0, '') as string;
+
+			// /* Mantener para uso futuro */
+			// const proveedor         = this.getNodeParameter('proveedorId', 0, '') as string;
+			// const articulos         = this.getNodeParameter('articleId', 0, '') as string;
+
+			// const sucursalFisica    = this.getNodeParameter('IdSucursalFisica', 0);
+			// const idCliente         = this.getNodeParameter('clienteId', 0);
+			// const idProveedor       = this.getNodeParameter('idProveedor', 0);
+			// const fechaProducto     = this.getNodeParameter('startDate', 0); // mantener
+			// const separarFecha      = String(fechaProducto).split('T')[0];   // mantener
+
+			// // Validaciones básicas
+			// const required = {
+			// 	idTipoComprobante, codigoComprobante, nombreTipoComprobante,
+			// 	numeroDocumento, puntoVenta, letraDocumento, fechaDocumento,
+			// 	idCliente, idProveedor, sucursalFisica,
+			// };
+			// for (const [key, value] of Object.entries(required)) {
+			// 	if (value === undefined || value === null || value === '') {
+			// 	throw new NodeOperationError(this.getNode(), `Falta el parámetro requerido: ${key}`);
+			// 	}
+			// }
+
+			// // Normaliza fecha a YYYY-MM-DD usando una sola fuente
+			// const fechaISO = new Date(fechaDocumento).toISOString().split('T')[0];
+
+			// const bodyCompraArticulos = {
+			// 	IdCliente: idCliente,
+			// 	FechaDocumento: fechaISO,
+			// };
+
+			// let bodyProveedor;
+			// let articulosVenta;
+
+			// const buildError = (err: any, fallback: string) =>
+			// 	err?.response?.data?.Message || err?.message || fallback;
+
+			// try {
+			// 	// Ejecutar en paralelo
+			// 	[bodyProveedor, articulosVenta] = await Promise.all([
+			// 	apiRequest<any>(`${centumUrl}/Proveedores/${idProveedor}`, { method: 'GET' })
+			// 		.catch((error: any) => {
+			// 		const msg = buildError(error, 'Error desconocido');
+			// 		throw new NodeOperationError(this.getNode(), `Error obteniendo el proveedor.\n${msg}`);
+			// 		}),
+			// 	apiRequest<any>(`${centumUrl}/Articulos/Venta`, { method: 'POST', body: bodyCompraArticulos })
+			// 		.catch((error: any) => {
+			// 		const msg = buildError(error, 'Error desconocido');
+			// 		throw new NodeOperationError(this.getNode(), `Error al obtener la información de los artículos.\n${msg}`);
+			// 		}),
+			// 	]);
+			// } catch (e) {
+			// 	throw e;
+			// }
+
+			// const finalBody = {
+			// 	TipoComprobanteCompra: {
+			// 	IdTipoComprobanteCompra: idTipoComprobante,
+			// 	Codigo: codigoComprobante,
+			// 	Nombre: nombreTipoComprobante,
+			// 	},
+			// 	SucursalFisica: { IdSucursalFisica: sucursalFisica },
+			// 	NumeroDocumento: {
+			// 	LetraDocumento: letraDocumento,
+			// 	PuntoVenta: puntoVenta,
+			// 	Numero: numeroDocumento,
+			// 	},
+			// 	FechaDocumento: fechaISO,
+			// 	Proveedor: bodyProveedor,
+			// 	CompraArticulos: articulosVenta,
+			// };
+
+			// try {
+			// 	const response = await apiRequest<any>(`${centumUrl}/Compras`, {
+			// 	method: 'POST',
+			// 	headers, // definido más arriba
+			// 	body: finalBody,
+			// 	});
+			// 	return [this.helpers.returnJsonArray(response)];
+			// } catch (error: any) {
+			// 	const msg = buildError(error, 'Error desconocido');
+			// 	throw new NodeOperationError(this.getNode(), `Error creando la compra.\n${msg}`);
+			// }
+			// }
+
 			case 'generarToken': {
 				try {
 					const tokenGenerado = createHash(headers.publicAccessKey);
