@@ -230,7 +230,13 @@ export const CentumOperations: INodeProperties[] = [
 				name: 'Tipo De Comprobante - Lista',
 				value: 'tipoComprobante',
 				description: 'Obtiene un listado de todos los tipos de comprobantes'
+			},
+			{
+				name: 'Ventas - Generar',
+				value: 'generarVentas',
+				description: 'Genera una venta en base a unos parametros completados'
 			}
+
 		],
 		default: 'pedidoVentaActividad',
 	},

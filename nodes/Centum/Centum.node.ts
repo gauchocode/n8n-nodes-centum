@@ -859,6 +859,77 @@ export class Centum implements INodeType {
 				}
 			}
 
+			case 'generarVentas': {
+				try {
+					// Payload hardcodeado de ejemplo
+					const venta = {
+						NumeroDocumento: {
+							PuntoVenta: 1,
+						},
+						TipoComprobanteVenta: {
+							IdTipoComprobanteVenta: 4,
+						},
+						EsContado: true,
+						Cliente: {
+							IdCliente: 2,
+						},
+						CondicionVenta: {
+							IdCondicionVenta: 1,
+						},
+						Observaciones: 'Venta desde API',
+						ListaPrecio: {
+							IdListaPrecio: 1,
+						},
+						VentaArticulos: [
+							{
+								Nombre: 'Test',
+								IdArticulo: 1450,
+								Cantidad: 2,
+								Precio: 100.0,
+								Codigo: 456,
+								Comision: {
+									IdComision: 6089,
+								},
+								CategoriaImpuestoIVA: {
+									IdCategoriaImpuestoIVA: 4,
+									Codigo: 5,
+									Nombre: 'IVA 21.00',
+									Tasa: 21.0,
+								},
+							},
+						],
+						Vendedor: {
+							IdVendedor: 1,
+						},
+						VentaValoresEfectivos: [
+							{
+								IdValor: 1,
+								Importe: 1210.0,
+								Cotizacion: 1.0,
+								Observaciones: 'Cobro contado',
+								CantidadCuotas: 0,
+							},
+						],
+					};
+
+					const url = `${centumUrl}/Ventas?verificaLimiteCreditoCliente=false&verificaStockNegativo=false&verificaCuotificador=false`;
+
+					const response = await apiRequest<any>(url, {
+						method: 'POST',
+						headers,
+						body: venta,
+					});
+
+					return [this.helpers.returnJsonArray(response)];
+				} catch (error) {
+					console.log('Error en solicitud de alta de venta:', error);
+					const errorMessage =
+						error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), `Error creando la venta.\n${errorMessage}`);
+				}
+			}
+
+
 			case 'listaPrecios': {
 				try {
 					const response = await apiRequest<any>(`${centumUrl}/ListasPrecios`, {
