@@ -543,7 +543,7 @@ export class Centum implements INodeType {
 							queryParams,
 						},
 					);
-
+					console.log(response)
 					return [this.helpers.returnJsonArray(response.Items as any)];
 				} catch (error) {
 					console.log(`[ClientesBusqueda] Error:`, error);
@@ -864,52 +864,85 @@ export class Centum implements INodeType {
 					// Payload hardcodeado de ejemplo
 					const venta = {
 						NumeroDocumento: {
-							PuntoVenta: 1,
+							PuntoVenta: 1
 						},
-						TipoComprobanteVenta: {
-							IdTipoComprobanteVenta: 4,
+						Bonificacion: {
+							IdBonificacion: 6235
 						},
 						EsContado: true,
 						Cliente: {
-							IdCliente: 2,
+							IdCliente: 2
 						},
 						CondicionVenta: {
-							IdCondicionVenta: 1,
+							IdCondicionVenta: 1
 						},
-						Observaciones: 'Venta desde API',
+						Observaciones: "Venta desde API",
+						PorcentajeDescuento: 0.0,
+						TipoComprobanteVenta: {
+							IdTipoComprobanteVenta: 4
+						},
+						Vendedor: {
+							IdVendedor: 1
+						},
+						Referencia: "",
 						ListaPrecio: {
-							IdListaPrecio: 1,
+							IdListaPrecio: 1
 						},
 						VentaArticulos: [
 							{
-								Nombre: 'Test',
 								IdArticulo: 1450,
-								Cantidad: 2,
-								Precio: 100.0,
 								Codigo: 456,
+								Nombre: "Test",
+								Cantidad: 2.0,
+								SegundoControlStock: 0.0,
+								Precio: 1210.0,
 								Comision: {
-									IdComision: 6089,
+									IdComision: 6089
 								},
+								PorcentajeDescuento1: 0.0,
+								PorcentajeDescuento2: 0.0,
+								PorcentajeDescuento3: 0.0,
+								DescuentoCalculado: 0.0,
 								CategoriaImpuestoIVA: {
 									IdCategoriaImpuestoIVA: 4,
 									Codigo: 5,
-									Nombre: 'IVA 21.00',
-									Tasa: 21.0,
+									Nombre: "IVA 21.00",
+									Tasa: 21.0
 								},
-							},
+								ImpuestoInterno: 0.0,
+								NumeroTropa: "",
+								NumeroSerie: "",
+								NumeroDespacho: "",
+								Observaciones: "",
+								ClaseDescuento: {
+									IdClaseDescuento: 0
+								},
+								NoAplicaBonificacionCliente: false,
+								Cuotificador: 0.0,
+								IdPromocionComercial: 0,
+								EsSinCargo: false,
+								EsArticuloAgrupador: false,
+								CantidadUnitariaPorConjunto: 0.0
+							}
 						],
-						Vendedor: {
-							IdVendedor: 1,
-						},
+						PedidoVentaArticulosSuscriptos: [],
+						RemitoVentaArticulosSuscriptos: [],
+						VentaConceptos: [],
+						VentaRegimenesEspeciales: [],
 						VentaValoresEfectivos: [
 							{
 								IdValor: 1,
-								Importe: 1210.0,
 								Cotizacion: 1.0,
-								Observaciones: 'Cobro contado',
-								CantidadCuotas: 0,
-							},
+								Importe: 2928.20,
+								Observaciones: "Cobro contado",
+								CantidadCuotas: 0
+							}
 						],
+						VentaValoresVouchers: [],
+						Moneda: {
+							IdMoneda: 1
+						},
+						Cotizacion: 1.0
 					};
 
 					const url = `${centumUrl}/Ventas?verificaLimiteCreditoCliente=false&verificaStockNegativo=false&verificaCuotificador=false`;
