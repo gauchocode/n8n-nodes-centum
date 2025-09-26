@@ -325,7 +325,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Client ID used to search the articles',
 		displayOptions: {
 			show: {
-				resource: ['generarCompras', 'articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente', 'obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'promocionesCliente', 'obtenerPedidosDeVenta', 'obtenerOrdenesCompra', 'obtenerCobros', 'obtenerCompras'],
+				resource: ['generarCompras', 'articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente', 'obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'promocionesCliente', 'obtenerPedidosDeVenta', 'obtenerOrdenesCompra', 'obtenerCobros', 'obtenerCompras', 'generarVentas'],
 			},
 		},
 	},
@@ -382,7 +382,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['generarCompras', 'obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'obtenerPedidosDeVenta', 'obtenerOrdenesCompra', 'obtenerCobros', 'obtenerCompras'],
+				resource: ['generarCompras', 'obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'obtenerPedidosDeVenta', 'obtenerOrdenesCompra', 'obtenerCobros', 'obtenerCompras', 'generarVentas'],
 			},
 		},
 	},
@@ -520,7 +520,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'ID de la lista para buscar los precios de los articulos',
 		displayOptions: {
 			show: {
-				resource: ['articulosPrecioPorLista'],
+				resource: ['articulosPrecioPorLista', 'generarVentas'],
 			},
 		},
 	},
@@ -537,7 +537,7 @@ const getArticulo: INodeProperties[] = [
 			},
 		},
 	},
-		{
+	{
 		displayName: 'ID De La Compra',
 		name: 'idCompra',
 		type: 'number',
@@ -545,6 +545,105 @@ const getArticulo: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['obtenerCompras'],
+			},
+		},
+	},
+	{
+		displayName: 'ID Del Vendedor',
+		name: 'idVendedor',
+		type: 'number',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['generarVentas'],
+			},
+		},
+	},
+	{
+		displayName: 'Condicion De Venta',
+		name: 'idCondicionVenta',
+		type: 'number',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['generarVentas'],
+			},
+		},
+	},
+	{
+		displayName: 'Es Contado',
+		name: 'esContado',
+		type: 'boolean',
+		default: false,
+		displayOptions: {
+			show: {
+				resource: ['generarVentas'],
+			},
+		},
+	},
+	{
+		displayName: 'ID Valor Efectivo',
+		name: 'idValorEfectivo',
+		type: 'number',
+		default: 0,
+		displayOptions: {
+			show: {
+				esContado: [true]
+			},
+		},
+	},
+	{
+		displayName: 'ID Bonificacion',
+		name: 'bonificacion',
+		type: 'number',
+		default: 0,
+		displayOptions: {
+			show: {
+				resource: ['generarVentas'],
+			},
+		},
+	},
+	{
+		displayName: 'Cotizacion',
+		name: 'cotizacionValorEfectivo',
+		type: 'number',
+		default: 0,
+		displayOptions: {
+			show: {
+				esContado: [true]
+			},
+		},
+	},
+	{
+		displayName: 'Importe',
+		name: 'importeValorEfectivo',
+		type: 'number',
+		default: 0,
+		displayOptions: {
+			show: {
+				esContado: [true]
+			},
+		},
+	},
+	{
+		displayName: 'Observaciones',
+		name: 'observacionesValorEfectivo',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				esContado: [true]
+			},
+		},
+	},
+	{
+		displayName: 'Cantidad De Cuotas Efectivo',
+		name: 'cantidadCuotasValorEfectivo',
+		type: 'number',
+		default: 0,
+		displayOptions: {
+			show: {
+				esContado: [true]
 			},
 		},
 	},
@@ -650,7 +749,7 @@ const getArticulo: INodeProperties[] = [
 			default: '',
 			displayOptions: {
 				show: {
-					resource: ['generarCompras', 'articulosImagenes', 'articuloPorId', 'articuloSucursalFisica'],
+					resource: ['generarCompras', 'articulosImagenes', 'articuloPorId', 'articuloSucursalFisica', 'generarVentas'],
 				},
 			},
 		},
@@ -782,6 +881,19 @@ const getArticulo: INodeProperties[] = [
 				}
 			}
 		},
+				{
+			displayName: 'ID Del Tipo De Comprobante',
+			name: 'idTipoComprobanteVenta',
+			type: 'number',
+			default: '',
+			placeholder: '1',
+			description: 'ID del tipo de comprobante de la venta',
+			displayOptions:{
+				show:{
+					resource: ['generarVentas']
+				}
+			}
+		},
 		{
 			displayName: 'Numero Del Documento De La Compra',
 			name: 'numeroFactura',
@@ -804,7 +916,7 @@ const getArticulo: INodeProperties[] = [
 			description: 'Numero del punto de venta del documento',
 			displayOptions:{
 				show:{
-					resource: ['generarCompras']
+					resource: ['generarCompras', 'generarVentas']
 				}
 			}
 		},
@@ -835,13 +947,15 @@ const getArticulo: INodeProperties[] = [
 			}
 		},
 		{
-    displayName: 'Articulos',
-    name: 'articlesCollection',
-    type: 'json',
-    placeholder: 'Agregar artículo',
-    default: {},
-  }
-		
+			displayName: 'Artículos',
+			name: 'articlesCollection',
+			type: 'string',
+			placeholder: '[{ "ID": 1234, "Cantidad": 10 }, {"ID": 4567, "Cantidad": 5}]',
+			default: '',
+			description: 'Lista de artículos en formato JSON',
+		}
+
+
 ];
 
 export const CentumFields: INodeProperties[] = [...getArticulo];

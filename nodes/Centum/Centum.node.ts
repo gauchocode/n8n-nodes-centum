@@ -380,14 +380,21 @@ export class Centum implements INodeType {
 				const IdSucursalFisica = this.getNodeParameter('idSucursalFisica', 0) as string;
 				const idArticulo = this.getNodeParameter('articleId', 0) as string;
 				const codigo = this.getNodeParameter('codigo', 0) as string;
-				const queryParams: { IdSucursalFisica?: string, codigoExacto?: string, idsArticulos: string } = {
+				const queryParams: {
+					IdSucursalFisica?: string;
+					codigoExacto?: string;
+					idsArticulos: string;
+				} = {
 					IdSucursalFisica: IdSucursalFisica,
 					codigoExacto: codigo,
-					idsArticulos: idArticulo
+					idsArticulos: idArticulo,
 				};
 
 				if (!IdSucursalFisica || (!idArticulo && !codigo)) {
-					throw new NodeOperationError(this.getNode(), 'El id de la sucursal fisica y el id del articulo o el codigo son obligatorios');
+					throw new NodeOperationError(
+						this.getNode(),
+						'El id de la sucursal fisica y el id del articulo o el codigo son obligatorios',
+					);
 				}
 				try {
 					const dataArticulosExistencias = await apiRequest<any>(
@@ -526,7 +533,10 @@ export class Centum implements INodeType {
 				const razonSocial = this.getNodeParameter('razonSocial', 0, '') as string;
 
 				if (!codigo && !cuit && !razonSocial) {
-					throw new NodeOperationError(this.getNode(), 'Debe proporcionar al menos un campo para la búsqueda (CUIT, Codigo o Razón Social).');
+					throw new NodeOperationError(
+						this.getNode(),
+						'Debe proporcionar al menos un campo para la búsqueda (CUIT, Codigo o Razón Social).',
+					);
 				}
 
 				const queryParams: Record<string, string> = {};
@@ -535,15 +545,12 @@ export class Centum implements INodeType {
 				if (razonSocial) queryParams.RazonSocial = razonSocial;
 
 				try {
-					const response = await apiRequest<IResponseCustomer>(
-						`${centumUrl}/Clientes`,
-						{
-							method: 'GET',
-							headers,
-							queryParams,
-						},
-					);
-					console.log(response)
+					const response = await apiRequest<IResponseCustomer>(`${centumUrl}/Clientes`, {
+						method: 'GET',
+						headers,
+						queryParams,
+					});
+					console.log(response);
 					return [this.helpers.returnJsonArray(response.Items as any)];
 				} catch (error) {
 					console.log(`[ClientesBusqueda] Error:`, error);
@@ -566,14 +573,11 @@ export class Centum implements INodeType {
 				const queryParams: Record<string, string> = { Cuit: cuit };
 
 				try {
-					const response = await apiRequest<IResponseCustomer>(
-						`${centumUrl}/Clientes`,
-						{
-							method: 'GET',
-							headers,
-							queryParams,
-						},
-					);
+					const response = await apiRequest<IResponseCustomer>(`${centumUrl}/Clientes`, {
+						method: 'GET',
+						headers,
+						queryParams,
+					});
 
 					return [this.helpers.returnJsonArray(response.Items as any)];
 				} catch (error) {
@@ -741,7 +745,11 @@ export class Centum implements INodeType {
 
 			case 'generarCompras': {
 				/* Información del comprobante */
-				const nombreTipoComprobante = this.getNodeParameter('nombreTipoComprobante', 0, '') as string;
+				const nombreTipoComprobante = this.getNodeParameter(
+					'nombreTipoComprobante',
+					0,
+					'',
+				) as string;
 				const codigoComprobante = this.getNodeParameter('codigoComprobante', 0, '') as string;
 				const idTipoComprobante = this.getNodeParameter('idTipoComprobante', 0);
 
@@ -764,10 +772,10 @@ export class Centum implements INodeType {
 				const separarFecha = String(fechaProducto).split('T')[0];
 
 				// Sólo los IDs para el request a /Articulos/Venta
-				const ids = articulosArray.map(a => a.ID);
+				const ids = articulosArray.map((a) => a.ID);
 				// Mapa id -> cantidad
 				const qtyById: Record<string, number> = Object.fromEntries(
-					articulosArray.map(a => [a.ID, a.Cantidad])
+					articulosArray.map((a) => [a.ID, a.Cantidad]),
 				);
 
 				let bodyProveedor;
@@ -784,8 +792,14 @@ export class Centum implements INodeType {
 					});
 					bodyProveedor = fetchProveedor;
 				} catch (error) {
-					const errorMessage = (error as any)?.response?.data?.Message || (error as any).message || 'Error desconocido';
-					throw new NodeOperationError(this.getNode(), `Error obteniendo el proveedor.\n ${errorMessage}`);
+					const errorMessage =
+						(error as any)?.response?.data?.Message ||
+						(error as any).message ||
+						'Error desconocido';
+					throw new NodeOperationError(
+						this.getNode(),
+						`Error obteniendo el proveedor.\n ${errorMessage}`,
+					);
 				}
 
 				let articulosVenta: any;
@@ -796,17 +810,21 @@ export class Centum implements INodeType {
 						headers,
 					});
 				} catch (error) {
-					const errorMessage = (error as any)?.response?.data?.Message || (error as any).message || 'Error desconocido';
-					throw new NodeOperationError(this.getNode(), `Error al obtener la informacion de los articulos ${errorMessage}`);
+					const errorMessage =
+						(error as any)?.response?.data?.Message ||
+						(error as any).message ||
+						'Error desconocido';
+					throw new NodeOperationError(
+						this.getNode(),
+						`Error al obtener la informacion de los articulos ${errorMessage}`,
+					);
 				}
 
-				const ventaObj = typeof articulosVenta === 'string' ? JSON.parse(articulosVenta) : articulosVenta;
+				const ventaObj =
+					typeof articulosVenta === 'string' ? JSON.parse(articulosVenta) : articulosVenta;
 
 				const itemsRespuesta: any[] =
-					ventaObj?.Articulos?.Items ??
-					ventaObj?.CompraArticulos ??
-					ventaObj?.Items ??
-					[];
+					ventaObj?.Articulos?.Items ?? ventaObj?.CompraArticulos ?? ventaObj?.Items ?? [];
 
 				// Agrego Cantidad desde el array original
 				const compraConCantidad = itemsRespuesta.map((art: any) => ({
@@ -841,8 +859,14 @@ export class Centum implements INodeType {
 					});
 					return [this.helpers.returnJsonArray(response)];
 				} catch (error) {
-					const errorMessage = (error as any)?.response?.data?.Message || (error as any).message || 'Error desconocido';
-					throw new NodeOperationError(this.getNode(), `Error creando la compra.\n ${errorMessage}`);
+					const errorMessage =
+						(error as any)?.response?.data?.Message ||
+						(error as any).message ||
+						'Error desconocido';
+					throw new NodeOperationError(
+						this.getNode(),
+						`Error creando la compra.\n ${errorMessage}`,
+					);
 				}
 			}
 
@@ -859,109 +883,303 @@ export class Centum implements INodeType {
 				}
 			}
 
+			// case 'generarVentas': {
+			// 	const numeroPuntoDeVenta = this.getNodeParameter('puntoDeVenta', 0, '') as string;
+			// 	const bonificacion = this.getNodeParameter('bonificacion', 0, '') as string;
+			// 	const esContado = this.getNodeParameter('esContado', 0);
+			// 	const idCliente = this.getNodeParameter('clienteId', 0);
+			// 	const condicionVentaId = this.getNodeParameter('condicionVentaId', 0);
+			// 	const tipoComprobanteVenta = this.getNodeParameter('idTipoComprobanteVenta', 0);
+			// 	const idVendedor = this.getNodeParameter('idVendedor', 0);
+			// 	const preciosListaId = this.getNodeParameter('idList', 0);
+			// 	const idValorEfectivo = this.getNodeParameter('idValorEfectivo', 0);
+			// 	const cotizacionValorEfectivo = this.getNodeParameter('cotizacionValorEfectivo', 0);
+			// 	const importeValorEfectivo = this.getNodeParameter('cotizacionValorEfectivo', 0);
+			// 	const observacionesValorEfectivo = this.getNodeParameter('observacionesValorEfectivo', 0, '') as string;
+			// 	const cantidadCuotasValorEfectivo = this.getNodeParameter('cantidadCuotasValorEfectivo', 0);
+
+			// 	try {
+			// 		//Datos Necesarios
+			// 		/*
+			// 		Punto de venta (El usuario tiene que ingresar el numero)
+			// 		Bonificacion (El usuario deberia ingresar el id o el nombre y despues buscarlo por api e ingresarlo automaticamente? <- MCP )
+			// 		EsContado -> True / false | En caso de true se debe agregar mas inputs para rellenar la informacion
+			// 		ID Cliente -> El usuario ingresa el id
+			// 		TipoComprobanteVenta -> El usuario ingresa el ID
+			// 		ID Vendedor -> El cliente lo ingresa
+			// 		Lista Precios ID -> El cliente lo ingresa
+			// 		Venta Valores Efectivo -> Este va de la mano con "EsContado", se habilita unicamente si la compra es al contado.
+			// 		*/
+			// 		// Payload hardcodeado de ejemplo
+			// 		const bodyVenta = {
+			// 			NumeroDocumento: {
+			// 				PuntoVenta: numeroPuntoDeVenta
+			// 			},
+			// 			Bonificacion: {
+			// 				IdBonificacion: bonificacion
+			// 			},
+			// 			EsContado: esContado,
+			// 			Cliente: {
+			// 				IdCliente: idCliente
+			// 			},
+			// 			CondicionVenta: {
+			// 				IdCondicionVenta: condicionVentaId
+			// 			},
+			// 			Observaciones: "Venta desde API",
+			// 			TipoComprobanteVenta: {
+			// 				IdTipoComprobanteVenta: tipoComprobanteVenta
+			// 			},
+			// 			Vendedor: {
+			// 				IdVendedor: idVendedor
+			// 			},
+			// 			ListaPrecio: {
+			// 				IdListaPrecio: preciosListaId
+			// 			},
+			// 			VentaArticulos: [
+			// 				{
+			// 					IdArticulo: 1450,
+			// 					Codigo: 456,
+			// 					Nombre: "Test",
+			// 					Cantidad: 2.0,
+			// 					SegundoControlStock: 0.0,
+			// 					Precio: 1210.0,
+			// 					Comision: {
+			// 						IdComision: 6089
+			// 					},
+			// 					PorcentajeDescuento1: 0.0,
+			// 					PorcentajeDescuento2: 0.0,
+			// 					PorcentajeDescuento3: 0.0,
+			// 					DescuentoCalculado: 0.0,
+			// 					CategoriaImpuestoIVA: {
+			// 						IdCategoriaImpuestoIVA: 4,
+			// 						Codigo: 5,
+			// 						Nombre: "IVA 21.00",
+			// 						Tasa: 21.0
+			// 					},
+			// 					ImpuestoInterno: 0.0,
+			// 					NumeroTropa: "",
+			// 					NumeroSerie: "",
+			// 					NumeroDespacho: "",
+			// 					Observaciones: "",
+			// 					ClaseDescuento: {
+			// 						IdClaseDescuento: 0
+			// 					},
+			// 					NoAplicaBonificacionCliente: false,
+			// 					Cuotificador: 0.0,
+			// 					IdPromocionComercial: 0,
+			// 					EsSinCargo: false,
+			// 					EsArticuloAgrupador: false,
+			// 					CantidadUnitariaPorConjunto: 0.0
+			// 				}
+			// 			],
+			// 			// PorcentajeDescuento: 0.0,
+			// 			// Referencia: "",
+			// 			// VentaValoresVouchers: [],
+			// 			// Moneda: {
+			// 			// 	IdMoneda: 1
+			// 			// },
+			// 			// Cotizacion: 1.0
+			// 			// PedidoVentaArticulosSuscriptos: [],
+			// 			// RemitoVentaArticulosSuscriptos: [],
+			// 			// VentaConceptos: [],
+			// 			// VentaRegimenesEspeciales: [],
+			// 		};
+
+			// 		const url = `${centumUrl}/Ventas?verificaLimiteCreditoCliente=false&verificaStockNegativo=false&verificaCuotificador=false`;
+
+			// 		const response = await apiRequest<any>(url, {
+			// 			method: 'POST',
+			// 			headers,
+			// 			body: bodyVenta,
+			// 		});
+
+			// 		return [this.helpers.returnJsonArray(response)];
+			// 	} catch (error) {
+			// 		console.log('Error en solicitud de alta de venta:', error);
+			// 		const errorMessage =
+			// 			error?.response?.data?.Message || error.message || 'Error desconocido';
+			// 		throw new NodeOperationError(this.getNode(), `Error creando la venta.\n${errorMessage}`);
+			// 	}
+			// }
+
 			case 'generarVentas': {
+				const numeroPuntoDeVenta = this.getNodeParameter('puntoDeVenta', 0) as number;
+				const bonificacion = this.getNodeParameter('bonificacion', 0, '') as string;
+				const esContado = this.getNodeParameter('esContado', 0) as boolean;
+				const idCliente = this.getNodeParameter('clienteId', 0) as number;
+				const condicionVentaId = this.getNodeParameter('idCondicionVenta', 0) as number;
+				const tipoComprobanteVenta = this.getNodeParameter('idTipoComprobanteVenta', 0) as number;
+				const idVendedor = this.getNodeParameter('idVendedor', 0) as number;
+				const preciosListaId = this.getNodeParameter('idList', 0) as number;
+
+				// === articlesCollection como STRING, luego parse ===
+				const articlesCollectionRaw = this.getNodeParameter('articlesCollection', 0, '') as string;
+				let articulosArray: Array<{ ID: string; Cantidad: number }> = [];
 				try {
-					// Payload hardcodeado de ejemplo
-					const venta = {
-						NumeroDocumento: {
-							PuntoVenta: 1
-						},
-						Bonificacion: {
-							IdBonificacion: 6235
-						},
-						EsContado: true,
-						Cliente: {
-							IdCliente: 2
-						},
-						CondicionVenta: {
-							IdCondicionVenta: 1
-						},
-						Observaciones: "Venta desde API",
-						PorcentajeDescuento: 0.0,
-						TipoComprobanteVenta: {
-							IdTipoComprobanteVenta: 4
-						},
-						Vendedor: {
-							IdVendedor: 1
-						},
-						Referencia: "",
-						ListaPrecio: {
-							IdListaPrecio: 1
-						},
-						VentaArticulos: [
-							{
-								IdArticulo: 1450,
-								Codigo: 456,
-								Nombre: "Test",
-								Cantidad: 2.0,
-								SegundoControlStock: 0.0,
-								Precio: 1210.0,
-								Comision: {
-									IdComision: 6089
-								},
-								PorcentajeDescuento1: 0.0,
-								PorcentajeDescuento2: 0.0,
-								PorcentajeDescuento3: 0.0,
-								DescuentoCalculado: 0.0,
-								CategoriaImpuestoIVA: {
-									IdCategoriaImpuestoIVA: 4,
-									Codigo: 5,
-									Nombre: "IVA 21.00",
-									Tasa: 21.0
-								},
-								ImpuestoInterno: 0.0,
-								NumeroTropa: "",
-								NumeroSerie: "",
-								NumeroDespacho: "",
-								Observaciones: "",
-								ClaseDescuento: {
-									IdClaseDescuento: 0
-								},
-								NoAplicaBonificacionCliente: false,
-								Cuotificador: 0.0,
-								IdPromocionComercial: 0,
-								EsSinCargo: false,
-								EsArticuloAgrupador: false,
-								CantidadUnitariaPorConjunto: 0.0
-							}
-						],
-						PedidoVentaArticulosSuscriptos: [],
-						RemitoVentaArticulosSuscriptos: [],
-						VentaConceptos: [],
-						VentaRegimenesEspeciales: [],
-						VentaValoresEfectivos: [
-							{
-								IdValor: 1,
-								Cotizacion: 1.0,
-								Importe: 2928.20,
-								Observaciones: "Cobro contado",
-								CantidadCuotas: 0
-							}
-						],
-						VentaValoresVouchers: [],
-						Moneda: {
-							IdMoneda: 1
-						},
-						Cotizacion: 1.0
+					articulosArray = JSON.parse(articlesCollectionRaw);
+					if (!Array.isArray(articulosArray)) {
+						throw new NodeOperationError(this.getNode(), 'El campo articlesCollection debe ser un array JSON válido.');
+					}
+				} catch (err) {
+					throw new NodeOperationError(this.getNode(), `El campo articlesCollection debe ser un JSON string válido. Ejemplo:[{"ID":"1450","Cantidad":2},{"ID":"1451","Cantidad":5}] Error: ${(err as any)?.message ?? String(err)}`);
+				}
+
+				const fechaDesde = this.getNodeParameter('startDate', 0, '') as string;
+				const separarFechaDesde = String(fechaDesde).split('T')[0];
+
+				// Campos condicionales (pueden no existir si esContado = false)
+				const idValorEfectivo = this.getNodeParameter('idValorEfectivo', 0, null) as number | null;
+				const cotizacionValorEfectivo = this.getNodeParameter(
+					'cotizacionValorEfectivo',
+					0,
+					null,
+				) as number | null;
+				const importeValorEfectivo = this.getNodeParameter('importeValorEfectivo', 0, null) as
+					| number
+					| null;
+				const observacionesValorEfectivo = this.getNodeParameter(
+					'observacionesValorEfectivo',
+					0,
+					'',
+				) as string;
+				const cantidadCuotasValorEfectivo = this.getNodeParameter(
+					'cantidadCuotasValorEfectivo',
+					0,
+					null,
+				) as number | null;
+
+				// Validaciones mínimas
+				if (!numeroPuntoDeVenta)
+					throw new NodeOperationError(this.getNode(), 'El punto de venta es obligatorio.');
+				if (!tipoComprobanteVenta)
+					throw new NodeOperationError(
+						this.getNode(),
+						'El tipo de comprobante de venta es obligatorio.',
+					);
+				if (!idCliente)
+					throw new NodeOperationError(this.getNode(), 'El IdCliente es obligatorio.');
+				if (!preciosListaId)
+					throw new NodeOperationError(this.getNode(), 'El IdListaPrecio es obligatorio.');
+				if (!articulosArray?.length)
+					throw new NodeOperationError(
+						this.getNode(),
+						'Debes enviar al menos un artículo en articlesCollection.',
+					);
+
+				// Si es contado, chequeo mínimos requeridos
+				if (esContado === true) {
+					if (idValorEfectivo == null)
+						throw new NodeOperationError(
+							this.getNode(),
+							'IdValor (efectivo) es obligatorio cuando EsContado = true.',
+						);
+					if (importeValorEfectivo == null)
+						throw new NodeOperationError(
+							this.getNode(),
+							'Importe (efectivo) es obligatorio cuando EsContado = true.',
+						);
+				}
+
+				// === Construcción de IDs y mapa de cantidades (misma lógica que Compras) ===
+				const ids = articulosArray.map((a) => a.ID);
+				const qtyById: Record<string, number> = Object.fromEntries(
+					articulosArray.map((a) => [a.ID, a.Cantidad]),
+				);
+
+				// 1) Traer info de artículos para venta
+				let ventaItemsConCantidad: any[] = [];
+				try {
+					const bodyArticulosVenta = {
+						IdCliente: idCliente,
+						FechaDocumento: separarFechaDesde,
+						Ids: ids,
 					};
 
+					let articulosVenta = await apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
+						headers,
+						method: 'POST',
+						body: bodyArticulosVenta,
+					});
+					const ventaObj = typeof articulosVenta === 'string' ? JSON.parse(articulosVenta) : articulosVenta;
+
+					const itemsRespuesta: any[] = ventaObj?.Articulos?.Items ?? ventaObj?.VentaArticulos ?? ventaObj?.Items ?? [];
+
+					// Agrego Cantidad desde el array original (clave: IdArticulo)
+					ventaItemsConCantidad = itemsRespuesta.map((art: any) => ({
+						...art, Cantidad: qtyById[String(art.IdArticulo)] ?? 0,
+					}));
+					console.log(ventaItemsConCantidad)
+				} catch (error) {
+					const errorMessage =
+						(error as any)?.response?.data?.Message ||
+						(error as any).message ||
+						'Error desconocido';
+					throw new NodeOperationError(
+						this.getNode(),
+						`Error obteniendo los artículos de venta.\n${errorMessage}`,
+					);
+				}
+
+				// 2) Armar el cuerpo de la venta
+				const bodyVenta: any = {
+					NumeroDocumento: { PuntoVenta: Number(numeroPuntoDeVenta) },
+					EsContado: Boolean(esContado),
+					Cliente: { IdCliente: Number(idCliente) },
+					CondicionVenta: { IdCondicionVenta: Number(condicionVentaId) },
+					Observaciones: 'Venta desde API',
+					TipoComprobanteVenta: { IdTipoComprobanteVenta: Number(tipoComprobanteVenta) },
+					Vendedor: { IdVendedor: Number(idVendedor) },
+					ListaPrecio: { IdListaPrecio: Number(preciosListaId) },
+					VentaArticulos: ventaItemsConCantidad,
+					PorcentajeDescuento: 0,
+				};
+
+				// Bonificación opcional
+				if (bonificacion) {
+					bodyVenta.Bonificacion = { IdBonificacion: bonificacion };
+				}
+
+				// 3) Solo agrego VentaValoresEfectivos si corresponde y con valores válidos
+				if (esContado === true) {
+					const cotizacion =
+						!cotizacionValorEfectivo || cotizacionValorEfectivo <= 0
+							? 1
+							: Number(cotizacionValorEfectivo);
+					const cuotas =
+						!cantidadCuotasValorEfectivo || cantidadCuotasValorEfectivo <= 0
+							? 1
+							: Number(cantidadCuotasValorEfectivo);
+
+					bodyVenta.VentaValoresEfectivos = [
+						{
+							IdValor: Number(idValorEfectivo),
+							Cotizacion: cotizacion,
+							Importe: Number(importeValorEfectivo),
+							Observaciones: observacionesValorEfectivo || '',
+							CantidadCuotas: cuotas,
+						},
+					];
+				}
+
+				// 4) POST final
+				try {
 					const url = `${centumUrl}/Ventas?verificaLimiteCreditoCliente=false&verificaStockNegativo=false&verificaCuotificador=false`;
 
 					const response = await apiRequest<any>(url, {
 						method: 'POST',
 						headers,
-						body: venta,
+						body: bodyVenta,
 					});
 
 					return [this.helpers.returnJsonArray(response)];
 				} catch (error) {
-					console.log('Error en solicitud de alta de venta:', error);
 					const errorMessage =
-						error?.response?.data?.Message || error.message || 'Error desconocido';
+						(error as any)?.response?.data?.Message ||
+						(error as any).message ||
+						'Error desconocido';
 					throw new NodeOperationError(this.getNode(), `Error creando la venta.\n${errorMessage}`);
 				}
 			}
-
 
 			case 'listaPrecios': {
 				try {
@@ -1031,28 +1249,35 @@ export class Centum implements INodeType {
 				const fechaHasta = this.getNodeParameter('endDate', 0, '') as string;
 				const separarFechaDesde = String(fechaDesde).split('T')[0];
 				const separarFechaHasta = String(fechaHasta).split('T')[0];
-				if(!idCliente && !separarFechaDesde && !separarFechaHasta && !idCobro){
-					throw new NodeOperationError(this.getNode(), 'Debes ingresar almenos un parametro para realizar la búsqueda.');
+				if (!idCliente && !separarFechaDesde && !separarFechaHasta && !idCobro) {
+					throw new NodeOperationError(
+						this.getNode(),
+						'Debes ingresar almenos un parametro para realizar la búsqueda.',
+					);
 				}
 
 				const body = {
 					idCliente,
 					fechaDocumentoDesde: separarFechaDesde,
 					fechaDocumentoHasta: separarFechaHasta,
-					idCobro
-				}
+					idCobro,
+				};
 
-				try{
+				try {
 					const response = await apiRequest<any>(`${centumUrl}/Cobros/FiltrosCobro`, {
 						method: 'POST',
 						headers,
-						body
-					})
+						body,
+					});
 					return [this.helpers.returnJsonArray(response)];
-				}catch(error){
+				} catch (error) {
 					console.log('Error en obtener el listado de cobros:', error);
-					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
-					throw new NodeOperationError( this.getNode(), `Error en obtener el listado de cobros para cliente ${idCliente}: ${errorMessage}`);
+					const errorMessage =
+						error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(
+						this.getNode(),
+						`Error en obtener el listado de cobros para cliente ${idCliente}: ${errorMessage}`,
+					);
 				}
 			}
 
@@ -1063,41 +1288,52 @@ export class Centum implements INodeType {
 				const fechaHasta = this.getNodeParameter('endDate', 0, '') as string;
 				const separarFechaDesde = String(fechaDesde).split('T')[0];
 				const separarFechaHasta = String(fechaHasta).split('T')[0];
-				if(!idCliente && !separarFechaDesde && !separarFechaHasta && !idCompra){
-					throw new NodeOperationError(this.getNode(), 'Debes ingresar almenos un parametro para realizar la búsqueda.');
+				if (!idCliente && !separarFechaDesde && !separarFechaHasta && !idCompra) {
+					throw new NodeOperationError(
+						this.getNode(),
+						'Debes ingresar almenos un parametro para realizar la búsqueda.',
+					);
 				}
 
 				const body = {
 					idCliente,
 					fechaDocumentoDesde: separarFechaDesde,
 					fechaDocumentoHasta: separarFechaHasta,
-					idCompra
-				}
+					idCompra,
+				};
 
-				try{
+				try {
 					const response = await apiRequest<any>(`${centumUrl}/Compras/FiltrosCompra`, {
 						method: 'POST',
 						headers,
-						body
-					})
+						body,
+					});
 					return [this.helpers.returnJsonArray(response)];
-				}catch(error){
+				} catch (error) {
 					console.log('Error en obtener el listado de cobros:', error);
-					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
-					throw new NodeOperationError( this.getNode(), `Error en obtener el listado de cobros para cliente ${idCliente}: ${errorMessage}`);
+					const errorMessage =
+						error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(
+						this.getNode(),
+						`Error en obtener el listado de cobros para cliente ${idCliente}: ${errorMessage}`,
+					);
 				}
 			}
 
 			case 'obtenerEstadosPedidosDeVenta': {
-				try{
-					const response = await apiRequest<any>(`${centumUrl}/EstadosPedidoVenta?bIncluirTodosEstados=true`, {
-						method: 'GET',
-						headers
-					})
+				try {
+					const response = await apiRequest<any>(
+						`${centumUrl}/EstadosPedidoVenta?bIncluirTodosEstados=true`,
+						{
+							method: 'GET',
+							headers,
+						},
+					);
 					return [this.helpers.returnJsonArray(response)];
-				}catch(error){
+				} catch (error) {
 					console.log(error);
-					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					const errorMessage =
+						error?.response?.data?.Message || error.message || 'Error desconocido';
 					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 			}
@@ -1223,28 +1459,35 @@ export class Centum implements INodeType {
 				const fechaHasta = this.getNodeParameter('endDate', 0, '') as string;
 				const separarFechaDesde = String(fechaDesde).split('T')[0];
 				const separarFechaHasta = String(fechaHasta).split('T')[0];
-				if(!idCliente && !idsEstado && !separarFechaDesde && !separarFechaHasta){
-					throw new NodeOperationError(this.getNode(), 'Debes ingresar almenos un parametro para realizar la búsqueda.');
+				if (!idCliente && !idsEstado && !separarFechaDesde && !separarFechaHasta) {
+					throw new NodeOperationError(
+						this.getNode(),
+						'Debes ingresar almenos un parametro para realizar la búsqueda.',
+					);
 				}
 
 				const body = {
 					idCliente,
 					fechaDocumentoDesde: separarFechaDesde,
 					fechaDocumentoHasta: separarFechaHasta,
-					idsEstado
-				}
+					idsEstado,
+				};
 
-				try{
+				try {
 					const response = await apiRequest<any>(`${centumUrl}/PedidosVenta/FiltrosPedidoVenta`, {
 						method: 'POST',
 						headers,
-						body
-					})
+						body,
+					});
 					return [this.helpers.returnJsonArray(response)];
-				}catch(error){
+				} catch (error) {
 					console.log('Error en solicitud de facturas pedidos ventas:', error);
-					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
-					throw new NodeOperationError( this.getNode(), `Error obteniendo los pedidos ventas para cliente ${idCliente}: ${errorMessage}`);
+					const errorMessage =
+						error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(
+						this.getNode(),
+						`Error obteniendo los pedidos ventas para cliente ${idCliente}: ${errorMessage}`,
+					);
 				}
 			}
 
@@ -1286,15 +1529,18 @@ export class Centum implements INodeType {
 				const password = this.getNodeParameter('password', 0, '') as string;
 
 				try {
-					const operadoresActividad = await apiRequest<any>(`
-						${centumUrl}/OperadoresMoviles/Credenciales?Usuario=${username}&Contrasena=${password}`, {
-						method: 'GET',
-						headers
-					}
+					const operadoresActividad = await apiRequest<any>(
+						`
+						${centumUrl}/OperadoresMoviles/Credenciales?Usuario=${username}&Contrasena=${password}`,
+						{
+							method: 'GET',
+							headers,
+						},
 					);
 					return [this.helpers.returnJsonArray(operadoresActividad)];
 				} catch (error) {
-					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					const errorMessage =
+						error?.response?.data?.Message || error.message || 'Error desconocido';
 					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 			}
@@ -1302,11 +1548,10 @@ export class Centum implements INodeType {
 			case 'pedidoVentaActividad': {
 				const pedidoID = this.getNodeParameter('id', 0);
 				try {
-					const dataActividad = await apiRequest<any>(`${centumUrl}/PedidosVenta/${pedidoID}`,{
+					const dataActividad = await apiRequest<any>(`${centumUrl}/PedidosVenta/${pedidoID}`, {
 						method: 'GET',
-						headers
-						}
-					);
+						headers,
+					});
 					return [this.helpers.returnJsonArray(dataActividad)];
 				} catch (error) {
 					console.log(error);
@@ -1438,8 +1683,8 @@ export class Centum implements INodeType {
 				try {
 					const dataRegimenesList = await apiRequest<any>(`${centumUrl}/RegimenesEspeciales`, {
 						method: 'GET',
-						headers
-					})
+						headers,
+					});
 					return [this.helpers.returnJsonArray(dataRegimenesList)];
 				} catch (error) {
 					console.log(error);
@@ -1458,8 +1703,8 @@ export class Centum implements INodeType {
 				try {
 					const regimen = await apiRequest<any>(`${centumUrl}/RegimenesEspeciales/${regimenId}`, {
 						method: 'GET',
-						headers
-					})
+						headers,
+					});
 					return [this.helpers.returnJsonArray(regimen)];
 				} catch (error) {
 					console.log(error);
