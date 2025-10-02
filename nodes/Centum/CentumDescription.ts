@@ -14,6 +14,12 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Genera un nuevo token para utilizarlo con una herramienta externa como postman'
 			},
 			{
+				name: 'Articulo - Buscar',
+				value: 'buscarArticulo',
+				action: 'Busca un articulo por nombre',
+				description: 'Busca un articulo por nombre y retorna todas las ocurrencias'
+			},
+			{
 				name: 'Articulo - Por ID',
 				value: 'articuloPorId',
 				action: 'Buscar artículo por ID',
@@ -60,6 +66,12 @@ export const CentumOperations: INodeProperties[] = [
 				value: 'articuloSucursalFisica',
 				action: 'Obtener el stock por artículo individual por sucursal física',
 				description: 'Retorna el stock de un artículo en específico de una sucursal física'
+			},
+			{
+				name: 'Categorías - Obtener',
+				value: 'categoriasObtener',
+				action: 'Obten el listado de las categorías',
+				description: 'Obten el listado completo de todas las categorías de los articulos'
 			},
 			{
 				name: 'Cliente - Actualizar',
@@ -163,6 +175,12 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obtiene un listado de departamentos, normalmente filtrado por provincia'
 			},
 			{
+				name: 'Marcas - Obtener',
+				value: 'marcasObtener',
+				action: 'Obten el listado de las marcas',
+				description: 'Obten el listado completo de todas las marcas de los articulos'
+			},
+			{
 				name: 'Obtener Operador Móvil',
 				value: 'operadoresMoviles',
 				description: 'Obtiene todos los datos de un operador móvil en base a las credenciales'
@@ -207,6 +225,18 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Genera un JSON estructurado para productos WooCommerce a partir de artículos Centum',
 			},
 			{
+				name: 'Proveedor - Buscar',
+				value: 'proveedorBuscar',
+				action: 'Obtén el proveedor segun el ID',
+				description: 'Retorna la información del proveedor en base al ID'
+			},
+			{
+				name: 'Proveedor - Crear',
+				value: 'proveedorCrear',
+				action: 'Obtén el proveedor segun el ID',
+				description: 'Retorna la información del proveedor en base al ID'
+			},
+			{
 				name: 'Provincias - Lista',
 				value: 'provinciasLista',
 				description: 'Obtiene un listado de provincias, normalmente filtrado por país'
@@ -220,6 +250,12 @@ export const CentumOperations: INodeProperties[] = [
 				name: 'Regímenes Especiales - Lista',
 				value: 'regimenesEspecialesLista',
 				description: 'Trae un listado entero de los regímenes especiales'
+			},
+			{
+				name: 'Rubros - Obtener',
+				value: 'rubrosObtener',
+				action: 'Obten el listado de los rubros',
+				description: 'Obten el listado completo de todos los rubros de los articulos'
 			},
 			{
 				name: 'Sucursales Físicas - Lista',
@@ -261,6 +297,19 @@ const getArticulo: INodeProperties[] = [
 		},
 		placeholder: '/Clientes, /Articulos/Venta, etc.',
 		description: 'Ruta del endpoint a utilizar',
+	},
+	{
+		displayName: 'Nombre del articulo',
+		name: 'nombreArticulo',
+		type: 'string',
+		default: '',
+		placeholder: 'Alfajores',
+		displayOptions:{
+			show: {
+				resource: ['buscarArticulo']
+			}
+		},
+		description: 'El nombre del producto a buscar'
 	},
 	{
 		displayName: 'SKU',
@@ -330,6 +379,19 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'Proveedor ID',
+		name: 'proveedorId',
+		type: 'number',
+		required: true,
+		default: '',
+		description: 'ID del proveedor usado para buscar dentro del sistema',
+		displayOptions: {
+			show: {
+				resource: ['proveedorBuscar']
+			}
+		}
+	},
+	{
 		displayName: 'Rubros IDs',
 		name: 'idsRubros',
 		type: 'string',
@@ -349,7 +411,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Client ID used to search the articles',
 		displayOptions: {
 			show: {
-				resource: ['articulo'],
+				resource: ['articulo', 'categoriasObtener'],
 			},
 		},
 	},
@@ -679,7 +741,74 @@ const getArticulo: INodeProperties[] = [
 		placeholder: 'Ingresá el CUIT...',
 		displayOptions: {
 			show: {
-				resource: ['clienteNuevo', 'buscarContribuyente', 'nuevoContribuyente', 'clientesBusquedaPorCuit', 'clientesBusqueda'],
+				resource: ['proveedorCrear','clienteNuevo', 'buscarContribuyente', 'nuevoContribuyente', 'clientesBusquedaPorCuit', 'clientesBusqueda'],
+			},
+		},
+	},
+	{
+		displayName: 'Condición IVA',
+		name: 'condicionIVA',
+		type: 'string',
+		default: '',
+		placeholder: 'Consumidor Final, Exento, Monotributo...',
+		displayOptions: {
+			show: {
+				resource: ['proveedorCrear'],
+			},
+		},
+	},
+	{
+		displayName: 'Forma De Pago Proveedor',
+		name: 'formaPagoProveedor',
+		type: 'number',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['proveedorCrear'],
+			},
+		},
+	},
+	{
+		displayName: 'Condición De Pago',
+		name: 'condicionDePago',
+		type: 'number',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['proveedorCrear'],
+			},
+		},
+	},
+	{
+		displayName: 'Categoría De Impuestos A Las Ganancias',
+		name: 'categoriaImpuestosGanancias',
+		type: 'number',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['proveedorCrear'],
+			},
+		},
+	},
+	{
+		displayName: 'Clase De Proveedor',
+		name: 'claseProveedor',
+		type: 'number',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['proveedorCrear'],
+			},
+		},
+	},
+	{
+		displayName: 'Activo',
+		name: 'active',
+		type: 'boolean',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['proveedorCrear'],
 			},
 		},
 	},
@@ -714,7 +843,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Razón social del cliente para buscar',
 		displayOptions: {
 			show: {
-				resource: ['buscarContribuyente', 'clientesBusqueda'],
+				resource: ['buscarContribuyente', 'clientesBusqueda', 'proveedorCrear'],
 			},
 		},
 	},
@@ -749,7 +878,7 @@ const getArticulo: INodeProperties[] = [
 			default: '',
 			displayOptions: {
 				show: {
-					resource: ['generarCompras', 'articulosImagenes', 'articuloPorId', 'articuloSucursalFisica', 'generarVentas'],
+					resource: ['articulosImagenes', 'articuloPorId', 'articuloSucursalFisica'],
 				},
 			},
 		},
@@ -775,7 +904,7 @@ const getArticulo: INodeProperties[] = [
 		description: "ID del país por la cual se buscarán las provincias",
 		displayOptions: {
 			show: {
-				resource: ['provinciasLista'],
+				resource: ['provinciasLista', 'proveedorCrear'],
 			},
 		},
 	},
@@ -787,7 +916,7 @@ const getArticulo: INodeProperties[] = [
 		description: "ID de la provincia por la cual se buscarán los departamentos",
 		displayOptions: {
 			show: {
-				resource: ['departamentosLista'],
+				resource: ['departamentosLista', 'proveedorCrear'],
 			},
 		},
 	},
@@ -838,7 +967,7 @@ const getArticulo: INodeProperties[] = [
 			description: 'Codigo del articulo a buscar',
 			displayOptions: {
 				show: {
-					resource: ['articuloPorId', 'articulosPrecioPorLista', 'articuloSucursalFisica', 'clientesBusqueda'],
+					resource: ['proveedorCrear','articuloPorId', 'articulosPrecioPorLista', 'articuloSucursalFisica', 'clientesBusqueda'],
 				},
 			},
 		},
@@ -953,6 +1082,11 @@ const getArticulo: INodeProperties[] = [
 			placeholder: '[{ "ID": 1234, "Cantidad": 10 }, {"ID": 4567, "Cantidad": 5}]',
 			default: '',
 			description: 'Lista de artículos en formato JSON',
+			displayOptions: {
+				show: {
+					resource: ['generarCompras', 'generarVentas']
+				}
+			}
 		}
 
 
