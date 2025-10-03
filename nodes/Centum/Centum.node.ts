@@ -1407,6 +1407,9 @@ export class Centum implements INodeType {
 				const categoriaImpuestoGanancias = this.getNodeParameter('categoriaImpuestosGanancias', 0);
 				const claseProveedor = this.getNodeParameter('claseProveedor', 0);
 				const activo = this.getNodeParameter('active', 0);
+				const idOperadorCompra = this.getNodeParameter('idOperadorCompra', 0);
+				const idZona = this.getNodeParameter('idZona', 0);
+				const idDescuentoProveedor = this.getNodeParameter('idDescuentoProveedor', 0);
 
 				const body = {
 					Codigo: codigo,
@@ -1433,7 +1436,16 @@ export class Centum implements INodeType {
 					ClaseProveedor: {
 						IdClaseProveedor: claseProveedor
 					},
-					Activo: activo
+					OperadorCompra: {
+						IdOperadorCompra: idOperadorCompra
+					},
+					Activo: activo,
+					Zona: {
+						IdZona: idZona
+					},
+					DescuentoProveedor: {
+						IdDescuentoProveedor: idDescuentoProveedor
+					}
 				}
 
 

@@ -1,87 +1,114 @@
-# Nodo Centum para n8n
+# n8n-nodes-centum
 
-![Logo Centum](nodes/Centum/centum.svg)
+![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
 
-Este nodo te da acceso directo a la API de Centum sin necesidad de librerías extra: buscá clientes por criterios, creá nuevos registros y automatizá tu gestión de usuarios en un par de clics. Diseñado bajo las guidelines oficiales de n8n, cumple con no tener dependencias externas y se instala en un segundo. Ideal para mantener tus flujos limpios y eficientes.
+Este es un nodo personalizado para [n8n](https://n8n.io/), una plataforma de automatización de flujos de trabajo de código abierto, diseñado para integrarse con la **API de Centum**, un sistema para gestionar clientes, cobros y otros recursos empresariales. El nodo `Centum` simplifica la interacción con los endpoints de la API de Centum, permitiendo operaciones como buscar clientes, crear cobros y más, directamente dentro de sus flujos de trabajo en n8n.
 
-## Instalación
+El nodo está construido para ser extensible, permitiendo la fácil adición de nuevas operaciones para satisfacer necesidades específicas de integración con Centum.
 
-**Método correcto para nodos comunitarios de n8n:**
+## Requiere 3 parametros en la credencial **Centum API**:
 
-1. En tu instancia de n8n, ve a **Settings > Community Nodes**
-2. Haz clic en **"Install Node"** 
-3. Coloca `n8n-nodes-centum`
-4. Confirma la instalación
+| Campo                             | Typo       | Ejemplo                                                     | Requerido |
+|-----------------------------------|------------|-------------------------------------------------------------|-----------|
+| Public Access Key                 | Password   | a1b2c3d4e5f6g7h8i9j0...                                     | Yes       |
+| CentumSuiteConsumidorApiPublicaId | Number     | 12345                                                       | Yes       |
+| Centum URL                        | Text (URL) | https://plataformaX.centum.com.ar:23990/BLX                 | Yes       |
+|-----------------------------------|------------|-------------------------------------------------------------|-----------|
 
-## Configuración de credenciales
 
-Requiere 3 parámetros en la credencial **Centum API**:
 
-| Campo | Tipo | Ejemplo | Obligatorio |
-|-------|------|---------|-------------|
-| Public Access Key | Contraseña | `a1b2c3d4...` | Sí |
-| CentumSuiteConsumidorApiPublicaId | Número | `12345` | Sí |
-| Centum URL | Texto | `https://plataformaX.centum.com.ar:23990/BLX` | Sí |
+## Operaciones Disponibles
 
-## Operaciones disponibles
-
-**28 endpoints organizados en 5 categorías:**
+**42 endpoints organizados en 5 categorías:**
 
 ### 📦 Artículos
-
-- `articulo`: Búsqueda con filtros (rubros, fechas, existencias)
-- `articuloPorId`: Consulta por ID/código exacto
+- `articulo`: Buscar artículos filtrados (categorías, fechas, stock)
+- `articuloPorId`: Consulta por ID o código exacto
+- `articulosDatosGenerales`: Datos generales de artículos
+- `articulosExistencia`: Existencias por sucursal física
 - `articulosImagenes`: Descarga y procesamiento de imágenes
-- `articulosPrecioPorLista`: Precios según lista de precios
-- `articulosSucursalesFisicas`: Consulta de artículos por sucursal física
-- `articuloSucursalFisica`: Consulta de artículo específico por sucursal
+- `articulosPrecioPorLista`: Precios por lista de precios
+- `articulosSucursalesFisicas`: Artículos agrupados por sucursal física
+- `articuloSucursalFisica`: Artículo específico en sucursal
+- `categoriasObtener`: Listado de categorías
+- `marcasObtener`: Listado de marcas
+- `rubrosObtener`: Listado de rubros
 
 ### 👤 Clientes
-
-- `clienteNuevo`: Creación desde WooCommerce (mapeo automático)
-- `nuevoContribuyente`: Alta de contribuyentes con CUIT
-- `composicionSaldoCliente`: Estado de cuenta detallado
+- `clienteNuevo`: Crear nuevo cliente
+- `nuevoContribuyente`: Registrar contribuyente con CUIT
+- `clientes`: Lista paginada de clientes
+- `clientesActualizar`: Actualizar datos de cliente
+- `clientesBusqueda`: Buscar cliente por email o DNI
+- `clientesBusquedaPorCuit`: Buscar cliente por CUIT
+- `buscarContribuyente`: Buscar contribuyente
+- `composicionSaldoCliente`: Detalle del estado de cuenta
 - `obtenerSaldoCliente`: Consulta de saldo actual
-- `clientes`: Listado de clientes con paginación
-- `clientesActualizar`: Actualización de datos de clientes
-- `clientesBusqueda`: Búsqueda por email/DNI
-- `clientesBusquedaPorCuit`: Búsqueda por CUIT
 
-### 📦 Pedidos y Cobros
-
-- `crearPedidoVenta`: Generación de pedidos de venta
-- `cobros`: Registro de cobros y pagos
-- `obtenerFacturasCobros`: Historial de facturas y cobros
-- `obtenerFacturasPedidosVentas`: Historial de pedidos de venta
-- `pedidoVentaActividad`: Consulta de actividad de pedidos
+### 💳 Pedidos y Cobros
+- `cobros`: Registrar cobro
+- `obtenerCobros`: Filtrar cobros
+- `obtenerFacturasCobros`: Historial de facturas asociadas a cobros
+- `crearPedidoVenta`: Crear pedido de venta
+- `obtenerPedidosDeVenta`: Listar pedidos de venta
+- `obtenerFacturasPedidosVentas`: Historial de facturas de pedidos de venta
+- `obtenerEstadosPedidosDeVenta`: Estados disponibles para pedidos de venta
+- `pedidoVentaActividad`: Consultar actividad de pedido de venta
+- `generarVentas`: Generar venta
+- `generarCompras`: Generar compra
+- `obtenerCompras`: Filtrar compras
 
 ### 🌍 Catálogos
-
-- `provinciasLista`: Listado de provincias argentinas
+- `provinciasLista`: Provincias argentinas
 - `departamentosLista`: Departamentos por provincia
-- `sucursalesFisicas`: Sucursales disponibles
-- `listaPrecios`: Listado de precios
-- `promocionesCliente`: Promociones para clientes
+- `sucursalesFisicas`: Sucursales físicas
+- `listaPrecios`: Listas de precios disponibles
+- `promocionesCliente`: Promociones comerciales aplicables
+- `regimenesEspecialesLista`: Regímenes especiales
+- `regimenesEspecialesPorId`: Régimen especial por ID
+- `tipoComprobante`: Tipos de comprobante
 
 ### ⚙️ Utilidades
+- `generarProductosWoo`: Transformar datos al formato de WooCommerce
+- `procesarImagenes`: Procesamiento y sincronización de imágenes
+- `generarToken`: Generar token de autenticación
+- `operadoresMoviles`: Consultar credenciales de operadores móviles
 
-- `generarProductosWoo`: Transformación a formato WooCommerce
-- `procesarImagenes`: Sincronización inteligente de imágenes
-- `generarToken`: Generación de token de autenticación
-- `buscarContribuyente`: Búsqueda de contribuyentes
-- `operadoresMoviles`: Retorna los datos de un operador móvil en base a las credenciales proporcionadas.
+## Requisitos Previos
 
-## Notas técnicas importantes
+Para usar este nodo, asegúrese de tener instalado lo siguiente en su máquina de desarrollo:
 
-- **Paginación:** Soporta 3 modos (default/custom/all) en operaciones masivas
-- **Mapeo de provincias:** Incluye conversión automática WooCommerce → Centum
-- **Manejo de errores:** Todos los endpoints incluyen validación de status HTTP
-- **Documentación API:** Disponible en [http://www.centum.com.ar/ApiPublica.pdf](http://www.centum.com.ar/ApiPublica.pdf)
+- **n8n**: Versión 1.75.2 o superior (se recomienda la versión más reciente para compatibilidad).
+- **Node.js**: Versión 20.x o superior.
+- **npm**: Requerido para instalar y construir el plugin.
+- **Git**: Para clonar el repositorio.
+- **Acceso a la API de Centum**: Credenciales válidas (`centumUrl`, `consumerApiPublicId`, `publicAccessKey`) proporcionadas por su proveedor de Centum.
 
-## Contribuir
+Recomendado: Siga la guía de n8n para [configurar su entorno de desarrollo](https://docs.n8n.io/integrations/creating-nodes/build/node-development-environment/).
 
-Si deseas contribuir a este proyecto, por favor revisa nuestro [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) y [CONTRIBUTING.md](CONTRIBUTING.md).
+## Uso de este starter
+
+Estos son los pasos básicos para trabajar con el starter. Para obtener una guía detallada sobre cómo crear y publicar nodos, consulte la [documentación](https://docs.n8n.io/integrations/creating-nodes/).
+
+1.  [Genere un nuevo repositorio](https://github.com/n8n-io/n8n-nodes-starter/generate) a partir de este repositorio plantilla.
+2.  git clone https://github.com//.git
+3.  Ejecute npm i para instalar las dependencias.
+4.  Abra el proyecto en su editor.
+5.  Explore los ejemplos en /nodes y /credentials. Modifique los ejemplos o reemplácelos con sus propios nodos.
+6.  Actualice el package.json con sus datos.
+7.  Ejecute npm run lint para verificar errores o npm run lintfix para corregir errores automáticamente cuando sea posible.
+8.  Pruebe su nodo localmente. Consulte [Ejecutar su nodo localmente](https://docs.n8n.io/integrations/creating-nodes/test/run-node-locally/) para obtener orientación.
+9.  Reemplace este README con la documentación de su nodo. Use la [PLANTILLA README](/broobe/n8n/n8n-nodes-blocky-nodes/-/blob/main/README_TEMPLATE.md) para comenzar.
+10.  Actualice el archivo LICENSE con sus datos.
+11.  [Publique](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry) su paquete en npm.
+
+## Soporte
+
+Para problemas o preguntas:
+- Abra un **issue** en el [repositorio de GitHub](https://github.com/your-username/n8n-nodes-centum).
+- Contacte a su proveedor de Centum para soporte relacionado con la API.
+- Consulte la [documentación de n8n](https://docs.n8n.io/) para obtener ayuda con la integración de flujos de trabajo.
 
 ## Licencia
 
-Este proyecto está licenciado bajo MIT - ver el archivo [LICENSE.md](LICENSE.md) para más detalles.
+Este proyecto está licenciado bajo la [Licencia MIT](LICENSE). Consulte el archivo `LICENSE` para obtener detalles.

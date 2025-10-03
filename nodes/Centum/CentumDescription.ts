@@ -280,422 +280,33 @@ export const CentumOperations: INodeProperties[] = [
 
 const getArticulo: INodeProperties[] = [
 	{
-		displayName: 'Endpoint',
-		name: 'endpoint',
-		type: 'string',
-		default: '/Clientes',
-		required: true,
-		displayOptions: {
-			show: {
-				resource: [
-					// 'activity',
-					// 'clientesBusqueda',
-					// 'searchArticleBySKU',
-					// 'productPriceList'
-				],
-			},
-		},
-		placeholder: '/Clientes, /Articulos/Venta, etc.',
-		description: 'Ruta del endpoint a utilizar',
-	},
-	{
-		displayName: 'Nombre del articulo',
-		name: 'nombreArticulo',
-		type: 'string',
-		default: '',
-		placeholder: 'Alfajores',
-		displayOptions:{
-			show: {
-				resource: ['buscarArticulo']
-			}
-		},
-		description: 'El nombre del producto a buscar'
-	},
-	{
-		displayName: 'SKU',
-		name: 'sku',
-		type: 'string',
-		default: '',
-		required: true,
-		displayOptions: {
-			show: {
-				resource: ['searchArticleBySKU'],
-			},
-		},
-		description: 'The SKU (product code) to search for',
-	},
-	{
-		displayName: 'ID Sucursal Física',
-		name: 'idSucursalFisica',
-		type: 'number',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['searchArticleBySKU', 'articuloSucursalFisica', 'generarCompras'],
-			},
-		},
-		description: 'The ID of the physical branch to filter stock (optional)',
-	},
-	{
-		displayName: 'Datos Imagen',
-		type: 'json',
-		required: true,
-		name: 'dataImg',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['procesarImagenes'],
-			},
-		},
-	},
-	{
-		displayName: 'Ultima Modificacion Imagenes',
-		type: 'json',
-		required: true,
-		name: 'lastModifiedImg',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['procesarImagenes'],
-			},
-		},
-	},
-	{
-		displayName: 'Cliente ID',
-		name: 'clienteId',
-		type: 'number',
-		required: true,
-		typeOptions: {
-			maxValue: 9999999,
-			minValue: 0,
-			numberStepSize: 1,
-		},
-		default: 0,
-		description: 'Client ID used to search the articles',
-		displayOptions: {
-			show: {
-				resource: ['generarCompras', 'articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente', 'obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'promocionesCliente', 'obtenerPedidosDeVenta', 'obtenerOrdenesCompra', 'obtenerCobros', 'obtenerCompras', 'generarVentas'],
-			},
-		},
-	},
-	{
-		displayName: 'Proveedor ID',
-		name: 'proveedorId',
-		type: 'number',
-		required: true,
-		default: '',
-		description: 'ID del proveedor usado para buscar dentro del sistema',
-		displayOptions: {
-			show: {
-				resource: ['proveedorBuscar']
-			}
-		}
-	},
-	{
-		displayName: 'Rubros IDs',
-		name: 'idsRubros',
-		type: 'string',
-		default: '',
-		description: 'ID Rubros used to search the articles',
-		displayOptions: {
-			show: {
-				resource: ['articulo'],
-			},
-		},
-	},
-	{
-		displayName: 'Sub-Rubros IDs',
-		name: 'idsSubRubros',
-		type: 'string',
-		default: '',
-		description: 'Client ID used to search the articles',
-		displayOptions: {
-			show: {
-				resource: ['articulo', 'categoriasObtener'],
-			},
-		},
-	},
-	{
-		displayName: 'Fecha Modificación Desde',
-		name: 'dateModified',
-		type: 'dateTime',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['articulo'],
-			},
-		},
-	},
-	{
-		displayName: 'Fecha Precio Actualizado Desde',
-		name: 'priceDateModified',
-		type: 'dateTime',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente'],
-			},
-		},
-	},
-	{
-		displayName: 'Fecha Desde',
-		name: 'startDate',
-		type: 'dateTime',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['generarCompras', 'obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'obtenerPedidosDeVenta', 'obtenerOrdenesCompra', 'obtenerCobros', 'obtenerCompras', 'generarVentas'],
-			},
-		},
-	},
-	{
-		displayName: 'Fecha Hasta',
-		name: 'endDate',
-		type: 'dateTime',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'obtenerPedidosDeVenta', 'obtenerOrdenesCompra', 'obtenerCobros', 'obtenerCompras'],
-			},
-		},
-	},
-	{
-		displayName: 'Fecha Modificación Imagen Desde',
-		name: 'dateModifiedImage',
-		type: 'dateTime',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['articulo'],
-			},
-		},
-	},
-	{
-		displayName: 'Fecha Documento',
-		name: 'documentDate',
-		type: 'dateTime',
-		required: true,
-		default: undefined,
-		description: 'Parametro fecha del body para las solicitudes',
-		displayOptions: {
-			show: {
-				resource: ['articulo', 'promocionesCliente', 'generarCompras'],
-			},
-		},
-	},
-	{
-		displayName: 'Dia De La Semana',
-		name: 'diaSemana',
-		type: 'number',
-		default: 0,
-		description: 'Numero de la semana por el cual filtrar promociones aplicadas (0 es Lunes)',
-		displayOptions: {
-			show: {
-				resource: ['promocionesCliente'],
-			},
-		},
-	},
-	{
-		displayName: 'Migración Completa',
-		name: 'migracionCompleta',
+		displayName: 'Activo',
+		name: 'active',
 		type: 'boolean',
-		default: false,
-		description: 'Whether complete articles migration or partial',
+		default: '',
 		displayOptions: {
-			show: {
-				resource: ['articulo'],
-			},
-		},
-	},
-		{
-		displayName: 'ID Del Estado',
-		name: 'statusId',
-		type: 'number',
-		default: false,
-		description: 'Número del estado del pedido',
-		displayOptions: {
-			show: {
-				resource: ['obtenerPedidosDeVenta', 'obtenerOrdenesCompra'],
-			},
-		},
-	},
-	// {
-	// 	displayName: 'Habilitado',
-	// 	name: 'enabled',
-	// 	type: 'boolean',
-	// 	required: true,
-	// 	default: true,
-	// 	// eslint-disable-next-line n8n-nodes-base/node-param-description-boolean-without-whether
-	// 	description: 'Select the items that are enabled',
-	// 	displayOptions: {
-	// 		show: {
-	// 			resource: ['articulo', 'articulosExistencia'],
-	// 		},
-	// 	},
-	// },
-	// {
-	// 	displayName: 'ActivoWeb',
-	// 	name: 'activeWeb',
-	// 	type: 'boolean',
-	// 	required: true,
-	// 	default: true,
-	// 	// eslint-disable-next-line n8n-nodes-base/node-param-description-boolean-without-whether
-	// 	description: 'Select the items that are active on the web',
-	// 	displayOptions: {
-	// 		show: {
-	// 			resource: ['articulo', 'articulosExistencia'],
-	// 		},
-	// 	},
-	// },
-		{
-		displayName: 'Sucursales Físicas - IDs Lista',
-		name: 'branchOfficeIds',
-		type: 'string',
-		required: true,
-		default: '7345',
-		description:
-			'Physical branch ID separated by comma to be able to fetch only the specified branch',
-		displayOptions: {
-			show: {
-				resource: ['articulosExistencia'],
-			},
+			show: { resource: ['proveedorCrear'] },
 		},
 	},
 	{
-		displayName: 'Información De Envío',
-		name: 'envio',
+		displayName: 'Articulos',
+		name: 'articulo',
 		required: true,
 		type: 'json',
 		default: {},
-		description: 'Shipping info from the order',
 		displayOptions: {
-			show: {
-				resource: ['cobros', 'crearPedidoVenta'],
-			},
+			show: { resource: ['crearPedidoVenta', 'cobros'] },
 		},
 	},
 	{
-		displayName: 'Lista ID',
-		name: 'idList',
-		type: 'number',
-		default: '',
-		description: 'ID de la lista para buscar los precios de los articulos',
-		displayOptions: {
-			show: {
-				resource: ['articulosPrecioPorLista', 'generarVentas'],
-			},
-		},
-	},
-	{
-		displayName: 'ID De Cobro',
-		name: 'idCobro',
-		required: true,
-		type: 'number',
-		default: 0,
-		description: 'ID del cobro',
-		displayOptions: {
-			show: {
-				resource: ['crearPedidoVenta', 'obtenerCobros'],
-			},
-		},
-	},
-	{
-		displayName: 'ID De La Compra',
-		name: 'idCompra',
-		type: 'number',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['obtenerCompras'],
-			},
-		},
-	},
-	{
-		displayName: 'ID Del Vendedor',
-		name: 'idVendedor',
-		type: 'number',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['generarVentas'],
-			},
-		},
-	},
-	{
-		displayName: 'Condicion De Venta',
-		name: 'idCondicionVenta',
-		type: 'number',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['generarVentas'],
-			},
-		},
-	},
-	{
-		displayName: 'Es Contado',
-		name: 'esContado',
-		type: 'boolean',
-		default: false,
-		displayOptions: {
-			show: {
-				resource: ['generarVentas'],
-			},
-		},
-	},
-	{
-		displayName: 'ID Valor Efectivo',
-		name: 'idValorEfectivo',
-		type: 'number',
-		default: 0,
-		displayOptions: {
-			show: {
-				esContado: [true]
-			},
-		},
-	},
-	{
-		displayName: 'ID Bonificacion',
-		name: 'bonificacion',
-		type: 'number',
-		default: 0,
-		displayOptions: {
-			show: {
-				resource: ['generarVentas'],
-			},
-		},
-	},
-	{
-		displayName: 'Cotizacion',
-		name: 'cotizacionValorEfectivo',
-		type: 'number',
-		default: 0,
-		displayOptions: {
-			show: {
-				esContado: [true]
-			},
-		},
-	},
-	{
-		displayName: 'Importe',
-		name: 'importeValorEfectivo',
-		type: 'number',
-		default: 0,
-		displayOptions: {
-			show: {
-				esContado: [true]
-			},
-		},
-	},
-	{
-		displayName: 'Observaciones',
-		name: 'observacionesValorEfectivo',
+		displayName: 'Artículos',
+		name: 'articlesCollection',
 		type: 'string',
+		placeholder: '[{ "ID": 1234, "Cantidad": 10 }, {"ID": 4567, "Cantidad": 5}]',
 		default: '',
+		description: 'Lista de artículos en formato JSON',
 		displayOptions: {
-			show: {
-				esContado: [true]
-			},
+			show: { resource: ['generarCompras', 'generarVentas'] },
 		},
 	},
 	{
@@ -703,11 +314,132 @@ const getArticulo: INodeProperties[] = [
 		name: 'cantidadCuotasValorEfectivo',
 		type: 'number',
 		default: 0,
+		displayOptions: { show: { esContado: [true] } },
+	},
+	{
+		displayName: 'Cantidad Por Página',
+		name: 'cantidadPorPagina',
+		type: 'number',
+		default: 50,
+		description: 'Cantidad de artículos por página',
+		displayOptions: { show: { resource: ['articulo'] } },
+	},
+	{
+		displayName: 'Categoría De Impuestos A Las Ganancias',
+		name: 'categoriaImpuestosGanancias',
+		type: 'number',
+		default: '',
+		displayOptions: { show: { resource: ['proveedorCrear'] } },
+	},
+	{
+		displayName: 'Clase De Proveedor',
+		name: 'claseProveedor',
+		type: 'number',
+		default: '',
+		displayOptions: { show: { resource: ['proveedorCrear'] } },
+	},
+	{
+		displayName: 'Cliente',
+		name: 'cliente',
+		required: true,
+		type: 'json',
+		default: {},
+		displayOptions: {
+			show: { resource: ['crearPedidoVenta', 'cobros'] },
+		},
+	},
+	{
+		displayName: 'Cliente ID',
+		name: 'clienteId',
+		type: 'number',
+		required: true,
+		typeOptions: { maxValue: 9999999, minValue: 0, numberStepSize: 1 },
+		default: 0,
+		description: 'Client ID used to search the articles',
 		displayOptions: {
 			show: {
-				esContado: [true]
+				resource: [
+					'generarCompras',
+					'articulo',
+					'obtenerSaldoCliente',
+					'composicionSaldoCliente',
+					'obtenerFacturasPedidosVentas',
+					'obtenerFacturasCobros',
+					'promocionesCliente',
+					'obtenerPedidosDeVenta',
+					'obtenerOrdenesCompra',
+					'obtenerCobros',
+					'obtenerCompras',
+					'generarVentas',
+				],
 			},
 		},
+	},
+	{
+		displayName: 'Codigo',
+		name: 'codigo',
+		type: 'string',
+		default: '',
+		typeOptions: { minValue: 1 },
+		placeholder: 'Ej. 1507',
+		description: 'Codigo del articulo a buscar',
+		displayOptions: {
+			show: {
+				resource: [
+					'proveedorCrear',
+					'articuloPorId',
+					'articulosPrecioPorLista',
+					'articuloSucursalFisica',
+					'clientesBusqueda',
+				],
+			},
+		},
+	},
+	{
+		displayName: 'Código Del Comprobante',
+		name: 'codigoComprobante',
+		type: 'string',
+		default: '',
+		placeholder: 'Codigo de la compra (FCC)',
+		description: 'Codigo del comprobante de la compra',
+		displayOptions: { show: { resource: ['generarCompras'] } },
+	},
+		{
+		displayName: 'Condicion De Venta',
+		name: 'idCondicionVenta',
+		type: 'number',
+		default: '',
+		displayOptions: { show: { resource: ['generarVentas'] } },
+	},
+	{
+		displayName: 'Condición De Pago',
+		name: 'condicionDePago',
+		type: 'number',
+		default: '',
+		displayOptions: { show: { resource: ['proveedorCrear'] } },
+	},
+	{
+		displayName: 'Condición IVA',
+		name: 'condicionIVA',
+		type: 'string',
+		default: '',
+		placeholder: 'Consumidor Final, Exento, Monotributo...',
+		displayOptions: { show: { resource: ['proveedorCrear'] } },
+	},
+	{
+		displayName: 'Contraseña',
+		name: 'password',
+		type: 'string',
+		typeOptions: { password: true },
+		default: '',
+		displayOptions: { show: { resource: ['operadoresMoviles'] } },
+	},
+	{
+		displayName: 'Cotizacion',
+		name: 'cotizacionValorEfectivo',
+		type: 'number',
+		default: 0,
+		displayOptions: { show: { esContado: [true] } },
 	},
 	{
 		displayName: 'Cuerpo Del Pedido',
@@ -723,17 +455,6 @@ const getArticulo: INodeProperties[] = [
 		description: 'Información en formato JSON para crear o actualizar un cliente',
 	},
 	{
-		displayName: 'DNI',
-		name: 'dni',
-		type: 'string',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['clienteNuevo'],
-			},
-		},
-	},
-	{
 		displayName: 'CUIT',
 		name: 'cuit',
 		type: 'string',
@@ -741,20 +462,138 @@ const getArticulo: INodeProperties[] = [
 		placeholder: 'Ingresá el CUIT...',
 		displayOptions: {
 			show: {
-				resource: ['proveedorCrear','clienteNuevo', 'buscarContribuyente', 'nuevoContribuyente', 'clientesBusquedaPorCuit', 'clientesBusqueda'],
+				resource: [
+					'proveedorCrear',
+					'clienteNuevo',
+					'buscarContribuyente',
+					'nuevoContribuyente',
+					'clientesBusquedaPorCuit',
+					'clientesBusqueda',
+				],
 			},
 		},
 	},
 	{
-		displayName: 'Condición IVA',
-		name: 'condicionIVA',
+		displayName: 'Datos Imagen',
+		name: 'dataImg',
+		type: 'json',
+		required: true,
+		default: '',
+		displayOptions: { show: { resource: ['procesarImagenes'] } },
+	},
+	{
+		displayName: 'Dia De La Semana',
+		name: 'diaSemana',
+		type: 'number',
+		default: 0,
+		description: 'Numero de la semana por el cual filtrar promociones aplicadas (0 es Lunes)',
+		displayOptions: { show: { resource: ['promocionesCliente'] } },
+	},
+	{
+		displayName: 'DNI',
+		name: 'dni',
 		type: 'string',
 		default: '',
-		placeholder: 'Consumidor Final, Exento, Monotributo...',
+		displayOptions: { show: { resource: ['clienteNuevo'] } },
+	},
+	{
+		displayName: 'Documento',
+		name: 'documentDate',
+		type: 'dateTime',
+		required: true,
+		default: undefined,
+		description: 'Parametro fecha del body para las solicitudes',
+		displayOptions: {
+			show: { resource: ['articulo', 'promocionesCliente', 'generarCompras'] },
+		},
+	},
+	{
+		displayName: 'Endpoint',
+		name: 'endpoint',
+		type: 'string',
+		default: '/Clientes',
+		required: true,
+		placeholder: '/Clientes, /Articulos/Venta, etc.',
+		description: 'Ruta del endpoint a utilizar',
+		displayOptions: { show: { resource: [] } },
+	},
+	{
+		displayName: 'Es Contado',
+		name: 'esContado',
+		type: 'boolean',
+		default: false,
+		displayOptions: { show: { resource: ['generarVentas'] } },
+	},
+	{
+		displayName: 'Fecha Desde',
+		name: 'startDate',
+		type: 'dateTime',
+		default: '',
 		displayOptions: {
 			show: {
-				resource: ['proveedorCrear'],
+				resource: [
+					'generarCompras',
+					'obtenerFacturasPedidosVentas',
+					'obtenerFacturasCobros',
+					'obtenerPedidosDeVenta',
+					'obtenerOrdenesCompra',
+					'obtenerCobros',
+					'obtenerCompras',
+					'generarVentas',
+				],
 			},
+		},
+	},
+	{
+		displayName: 'Fecha Documento',
+		name: 'documentDate',
+		type: 'dateTime',
+		required: true,
+		default: undefined,
+		description: 'Parametro fecha del body para las solicitudes',
+		displayOptions: {
+			show: { resource: ['articulo', 'promocionesCliente', 'generarCompras'] },
+		},
+	},
+	{
+		displayName: 'Fecha Hasta',
+		name: 'endDate',
+		type: 'dateTime',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: [
+					'obtenerFacturasPedidosVentas',
+					'obtenerFacturasCobros',
+					'obtenerPedidosDeVenta',
+					'obtenerOrdenesCompra',
+					'obtenerCobros',
+					'obtenerCompras',
+				],
+			},
+		},
+	},
+	{
+		displayName: 'Fecha Modificación Desde',
+		name: 'dateModified',
+		type: 'dateTime',
+		default: '',
+		displayOptions: { show: { resource: ['articulo'] } },
+	},
+	{
+		displayName: 'Fecha Modificación Imagen Desde',
+		name: 'dateModifiedImage',
+		type: 'dateTime',
+		default: '',
+		displayOptions: { show: { resource: ['articulo'] } },
+	},
+	{
+		displayName: 'Fecha Precio Actualizado Desde',
+		name: 'priceDateModified',
+		type: 'dateTime',
+		default: '',
+		displayOptions: {
+			show: { resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente'] },
 		},
 	},
 	{
@@ -762,161 +601,127 @@ const getArticulo: INodeProperties[] = [
 		name: 'formaPagoProveedor',
 		type: 'number',
 		default: '',
-		displayOptions: {
-			show: {
-				resource: ['proveedorCrear'],
-			},
-		},
+		displayOptions: { show: { resource: ['proveedorCrear'] } },
 	},
-	{
-		displayName: 'Condición De Pago',
-		name: 'condicionDePago',
-		type: 'number',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['proveedorCrear'],
-			},
-		},
-	},
-	{
-		displayName: 'Categoría De Impuestos A Las Ganancias',
-		name: 'categoriaImpuestosGanancias',
-		type: 'number',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['proveedorCrear'],
-			},
-		},
-	},
-	{
-		displayName: 'Clase De Proveedor',
-		name: 'claseProveedor',
-		type: 'number',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['proveedorCrear'],
-			},
-		},
-	},
-	{
-		displayName: 'Activo',
-		name: 'active',
-		type: 'boolean',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['proveedorCrear'],
-			},
-		},
-	},
-		{
-		displayName: 'Usuario',
-		name: 'username',
-		type: 'string',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['operadoresMoviles'],
-			},
-		},
-	},
-		{
-		displayName: 'Contraseña',
-		name: 'password',
-		type: 'string',
-		typeOptions: { password: true },
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['operadoresMoviles'],
-			},
-		},
-	},
-	{
-		displayName: 'Razón Social',
-		name: 'razonSocial',
-		type: 'string',
-		default: '',
-		description: 'Razón social del cliente para buscar',
-		displayOptions: {
-			show: {
-				resource: ['buscarContribuyente', 'clientesBusqueda', 'proveedorCrear'],
-			},
-		},
-	},
-	{
-		displayName: 'Cliente',
-		name: 'cliente',
-		required: true,
-		type: 'json',
-		default: {},
-		displayOptions: {
-			show: {
-				resource: ['crearPedidoVenta', 'cobros'],
-			},
-		},
-	},
-	{
-		displayName: 'Articulos',
-		name: 'articulo',
-		required: true,
-		type: 'json',
-		default: {},
-		displayOptions: {
-			show: {
-				resource: ['crearPedidoVenta', 'cobros'],
-			},
-		},
-	},
-		{
-			displayName: 'ID Articulo',
-			name: 'articleId',
-			type: 'string',
-			default: '',
-			displayOptions: {
-				show: {
-					resource: ['articulosImagenes', 'articuloPorId', 'articuloSucursalFisica'],
-				},
-			},
-		},
 	{
 		displayName: 'ID',
 		name: 'id',
 		required: true,
 		type: 'string',
 		default: '',
-		placeholder:'Ej. 27231',
+		placeholder: 'Ej. 27231',
 		description: 'Identificador unico con el cual hacer solicitudes a la API',
 		displayOptions: {
-			show: {
-				resource: ['pedidoVentaActividad', 'regimenesEspecialesPorId'],
-			},
+			show: { resource: ['pedidoVentaActividad', 'regimenesEspecialesPorId'] },
 		},
 	},
 	{
-		displayName: 'ID País',
+		displayName: 'ID Articulo',
+		name: 'articleId',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: { resource: ['articulosImagenes', 'articuloPorId', 'articuloSucursalFisica'] },
+		},
+	},
+	{
+		displayName: 'ID Bonificacion',
+		name: 'bonificacion',
+		type: 'number',
+		default: 0,
+		displayOptions: { show: { resource: ['generarVentas'] } },
+	},
+	{
+		displayName: 'ID De Cobro',
+		name: 'idCobro',
+		required: true,
+		type: 'number',
+		default: 0,
+		description: 'ID del cobro',
+		displayOptions: { show: { resource: ['crearPedidoVenta', 'obtenerCobros'] } },
+	},
+	{
+		displayName: 'ID De La Compra',
+		name: 'idCompra',
+		type: 'number',
+		default: '',
+		displayOptions: { show: { resource: ['obtenerCompras'] } },
+	},
+	{
+		displayName: 'ID Del Estado',
+		name: 'statusId',
+		type: 'number',
+		default: false,
+		description: 'Número del estado del pedido',
+		displayOptions: { show: { resource: ['obtenerPedidosDeVenta', 'obtenerOrdenesCompra'] } },
+	},
+	{
+		displayName: 'ID Del Operador Compra',
+		name: 'idOperadorCompra',
+		type: 'number',
+		default: '',
+		displayOptions: { show: { resource: ['proveedorCrear'] } },
+	},
+	{
+		displayName: 'ID Del Proveedor',
+		name: 'idProveedor',
+		type: 'number',
+		default: '',
+		placeholder: '2',
+		description: 'ID Del proveedor de la compra',
+		displayOptions: { show: { resource: ['generarCompras'] } },
+	},
+	{
+		displayName: 'ID Del Tipo De Comprobante',
+		name: 'idTipoComprobante',
+		type: 'number',
+		default: '',
+		placeholder: '1',
+		description: 'ID del tipo de comprobante de la factura',
+		displayOptions: { show: { resource: ['generarCompras'] } },
+	},
+	{
+		displayName: 'ID Del Tipo De Comprobante',
+		name: 'idTipoComprobanteVenta',
+		type: 'number',
+		default: '',
+		placeholder: '1',
+		description: 'ID del tipo de comprobante de la venta',
+		displayOptions: { show: { resource: ['generarVentas'] } 
+	},
+	},
+	{
+		displayName: 'ID Del Vendedor',
+		name: 'idVendedor',
+		type: 'number',
+		default: '',
+		displayOptions: { show: { resource: ['generarVentas'] } },
+	},
+	{
+		displayName: 'ID Pais',
 		name: 'idPais',
 		type: 'string',
 		default: '',
-		description: "ID del país por la cual se buscarán las provincias",
-		displayOptions: {
-			show: {
-				resource: ['provinciasLista', 'proveedorCrear'],
-			},
-		},
+		description: 'ID del país por la cual se buscarán las provincias',
+		displayOptions: { show: { resource: ['provinciasLista', 'proveedorCrear'] } },
 	},
 	{
 		displayName: 'ID Provincia',
 		name: 'idProvincia',
 		type: 'string',
 		default: '',
-		description: "ID de la provincia por la cual se buscarán los departamentos",
+		description: 'ID de la provincia por la cual se buscarán los departamentos',
+		displayOptions: { show: { resource: ['departamentosLista', 'proveedorCrear'] } },
+	},
+	{
+		displayName: 'ID Sucursal Física',
+		name: 'idSucursalFisica',
+		type: 'number',
+		default: '',
+		description: 'The ID of the physical branch to filter stock (optional)',
 		displayOptions: {
 			show: {
-				resource: ['departamentosLista', 'proveedorCrear'],
+				resource: ['searchArticleBySKU', 'articuloSucursalFisica', 'generarCompras'],
 			},
 		},
 	},
@@ -925,11 +730,87 @@ const getArticulo: INodeProperties[] = [
 		name: 'IdSucursalFisica',
 		type: 'string',
 		default: '',
-		displayOptions: {
-			show: {
-				resource: ['articulosSucursalesFisicas'],
-			},
-		},
+		displayOptions: { show: { resource: ['articulosSucursalesFisicas'] } },
+	},
+	{
+		displayName: 'ID Valor Efectivo',
+		name: 'idValorEfectivo',
+		type: 'number',
+		default: 0,
+		displayOptions: { show: { esContado: [true] } },
+	},
+	{
+		displayName: 'ID de la zona',
+		name: 'idZona',
+		type: 'number',
+		default: '',
+		displayOptions: { show: { resource: ['proveedorCrear'] } },
+	},
+		{
+		displayName: 'ID del descuento del proveedor',
+		name: 'idDescuentoProveedor',
+		type: 'number',
+		default: '',
+		displayOptions: { show: { resource: ['proveedorCrear'] } },
+	},
+	{
+		displayName: 'Importe',
+		name: 'importeValorEfectivo',
+		type: 'number',
+		default: 0,
+		displayOptions: { show: { esContado: [true] } },
+	},
+	{
+		displayName: 'Información De Envío',
+		name: 'envio',
+		required: true,
+		type: 'json',
+		default: {},
+		description: 'Shipping info from the order',
+		displayOptions: { show: { resource: ['cobros', 'crearPedidoVenta'] } },
+	},
+	{
+		displayName: 'Lista ID',
+		name: 'idList',
+		type: 'number',
+		default: '',
+		description: 'ID de la lista para buscar los precios de los articulos',
+		displayOptions: { show: { resource: ['articulosPrecioPorLista', 'generarVentas'] } },
+	},
+	{
+		displayName: 'Letra Del Documento De La Compra',
+		name: 'letraDocumento',
+		type: 'string',
+		default: '',
+		placeholder: 'A',
+		description: 'Letra del documento de la compra de la factura',
+		displayOptions: { show: { resource: ['generarCompras'] } },
+	},
+	{
+		displayName: 'Migración Completa',
+		name: 'migracionCompleta',
+		type: 'boolean',
+		default: false,
+		description: 'Whether complete articles migration or partial',
+		displayOptions: { show: { resource: ['articulo'] } },
+	},
+	{
+		displayName: 'Nombre Del Tipo De Comprobante',
+		name: 'nombreTipoComprobante',
+		type: 'string',
+		default: '',
+		placeholder: 'Factura de compras',
+		description: 'Nombre del tipo de comprobante de la factura',
+		displayOptions: { show: { resource: ['generarCompras'] } },
+	},
+	{
+		displayName: 'Nombre del articulo',
+		name: 'nombreArticulo',
+		type: 'string',
+		default: '',
+		placeholder: 'Alfajores',
+		displayOptions: { show: { resource: ['buscarArticulo'] } },
+		description: 'El nombre del producto a buscar',
 	},
 	{
 		displayName: 'Número De Página',
@@ -937,160 +818,104 @@ const getArticulo: INodeProperties[] = [
 		type: 'number',
 		default: 1,
 		description: 'Número de página para la paginación de artículos',
+		displayOptions: { show: { resource: ['articulo'] } },
+	},
+	{
+		displayName: 'Numero Del Documento De La Compra',
+		name: 'numeroFactura',
+		type: 'number',
+		default: '',
+		placeholder: '1',
+		description: 'Numero del documento de la compra de la factura',
+		displayOptions: { show: { resource: ['generarCompras'] } },
+	},
+	{
+		displayName: 'Observaciones',
+		name: 'observacionesValorEfectivo',
+		type: 'string',
+		default: '',
+		displayOptions: { show: { esContado: [true] } },
+	},
+	{
+		displayName: 'Proveedor ID',
+		name: 'proveedorId',
+		type: 'number',
+		required: true,
+		default: '',
+		description: 'ID del proveedor usado para buscar dentro del sistema',
+		displayOptions: { show: { resource: ['proveedorBuscar'] } },
+	},
+	{
+		displayName: 'Punto De Venta',
+		name: 'puntoDeVenta',
+		type: 'number',
+		default: '',
+		placeholder: '1',
+		description: 'Numero del punto de venta del documento',
+		displayOptions: { show: { resource: ['generarCompras', 'generarVentas'] } },
+	},
+	{
+		displayName: 'Razón Social',
+		name: 'razonSocial',
+		type: 'string',
+		default: '',
+		description: 'Razón social del cliente para buscar',
 		displayOptions: {
-			show: {
-				resource: ['articulo'],
-			},
+			show: { resource: ['buscarContribuyente', 'clientesBusqueda', 'proveedorCrear'] },
 		},
 	},
 	{
-		displayName: 'Cantidad Por Página',
-		name: 'cantidadPorPagina',
-		type: 'number',
-		default: 50,
-		description: 'Cantidad de artículos por página',
-		displayOptions: {
-			show: {
-				resource: ['articulo'],
-			},
-		},
+		displayName: 'Rubros IDs',
+		name: 'idsRubros',
+		type: 'string',
+		default: '',
+		description: 'ID Rubros used to search the articles',
+		displayOptions: { show: { resource: ['articulo'] } },
 	},
-		{
-			displayName: 'Codigo',
-			name: 'codigo',
-			type: 'string',
-			default: '',
-			typeOptions: {
-				minValue: 1,
-			},
-			placeholder: 'Ej. 1507',
-			description: 'Codigo del articulo a buscar',
-			displayOptions: {
-				show: {
-					resource: ['proveedorCrear','articuloPorId', 'articulosPrecioPorLista', 'articuloSucursalFisica', 'clientesBusqueda'],
-				},
-			},
-		},
-		{
-			displayName: 'Nombre Del Tipo De Comprobante',
-			name: 'nombreTipoComprobante',
-			type: 'string',
-			default: '',
-			placeholder: 'Factura de compras',
-			description: 'Nombre del tipo de comprobante de la factura',
-			displayOptions:{
-				show:{
-					resource: ['generarCompras']
-				}
-			}
-		},
-		{
-			displayName: 'Código Del Comprobante',
-			name: 'codigoComprobante',
-			type: 'string',
-			default: '',
-			placeholder: 'Codigo de la compra (FCC)',
-			description: 'Codigo del comprobante de la compra',
-			displayOptions:{
-				show:{
-					resource: ['generarCompras']
-				}
-			}
-		},
-		{
-			displayName: 'ID Del Tipo De Comprobante',
-			name: 'idTipoComprobante',
-			type: 'number',
-			default: '',
-			placeholder: '1',
-			description: 'ID del tipo de comprobante de la factura',
-			displayOptions:{
-				show:{
-					resource: ['generarCompras']
-				}
-			}
-		},
-				{
-			displayName: 'ID Del Tipo De Comprobante',
-			name: 'idTipoComprobanteVenta',
-			type: 'number',
-			default: '',
-			placeholder: '1',
-			description: 'ID del tipo de comprobante de la venta',
-			displayOptions:{
-				show:{
-					resource: ['generarVentas']
-				}
-			}
-		},
-		{
-			displayName: 'Numero Del Documento De La Compra',
-			name: 'numeroFactura',
-			type: 'number',
-			default: '',
-			placeholder: '1',
-			description: 'Numero del documento de la compra de la factura',
-			displayOptions:{
-				show:{
-					resource: ['generarCompras']
-				}
-			}
-		},
-		{
-			displayName: 'Punto De Venta',
-			name: 'puntoDeVenta',
-			type: 'number',
-			default: '',
-			placeholder: '1',
-			description: 'Numero del punto de venta del documento',
-			displayOptions:{
-				show:{
-					resource: ['generarCompras', 'generarVentas']
-				}
-			}
-		},
-		{
-			displayName: 'Letra Del Documento De La Compra',
-			name: 'letraDocumento',
-			type: 'string',
-			default: '',
-			placeholder: 'A',
-			description: 'Letra del documento de la compra de la factura',
-			displayOptions:{
-				show:{
-					resource: ['generarCompras']
-				}
-			}
-		},
-		{
-			displayName: 'ID Del Proveedor',
-			name: 'idProveedor',
-			type: 'number',
-			default: '',
-			placeholder: '2',
-			description: 'ID Del proveedor de la compra',
-			displayOptions: {
-				show:{
-					resource: ['generarCompras']
-				}
-			}
-		},
-		{
-			displayName: 'Artículos',
-			name: 'articlesCollection',
-			type: 'string',
-			placeholder: '[{ "ID": 1234, "Cantidad": 10 }, {"ID": 4567, "Cantidad": 5}]',
-			default: '',
-			description: 'Lista de artículos en formato JSON',
-			displayOptions: {
-				show: {
-					resource: ['generarCompras', 'generarVentas']
-				}
-			}
-		}
-
-
+	{
+		displayName: 'SKU',
+		name: 'sku',
+		type: 'string',
+		default: '',
+		required: true,
+		description: 'The SKU (product code) to search for',
+		displayOptions: { show: { resource: ['searchArticleBySKU'] } },
+	},
+	{
+		displayName: 'Sub-Rubros IDs',
+		name: 'idsSubRubros',
+		type: 'string',
+		default: '',
+		description: 'Client ID used to search the articles',
+		displayOptions: { show: { resource: ['articulo', 'categoriasObtener'] } },
+	},
+	{
+		displayName: 'Sucursales Físicas - IDs Lista',
+		name: 'branchOfficeIds',
+		type: 'string',
+		required: true,
+		default: '7345',
+		description: 'Physical branch ID separated by comma',
+		displayOptions: { show: { resource: ['articulosExistencia'] } },
+	},
+	{
+		displayName: 'Ultima Modificacion Imagenes',
+		name: 'lastModifiedImg',
+		type: 'json',
+		required: true,
+		default: '',
+		displayOptions: { show: { resource: ['procesarImagenes'] } },
+	},
+	{
+		displayName: 'Usuario',
+		name: 'username',
+		type: 'string',
+		default: '',
+		displayOptions: { show: { resource: ['operadoresMoviles'] } },
+	},
 ];
+
+
 
 export const CentumFields: INodeProperties[] = [...getArticulo];
 
