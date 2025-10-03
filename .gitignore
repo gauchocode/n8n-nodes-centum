@@ -4,6 +4,7 @@ node_modules
 tmp
 .idea
 .vscode
+.prettierrc
 
 npm-debug.log*
 yarn.lock

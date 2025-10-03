@@ -14,52 +14,64 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Genera un nuevo token para utilizarlo con una herramienta externa como postman'
 			},
 			{
+				name: 'Articulo - Buscar',
+				value: 'buscarArticulo',
+				action: 'Busca un articulo por nombre',
+				description: 'Busca un articulo por nombre y retorna todas las ocurrencias'
+			},
+			{
 				name: 'Articulo - Por ID',
 				value: 'articuloPorId',
 				action: 'Buscar artículo por ID',
 				description: 'Retorna un artículo específico basado en su ID único'
 			},
 			{
-				name: 'Articulos - Existencia',
+				name: 'Artículos - Existencia',
 				value: 'articulosExistencia',
 				action: 'Obtener existencias de artículos',
 				description: 'Retorna un listado de las existencias de los artículos en base a ciertos filtros'
 			},
 			{
-				name: 'Articulos - Filtrado',
+				name: 'Artículos - Filtrado',
 				value: 'articulo',
 				action: 'Buscar artículos con filtros',
 				description: 'Retorna un listado de artículos para vender en base a ciertos filtros'
 			},
 			{
-				name: 'Articulos - Imagen',
+				name: 'Artículos - Imagen',
 				value: 'articulosImagenes',
 				action: 'Obtener imagen de artículo',
 				description: 'Retorna la imagen (binario) de un artículo'
 			},
 			{
-				name: 'Articulos - Listado',
+				name: 'Artículos - Listado',
 				value: 'articulosDatosGenerales',
 				action: 'Obtener datos generales de artículos',
 				description: 'Retorna un listado de los artículos y sus datos generales'
 			},
 			{
-				name: 'Articulos - Precio Por Lista',
+				name: 'Artículos - Precio Por Lista',
 				value: 'articulosPrecioPorLista',
-				action: 'Obten el precio de un articulo segun la lista',
-				description: 'Devuelve el valor de un articulo, segun la lista indicada'
+				action: 'Obtén el precio de un artículo según la lista',
+				description: 'Devuelve el valor de un artículo, según la lista indicada'
 			},
 			{
-				name: 'Articulos - Stock Sucursal Física',
+				name: 'Artículos - Stock Sucursal Física',
 				value: 'articulosSucursalesFisicas',
 				action: 'Obtener stock por sucursal física',
 				description: 'Retorna el stock de artículos en una sucursal física específica'
 			},
 			{
-				name: 'Articulos - Stock Sucursal Física Por ID Articulo',
+				name: 'Artículos - Stock Sucursal Física Por ID Artículo',
 				value: 'articuloSucursalFisica',
-				action: 'Obtener el stock por articulo individiual por sucursal física',
-				description: 'Retorn el stock de un articulo en especifico de una sucursal fisica'
+				action: 'Obtener el stock por artículo individual por sucursal física',
+				description: 'Retorna el stock de un artículo en específico de una sucursal física'
+			},
+			{
+				name: 'Categorías - Obtener',
+				value: 'categoriasObtener',
+				action: 'Obten el listado de las categorías',
+				description: 'Obten el listado completo de todas las categorías de los articulos'
 			},
 			{
 				name: 'Cliente - Actualizar',
@@ -110,7 +122,7 @@ export const CentumOperations: INodeProperties[] = [
 				action: 'Obtener facturas de pedidos de ventas del cliente'
 			},
 			{
-				name: 'Cliente - Obtener Promocion',
+				name: 'Cliente - Obtener Promoción',
 				value: 'promocionesCliente',
 				description: 'Obtiene las promociones aplicadas a un cliente desde una fecha seleccionada',
 				action: 'Obtener promociones aplicadas a un cliente'
@@ -122,9 +134,9 @@ export const CentumOperations: INodeProperties[] = [
 				action: 'Obtener saldo del cliente'
 			},
 			{
-				name: 'Cliente Contribuyente - Busqueda',
+				name: 'Cliente Contribuyente - Búsqueda',
 				value: 'buscarContribuyente',
-				description: 'Retorna los datos del contribuyente por medio de una búsqueda por CUIT o Razon Social',
+				description: 'Retorna los datos del contribuyente por medio de una búsqueda por CUIT o Razón Social',
 				action: 'Buscar cliente contribuyente'
 			},
 			{
@@ -140,9 +152,38 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Da de alta el comprobante. Retornará el comprobante creado con su información y una URL.'
 			},
 			{
+				name: 'Cobro - Obtener Listado',
+				value: 'obtenerCobros',
+				action: 'Obtener un listado de cobro',
+				description: 'Obtener un listado de cobros en base a ciertos parametros'
+			},
+			{
+				name: 'Compras - Generar Compra',
+				value: 'generarCompras',
+				action: 'Genera una compra',
+				description: 'Genera una compra desde los parametros especificados'
+			},
+			{
+				name: 'Compras - Obtener Listado',
+				value: 'obtenerCompras',
+				action: 'Obtener un listado de las compras',
+				description: 'Obtener un listado de las compras en base a ciertos parametros'
+			},
+			{
 				name: 'Departamentos - Lista',
 				value: 'departamentosLista',
 				description: 'Obtiene un listado de departamentos, normalmente filtrado por provincia'
+			},
+			{
+				name: 'Marcas - Obtener',
+				value: 'marcasObtener',
+				action: 'Obten el listado de las marcas',
+				description: 'Obten el listado completo de todas las marcas de los articulos'
+			},
+			{
+				name: 'Obtener Operador Móvil',
+				value: 'operadoresMoviles',
+				description: 'Obtiene todos los datos de un operador móvil en base a las credenciales'
 			},
 			{
 				name: 'Pedido De Venta - Actividad',
@@ -157,10 +198,20 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Realiza pedidos de venta de los artículos'
 			},
 			{
+				name: 'Pedidos De Venta - Estado',
+				value: 'obtenerEstadosPedidosDeVenta',
+				description: 'Obtiene todos los estados disponibles de los pedidos de ventas'
+			},
+			{
+				name: 'Pedidos De Venta - Listar',
+				value: 'obtenerPedidosDeVenta',
+				description: 'Obtiene todos los pedidos de ventas en base a ciertos parámetros'
+			},
+			{
 				name: 'Precios De Productos - Lista',
 				value: 'listaPrecios',
 				action: 'Obtener lista de precios de productos',
-				description: 'Obtiene una lista con los listado de los precios sugeridos'
+				description: 'Obtiene una lista con el listado de los precios sugeridos'
 			},
 			{
 				name: 'Proceso Binario a Imagen',
@@ -174,25 +225,54 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Genera un JSON estructurado para productos WooCommerce a partir de artículos Centum',
 			},
 			{
+				name: 'Proveedor - Buscar',
+				value: 'proveedorBuscar',
+				action: 'Obtén el proveedor segun el ID',
+				description: 'Retorna la información del proveedor en base al ID'
+			},
+			{
+				name: 'Proveedor - Crear',
+				value: 'proveedorCrear',
+				action: 'Obtén el proveedor segun el ID',
+				description: 'Retorna la información del proveedor en base al ID'
+			},
+			{
 				name: 'Provincias - Lista',
 				value: 'provinciasLista',
 				description: 'Obtiene un listado de provincias, normalmente filtrado por país'
 			},
 			{
-				name: 'Regimenes Especiales - ID',
+				name: 'Regímenes Especiales - ID',
 				value: 'regimenesEspecialesPorId',
-				description: 'Trae un listado entero de los regimenes especiales'
+				description: 'Trae un listado entero de los regímenes especiales'
 			},
 			{
-				name: 'Regimenes Especiales - Lista',
+				name: 'Regímenes Especiales - Lista',
 				value: 'regimenesEspecialesLista',
-				description: 'Trae un listado entero de los regimenes especiales'
+				description: 'Trae un listado entero de los regímenes especiales'
+			},
+			{
+				name: 'Rubros - Obtener',
+				value: 'rubrosObtener',
+				action: 'Obten el listado de los rubros',
+				description: 'Obten el listado completo de todos los rubros de los articulos'
 			},
 			{
 				name: 'Sucursales Físicas - Lista',
 				value: 'sucursalesFisicas',
 				description: 'Obtiene un listado de las sucursales físicas disponibles',
+			},
+			{
+				name: 'Tipo De Comprobante - Lista',
+				value: 'tipoComprobante',
+				description: 'Obtiene un listado de todos los tipos de comprobantes'
+			},
+			{
+				name: 'Ventas - Generar',
+				value: 'generarVentas',
+				description: 'Genera una venta en base a unos parametros completados'
 			}
+
 		],
 		default: 'pedidoVentaActividad',
 	},
@@ -200,71 +280,72 @@ export const CentumOperations: INodeProperties[] = [
 
 const getArticulo: INodeProperties[] = [
 	{
-		displayName: 'Endpoint',
-		name: 'endpoint',
-		type: 'string',
-		default: '/Clientes',
-		required: true,
-		displayOptions: {
-			show: {
-				resource: [
-					// 'activity',
-					// 'clientesBusqueda',
-					// 'searchArticleBySKU',
-					// 'productPriceList'
-				],
-			},
-		},
-		placeholder: '/Clientes, /Articulos/Venta, etc.',
-		description: 'Ruta del endpoint a utilizar',
-	},
-	{
-		displayName: 'SKU',
-		name: 'sku',
-		type: 'string',
+		displayName: 'Activo',
+		name: 'active',
+		type: 'boolean',
 		default: '',
-		required: true,
 		displayOptions: {
-			show: {
-				resource: ['searchArticleBySKU'],
-			},
+			show: { resource: ['proveedorCrear'] },
 		},
-		description: 'The SKU (product code) to search for',
 	},
 	{
-		displayName: 'ID Sucursal Física',
-		name: 'idSucursalFisica',
+		displayName: 'Articulos',
+		name: 'articulo',
+		required: true,
+		type: 'json',
+		default: {},
+		displayOptions: {
+			show: { resource: ['crearPedidoVenta', 'cobros'] },
+		},
+	},
+	{
+		displayName: 'Artículos',
+		name: 'articlesCollection',
+		type: 'string',
+		placeholder: '[{ "ID": 1234, "Cantidad": 10 }, {"ID": 4567, "Cantidad": 5}]',
+		default: '',
+		description: 'Lista de artículos en formato JSON',
+		displayOptions: {
+			show: { resource: ['generarCompras', 'generarVentas'] },
+		},
+	},
+	{
+		displayName: 'Cantidad De Cuotas Efectivo',
+		name: 'cantidadCuotasValorEfectivo',
+		type: 'number',
+		default: 0,
+		displayOptions: { show: { esContado: [true] } },
+	},
+	{
+		displayName: 'Cantidad Por Página',
+		name: 'cantidadPorPagina',
+		type: 'number',
+		default: 50,
+		description: 'Cantidad de artículos por página',
+		displayOptions: { show: { resource: ['articulo'] } },
+	},
+	{
+		displayName: 'Categoría De Impuestos A Las Ganancias',
+		name: 'categoriaImpuestosGanancias',
 		type: 'number',
 		default: '',
-		displayOptions: {
-			show: {
-				resource: ['searchArticleBySKU', 'articuloSucursalFisica'],
-			},
-		},
-		description: 'The ID of the physical branch to filter stock (optional)',
+		displayOptions: { show: { resource: ['proveedorCrear'] } },
 	},
 	{
-		displayName: 'Datos Imagen',
-		type: 'json',
-		required: true,
-		name: 'dataImg',
+		displayName: 'Clase De Proveedor',
+		name: 'claseProveedor',
+		type: 'number',
 		default: '',
-		displayOptions: {
-			show: {
-				resource: ['procesarImagenes'],
-			},
-		},
+		displayOptions: { show: { resource: ['proveedorCrear'] } },
 	},
 	{
-		displayName: 'Ultima Modificacion Imagenes',
-		type: 'json',
+		displayName: 'Cliente',
+		name: 'cliente',
 		required: true,
-		name: 'lastModifiedImg',
-		default: '',
+		type: 'json',
+		default: {},
 		displayOptions: {
-			show: {
-				resource: ['procesarImagenes'],
-			},
+			show: { resource: ['crearPedidoVenta', 'cobros'] },
 		},
 	},
 	{
@@ -272,214 +353,93 @@ const getArticulo: INodeProperties[] = [
 		name: 'clienteId',
 		type: 'number',
 		required: true,
-		typeOptions: {
-			maxValue: 9999999,
-			minValue: 0,
-			numberStepSize: 1,
-		},
+		typeOptions: { maxValue: 9999999, minValue: 0, numberStepSize: 1 },
 		default: 0,
 		description: 'Client ID used to search the articles',
 		displayOptions: {
 			show: {
-				resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente', 'obtenerFacturasPedidosVentas', 'obtenerFacturasCobros', 'promocionesCliente'],
+				resource: [
+					'generarCompras',
+					'articulo',
+					'obtenerSaldoCliente',
+					'composicionSaldoCliente',
+					'obtenerFacturasPedidosVentas',
+					'obtenerFacturasCobros',
+					'promocionesCliente',
+					'obtenerPedidosDeVenta',
+					'obtenerOrdenesCompra',
+					'obtenerCobros',
+					'obtenerCompras',
+					'generarVentas',
+				],
 			},
 		},
 	},
 	{
-		displayName: 'Rubros IDs',
-		name: 'idsRubros',
+		displayName: 'Codigo',
+		name: 'codigo',
 		type: 'string',
 		default: '',
-		description: 'ID Rubros used to search the articles',
+		typeOptions: { minValue: 1 },
+		placeholder: 'Ej. 1507',
+		description: 'Codigo del articulo a buscar',
 		displayOptions: {
 			show: {
-				resource: ['articulo'],
+				resource: [
+					'proveedorCrear',
+					'articuloPorId',
+					'articulosPrecioPorLista',
+					'articuloSucursalFisica',
+					'clientesBusqueda',
+				],
 			},
 		},
 	},
 	{
-		displayName: 'Sub-Rubros IDs',
-		name: 'idsSubRubros',
+		displayName: 'Código Del Comprobante',
+		name: 'codigoComprobante',
 		type: 'string',
 		default: '',
-		description: 'Client ID used to search the articles',
-		displayOptions: {
-			show: {
-				resource: ['articulo'],
-			},
-		},
+		placeholder: 'Codigo de la compra (FCC)',
+		description: 'Codigo del comprobante de la compra',
+		displayOptions: { show: { resource: ['generarCompras'] } },
 	},
-	{
-		displayName: 'Fecha Modificación Desde',
-		name: 'dateModified',
-		type: 'dateTime',
+		{
+		displayName: 'Condicion De Venta',
+		name: 'idCondicionVenta',
+		type: 'number',
 		default: '',
-		displayOptions: {
-			show: {
-				resource: ['articulo'],
-			},
-		},
+		displayOptions: { show: { resource: ['generarVentas'] } },
 	},
 	{
-		displayName: 'Fecha Precio Actualizado Desde',
-		name: 'priceDateModified',
-		type: 'dateTime',
+		displayName: 'Condición De Pago',
+		name: 'condicionDePago',
+		type: 'number',
 		default: '',
-		displayOptions: {
-			show: {
-				resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente'],
-			},
-		},
+		displayOptions: { show: { resource: ['proveedorCrear'] } },
 	},
 	{
-		displayName: 'Fecha Desde',
-		name: 'balanceStartDate',
-		type: 'dateTime',
+		displayName: 'Condición IVA',
+		name: 'condicionIVA',
+		type: 'string',
 		default: '',
-		displayOptions: {
-			show: {
-				resource: ['obtenerFacturasPedidosVentas', 'obtenerFacturasCobros'],
-			},
-		},
+		placeholder: 'Consumidor Final, Exento, Monotributo...',
+		displayOptions: { show: { resource: ['proveedorCrear'] } },
 	},
 	{
-		displayName: 'Fecha Hasta',
-		name: 'balanceEndDate',
-		type: 'dateTime',
+		displayName: 'Contraseña',
+		name: 'password',
+		type: 'string',
+		typeOptions: { password: true },
 		default: '',
-		displayOptions: {
-			show: {
-				resource: ['obtenerFacturasPedidosVentas', 'obtenerFacturasCobros'],
-			},
-		},
+		displayOptions: { show: { resource: ['operadoresMoviles'] } },
 	},
 	{
-		displayName: 'Fecha Modificación Imagen Desde',
-		name: 'dateModifiedImage',
-		type: 'dateTime',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['articulo'],
-			},
-		},
-	},
-	{
-		displayName: 'Fecha Documento',
-		name: 'documentDate',
-		type: 'dateTime',
-		required: true,
-		default: undefined,
-		description: 'Parametro fecha del body para las solicitudes',
-		displayOptions: {
-			show: {
-				resource: ['articulo', 'promocionesCliente'],
-			},
-		},
-	},
-	{
-		displayName: 'Dia De La Semana',
-		name: 'diaSemana',
+		displayName: 'Cotizacion',
+		name: 'cotizacionValorEfectivo',
 		type: 'number',
 		default: 0,
-		description: 'Numero de la semana por el cual filtrar promociones aplicadas (0 es Lunes)',
-		displayOptions: {
-			show: {
-				resource: ['promocionesCliente'],
-			},
-		},
-	},
-	{
-		displayName: 'Migración Completa',
-		name: 'migracionCompleta',
-		type: 'boolean',
-		default: false,
-		description: 'Whether complete articles migration or partial',
-		displayOptions: {
-			show: {
-				resource: ['articulo'],
-			},
-		},
-	},
-	// {
-	// 	displayName: 'Habilitado',
-	// 	name: 'enabled',
-	// 	type: 'boolean',
-	// 	required: true,
-	// 	default: true,
-	// 	// eslint-disable-next-line n8n-nodes-base/node-param-description-boolean-without-whether
-	// 	description: 'Select the items that are enabled',
-	// 	displayOptions: {
-	// 		show: {
-	// 			resource: ['articulo', 'articulosExistencia'],
-	// 		},
-	// 	},
-	// },
-	// {
-	// 	displayName: 'ActivoWeb',
-	// 	name: 'activeWeb',
-	// 	type: 'boolean',
-	// 	required: true,
-	// 	default: true,
-	// 	// eslint-disable-next-line n8n-nodes-base/node-param-description-boolean-without-whether
-	// 	description: 'Select the items that are active on the web',
-	// 	displayOptions: {
-	// 		show: {
-	// 			resource: ['articulo', 'articulosExistencia'],
-	// 		},
-	// 	},
-	// },
-	{
-		displayName: 'Sucursales Físicas - IDs Lista',
-		name: 'branchOfficeIds',
-		type: 'string',
-		required: true,
-		default: '7345',
-		description:
-			'Physical branch IDs separated by comma to be able to fetch only the specified branches',
-		displayOptions: {
-			show: {
-				resource: ['articulosExistencia'],
-			},
-		},
-	},
-	{
-		displayName: 'Información De Envío',
-		name: 'envio',
-		required: true,
-		type: 'json',
-		default: {},
-		description: 'Shipping info from the order',
-		displayOptions: {
-			show: {
-				resource: ['cobros', 'crearPedidoVenta'],
-			},
-		},
-	},
-	{
-		displayName: 'Lista ID',
-		name: 'idList',
-		type: 'number',
-		default: '',
-		description: 'ID de la lista para buscar los precios de los articulos',
-		displayOptions: {
-			show: {
-				resource: ['articulosPrecioPorLista'],
-			},
-		},
-	},
-	{
-		displayName: 'ID De Cobro',
-		name: 'idCobro',
-		required: true,
-		type: 'number',
-		default: 0,
-		description: 'ID del cobro',
-		displayOptions: {
-			show: {
-				resource: ['crearPedidoVenta'],
-			},
-		},
+		displayOptions: { show: { esContado: [true] } },
 	},
 	{
 		displayName: 'Cuerpo Del Pedido',
@@ -495,17 +455,6 @@ const getArticulo: INodeProperties[] = [
 		description: 'Información en formato JSON para crear o actualizar un cliente',
 	},
 	{
-		displayName: 'DNI',
-		name: 'dni',
-		type: 'string',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['clienteNuevo'],
-			},
-		},
-	},
-	{
 		displayName: 'CUIT',
 		name: 'cuit',
 		type: 'string',
@@ -513,100 +462,266 @@ const getArticulo: INodeProperties[] = [
 		placeholder: 'Ingresá el CUIT...',
 		displayOptions: {
 			show: {
-				resource: ['clienteNuevo', 'buscarContribuyente', 'nuevoContribuyente', 'clientesBusquedaPorCuit', 'clientesBusqueda'],
+				resource: [
+					'proveedorCrear',
+					'clienteNuevo',
+					'buscarContribuyente',
+					'nuevoContribuyente',
+					'clientesBusquedaPorCuit',
+					'clientesBusqueda',
+				],
 			},
 		},
 	},
 	{
-		displayName: 'Email',
-		name: 'email',
-		type: 'string',
-		placeholder: 'name@email.com',
-		default: '',
-		displayOptions: {},
-	},
-	{
-		displayName: 'Razón Social',
-		name: 'razonSocial',
-		type: 'string',
-		default: '',
-		description: 'Razón social del cliente para buscar',
-		displayOptions: {
-			show: {
-				resource: ['buscarContribuyente', 'clientesBusqueda'],
-			},
-		},
-	},
-	{
-		displayName: 'Cliente',
-		name: 'cliente',
-		required: true,
+		displayName: 'Datos Imagen',
+		name: 'dataImg',
 		type: 'json',
-		default: {},
+		required: true,
+		default: '',
+		displayOptions: { show: { resource: ['procesarImagenes'] } },
+	},
+	{
+		displayName: 'Dia De La Semana',
+		name: 'diaSemana',
+		type: 'number',
+		default: 0,
+		description: 'Numero de la semana por el cual filtrar promociones aplicadas (0 es Lunes)',
+		displayOptions: { show: { resource: ['promocionesCliente'] } },
+	},
+	{
+		displayName: 'DNI',
+		name: 'dni',
+		type: 'string',
+		default: '',
+		displayOptions: { show: { resource: ['clienteNuevo'] } },
+	},
+	{
+		displayName: 'Documento',
+		name: 'documentDate',
+		type: 'dateTime',
+		required: true,
+		default: undefined,
+		description: 'Parametro fecha del body para las solicitudes',
+		displayOptions: {
+			show: { resource: ['articulo', 'promocionesCliente', 'generarCompras'] },
+		},
+	},
+	{
+		displayName: 'Endpoint',
+		name: 'endpoint',
+		type: 'string',
+		default: '/Clientes',
+		required: true,
+		placeholder: '/Clientes, /Articulos/Venta, etc.',
+		description: 'Ruta del endpoint a utilizar',
+		displayOptions: { show: { resource: [] } },
+	},
+	{
+		displayName: 'Es Contado',
+		name: 'esContado',
+		type: 'boolean',
+		default: false,
+		displayOptions: { show: { resource: ['generarVentas'] } },
+	},
+	{
+		displayName: 'Fecha Desde',
+		name: 'startDate',
+		type: 'dateTime',
+		default: '',
 		displayOptions: {
 			show: {
-				resource: ['crearPedidoVenta', 'cobros'],
+				resource: [
+					'generarCompras',
+					'obtenerFacturasPedidosVentas',
+					'obtenerFacturasCobros',
+					'obtenerPedidosDeVenta',
+					'obtenerOrdenesCompra',
+					'obtenerCobros',
+					'obtenerCompras',
+					'generarVentas',
+				],
 			},
 		},
 	},
 	{
-		displayName: 'Articulos',
-		name: 'articulo',
+		displayName: 'Fecha Documento',
+		name: 'documentDate',
+		type: 'dateTime',
 		required: true,
-		type: 'json',
-		default: {},
+		default: undefined,
+		description: 'Parametro fecha del body para las solicitudes',
+		displayOptions: {
+			show: { resource: ['articulo', 'promocionesCliente', 'generarCompras'] },
+		},
+	},
+	{
+		displayName: 'Fecha Hasta',
+		name: 'endDate',
+		type: 'dateTime',
+		default: '',
 		displayOptions: {
 			show: {
-				resource: ['crearPedidoVenta', 'cobros'],
+				resource: [
+					'obtenerFacturasPedidosVentas',
+					'obtenerFacturasCobros',
+					'obtenerPedidosDeVenta',
+					'obtenerOrdenesCompra',
+					'obtenerCobros',
+					'obtenerCompras',
+				],
 			},
 		},
 	},
-		{
-			displayName: 'ID Articulo',
-			name: 'articleId',
-			type: 'string',
-			default: '',
-			displayOptions: {
-				show: {
-					resource: ['articulosImagenes', 'articuloPorId', 'articuloSucursalFisica'],
-				},
-			},
+	{
+		displayName: 'Fecha Modificación Desde',
+		name: 'dateModified',
+		type: 'dateTime',
+		default: '',
+		displayOptions: { show: { resource: ['articulo'] } },
+	},
+	{
+		displayName: 'Fecha Modificación Imagen Desde',
+		name: 'dateModifiedImage',
+		type: 'dateTime',
+		default: '',
+		displayOptions: { show: { resource: ['articulo'] } },
+	},
+	{
+		displayName: 'Fecha Precio Actualizado Desde',
+		name: 'priceDateModified',
+		type: 'dateTime',
+		default: '',
+		displayOptions: {
+			show: { resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente'] },
 		},
+	},
+	{
+		displayName: 'Forma De Pago Proveedor',
+		name: 'formaPagoProveedor',
+		type: 'number',
+		default: '',
+		displayOptions: { show: { resource: ['proveedorCrear'] } },
+	},
 	{
 		displayName: 'ID',
 		name: 'id',
 		required: true,
 		type: 'string',
 		default: '',
-		placeholder:'Ej. 27231',
+		placeholder: 'Ej. 27231',
 		description: 'Identificador unico con el cual hacer solicitudes a la API',
 		displayOptions: {
-			show: {
-				resource: ['pedidoVentaActividad', 'regimenesEspecialesPorId'],
-			},
+			show: { resource: ['pedidoVentaActividad', 'regimenesEspecialesPorId'] },
 		},
 	},
 	{
-		displayName: 'ID País (Opcional)',
+		displayName: 'ID Articulo',
+		name: 'articleId',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: { resource: ['articulosImagenes', 'articuloPorId', 'articuloSucursalFisica'] },
+		},
+	},
+	{
+		displayName: 'ID Bonificacion',
+		name: 'bonificacion',
+		type: 'number',
+		default: 0,
+		displayOptions: { show: { resource: ['generarVentas'] } },
+	},
+	{
+		displayName: 'ID De Cobro',
+		name: 'idCobro',
+		required: true,
+		type: 'number',
+		default: 0,
+		description: 'ID del cobro',
+		displayOptions: { show: { resource: ['crearPedidoVenta', 'obtenerCobros'] } },
+	},
+	{
+		displayName: 'ID De La Compra',
+		name: 'idCompra',
+		type: 'number',
+		default: '',
+		displayOptions: { show: { resource: ['obtenerCompras'] } },
+	},
+	{
+		displayName: 'ID Del Estado',
+		name: 'statusId',
+		type: 'number',
+		default: false,
+		description: 'Número del estado del pedido',
+		displayOptions: { show: { resource: ['obtenerPedidosDeVenta', 'obtenerOrdenesCompra'] } },
+	},
+	{
+		displayName: 'ID Del Operador Compra',
+		name: 'idOperadorCompra',
+		type: 'number',
+		default: '',
+		displayOptions: { show: { resource: ['proveedorCrear'] } },
+	},
+	{
+		displayName: 'ID Del Proveedor',
+		name: 'idProveedor',
+		type: 'number',
+		default: '',
+		placeholder: '2',
+		description: 'ID Del proveedor de la compra',
+		displayOptions: { show: { resource: ['generarCompras'] } },
+	},
+	{
+		displayName: 'ID Del Tipo De Comprobante',
+		name: 'idTipoComprobante',
+		type: 'number',
+		default: '',
+		placeholder: '1',
+		description: 'ID del tipo de comprobante de la factura',
+		displayOptions: { show: { resource: ['generarCompras'] } },
+	},
+	{
+		displayName: 'ID Del Tipo De Comprobante',
+		name: 'idTipoComprobanteVenta',
+		type: 'number',
+		default: '',
+		placeholder: '1',
+		description: 'ID del tipo de comprobante de la venta',
+		displayOptions: { show: { resource: ['generarVentas'] } 
+	},
+	},
+	{
+		displayName: 'ID Del Vendedor',
+		name: 'idVendedor',
+		type: 'number',
+		default: '',
+		displayOptions: { show: { resource: ['generarVentas'] } },
+	},
+	{
+		displayName: 'ID Pais',
 		name: 'idPais',
 		type: 'string',
 		default: '',
-		description: "ID del país por la cual se buscarán las provincias",
-		displayOptions: {
-			show: {
-				resource: ['provinciasLista'],
-			},
-		},
+		description: 'ID del país por la cual se buscarán las provincias',
+		displayOptions: { show: { resource: ['provinciasLista', 'proveedorCrear'] } },
 	},
 	{
-		displayName: 'ID Provincia (Opcional)',
+		displayName: 'ID Provincia',
 		name: 'idProvincia',
 		type: 'string',
 		default: '',
-		description: "ID de la provincia por la cual se buscarán los departamentos",
+		description: 'ID de la provincia por la cual se buscarán los departamentos',
+		displayOptions: { show: { resource: ['departamentosLista', 'proveedorCrear'] } },
+	},
+	{
+		displayName: 'ID Sucursal Física',
+		name: 'idSucursalFisica',
+		type: 'number',
+		default: '',
+		description: 'The ID of the physical branch to filter stock (optional)',
 		displayOptions: {
 			show: {
-				resource: ['departamentosLista'],
+				resource: ['searchArticleBySKU', 'articuloSucursalFisica', 'generarCompras'],
 			},
 		},
 	},
@@ -615,11 +730,87 @@ const getArticulo: INodeProperties[] = [
 		name: 'IdSucursalFisica',
 		type: 'string',
 		default: '',
-		displayOptions: {
-			show: {
-				resource: ['articulosSucursalesFisicas'],
-			},
-		},
+		displayOptions: { show: { resource: ['articulosSucursalesFisicas'] } },
+	},
+	{
+		displayName: 'ID Valor Efectivo',
+		name: 'idValorEfectivo',
+		type: 'number',
+		default: 0,
+		displayOptions: { show: { esContado: [true] } },
+	},
+	{
+		displayName: 'ID de la zona',
+		name: 'idZona',
+		type: 'number',
+		default: '',
+		displayOptions: { show: { resource: ['proveedorCrear'] } },
+	},
+		{
+		displayName: 'ID del descuento del proveedor',
+		name: 'idDescuentoProveedor',
+		type: 'number',
+		default: '',
+		displayOptions: { show: { resource: ['proveedorCrear'] } },
+	},
+	{
+		displayName: 'Importe',
+		name: 'importeValorEfectivo',
+		type: 'number',
+		default: 0,
+		displayOptions: { show: { esContado: [true] } },
+	},
+	{
+		displayName: 'Información De Envío',
+		name: 'envio',
+		required: true,
+		type: 'json',
+		default: {},
+		description: 'Shipping info from the order',
+		displayOptions: { show: { resource: ['cobros', 'crearPedidoVenta'] } },
+	},
+	{
+		displayName: 'Lista ID',
+		name: 'idList',
+		type: 'number',
+		default: '',
+		description: 'ID de la lista para buscar los precios de los articulos',
+		displayOptions: { show: { resource: ['articulosPrecioPorLista', 'generarVentas'] } },
+	},
+	{
+		displayName: 'Letra Del Documento De La Compra',
+		name: 'letraDocumento',
+		type: 'string',
+		default: '',
+		placeholder: 'A',
+		description: 'Letra del documento de la compra de la factura',
+		displayOptions: { show: { resource: ['generarCompras'] } },
+	},
+	{
+		displayName: 'Migración Completa',
+		name: 'migracionCompleta',
+		type: 'boolean',
+		default: false,
+		description: 'Whether complete articles migration or partial',
+		displayOptions: { show: { resource: ['articulo'] } },
+	},
+	{
+		displayName: 'Nombre Del Tipo De Comprobante',
+		name: 'nombreTipoComprobante',
+		type: 'string',
+		default: '',
+		placeholder: 'Factura de compras',
+		description: 'Nombre del tipo de comprobante de la factura',
+		displayOptions: { show: { resource: ['generarCompras'] } },
+	},
+	{
+		displayName: 'Nombre del articulo',
+		name: 'nombreArticulo',
+		type: 'string',
+		default: '',
+		placeholder: 'Alfajores',
+		displayOptions: { show: { resource: ['buscarArticulo'] } },
+		description: 'El nombre del producto a buscar',
 	},
 	{
 		displayName: 'Número De Página',
@@ -627,41 +818,104 @@ const getArticulo: INodeProperties[] = [
 		type: 'number',
 		default: 1,
 		description: 'Número de página para la paginación de artículos',
+		displayOptions: { show: { resource: ['articulo'] } },
+	},
+	{
+		displayName: 'Numero Del Documento De La Compra',
+		name: 'numeroFactura',
+		type: 'number',
+		default: '',
+		placeholder: '1',
+		description: 'Numero del documento de la compra de la factura',
+		displayOptions: { show: { resource: ['generarCompras'] } },
+	},
+	{
+		displayName: 'Observaciones',
+		name: 'observacionesValorEfectivo',
+		type: 'string',
+		default: '',
+		displayOptions: { show: { esContado: [true] } },
+	},
+	{
+		displayName: 'Proveedor ID',
+		name: 'proveedorId',
+		type: 'number',
+		required: true,
+		default: '',
+		description: 'ID del proveedor usado para buscar dentro del sistema',
+		displayOptions: { show: { resource: ['proveedorBuscar'] } },
+	},
+	{
+		displayName: 'Punto De Venta',
+		name: 'puntoDeVenta',
+		type: 'number',
+		default: '',
+		placeholder: '1',
+		description: 'Numero del punto de venta del documento',
+		displayOptions: { show: { resource: ['generarCompras', 'generarVentas'] } },
+	},
+	{
+		displayName: 'Razón Social',
+		name: 'razonSocial',
+		type: 'string',
+		default: '',
+		description: 'Razón social del cliente para buscar',
 		displayOptions: {
-			show: {
-				resource: ['articulo'],
-			},
+			show: { resource: ['buscarContribuyente', 'clientesBusqueda', 'proveedorCrear'] },
 		},
 	},
 	{
-		displayName: 'Cantidad Por Página',
-		name: 'cantidadPorPagina',
-		type: 'number',
-		default: 50,
-		description: 'Cantidad de artículos por página',
-		displayOptions: {
-			show: {
-				resource: ['articulo'],
-			},
-		},
+		displayName: 'Rubros IDs',
+		name: 'idsRubros',
+		type: 'string',
+		default: '',
+		description: 'ID Rubros used to search the articles',
+		displayOptions: { show: { resource: ['articulo'] } },
 	},
-		{
-			displayName: 'Codigo',
-			name: 'codigo',
-			type: 'string',
-			default: '',
-			typeOptions: {
-				minValue: 1,
-			},
-			placeholder: 'Ej. 1507',
-			description: 'Codigo del articulo a buscar',
-			displayOptions: {
-				show: {
-					resource: ['articuloPorId', 'articulosPrecioPorLista', 'articuloSucursalFisica', 'clientesBusqueda'],
-				},
-			},
-		},
+	{
+		displayName: 'SKU',
+		name: 'sku',
+		type: 'string',
+		default: '',
+		required: true,
+		description: 'The SKU (product code) to search for',
+		displayOptions: { show: { resource: ['searchArticleBySKU'] } },
+	},
+	{
+		displayName: 'Sub-Rubros IDs',
+		name: 'idsSubRubros',
+		type: 'string',
+		default: '',
+		description: 'Client ID used to search the articles',
+		displayOptions: { show: { resource: ['articulo', 'categoriasObtener'] } },
+	},
+	{
+		displayName: 'Sucursales Físicas - IDs Lista',
+		name: 'branchOfficeIds',
+		type: 'string',
+		required: true,
+		default: '7345',
+		description: 'Physical branch ID separated by comma',
+		displayOptions: { show: { resource: ['articulosExistencia'] } },
+	},
+	{
+		displayName: 'Ultima Modificacion Imagenes',
+		name: 'lastModifiedImg',
+		type: 'json',
+		required: true,
+		default: '',
+		displayOptions: { show: { resource: ['procesarImagenes'] } },
+	},
+	{
+		displayName: 'Usuario',
+		name: 'username',
+		type: 'string',
+		default: '',
+		displayOptions: { show: { resource: ['operadoresMoviles'] } },
+	},
 ];
+
+
 
 export const CentumFields: INodeProperties[] = [...getArticulo];
 
