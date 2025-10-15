@@ -540,7 +540,7 @@ const getArticulo: INodeProperties[] = [
 					'obtenerCobros',
 					'obtenerCompras',
 					'generarVentas',
-					'articuloPorNombre',
+					'buscarArticulo',
 					'articuloPorId'
 				],
 			},
@@ -571,7 +571,7 @@ const getArticulo: INodeProperties[] = [
 					'obtenerOrdenesCompra',
 					'obtenerCobros',
 					'obtenerCompras',
-					'articuloPorNombre',
+					'buscarArticulo',
 					'articuloPorId'
 				],
 			},

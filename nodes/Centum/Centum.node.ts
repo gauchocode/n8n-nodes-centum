@@ -201,9 +201,7 @@ export class Centum implements INodeType {
 
 			case "articuloPorNombre": {
 				const nombre = this.getNodeParameter("nombre", 0) as string;
-				const fechaCreacionDesde = this.getNodeParameter("startDate", 0) as string;
-				const fechaCreacionHasta = this.getNodeParameter("endDate", 0) as string;
-
+				
 				if (!nombre) {
 					throw new NodeOperationError(this.getNode(), "El nombre del artículo es obligatorio");
 				}
@@ -211,7 +209,9 @@ export class Centum implements INodeType {
 					const articulo = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
 						method: "POST",
 						headers,
-						body: { Nombre: nombre, FechaCreacionDesde: fechaCreacionDesde, FechaCreacionHasta: fechaCreacionHasta },
+						body: {
+							Nombre: nombre
+						}
 					});
 
 					return [this.helpers.returnJsonArray(articulo)];
@@ -402,14 +402,15 @@ export class Centum implements INodeType {
 
 			case 'buscarArticulo': {
 				const nombreArticulo = this.getNodeParameter('nombreArticulo', 0, '') as string;
+				const fechaCreacionDesde = this.getNodeParameter("startDate", 0) as string;
+				const fechaCreacionHasta = this.getNodeParameter("endDate", 0) as string;
+
 				
 				try{
 					const response = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
 						method: 'POST',
 						headers,
-						body: {
-							Nombre: nombreArticulo
-						}
+						body: { Nombre: nombreArticulo, FechaCreacionDesde: fechaCreacionDesde, FechaCreacionHasta: fechaCreacionHasta },
 					});
 
 					return [this.helpers.returnJsonArray(response as any)];
