@@ -178,6 +178,8 @@ export class Centum implements INodeType {
 			case "articuloPorId": {
 				const codigo = this.getNodeParameter("codigo", 0) as string;
 				const articleId = this.getNodeParameter("articleId", 0) as string;
+				const fechaCreacionDesde = this.getNodeParameter("startDate", 0) as string;
+				const fechaCreacionHasta = this.getNodeParameter("endDate", 0) as string;
 
 				if (!codigo && !articleId) {
 					throw new NodeOperationError(this.getNode(), "El id o codigo del articulo es obligatorio");
@@ -186,7 +188,30 @@ export class Centum implements INodeType {
 					const articulo = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
 						method: "POST",
 						headers,
-						body: { CodigoExacto: codigo, Ids: articleId },
+						body: { CodigoExacto: codigo, Ids: articleId, FechaCreacionDesde: fechaCreacionDesde, FechaCreacionHasta: fechaCreacionHasta  },
+					});
+
+					return [this.helpers.returnJsonArray(articulo)];
+				} catch (error) {
+					console.log("Error en solicitud de artículo por ID:", error);
+					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+					throw new NodeOperationError(this.getNode(), errorMessage);
+				}
+			}
+
+			case "articuloPorNombre": {
+				const nombre = this.getNodeParameter("nombre", 0) as string;
+				const fechaCreacionDesde = this.getNodeParameter("startDate", 0) as string;
+				const fechaCreacionHasta = this.getNodeParameter("endDate", 0) as string;
+
+				if (!nombre) {
+					throw new NodeOperationError(this.getNode(), "El nombre del artículo es obligatorio");
+				}
+				try {
+					const articulo = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
+						method: "POST",
+						headers,
+						body: { Nombre: nombre, FechaCreacionDesde: fechaCreacionDesde, FechaCreacionHasta: fechaCreacionHasta },
 					});
 
 					return [this.helpers.returnJsonArray(articulo)];
@@ -210,8 +235,6 @@ export class Centum implements INodeType {
 						pagination: ajustesHTTP.pagination,
 						cantidadItemsPorPagina: ajustesHTTP.cantidadItemsPorPagina,
 						intervaloPagina: ajustesHTTP.intervaloPagina,
-						itemsField: "Items", // Ajusta si la respuesta es diferente
-						context: this,
 					};
 					const paginated = await apiPostRequestPaginated<IArticulos>(articulosURL, fetchOptions);
 					return [this.helpers.returnJsonArray(paginated as any)];
@@ -348,17 +371,20 @@ export class Centum implements INodeType {
 				const IdSucursalFisica = this.getNodeParameter("idSucursalFisica", 0) as string;
 				const idArticulo = this.getNodeParameter("articleId", 0) as string;
 				const codigo = this.getNodeParameter("codigo", 0) as string;
-				const queryParams: {
+				const nombre = this.getNodeParameter("nombreArticulo", 0) as string;
+ 				const queryParams: {
 					IdSucursalFisica?: string;
 					codigoExacto?: string;
 					idsArticulos: string;
+					nombre: string;
 				} = {
 					IdSucursalFisica: IdSucursalFisica,
 					codigoExacto: codigo,
 					idsArticulos: idArticulo,
+					nombre
 				};
 
-				if (!IdSucursalFisica || (!idArticulo && !codigo)) {
+				if (!IdSucursalFisica || (!idArticulo && !codigo && !nombre )) {
 					throw new NodeOperationError(this.getNode(), "El id de la sucursal fisica y el id del articulo o el codigo son obligatorios");
 				}
 				try {

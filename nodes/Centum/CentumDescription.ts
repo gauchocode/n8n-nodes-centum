@@ -283,7 +283,7 @@ const getArticulo: INodeProperties[] = [
 		displayName: 'Activo',
 		name: 'active',
 		type: 'boolean',
-		default: '',
+		default: false,
 		displayOptions: {
 			show: { resource: ['proveedorCrear'] },
 		},
@@ -540,6 +540,8 @@ const getArticulo: INodeProperties[] = [
 					'obtenerCobros',
 					'obtenerCompras',
 					'generarVentas',
+					'articuloPorNombre',
+					'articuloPorId'
 				],
 			},
 		},
@@ -569,6 +571,8 @@ const getArticulo: INodeProperties[] = [
 					'obtenerOrdenesCompra',
 					'obtenerCobros',
 					'obtenerCompras',
+					'articuloPorNombre',
+					'articuloPorId'
 				],
 			},
 		},
@@ -740,7 +744,7 @@ const getArticulo: INodeProperties[] = [
 		displayOptions: { show: { esContado: [true] } },
 	},
 	{
-		displayName: 'ID de la zona',
+		displayName: 'ID De La Zona',
 		name: 'idZona',
 		type: 'number',
 		default: '',
@@ -804,12 +808,12 @@ const getArticulo: INodeProperties[] = [
 		displayOptions: { show: { resource: ['generarCompras'] } },
 	},
 	{
-		displayName: 'Nombre del articulo',
+		displayName: 'Nombre Del Articulo',
 		name: 'nombreArticulo',
 		type: 'string',
 		default: '',
 		placeholder: 'Alfajores',
-		displayOptions: { show: { resource: ['buscarArticulo'] } },
+		displayOptions: { show: { resource: ['buscarArticulo', 'articuloSucursalFisica'] } },
 		description: 'El nombre del producto a buscar',
 	},
 	{
