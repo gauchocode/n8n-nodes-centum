@@ -1201,7 +1201,7 @@ export class Centum implements INodeType {
 						idProveedor
 					};
 
-					const response = await apiRequest<any>(`${centumUrl}/OrdenesCompra/FiltrosCobro`, {
+					const response = await apiRequest<any>(`${centumUrl}/OrdenesCompra/FiltrosOrdenCompra`, {
 						method: "POST",
 						headers,
 						body,
