@@ -186,6 +186,16 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obtiene todos los datos de un operador móvil en base a las credenciales'
 			},
 			{
+				name: 'Orden De Compra - Obtener',
+				value: 'obtenerOrdenCompra',
+				description: 'Obtiene una unica orden de compra en base al ID'
+			},
+			{
+				name: 'Ordenes De Compra - Obtener',
+				value: 'obtenerOrdenesCompras',
+				description: 'Obtiene todas las ordenes de compra en base a ciertos filtros'
+			},
+			{
 				name: 'Pedido De Venta - Actividad',
 				value: 'pedidoVentaActividad',
 				action: 'Obtener actividad de pedido de venta',
@@ -541,7 +551,8 @@ const getArticulo: INodeProperties[] = [
 					'obtenerCompras',
 					'generarVentas',
 					'buscarArticulo',
-					'articuloPorId'
+					'articuloPorId',
+					'obtenerOrdenesCompras'
 				],
 			},
 		},
@@ -572,7 +583,8 @@ const getArticulo: INodeProperties[] = [
 					'obtenerCobros',
 					'obtenerCompras',
 					'buscarArticulo',
-					'articuloPorId'
+					'articuloPorId',
+					'obtenerOrdenesCompras'
 				],
 			},
 		},
@@ -649,7 +661,7 @@ const getArticulo: INodeProperties[] = [
 		name: 'idCompra',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['obtenerCompras'] } },
+		displayOptions: { show: { resource: ['obtenerCompras', 'obtenerOrdenCompra'] } },
 	},
 	{
 		displayName: 'ID Del Estado',
@@ -847,7 +859,7 @@ const getArticulo: INodeProperties[] = [
 		required: true,
 		default: '',
 		description: 'ID del proveedor usado para buscar dentro del sistema',
-		displayOptions: { show: { resource: ['proveedorBuscar'] } },
+		displayOptions: { show: { resource: ['proveedorBuscar', 'obtenerOrdenesCompras'] } },
 	},
 	{
 		displayName: 'Punto De Venta',

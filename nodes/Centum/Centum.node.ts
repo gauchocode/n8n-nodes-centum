@@ -1179,6 +1179,76 @@ export class Centum implements INodeType {
 				}
 			}
 
+			case "obtenerOrdenesCompras": {
+				const idProveedor = this.getNodeParameter("proveedorId", 0);
+				const desdeSaldoFecha = this.getNodeParameter("startDate", 0);
+				const hastaSaldoFecha = this.getNodeParameter("endDate", 0);
+				const separarFechaDesde = String(desdeSaldoFecha).split("T")[0];
+				const separarFechaHasta = String(hastaSaldoFecha).split("T")[0];
+
+				if (!desdeSaldoFecha) {
+					throw new NodeOperationError(this.getNode(), "priceDateModified (fecha desde) es requerido");
+				}
+
+				if (!hastaSaldoFecha) {
+					throw new NodeOperationError(this.getNode(), "priceDateModifiedSince (fecha hasta) es requerido");
+				}
+
+				try {
+					const body = {
+						fechaDocumentoDesde: separarFechaDesde,
+						fechaDocumentoHasta: separarFechaHasta,
+						idProveedor
+					};
+
+					const response = await apiRequest<any>(`${centumUrl}/OrdenesCompra/FiltrosCobro`, {
+						method: "POST",
+						headers,
+						body,
+					});
+
+					// Validación de la respuesta
+					if (!response || typeof response !== "object") {
+						throw new NodeOperationError(this.getNode(), "Respuesta inválida del servidor");
+					}
+
+					return [this.helpers.returnJsonArray(response)];
+				} catch (error) {
+					console.log("Error en solicitud de facturas pedidos ventas:", error);
+					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+					throw new NodeOperationError(this.getNode(), `Error obteniendo ordenes de compra del proveedor ${idProveedor}: ${errorMessage}`);
+				}
+			}
+
+			case "obtenerOrdenCompra": {
+				const ordenCompraId = this.getNodeParameter("idCompra", 0);
+
+				if(!ordenCompraId){
+					throw new NodeOperationError(this.getNode(), "El id de la compra es requerido");
+				}
+
+				try {
+					let url = `${centumUrl}/OrdenesCompra/${ordenCompraId}`;
+
+					const response = await apiRequest<any>(`${url}`, {
+						method: "GET",
+						headers
+					});
+
+					// Validación de la respuesta
+					if (!response || typeof response !== "object") {
+						throw new NodeOperationError(this.getNode(), "Respuesta inválida del servidor");
+					}
+
+					return [this.helpers.returnJsonArray(response)];
+				} catch (error) {
+					console.log("Error en solicitud de facturas pedidos ventas:", error);
+					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+					throw new NodeOperationError(this.getNode(), `Error obteniendo la orden de compra con el id ${ordenCompraId}: ${errorMessage}`);
+				}
+			}
+
+
 			case "obtenerFacturasPedidosVentas": {
 				const clientIdParam = this.getNodeParameter("clienteId", 0);
 				const desdeSaldoFecha = this.getNodeParameter("startDate", 0);
