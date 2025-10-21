@@ -651,6 +651,38 @@ function centumGetArticleAttributes(article: { json: { AtributosArticulo: any[] 
 	}));
 }
 
+// function centumGetArticleVariations(groupId: number, arrArticles: any) {
+// 	const allAttributes: any = [];
+// 	const articlesWithSameGroupId = arrArticles.filter(
+// 		(article: { json: { GrupoArticulo: { IdGrupoArticulo: number } | null } }) =>
+// 			article.json.GrupoArticulo !== null && article.json.GrupoArticulo.IdGrupoArticulo === groupId,
+// 	);
+
+// 	articlesWithSameGroupId.forEach((article: { json: { AtributosArticulo: any[] } }) => {
+// 		allAttributes.push(...centumGetArticleAttributes(article));
+// 	});
+
+// 	const variations = articlesWithSameGroupId.map((article: { json: any }) => ({
+// 		sku: article.json.Codigo,
+// 		regular_price: article.json.Precio,
+// 		enabled: article.json.Habilitado === true && article.json.ActivoWeb === true,
+// 		attributes: centumGetArticleAttributes(article),
+// 		stock: article.json.ExistenciasSucursales,
+// 		dimensions: {
+// 			height: article.json.Alto * 100,
+// 			length: article.json.Largo * 100,
+// 			width: article.json.Ancho * 100,
+// 			weight: article.json.Masa,
+// 		},
+// 		images: article.json.images?.map((image: any) => image.data.fileName) || [],
+// 		description: article.json.Detalle ?? '',
+// 	}));
+
+// 	const allUniqueAttributes = getUniqueValues(allAttributes, 'value');
+
+// 	return [variations, allUniqueAttributes];
+// }
+
 function centumGetArticleVariations(groupId: number, arrArticles: any) {
 	const allAttributes: any = [];
 	const articlesWithSameGroupId = arrArticles.filter(
@@ -662,21 +694,36 @@ function centumGetArticleVariations(groupId: number, arrArticles: any) {
 		allAttributes.push(...centumGetArticleAttributes(article));
 	});
 
-	const variations = articlesWithSameGroupId.map((article: { json: any }) => ({
-		sku: article.json.Codigo,
-		regular_price: article.json.Precio,
-		enabled: article.json.Habilitado === true && article.json.ActivoWeb === true,
-		attributes: centumGetArticleAttributes(article),
-		stock: article.json.ExistenciasSucursales,
-		dimensions: {
-			height: article.json.Alto * 100,
-			length: article.json.Largo * 100,
-			width: article.json.Ancho * 100,
-			weight: article.json.Masa,
-		},
-		images: article.json.images?.map((image: any) => image.data.fileName) || [],
-		description: article.json.Detalle ?? '',
-	}));
+	const variations = articlesWithSameGroupId.map((article: { json: any }) => {
+		const regular = Number(article.json.Precio);
+		const variation: any = {
+			sku: article.json.Codigo,
+			regular_price: regular,
+			enabled: article.json.Habilitado === true && article.json.ActivoWeb === true,
+			attributes: centumGetArticleAttributes(article),
+			stock: article.json.ExistenciasSucursales,
+			dimensions: {
+				height: article.json.Alto * 100,
+				length: article.json.Largo * 100,
+				width: article.json.Ancho * 100,
+				weight: article.json.Masa,
+			},
+			images: article.json.images?.map((image: any) => image.data.fileName) || [],
+			// description: article.json.Detalle ?? '',
+			description:  '',
+		};
+
+		// ⬇️ Solo setear sale_price si existe la propiedad y es válido (< regular)
+		if (article.json.DescuentoPromocion != null) {
+			const desc = Math.abs(Number(article.json.DescuentoPromocion));
+			const sale = regular - desc;
+			if (Number.isFinite(sale) && sale > 0 && sale < regular) {
+				variation.sale_price = sale;
+			}
+		}
+
+		return variation;
+	});
 
 	const allUniqueAttributes = getUniqueValues(allAttributes, 'value');
 
@@ -698,6 +745,12 @@ export const createJsonProducts = (arrArticles: IMergeArticulos[]) => {
 			continue;
 		}
 
+		if(article.json.DescuentoPromocion){
+			console.log(article.json.Precio)
+			console.log(article.json.DescuentoPromocion)
+  			obj.sale_price = article.json.Precio - Math.abs(article.json.DescuentoPromocion);
+		}
+
 		obj.dimensions = {
 			height: article.json.Alto * 100,
 			length: article.json.Largo * 100,
@@ -706,7 +759,8 @@ export const createJsonProducts = (arrArticles: IMergeArticulos[]) => {
 		};
 		obj.regular_price = article.json.Precio;
 		// Actualización de description para no hacer match sobre undefined
-		const description = article?.json?.Detalle || '';
+		// const description = article?.json?.Detalle || '';
+		const description = '';
 
 		const pattern = /\/{2,}/g;
 		const matches = (description.match(pattern) || []).length;
@@ -798,6 +852,7 @@ export const createJsonProducts = (arrArticles: IMergeArticulos[]) => {
 	const uniqueArticles = getUniqueValues(wooProducts.products, 'name');
 
 	wooProducts.products = uniqueArticles;
+	console.log(wooProducts)
 
 	return wooProducts;
 };
