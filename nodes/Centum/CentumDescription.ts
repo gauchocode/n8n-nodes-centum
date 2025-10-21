@@ -400,7 +400,8 @@ const getArticulo: INodeProperties[] = [
 					'articuloPorId',
 					'articulosPrecioPorLista',
 					'articuloSucursalFisica',
-					'clientesBusqueda',
+					'clientesBusqueda',,
+					'buscarArticulo'
 				],
 			},
 		},
@@ -550,8 +551,6 @@ const getArticulo: INodeProperties[] = [
 					'obtenerCobros',
 					'obtenerCompras',
 					'generarVentas',
-					'buscarArticulo',
-					'articuloPorId',
 					'obtenerOrdenesCompras'
 				],
 			},
@@ -582,8 +581,6 @@ const getArticulo: INodeProperties[] = [
 					'obtenerOrdenesCompra',
 					'obtenerCobros',
 					'obtenerCompras',
-					'buscarArticulo',
-					'articuloPorId',
 					'obtenerOrdenesCompras'
 				],
 			},

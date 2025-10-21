@@ -402,15 +402,14 @@ export class Centum implements INodeType {
 
 			case 'buscarArticulo': {
 				const nombreArticulo = this.getNodeParameter('nombreArticulo', 0, '') as string;
-				const fechaCreacionDesde = this.getNodeParameter("startDate", 0) as string;
-				const fechaCreacionHasta = this.getNodeParameter("endDate", 0) as string;
+				const codigoArticulo = this.getNodeParameter('codigo', 0, '') as string;
 
 				
 				try{
 					const response = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
 						method: 'POST',
 						headers,
-						body: { Nombre: nombreArticulo, FechaCreacionDesde: fechaCreacionDesde, FechaCreacionHasta: fechaCreacionHasta },
+						body: { Nombre: nombreArticulo, Codigo: codigoArticulo },
 					});
 
 					return [this.helpers.returnJsonArray(response as any)];
