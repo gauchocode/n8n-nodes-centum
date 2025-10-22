@@ -709,8 +709,7 @@ function centumGetArticleVariations(groupId: number, arrArticles: any) {
 				weight: article.json.Masa,
 			},
 			images: article.json.images?.map((image: any) => image.data.fileName) || [],
-			// description: article.json.Detalle ?? '',
-			description:  '',
+			description: article.json.Detalle ?? '',
 		};
 
 		// ⬇️ Solo setear sale_price si existe la propiedad y es válido (< regular)
@@ -745,22 +744,23 @@ export const createJsonProducts = (arrArticles: IMergeArticulos[]) => {
 			continue;
 		}
 
-		if(article.json.DescuentoPromocion){
-			console.log(article.json.Precio)
-			console.log(article.json.DescuentoPromocion)
-  			obj.sale_price = article.json.Precio - Math.abs(article.json.DescuentoPromocion);
-		}
-
 		obj.dimensions = {
 			height: article.json.Alto * 100,
 			length: article.json.Largo * 100,
 			width: article.json.Ancho * 100,
 			weight: article.json.Masa,
 		};
+
+		if(article.json.DescuentoPromocion){
+			console.log(article.json.Precio)
+			console.log(article.json.DescuentoPromocion)
+  			obj.sale_price = article.json.Precio - Math.abs(article.json.DescuentoPromocion);
+		}
 		obj.regular_price = article.json.Precio;
+
+		
 		// Actualización de description para no hacer match sobre undefined
-		// const description = article?.json?.Detalle || '';
-		const description = '';
+		const description = article?.json?.Detalle || '';
 
 		const pattern = /\/{2,}/g;
 		const matches = (description.match(pattern) || []).length;
