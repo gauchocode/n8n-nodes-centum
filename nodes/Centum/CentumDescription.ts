@@ -213,15 +213,15 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obtiene todos los estados disponibles de los pedidos de ventas'
 			},
 			{
+				name: 'Pedidos De Venta - Listar',
+				value: 'obtenerPedidosDeVenta',
+				description: 'Obtiene todos los pedidos de ventas en base a ciertos parámetros'
+			},
+			{
 				name: 'Pedidos De Venta - Resumido',
 				value: 'obtenerPedidosDeVentaFiltrados',
 				action: 'Obtiene todos los pedidos de venta en base a ciertos parametros',
 				description: 'Obtiene todos los pedidos de venta con un cuerpo de respuesta mas ligero',
-			},
-			{
-				name: 'Pedidos De Venta - Listar',
-				value: 'obtenerPedidosDeVenta',
-				description: 'Obtiene todos los pedidos de ventas en base a ciertos parámetros'
 			},
 			{
 				name: 'Precios De Productos - Lista',
