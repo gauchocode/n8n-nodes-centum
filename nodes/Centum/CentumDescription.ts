@@ -213,6 +213,12 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obtiene todos los estados disponibles de los pedidos de ventas'
 			},
 			{
+				name: 'Pedidos De Venta - Resumido',
+				value: 'obtenerPedidosDeVentaFiltrados',
+				action: 'Obtiene todos los pedidos de venta en base a ciertos parametros',
+				description: 'Obtiene todos los pedidos de venta con un cuerpo de respuesta mas ligero',
+			},
+			{
 				name: 'Pedidos De Venta - Listar',
 				value: 'obtenerPedidosDeVenta',
 				description: 'Obtiene todos los pedidos de ventas en base a ciertos parámetros'
@@ -326,14 +332,14 @@ const getArticulo: INodeProperties[] = [
 		default: 0,
 		displayOptions: { show: { esContado: [true] } },
 	},
-	{
-		displayName: 'Cantidad Por Página',
-		name: 'cantidadPorPagina',
-		type: 'number',
-		default: 50,
-		description: 'Cantidad de artículos por página',
-		displayOptions: { show: { resource: ['articulo'] } },
-	},
+	// {
+	// 	displayName: 'Cantidad Por Página',
+	// 	name: 'cantidadPorPagina',
+	// 	type: 'number',
+	// 	default: 50,
+	// 	description: 'Cantidad de artículos por página',
+	// 	displayOptions: { show: { resource: ['articulo'] } },
+	// },
 	{
 		displayName: 'Categoría De Impuestos A Las Ganancias',
 		name: 'categoriaImpuestosGanancias',
@@ -380,7 +386,8 @@ const getArticulo: INodeProperties[] = [
 					'obtenerOrdenesCompra',
 					'obtenerCobros',
 					'obtenerCompras',
-					'generarVentas',
+					'generarVentas',,
+					'obtenerPedidosDeVentaFiltrados'
 				],
 			},
 		},
@@ -507,17 +514,17 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: { show: { resource: ['clienteNuevo'] } },
 	},
-	{
-		displayName: 'Documento',
-		name: 'documentDate',
-		type: 'dateTime',
-		required: true,
-		default: undefined,
-		description: 'Parametro fecha del body para las solicitudes',
-		displayOptions: {
-			show: { resource: ['articulo', 'promocionesCliente', 'generarCompras'] },
-		},
-	},
+	// {
+	// 	displayName: 'Documento',
+	// 	name: 'documentDate',
+	// 	type: 'dateTime',
+	// 	required: true,
+	// 	default: undefined,
+	// 	description: 'Parametro fecha del body para las solicitudes',
+	// 	displayOptions: {
+	// 		show: { resource: ['articulo', 'promocionesCliente', 'generarCompras'] },
+	// 	},
+	// },
 	{
 		displayName: 'Endpoint',
 		name: 'endpoint',
@@ -547,6 +554,7 @@ const getArticulo: INodeProperties[] = [
 					'obtenerFacturasPedidosVentas',
 					'obtenerFacturasCobros',
 					'obtenerPedidosDeVenta',
+					'obtenerPedidosDeVentaFiltrados',
 					'obtenerOrdenesCompra',
 					'obtenerCobros',
 					'obtenerCompras',
@@ -578,6 +586,7 @@ const getArticulo: INodeProperties[] = [
 					'obtenerFacturasPedidosVentas',
 					'obtenerFacturasCobros',
 					'obtenerPedidosDeVenta',
+					'obtenerPedidosDeVentaFiltrados',
 					'obtenerOrdenesCompra',
 					'obtenerCobros',
 					'obtenerCompras',
@@ -593,20 +602,20 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: { show: { resource: ['articulo'] } },
 	},
-	{
-		displayName: 'Fecha Modificación Imagen Desde',
-		name: 'dateModifiedImage',
-		type: 'dateTime',
-		default: '',
-		displayOptions: { show: { resource: ['articulo'] } },
-	},
+	// {
+	// 	displayName: 'Fecha Modificación Imagen Desde',
+	// 	name: 'dateModifiedImage',
+	// 	type: 'dateTime',
+	// 	default: '',
+	// 	displayOptions: { show: { resource: ['articulo'] } },
+	// },
 	{
 		displayName: 'Fecha Precio Actualizado Desde',
 		name: 'priceDateModified',
 		type: 'dateTime',
 		default: '',
 		displayOptions: {
-			show: { resource: ['articulo', 'obtenerSaldoCliente', 'composicionSaldoCliente'] },
+			show: { resource: ['obtenerSaldoCliente', 'composicionSaldoCliente'] },
 		},
 	},
 	{
@@ -666,7 +675,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'number',
 		default: false,
 		description: 'Número del estado del pedido',
-		displayOptions: { show: { resource: ['obtenerPedidosDeVenta', 'obtenerOrdenesCompra'] } },
+		displayOptions: { show: { resource: ['obtenerPedidosDeVenta', 'obtenerOrdenesCompra', 'obtenerPedidosDeVentaFiltrados'] } },
 	},
 	{
 		displayName: 'ID Del Operador Compra',
@@ -799,14 +808,14 @@ const getArticulo: INodeProperties[] = [
 		description: 'Letra del documento de la compra de la factura',
 		displayOptions: { show: { resource: ['generarCompras'] } },
 	},
-	{
-		displayName: 'Migración Completa',
-		name: 'migracionCompleta',
-		type: 'boolean',
-		default: false,
-		description: 'Whether complete articles migration or partial',
-		displayOptions: { show: { resource: ['articulo'] } },
-	},
+	// {
+	// 	displayName: 'Migración Completa',
+	// 	name: 'migracionCompleta',
+	// 	type: 'boolean',
+	// 	default: false,
+	// 	description: 'Whether complete articles migration or partial',
+	// 	displayOptions: { show: { resource: ['articulo'] } },
+	// },
 	{
 		displayName: 'Nombre Del Tipo De Comprobante',
 		name: 'nombreTipoComprobante',
@@ -825,14 +834,14 @@ const getArticulo: INodeProperties[] = [
 		displayOptions: { show: { resource: ['buscarArticulo', 'articuloSucursalFisica'] } },
 		description: 'El nombre del producto a buscar',
 	},
-	{
-		displayName: 'Número De Página',
-		name: 'numeroPagina',
-		type: 'number',
-		default: 1,
-		description: 'Número de página para la paginación de artículos',
-		displayOptions: { show: { resource: ['articulo'] } },
-	},
+	// {
+	// 	displayName: 'Número De Página',
+	// 	name: 'numeroPagina',
+	// 	type: 'number',
+	// 	default: 1,
+	// 	description: 'Número de página para la paginación de artículos',
+	// 	displayOptions: { show: { resource: ['articulo'] } },
+	// },
 	{
 		displayName: 'Numero Del Documento De La Compra',
 		name: 'numeroFactura',
@@ -877,14 +886,14 @@ const getArticulo: INodeProperties[] = [
 			show: { resource: ['buscarContribuyente', 'clientesBusqueda', 'proveedorCrear'] },
 		},
 	},
-	{
-		displayName: 'Rubros IDs',
-		name: 'idsRubros',
-		type: 'string',
-		default: '',
-		description: 'ID Rubros used to search the articles',
-		displayOptions: { show: { resource: ['articulo'] } },
-	},
+	// {
+	// 	displayName: 'Rubros IDs',
+	// 	name: 'idsRubros',
+	// 	type: 'string',
+	// 	default: '',
+	// 	description: 'ID Rubros used to search the articles',
+	// 	displayOptions: { show: { resource: ['articulo'] } },
+	// },
 	{
 		displayName: 'SKU',
 		name: 'sku',
@@ -900,7 +909,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		description: 'Client ID used to search the articles',
-		displayOptions: { show: { resource: ['articulo', 'categoriasObtener'] } },
+		displayOptions: { show: { resource: ['categoriasObtener'] } },
 	},
 	{
 		displayName: 'Sucursales Físicas - IDs Lista',

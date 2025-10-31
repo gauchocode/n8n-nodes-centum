@@ -113,57 +113,57 @@ export class Centum implements INodeType {
 
 					if (response.Articulos.Items.length > 0) {
 						const items = response.Articulos.Items;
-						if (!completeMigration) {
-							const acc = [];
-							for (const item of items) {
-								const groupArticle = item.GrupoArticulo;
-								if (!groupArticle) continue;
+						 if (!completeMigration) {
+						 	const acc = [];
+						 	for (const item of items) {
+						 		const groupArticle = item.GrupoArticulo;
+						 		if (!groupArticle) continue;
 
-								// const centumSuiteAccessToken = createHash(
-								// 	centumApiCredentials.publicAccessKey as string,
-								// );
-								// const requestHeaders: any = {
-								// 	CentumSuiteConsumidorApiPublicaId: consumerApiPublicId,
-								// 	CentumSuiteAccessToken: centumSuiteAccessToken,
-								// };
+						 		//  const centumSuiteAccessToken = createHash(
+						 		//  	centumApiCredentials.publicAccessKey as string,
+						 		//  );
+						 		//  const requestHeaders: any = {
+						 		//  	CentumSuiteConsumidorApiPublicaId: consumerApiPublicId,
+						 		//  	CentumSuiteAccessToken: centumSuiteAccessToken,
+						 		//  };
 
-								const body = {
-									idCliente: clientId,
-									FechaDocumento: formattedDocumentDate,
-									incluirAtributosArticulos: true,
-									IdsRubro: IdsRubro ? [IdsRubro] : [],
-									IdsSubRubro: IdsSubRubro ? [IdsSubRubro] : [""],
-									NombreGrupoArticulo: groupArticle.Nombre,
-									IdGrupoArticulo: groupArticle.IdGrupoArticulo,
-								};
+						 		const body = {
+						 			idCliente: clientId,
+						 			FechaDocumento: formattedDocumentDate,
+						 			incluirAtributosArticulos: true,
+						 			IdsRubro: IdsRubro ? [IdsRubro] : [],
+						 			IdsSubRubro: IdsSubRubro ? [IdsSubRubro] : [""],
+						 			NombreGrupoArticulo: groupArticle.Nombre,
+						 			IdGrupoArticulo: groupArticle.IdGrupoArticulo,
+						 		};
 
-								try {
-									const response = await apiRequest<IArticulos>(`${centumUrl}/Articulos/Venta`, {
-										method: "POST",
-										headers: { ...headers }, // reusar headers de la primera request
-										body,
-										queryParams: { tipoOrdenArticulos: "Codigo" },
-									});
+						 		try {
+						 			const response = await apiRequest<IArticulos>(`${centumUrl}/Articulos/Venta`, {
+						 				method: "POST",
+						 				headers: { ...headers }, // reusar headers de la primera request
+						 				body,
+						 				queryParams: { tipoOrdenArticulos: "Codigo" },
+						 			});
 
-									if (response.Articulos.Items.length > 0) {
-										acc.push(...response.Articulos.Items);
-									}
-								} catch (error) {
-									console.log("Error en solicitud de grupo de artículos", { error });
-									const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
-									throw new NodeOperationError(this.getNode(), errorMessage);
-								}
-							}
-							const combinedArrays = [...acc, ...items];
-							const filteredArray = Array.from(new Map(combinedArrays.map((obj) => [obj.IdArticulo, obj])).values());
+						 			if (response.Articulos.Items.length > 0) {
+						 				acc.push(...response.Articulos.Items);
+						 			}
+						 		} catch (error) {
+						 			console.log("Error en solicitud de grupo de artículos", { error });
+						 			const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+						 			throw new NodeOperationError(this.getNode(), errorMessage);
+						 		}
+						 	}
+						 	const combinedArrays = [...acc, ...items];
+						 	const filteredArray = Array.from(new Map(combinedArrays.map((obj) => [obj.IdArticulo, obj])).values());
 
-							const itemsArray = filteredArray.map((item: any) => ({
-								...item,
-								AtributosArticulo: item.Habilitado && item.ActivoWeb ? item.AtributosArticulo : [],
-							}));
+						 	const itemsArray = filteredArray.map((item: any) => ({
+						 		...item,
+						 		AtributosArticulo: item.Habilitado && item.ActivoWeb ? item.AtributosArticulo : [],
+						 	}));
 
-							return [this.helpers.returnJsonArray(itemsArray as any)];
-						}
+						 	return [this.helpers.returnJsonArray(itemsArray as any)];
+						 }
 						return [this.helpers.returnJsonArray(items as any)];
 					} else {
 						return [this.helpers.returnJsonArray({ json: {} })];
@@ -515,7 +515,7 @@ export class Centum implements INodeType {
 						intervaloPagina: ajustesHTTP.intervaloPagina,
 						itemsField: "Items",
 						context: this,
-						headers,
+						headers, 
 					};
 
 					let clientes: IResponseCustomer | IResponseCustomer[] = [];
@@ -1315,6 +1315,38 @@ export class Centum implements INodeType {
 
 				try {
 					const response = await apiRequest<any>(`${centumUrl}/PedidosVenta/FiltrosPedidoVenta`, {
+						method: "POST",
+						headers,
+						body,
+					});
+					return [this.helpers.returnJsonArray(response)];
+				} catch (error) {
+					console.log("Error en solicitud de facturas pedidos ventas:", error);
+					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+					throw new NodeOperationError(this.getNode(), `Error obteniendo los pedidos ventas para cliente ${idCliente}: ${errorMessage}`);
+				}
+			}
+
+			case "obtenerPedidosDeVentaFiltrados": {
+				const idCliente = this.getNodeParameter("clienteId", 0);
+				const idsEstado = this.getNodeParameter("statusId", 0);
+				const fechaDesde = this.getNodeParameter("startDate", 0, "") as string;
+				const fechaHasta = this.getNodeParameter("endDate", 0, "") as string;
+				const separarFechaDesde = String(fechaDesde).split("T")[0];
+				const separarFechaHasta = String(fechaHasta).split("T")[0];
+				if (!idCliente && !idsEstado && !separarFechaDesde && !separarFechaHasta) {
+					throw new NodeOperationError(this.getNode(), "Debes ingresar almenos un parametro para realizar la búsqueda.");
+				}
+
+				const body = {
+					idCliente,
+					fechaDocumentoDesde: separarFechaDesde,
+					fechaDocumentoHasta: separarFechaHasta,
+					idsEstado,
+				};
+
+				try {
+					const response = await apiRequest<any>(`${centumUrl}/PedidosVenta/FiltrosPedidoVentaConsulta`, {
 						method: "POST",
 						headers,
 						body,
