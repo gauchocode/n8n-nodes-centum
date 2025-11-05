@@ -290,7 +290,7 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obtiene un listado de todos los tipos de comprobantes'
 			},
 			{
-				name: 'Turno de Entrega - Obtener',
+				name: 'Turno De Entrega - Obtener',
 				value: 'obtenerTurnoEntrega',
 				description: 'Obtiene el listado total disponible de turnos de entrega'	
 			},

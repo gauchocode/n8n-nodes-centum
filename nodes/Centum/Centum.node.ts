@@ -680,7 +680,7 @@ export class Centum implements INodeType {
 
 					const cliente = dataCliente?.Items?.[0]
 					if(!cliente?.IdCliente){
-						throw new Error('El cliente no fue encontrado en centum.')
+						throw new NodeOperationError(this.getNode(), 'El cliente no fue encontrado');
 					}
 					clientId = cliente.IdCliente;
 				} catch (error) {
