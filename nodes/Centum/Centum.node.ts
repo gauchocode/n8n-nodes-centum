@@ -11,7 +11,7 @@ import {
 	LineItem,
 	IMergeArticulos,
 	ShippingLine,
-	CobroId,
+	// CobroId,
 	IContribuyenteBodyInput,
 	IProvincias
 } from "./interfaces";
@@ -21,7 +21,7 @@ import {
 	createCustomerJson,
 	createHash,
 	createJsonProducts,
-	createOrderSaleJson,
+	// createOrderSaleJson,
 	centumGetArticleImages,
 	getHttpSettings,
 	apiRequest,
@@ -113,57 +113,57 @@ export class Centum implements INodeType {
 
 					if (response.Articulos.Items.length > 0) {
 						const items = response.Articulos.Items;
-						 if (!completeMigration) {
-						 	const acc = [];
-						 	for (const item of items) {
-						 		const groupArticle = item.GrupoArticulo;
-						 		if (!groupArticle) continue;
+						if (!completeMigration) {
+							const acc = [];
+							for (const item of items) {
+								const groupArticle = item.GrupoArticulo;
+								if (!groupArticle) continue;
 
-						 		//  const centumSuiteAccessToken = createHash(
-						 		//  	centumApiCredentials.publicAccessKey as string,
-						 		//  );
-						 		//  const requestHeaders: any = {
-						 		//  	CentumSuiteConsumidorApiPublicaId: consumerApiPublicId,
-						 		//  	CentumSuiteAccessToken: centumSuiteAccessToken,
-						 		//  };
+								//  const centumSuiteAccessToken = createHash(
+								//  	centumApiCredentials.publicAccessKey as string,
+								//  );
+								//  const requestHeaders: any = {
+								//  	CentumSuiteConsumidorApiPublicaId: consumerApiPublicId,
+								//  	CentumSuiteAccessToken: centumSuiteAccessToken,
+								//  };
 
-						 		const body = {
-						 			idCliente: clientId,
-						 			FechaDocumento: formattedDocumentDate,
-						 			incluirAtributosArticulos: true,
-						 			IdsRubro: IdsRubro ? [IdsRubro] : [],
-						 			IdsSubRubro: IdsSubRubro ? [IdsSubRubro] : [""],
-						 			NombreGrupoArticulo: groupArticle.Nombre,
-						 			IdGrupoArticulo: groupArticle.IdGrupoArticulo,
-						 		};
+								const body = {
+									idCliente: clientId,
+									FechaDocumento: formattedDocumentDate,
+									incluirAtributosArticulos: true,
+									IdsRubro: IdsRubro ? [IdsRubro] : [],
+									IdsSubRubro: IdsSubRubro ? [IdsSubRubro] : [""],
+									NombreGrupoArticulo: groupArticle.Nombre,
+									IdGrupoArticulo: groupArticle.IdGrupoArticulo,
+								};
 
-						 		try {
-						 			const response = await apiRequest<IArticulos>(`${centumUrl}/Articulos/Venta`, {
-						 				method: "POST",
-						 				headers: { ...headers }, // reusar headers de la primera request
-						 				body,
-						 				queryParams: { tipoOrdenArticulos: "Codigo" },
-						 			});
+								try {
+									const response = await apiRequest<IArticulos>(`${centumUrl}/Articulos/Venta`, {
+										method: "POST",
+										headers: { ...headers }, // reusar headers de la primera request
+										body,
+										queryParams: { tipoOrdenArticulos: "Codigo" },
+									});
 
-						 			if (response.Articulos.Items.length > 0) {
-						 				acc.push(...response.Articulos.Items);
-						 			}
-						 		} catch (error) {
-						 			console.log("Error en solicitud de grupo de artículos", { error });
-						 			const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
-						 			throw new NodeOperationError(this.getNode(), errorMessage);
-						 		}
-						 	}
-						 	const combinedArrays = [...acc, ...items];
-						 	const filteredArray = Array.from(new Map(combinedArrays.map((obj) => [obj.IdArticulo, obj])).values());
+									if (response.Articulos.Items.length > 0) {
+										acc.push(...response.Articulos.Items);
+									}
+								} catch (error) {
+									console.log("Error en solicitud de grupo de artículos", { error });
+									const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+									throw new NodeOperationError(this.getNode(), errorMessage);
+								}
+							}
+							const combinedArrays = [...acc, ...items];
+							const filteredArray = Array.from(new Map(combinedArrays.map((obj) => [obj.IdArticulo, obj])).values());
 
-						 	const itemsArray = filteredArray.map((item: any) => ({
-						 		...item,
-						 		AtributosArticulo: item.Habilitado && item.ActivoWeb ? item.AtributosArticulo : [],
-						 	}));
+							const itemsArray = filteredArray.map((item: any) => ({
+								...item,
+								AtributosArticulo: item.Habilitado && item.ActivoWeb ? item.AtributosArticulo : [],
+							}));
 
-						 	return [this.helpers.returnJsonArray(itemsArray as any)];
-						 }
+							return [this.helpers.returnJsonArray(itemsArray as any)];
+						}
 						return [this.helpers.returnJsonArray(items as any)];
 					} else {
 						return [this.helpers.returnJsonArray({ json: {} })];
@@ -176,7 +176,7 @@ export class Centum implements INodeType {
 			}
 
 			case "articuloPorId": {
-				const codigo = this.getNodeParameter("codigo", 0) as string;
+				const codigo = this.getNodeParameter("codigoArticulo", 0) as string;
 				const articleId = this.getNodeParameter("articleId", 0) as string;
 				const fechaCreacionDesde = this.getNodeParameter("startDate", 0) as string;
 				const fechaCreacionHasta = this.getNodeParameter("endDate", 0) as string;
@@ -188,7 +188,7 @@ export class Centum implements INodeType {
 					const articulo = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
 						method: "POST",
 						headers,
-						body: { CodigoExacto: codigo, Ids: articleId, FechaCreacionDesde: fechaCreacionDesde, FechaCreacionHasta: fechaCreacionHasta  },
+						body: { CodigoExacto: codigo, Ids: articleId, FechaCreacionDesde: fechaCreacionDesde, FechaCreacionHasta: fechaCreacionHasta },
 					});
 
 					return [this.helpers.returnJsonArray(articulo)];
@@ -201,7 +201,7 @@ export class Centum implements INodeType {
 
 			case "articuloPorNombre": {
 				const nombre = this.getNodeParameter("nombre", 0) as string;
-				
+
 				if (!nombre) {
 					throw new NodeOperationError(this.getNode(), "El nombre del artículo es obligatorio");
 				}
@@ -322,7 +322,7 @@ export class Centum implements INodeType {
 			}
 
 			case "articulosPrecioPorLista": {
-				const idArticulos = this.getNodeParameter("codigo", 0) as string;
+				const idArticulos = this.getNodeParameter("codigoArticulo", 0) as string;
 				const idLista = this.getNodeParameter("idList", 0) as string;
 
 				if (!idLista || !idArticulos) {
@@ -370,9 +370,9 @@ export class Centum implements INodeType {
 			case "articuloSucursalFisica": {
 				const IdSucursalFisica = this.getNodeParameter("idSucursalFisica", 0) as string;
 				const idArticulo = this.getNodeParameter("articleId", 0) as string;
-				const codigo = this.getNodeParameter("codigo", 0) as string;
+				const codigo = this.getNodeParameter("codigoArticulo", 0) as string;
 				const nombre = this.getNodeParameter("nombreArticulo", 0) as string;
- 				const queryParams: {
+				const queryParams: {
 					IdSucursalFisica?: string;
 					codigoExacto?: string;
 					idsArticulos: string;
@@ -384,7 +384,7 @@ export class Centum implements INodeType {
 					nombre
 				};
 
-				if (!IdSucursalFisica || (!idArticulo && !codigo && !nombre )) {
+				if (!IdSucursalFisica || (!idArticulo && !codigo && !nombre)) {
 					throw new NodeOperationError(this.getNode(), "El id de la sucursal fisica y el id del articulo o el codigo son obligatorios");
 				}
 				try {
@@ -402,10 +402,10 @@ export class Centum implements INodeType {
 
 			case 'buscarArticulo': {
 				const nombreArticulo = this.getNodeParameter('nombreArticulo', 0, '') as string;
-				const codigoArticulo = this.getNodeParameter('codigo', 0, '') as string;
+				const codigoArticulo = this.getNodeParameter('codigoArticulo', 0, '') as string;
 
-				
-				try{
+
+				try {
 					const response = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
 						method: 'POST',
 						headers,
@@ -413,7 +413,7 @@ export class Centum implements INodeType {
 					});
 
 					return [this.helpers.returnJsonArray(response as any)];
-				}catch(error){
+				} catch (error) {
 					throw new NodeOperationError(this.getNode(), `Hubo un error al buscar el articulo. Error: ${error}`);
 				}
 			}
@@ -467,16 +467,16 @@ export class Centum implements INodeType {
 
 				const subRubro = this.getNodeParameter('idsSubRubros', 0);
 				let url = `${centumUrl}/CategoriasArticulo`;
-				
-				if(subRubro){
+
+				if (subRubro) {
 					url = `${url}?idSubRubro=${subRubro}`
 				}
 
-				try{
+				try {
 					const response = await apiRequest<any>(url);
 
 					return [this.helpers.returnJsonArray(response)];
-				}catch( error ){
+				} catch (error) {
 					throw new NodeOperationError(this.getNode(), `Hubo un error al obtener el listado de categorias. Error: ${error}`);
 				}
 			}
@@ -515,7 +515,7 @@ export class Centum implements INodeType {
 						intervaloPagina: ajustesHTTP.intervaloPagina,
 						itemsField: "Items",
 						context: this,
-						headers, 
+						headers,
 					};
 
 					let clientes: IResponseCustomer | IResponseCustomer[] = [];
@@ -546,7 +546,7 @@ export class Centum implements INodeType {
 			}
 
 			case "clientesBusqueda": {
-				const codigo = this.getNodeParameter("codigo", 0, "") as string;
+				const codigo = this.getNodeParameter("codigoCliente", 0, "") as string;
 				const cuit = this.getNodeParameter("cuit", 0, "") as string;
 				const razonSocial = this.getNodeParameter("razonSocial", 0, "") as string;
 
@@ -556,7 +556,7 @@ export class Centum implements INodeType {
 
 				const queryParams: Record<string, string> = {};
 				if (cuit) queryParams.Cuit = cuit;
-				if (codigo) queryParams.Codigo = codigo;
+				if (codigo) queryParams.codigo = codigo;
 				if (razonSocial) queryParams.RazonSocial = razonSocial;
 
 				try {
@@ -654,59 +654,110 @@ export class Centum implements INodeType {
 			}
 
 			case "crearPedidoVenta": {
-				const customerSalesOrder = this.getNodeParameter("cliente", 0);
-				const articlesSalesOrder = this.getNodeParameter("articulo", 0);
-				const shippingSalesOrder = this.getNodeParameter("envio", 0);
-				const idCobro = this.getNodeParameter("idCobro", 0);
+				const razonSocial = this.getNodeParameter('razonSocial', 0) as string;
+				const codigosArticulos = this.getNodeParameter('codigoArticulo', 0) as string;
+				const codigoCliente = this.getNodeParameter('codigoCliente', 0) as string;
+				const fechaDocumento = this.getNodeParameter('documentDate', 0) as string;
+				const formattedDocumentDate = String(fechaDocumento).split("T")[0];
 
-				const date = new Date().toISOString();
-				const formattedDate = date.replace(/\..+/, "");
 
+				let clientId, queryParams;
+
+				if (!razonSocial.trim() && !codigoCliente.trim()) {
+					throw new NodeOperationError(this.getNode(), 'El código o la razón social del cliente es obligatorio.');
+				}
+
+				if (codigoCliente) queryParams = `codigo=${codigoCliente}`;
+				if (razonSocial) queryParams = `razonSocial=${razonSocial}`;
+			
+
+				/* 1st Request to get Client ID */
 				try {
-					// First request: get articles for the sales order
-					const arrArticles = await apiRequest<IArticulos>(`${centumUrl}/Articulos/Venta`, {
-						method: "POST",
-						headers,
-						body: {
-							idCliente: 1,
-							FechaDocumento: formattedDate,
-							Habilitado: true,
-							ActivoWeb: true,
-						},
-					});
-					// Create the body for the sales order
-					const bodyPedidoVenta = createOrderSaleJson(
-						arrArticles.Articulos.Items,
-						customerSalesOrder as any,
-						articlesSalesOrder as LineItem[],
-						shippingSalesOrder as ShippingLine[],
-						idCobro as CobroId,
-					);
+					const dataCliente = await apiRequest<any>(`${centumUrl}/Clientes?${queryParams}`, {
+						method: "GET",
+						headers
+					})
 
-					// New hash for sales order
-					const centumSuiteAccessTokenSalesOrder = createHash(centumApiCredentials.publicAccessKey as string);
-
-					const headersSalesOrder = {
-						CentumSuiteConsumidorApiPublicaId: consumerApiPublicId,
-						CentumSuiteAccessToken: centumSuiteAccessTokenSalesOrder,
-					};
-
-					// Second request: create sales order
-					const dataPedidosVenta = await apiRequest<any>(`${centumUrl}/PedidosVenta`, {
-						method: "POST",
-						headers: headersSalesOrder,
-						body: bodyPedidoVenta,
-					});
-
-					// Add charge ID to the order
-					dataPedidosVenta.IdCobro = idCobro;
-
-					return [this.helpers.returnJsonArray(dataPedidosVenta)];
+					const cliente = dataCliente?.Items?.[0]
+					if(!cliente?.IdCliente){
+						throw new Error('El cliente no fue encontrado en centum.')
+					}
+					clientId = cliente.IdCliente;
 				} catch (error) {
 					console.log("Error creating sales order:", error);
-					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+					const errorMessage = error?.response?.data?.Message || error.message || "Error al obtener el cliente.";
 					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
+				
+				/* 2da Request to get articles data */
+				const codigoArticulo = codigosArticulos.split(',').map(c => c.trim()).filter(Boolean);
+
+				const resultados: any[] = [];
+
+				for (const articulo of codigoArticulo) {
+					try {
+						const dataArticulo = await apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
+							method: 'POST',
+							headers,
+							body: {
+								IdCliente: clientId,
+								FechaDocumento: formattedDocumentDate,
+								Codigo: articulo,
+							},
+						});
+
+						const items = dataArticulo?.Articulos?.Items ?? [];
+							if (items.length > 0) {
+								const itemsConCantidad = items.map((item: any) => ({
+									...item,
+									Cantidad: 1, // ← agregamos la propiedad hardcodeada
+								}));
+
+								resultados.push(...itemsConCantidad);
+							}
+
+						console.log(`✔ Artículo ${articulo} procesado correctamente`);
+					} catch (error: any) {
+						console.log(`❌ Error consultando artículo ${articulo}:`, error.message);
+						resultados.push({
+							codigo: articulo,
+							error: error.message || 'Error desconocido',
+						});
+					}
+				}
+
+				const bodyPedidoVenta = {
+					NumeroDocumento:{
+						PuntoVenta: 1
+					},
+					Bonificacion:{
+						IdBonificacion: 6235 //Se puede obtener via api 
+					},
+					PedidoVentaArticulos: resultados,
+					Cliente:{
+						IdCliente: clientId
+					},
+					Vendedor: {
+						IdVendedor: 2
+					},
+					TurnoEntrega: {
+						IdTurnoEntrega: 6083 //Se puede obtener via api 
+					},
+					FechaEntrega: "2025-10-31T23:18:01.640-04:00" //Ingresa el usuario?
+				}
+
+				try{
+					const pedidoVenta = await apiRequest<any>(`${centumUrl}/PedidosVenta`, {
+						method: "POST",
+						headers,
+						body: bodyPedidoVenta
+					})
+				return [this.helpers.returnJsonArray(pedidoVenta)];
+				}catch(error){
+					const errorMessage = error?.response?.data?.Message || error.message || "Error al crear el pedido de venta.";
+					throw new NodeOperationError(this.getNode(), errorMessage);
+				}
+
 			}
 
 			case "departamentosLista": {
@@ -1002,7 +1053,7 @@ export class Centum implements INodeType {
 
 			case "marcasObtener": {
 
-				try{
+				try {
 
 					const response = await apiRequest<any>(`${centumUrl}/MarcasArticulo`, {
 						method: 'GET',
@@ -1011,7 +1062,7 @@ export class Centum implements INodeType {
 
 					return [this.helpers.returnJsonArray(response)];
 
-				}catch( error ){
+				} catch (error) {
 					console.log("Error en obtener el listado de marcas:", error);
 					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
 					throw new NodeOperationError(this.getNode(), `Error en obtener el listado de marcas. \n ${errorMessage}`);
@@ -1047,6 +1098,25 @@ export class Centum implements INodeType {
 
 					const fullMessage = statusCode ? `Error ${statusCode}: ${errorMessage}` : errorMessage;
 
+					throw new NodeOperationError(this.getNode(), fullMessage, {
+						description: responseData?.Detail || "Ocurrió un error inesperado al llamar a la API de Centum.",
+					});
+				}
+			}
+
+			case 'obtenerBonificaciones':{
+				try{
+					const bonificaciones = await apiRequest<any>(`${centumUrl}/Bonificaciones`, {
+						method: "GET",
+						headers
+					})
+					return [this.helpers.returnJsonArray([bonificaciones])];
+				}catch(error){
+					console.error("Error al obtener las bonificaciones:", error);
+					const statusCode = error?.response?.status;
+					const responseData = error?.response?.data;
+					const errorMessage = responseData?.Message || responseData?.message || error?.message || "Error desconocido al crear el contribuyente.";
+					const fullMessage = statusCode ? `Error ${statusCode}: ${errorMessage}` : errorMessage;
 					throw new NodeOperationError(this.getNode(), fullMessage, {
 						description: responseData?.Detail || "Ocurrió un error inesperado al llamar a la API de Centum.",
 					});
@@ -1222,7 +1292,7 @@ export class Centum implements INodeType {
 			case "obtenerOrdenCompra": {
 				const ordenCompraId = this.getNodeParameter("idCompra", 0);
 
-				if(!ordenCompraId){
+				if (!ordenCompraId) {
 					throw new NodeOperationError(this.getNode(), "El id de la compra es requerido");
 				}
 
@@ -1388,6 +1458,19 @@ export class Centum implements INodeType {
 				}
 			}
 
+			case 'obtenerTurnoEntrega': {
+				try{
+					const turnoEntrega = await apiRequest<any>(`${centumUrl}/TurnosEntrega`, {
+						method: 'GET',
+						headers
+					})
+					return [this.helpers.returnJsonArray(turnoEntrega)];
+				}catch(error){
+					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+					throw new NodeOperationError(this.getNode(), `Error obteniendo los turnos de entrega: ${errorMessage}`);
+				}
+			}
+
 			case "operadoresMoviles": {
 				const username = this.getNodeParameter("username", 0, "") as string;
 				const password = this.getNodeParameter("password", 0, "") as string;
@@ -1510,13 +1593,13 @@ export class Centum implements INodeType {
 			case 'proveedorBuscar': {
 				const proveedorId = this.getNodeParameter('proveedorId', 0);
 
-				try{
+				try {
 					const response = await apiRequest<any>(`${centumUrl}/Proveedores/${proveedorId}`, {
 						method: 'GET',
 						headers
 					});
 					return [this.helpers.returnJsonArray(response)];
-				}catch(error){
+				} catch (error) {
 					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
 					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
@@ -1524,7 +1607,7 @@ export class Centum implements INodeType {
 
 			case 'proveedorCrear': {
 
-				const codigo = this.getNodeParameter('codigo', 0, '') as string;
+				const codigo = this.getNodeParameter('codigoArticulo', 0, '') as string;
 				const razonSocial = this.getNodeParameter('razonSocial', 0, '') as string;
 				const cuit = this.getNodeParameter('cuit', 0);
 				const provincia = this.getNodeParameter('idProvincia', 0);
@@ -1546,7 +1629,7 @@ export class Centum implements INodeType {
 					Provincia: {
 						IdProvincia: provincia
 					},
-					Pais:{
+					Pais: {
 						IdPais: pais
 					},
 					CondicionIVA: {
@@ -1577,14 +1660,14 @@ export class Centum implements INodeType {
 				}
 
 
-				try{
+				try {
 					const response = await apiRequest<any>(`${centumUrl}/Proveedores/`, {
 						method: 'POST',
 						headers,
 						body
 					});
 					return [this.helpers.returnJsonArray(response)];
-				}catch(error){
+				} catch (error) {
 					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
 					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
@@ -1648,15 +1731,15 @@ export class Centum implements INodeType {
 			}
 
 			case "rubrosObtener": {
-				try{
+				try {
 					const response = await apiRequest<any>(`${centumUrl}/Rubros`, {
-					method: 'GET',
-					headers
-				});
+						method: 'GET',
+						headers
+					});
 
-				return [this.helpers.returnJsonArray(response)];
-				
-			}catch(error){
+					return [this.helpers.returnJsonArray(response)];
+
+				} catch (error) {
 					console.log(error);
 					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
 					throw new NodeOperationError(this.getNode(), errorMessage);

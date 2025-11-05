@@ -68,6 +68,12 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Retorna el stock de un artículo en específico de una sucursal física'
 			},
 			{
+				name: 'Bonificaciones - Obtener',
+				value: 'obtenerBonificaciones',
+				action: 'Obtiene el listado de bonificaciones disponibles',
+				description: 'Obtiene el listado completo de bonificaciones disponibles'
+			},
+			{
 				name: 'Categorías - Obtener',
 				value: 'categoriasObtener',
 				action: 'Obten el listado de las categorías',
@@ -284,6 +290,11 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obtiene un listado de todos los tipos de comprobantes'
 			},
 			{
+				name: 'Turno de Entrega - Obtener',
+				value: 'obtenerTurnoEntrega',
+				description: 'Obtiene el listado total disponible de turnos de entrega'	
+			},
+			{
 				name: 'Ventas - Generar',
 				value: 'generarVentas',
 				description: 'Genera una venta en base a unos parametros completados'
@@ -311,7 +322,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'json',
 		default: {},
 		displayOptions: {
-			show: { resource: ['crearPedidoVenta', 'cobros'] },
+			show: { resource: ['cobros'] },
 		},
 	},
 	{
@@ -361,7 +372,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'json',
 		default: {},
 		displayOptions: {
-			show: { resource: ['crearPedidoVenta', 'cobros'] },
+			show: { resource: ['cobros'] },
 		},
 	},
 	{
@@ -393,13 +404,13 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Codigo',
-		name: 'codigo',
+		displayName: 'Codigo Artículo',
+		name: 'codigoArticulo',
 		type: 'string',
 		default: '',
 		typeOptions: { minValue: 1 },
 		placeholder: 'Ej. 1507',
-		description: 'Codigo del articulo a buscar',
+		description: 'Codigo del articulo a buscar. (Separa con "," si necesitas mas de uno.',
 		displayOptions: {
 			show: {
 				resource: [
@@ -407,8 +418,24 @@ const getArticulo: INodeProperties[] = [
 					'articuloPorId',
 					'articulosPrecioPorLista',
 					'articuloSucursalFisica',
-					'clientesBusqueda',,
-					'buscarArticulo'
+					'buscarArticulo',
+					'crearPedidoVenta'
+				],
+			},
+		},
+	},
+		{
+		displayName: 'Codigo Cliente',
+		name: 'codigoCliente',
+		type: 'string',
+		default: '',
+		typeOptions: { minValue: 1 },
+		placeholder: 'Ej. 1507',
+		description: 'Codigo del cliente a buscar',
+		displayOptions: {
+			show: {
+				resource: [
+					'clientesBusqueda', 'crearPedidoVenta'
 				],
 			},
 		},
@@ -572,7 +599,7 @@ const getArticulo: INodeProperties[] = [
 		default: undefined,
 		description: 'Parametro fecha del body para las solicitudes',
 		displayOptions: {
-			show: { resource: ['articulo', 'promocionesCliente', 'generarCompras'] },
+			show: { resource: ['articulo', 'promocionesCliente', 'generarCompras', 'crearPedidoVenta'] },
 		},
 	},
 	{
@@ -660,7 +687,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'number',
 		default: 0,
 		description: 'ID del cobro',
-		displayOptions: { show: { resource: ['crearPedidoVenta', 'obtenerCobros'] } },
+		displayOptions: { show: { resource: ['obtenerCobros'] } },
 	},
 	{
 		displayName: 'ID De La Compra',
@@ -789,7 +816,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'json',
 		default: {},
 		description: 'Shipping info from the order',
-		displayOptions: { show: { resource: ['cobros', 'crearPedidoVenta'] } },
+		displayOptions: { show: { resource: ['cobros'] } },
 	},
 	{
 		displayName: 'Lista ID',
@@ -883,7 +910,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		description: 'Razón social del cliente para buscar',
 		displayOptions: {
-			show: { resource: ['buscarContribuyente', 'clientesBusqueda', 'proveedorCrear'] },
+			show: { resource: ['buscarContribuyente', 'clientesBusqueda', 'proveedorCrear', 'crearPedidoVenta'] },
 		},
 	},
 	// {
