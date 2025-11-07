@@ -811,7 +811,7 @@ export class Centum implements INodeType {
 				const bonificacion = this.getNodeParameter('idBonificacion', 0);
 				const turnoEntrega = this.getNodeParameter('turnoEntrega', 0);
 				const fechaEntrega = this.getNodeParameter('deliveryDate', 0);
-				const vendedor = this.getNodeParameter('vendedorId', 0);
+				const vendedor = this.getNodeParameter('vendedorID', 0);
 
 				let clientId, queryParams;
 
