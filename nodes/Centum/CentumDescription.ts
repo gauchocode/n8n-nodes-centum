@@ -192,6 +192,11 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obtiene todos los datos de un operador móvil en base a las credenciales'
 			},
 			{
+				name: 'Order De Compra - Generar',
+				value: 'generarOrdenCompra',
+				description: 'Genera una orden de compra en base a ciertos parametros'
+			},
+			{
 				name: 'Orden De Compra - Obtener',
 				value: 'obtenerOrdenCompra',
 				description: 'Obtiene una unica orden de compra en base al ID'
@@ -295,6 +300,11 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obtiene el listado total disponible de turnos de entrega'	
 			},
 			{
+				name: 'Vendedores - Obtener',
+				value: 'obtenerVendedores',
+				description: 'Obtiene una lista de todos los vendedores disponibles'
+			},
+			{
 				name: 'Ventas - Generar',
 				value: 'generarVentas',
 				description: 'Genera una venta en base a unos parametros completados'
@@ -322,7 +332,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'json',
 		default: {},
 		displayOptions: {
-			show: { resource: ['cobros'] },
+			show: { resource: ['cobros', 'crearPedidoVenta'] },
 		},
 	},
 	{
@@ -408,8 +418,7 @@ const getArticulo: INodeProperties[] = [
 		name: 'codigoArticulo',
 		type: 'string',
 		default: '',
-		typeOptions: { minValue: 1 },
-		placeholder: 'Ej. 1507',
+		placeholder: '[{ "ID": 1234, "Cantidad": 10 }, {"ID": 4567, "Cantidad": 5}]',
 		description: 'Codigo del articulo a buscar. (Separa con "," si necesitas mas de uno.',
 		displayOptions: {
 			show: {
@@ -418,8 +427,7 @@ const getArticulo: INodeProperties[] = [
 					'articuloPorId',
 					'articulosPrecioPorLista',
 					'articuloSucursalFisica',
-					'buscarArticulo',
-					'crearPedidoVenta'
+					'buscarArticulo'
 				],
 			},
 		},
@@ -600,6 +608,52 @@ const getArticulo: INodeProperties[] = [
 		description: 'Parametro fecha del body para las solicitudes',
 		displayOptions: {
 			show: { resource: ['articulo', 'promocionesCliente', 'generarCompras', 'crearPedidoVenta'] },
+		},
+	},
+	{
+		displayName: 'Vendedor Id',
+		name: 'vendedorId',
+		type: 'number',
+		required: true,
+		default: 0,
+		description: 'Id del vendedor utilizado para generar ventas',
+		displayOptions: {
+			show: {
+				resource: ['crearPedidoVenta']
+			}
+		}
+	},
+	{
+		displayName: 'Fecha De Entrega',
+		name: 'deliveryDate',
+		type: 'dateTime',
+		required: true,
+		default: undefined,
+		description: 'Parametro fecha del body para las solicitudes',
+		displayOptions: {
+			show: { resource: ['crearPedidoVenta'] },
+		},
+	},
+		{
+		displayName: 'Bonificación',
+		name: 'idBonificacion',
+		type: 'number',
+		required: true,
+		default: 0,
+		description: 'ID de la bonificación',
+		displayOptions: {
+			show: { resource: ['crearPedidoVenta'] },
+		},
+	},
+	{
+		displayName: 'Turno de Entrega',
+		name: 'turnoEntrega',
+		type: 'string',
+		required: true,
+		default: '',
+		description: 'ID del turno de entrega',
+		displayOptions: {
+			show: { resource: ['crearPedidoVenta'] },
 		},
 	},
 	{
