@@ -785,7 +785,8 @@ export class Centum implements INodeType {
 							articulos = parsed as ArticuloInput[];
 						}
 						else {
-							throw new Error('Formato inválido');
+							throw new NodeOperationError(
+							this.getNode(), 'Formato Inválido');
 						}
 					} catch (error) {
 						throw new NodeOperationError(

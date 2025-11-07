@@ -192,7 +192,7 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obtiene todos los datos de un operador móvil en base a las credenciales'
 			},
 			{
-				name: 'Order De Compra - Generar',
+				name: 'Orden De Compra - Generar',
 				value: 'generarOrdenCompra',
 				description: 'Genera una orden de compra en base a ciertos parametros'
 			},
@@ -611,12 +611,12 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Vendedor Id',
-		name: 'vendedorId',
+		displayName: 'Vendedor ID',
+		name: 'vendedorID',
 		type: 'number',
 		required: true,
 		default: 0,
-		description: 'Id del vendedor utilizado para generar ventas',
+		description: 'ID del vendedor utilizado para generar ventas',
 		displayOptions: {
 			show: {
 				resource: ['crearPedidoVenta']
@@ -646,7 +646,7 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Turno de Entrega',
+		displayName: 'Turno De Entrega',
 		name: 'turnoEntrega',
 		type: 'string',
 		required: true,
