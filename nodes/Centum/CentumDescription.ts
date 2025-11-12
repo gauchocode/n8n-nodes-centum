@@ -128,6 +128,12 @@ export const CentumOperations: INodeProperties[] = [
 				action: 'Obtener facturas de pedidos de ventas del cliente'
 			},
 			{
+				name: 'Cliente - Obtener Facturas De Venta Por ID',
+				value: 'obtenerFacturasPedidosVentasPorID',
+				description: 'Obtiene la totalidad de las facturas de los pedido de ventas del cliente especificado',
+				action: 'Obtener facturas de pedidos de ventas del cliente'
+			},
+			{
 				name: 'Cliente - Obtener Promoción',
 				value: 'promocionesCliente',
 				description: 'Obtiene las promociones aplicadas a un cliente desde una fecha seleccionada',
@@ -164,10 +170,10 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obtener un listado de cobros en base a ciertos parametros'
 			},
 			{
-				name: 'Compras - Generar Compra',
-				value: 'generarCompras',
-				action: 'Genera una compra',
-				description: 'Genera una compra desde los parametros especificados'
+			 	name: 'Compras - Generar Compra',
+			 	value: 'generarCompras',
+			 	action: 'Genera una compra',
+			 	description: 'Genera una compra desde los parametros especificados'
 			},
 			{
 				name: 'Compras - Obtener Listado',
@@ -304,11 +310,11 @@ export const CentumOperations: INodeProperties[] = [
 				value: 'obtenerVendedores',
 				description: 'Obtiene una lista de todos los vendedores disponibles'
 			},
-			{
-				name: 'Ventas - Generar',
-				value: 'generarVentas',
+			 {
+			 	name: 'Ventas - Generar',
+			 	value: 'generarVentas',
 				description: 'Genera una venta en base a unos parametros completados'
-			}
+			 }
 
 		],
 		default: 'pedidoVentaActividad',
@@ -400,6 +406,7 @@ const getArticulo: INodeProperties[] = [
 					'articulo',
 					'obtenerSaldoCliente',
 					'composicionSaldoCliente',
+					'obtenerFacturasPedidosVentasPorId',
 					'obtenerFacturasPedidosVentas',
 					'obtenerFacturasCobros',
 					'promocionesCliente',
@@ -586,6 +593,7 @@ const getArticulo: INodeProperties[] = [
 			show: {
 				resource: [
 					'generarCompras',
+					'obtenerFacturasPedidosVentasPorId',
 					'obtenerFacturasPedidosVentas',
 					'obtenerFacturasCobros',
 					'obtenerPedidosDeVenta',
@@ -664,6 +672,7 @@ const getArticulo: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: [
+					'obtenerFacturasPedidosVentasPorId',
 					'obtenerFacturasPedidosVentas',
 					'obtenerFacturasCobros',
 					'obtenerPedidosDeVenta',
@@ -781,24 +790,83 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: '1',
 		description: 'ID del tipo de comprobante de la factura',
-		displayOptions: { show: { resource: ['generarCompras'] } },
+		displayOptions: { show: { resource: ['generarCompras', 'obtenerFacturasPedidosVentas'] } },
 	},
 	{
 		displayName: 'ID Del Tipo De Comprobante',
-		name: 'idTipoComprobanteVenta',
+		name: 'idTipoComprobante',
 		type: 'number',
 		default: '',
 		placeholder: '1',
 		description: 'ID del tipo de comprobante de la venta',
-		displayOptions: { show: { resource: ['generarVentas'] } 
+		displayOptions: { show: { resource: ['obtenerFacturasPedidosVentas', 'obtenerFacturasPedidosVentas'] } }
 	},
+	{
+		displayName: 'ID Cuenta Corriente',
+		name: 'cuentaCorrienteId',
+		type: 'number',
+		default: '',
+		placeholder: '1',
+		description: 'ID del cliente cuenta corriente del comprobante de venta',
+		displayOptions: { show: { resource: ['obtenerFacturasPedidosVentas'] } }
 	},
 	{
 		displayName: 'ID Del Vendedor',
 		name: 'idVendedor',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['generarVentas'] } },
+		displayOptions: { show: { resource: ['generarVentas', 'obtenerFacturasPedidosVentas'] } },
+	},
+	{
+		displayName: 'ID De La Venta',
+		name: 'ventaId',
+		type: 'number',
+		default: '',
+		displayOptions: { show: { resource: ['obtenerFacturasPedidosVentas'] } },
+	},
+	{
+		displayName: 'ID De La Sucursal',
+		name: 'sucursalId',
+		type: 'number',
+		default: '',
+		displayOptions: { show: { resource: ['obtenerFacturasPedidosVentas'] } },
+	},
+	{
+		displayName: 'Incluir Pedidos Anulados',
+		name: 'incluirAnulados',
+		type: 'boolean',
+		default: false,
+		displayOptions: { show: { resource: ['obtenerFacturasPedidosVentas'] } },
+	},
+	{
+		displayName: 'ID Del Canal De Venta',
+		name: 'canalVentaId',
+		type: 'number',
+		default: '',
+		displayOptions: { show: { resource: ['obtenerFacturasPedidosVentas'] } },
+	},
+	{
+		displayName: 'ID De La Division Empresa',
+		name: 'divisionEmpresaId',
+		type: 'number',
+		default: '',
+		displayOptions: { show: { resource: ['obtenerFacturasPedidosVentas'] } },
+	},
+	{
+		displayName: 'ID Usuario Creador',
+		name: 'usuarioCreadorId',
+		type: 'number',
+		description: 'ID Del usuario que creo el comprobante de venta',
+		default: '',
+		displayOptions: { show: { resource: ['obtenerFacturasPedidosVentas'] } },
+	},
+	{
+		displayName: 'ID Del Transporte',
+		name: 'transporteId',
+		type: 'number',
+		description: 'ID del transporte asociado al comprobante de venta',
+		default: '',
+		displayOptions: { show: { resource: ['obtenerFacturasPedidosVentas'] } },
 	},
 	{
 		displayName: 'ID Pais',
