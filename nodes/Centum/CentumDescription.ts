@@ -406,7 +406,7 @@ const getArticulo: INodeProperties[] = [
 					'articulo',
 					'obtenerSaldoCliente',
 					'composicionSaldoCliente',
-					'obtenerFacturasPedidosVentasPorId',
+					'obtenerFacturasPedidosVentasPorID',
 					'obtenerFacturasPedidosVentas',
 					'obtenerFacturasCobros',
 					'promocionesCliente',
@@ -593,7 +593,7 @@ const getArticulo: INodeProperties[] = [
 			show: {
 				resource: [
 					'generarCompras',
-					'obtenerFacturasPedidosVentasPorId',
+					'obtenerFacturasPedidosVentasPorID',
 					'obtenerFacturasPedidosVentas',
 					'obtenerFacturasCobros',
 					'obtenerPedidosDeVenta',
@@ -672,7 +672,7 @@ const getArticulo: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: [
-					'obtenerFacturasPedidosVentasPorId',
+					'obtenerFacturasPedidosVentasPorID',
 					'obtenerFacturasPedidosVentas',
 					'obtenerFacturasCobros',
 					'obtenerPedidosDeVenta',

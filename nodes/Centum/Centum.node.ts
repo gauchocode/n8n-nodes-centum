@@ -1528,7 +1528,7 @@ export class Centum implements INodeType {
 				}
 			}
 
-			case "obtenerFacturasPedidosVentasPorId": {
+			case "obtenerFacturasPedidosVentasPorID": {
 				const clientIdParam = this.getNodeParameter("clienteId", 0);
 				const desdeSaldoFecha = this.getNodeParameter("startDate", 0);
 				const hastaSaldoFecha = this.getNodeParameter("endDate", 0);
