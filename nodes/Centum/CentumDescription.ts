@@ -655,7 +655,7 @@ const getArticulo: INodeProperties[] = [
 		displayName: 'Tipo De Ranking',
 		name: 'tipoDeRanking',
 		type: 'options',
-		default: '',
+		default: 'none',
 		description: 'Tipo de ranking a filtrar',
 		options: [
 			{
@@ -679,11 +679,35 @@ const getArticulo: INodeProperties[] = [
 			show: { resource: ['estadisticaVentaRanking']}
 		}
 	},
+{
+	displayName: 'Ordenar Ascendentemente',
+	name: 'orderAsc',
+	type: 'boolean',
+	default: false,
+	description: 'Whether to order the sales statistics in ascending mode',
+	displayOptions: {
+		show: { resource: ['estadisticaVentaRanking'] }
+	}
+},
+
+	{
+		displayName: 'Vendedor ID',
+		name: 'vendedorID',
+		type: 'number',
+		required: true,
+		default: 0,
+		description: 'ID del vendedor utilizado para generar ventas',
+		displayOptions: {
+			show: {
+				resource: ['crearPedidoVenta']
+			}
+		}
+	},
 	{
 		displayName: 'Tipo De Orden',
 		name: 'ventaRankingOrderBy',
 		type: 'options',
-		default: '',
+		default: 'CantidadUnidadNivel0',
 		description: 'Tipo de orden para obtener el ranking',
 		options: [
 			{
@@ -699,39 +723,16 @@ const getArticulo: INodeProperties[] = [
 				value: 'CantidadUnidadNivel2'
 			},
 			{
-				name: 'Importe Total Neto',
-				value: 'ImporteTotalNeto'
-			},
-			{
 				name: 'Importe Total Final',
 				value: 'ImporteTotalFinal'
+			},
+			{
+				name: 'Importe Total Neto',
+				value: 'ImporteTotalNeto'
 			}
 		],
 		displayOptions: {
-			show: { resource: ['estadisticaVentaRanking']}
-		}
-	},
-	{
-		displayName: 'Ordenar Ascendentemente',
-		name: 'orderAsc',
-		type: 'boolean',
-		default: false,
-		description: 'Ordena las estadísticas de ventas de manera ascendente',
-		displayOptions: {
-			show: { resource: ['estadisticaVentaRanking']}
-		}
-	},
-	{
-		displayName: 'Vendedor ID',
-		name: 'vendedorID',
-		type: 'number',
-		required: true,
-		default: 0,
-		description: 'ID del vendedor utilizado para generar ventas',
-		displayOptions: {
-			show: {
-				resource: ['crearPedidoVenta']
-			}
+			show: { resource: ['estadisticaVentaRanking'] }
 		}
 	},
 	{
