@@ -257,11 +257,6 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obtiene una lista con el listado de los precios sugeridos'
 			},
 			{
-				name: 'Proveedores - Listar',
-				value: 'listarProveedores',
-				description: 'Obtiene una lista entera de los proveedores'
-			},
-			{
 				name: 'Proceso Binario a Imagen',
 				value: 'sincronizarImagenes',
 				action: 'Procesar imágenes binarias',
@@ -283,6 +278,11 @@ export const CentumOperations: INodeProperties[] = [
 				value: 'crearProveedor',
 				action: 'Obtén el proveedor segun el ID',
 				description: 'Retorna la información del proveedor en base al ID'
+			},
+			{
+				name: 'Proveedores - Listar',
+				value: 'listarProveedores',
+				description: 'Obtiene una lista entera de los proveedores'
 			},
 			{
 				name: 'Provincias - Lista',
@@ -1263,6 +1263,7 @@ const getArticulo: INodeProperties[] = [
 		displayName: 'Correo',
 		name: 'email',
 		type: 'string',
+		placeholder: 'name@email.com',
 		default: '',
 		displayOptions: {
 			show: {
