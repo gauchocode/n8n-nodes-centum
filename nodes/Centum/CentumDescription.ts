@@ -1260,6 +1260,17 @@ const getArticulo: INodeProperties[] = [
 		}
 	},
 	{
+		displayName: 'Código',
+		name: 'codigo',
+		type: 'number',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['listarProveedores']
+			}
+		}
+	},
+	{
 		displayName: 'Correo',
 		name: 'email',
 		type: 'string',

@@ -1841,59 +1841,71 @@ export class Centum implements INodeType {
 			}
 
 			case "listarProveedores": {
+			const codigo = this.getNodeParameter('codigo', 0) as string | undefined;
+			const codigoDesde = this.getNodeParameter('codigoDesde', 0) as string | undefined;
+			const codigoHasta = this.getNodeParameter('codigoHasta', 0) as string | undefined;
+			const razonSocial = this.getNodeParameter('razonSocial', 0) as string | undefined;
+			const direccion = this.getNodeParameter('direccion', 0) as string | undefined;
+			const localidad = this.getNodeParameter('localidad', 0) as string | undefined;
+			const telefono = this.getNodeParameter('telefono', 0) as string | undefined;
+			const telefonoAlt = this.getNodeParameter('telefonoAlt', 0) as string | undefined;
+			const codigoPostal = this.getNodeParameter('codigoPostal', 0) as string | undefined;
+			const cuit = this.getNodeParameter('cuit', 0) as string | undefined;
+			const email = this.getNodeParameter('email', 0) as string | undefined;
+			const idProvincia = this.getNodeParameter('idProvincia', 0) as number | undefined;
+			const idPais = this.getNodeParameter('idPais', 0) as number | undefined;
+			const IdClaseProveedor = this.getNodeParameter('idClaseProveedor', 0) as number | undefined;
+			const activo = this.getNodeParameter("active", 0) as boolean | undefined;
+			const FechaActualizacionDesde = this.getNodeParameter('fechaActualizacionDesde', 0) as string | undefined;
 
-				const codigo = this.getNodeParameter('codigo', 0, "") as string;
-				const razonSocial = this.getNodeParameter('razonSocial', 0);
-				const direccion = this.getNodeParameter('direccion', 0, "") as string;
-				const localidad = this.getNodeParameter('localidad', 0, "") as string;
-				const telefono = this.getNodeParameter('telefono', 0);
-				const telefonoAlt = this.getNodeParameter('telefonoAlt', 0);
-				const codigoPostal = this.getNodeParameter('codigoPostal', 0);
-				const cuit = this.getNodeParameter('cuit', 0);
-				const email = this.getNodeParameter('email', 0, "") as string;
-				const idProvincia = this.getNodeParameter('idProvincia', 0);
-				const idPais = this.getNodeParameter('idPais', 0);
-				const IdClaseProveedor = this.getNodeParameter('idClaseProveedor', 0);
-				const activo = this.getNodeParameter("active", 0);
-				const FechaActualizacionDesde = this.getNodeParameter('fechaActualizacionDesde', 0);
+			// Better filtering function
+			const queryParams = Object.fromEntries(
+				Object.entries({
+					idPais,
+					codigo,
+					razonSocial,
+					direccion,
+					localidad,
+					telefono,
+					telefonoAlt,
+					codigoPostal,
+					cuit,
+					email,
+					idProvincia,
+					IdClaseProveedor,
+					activo,
+					codigoDesde,
+					codigoHasta,
+					FechaActualizacionDesde,
+				}).filter(([key, value]) => {
+					// Debug: log each parameter
+					console.log(`Param ${key}:`, value, typeof value);
+					
+					// Exclude undefined and null
+					if (value === undefined || value === null) return false;
+					
+					// Exclude empty strings (after trimming if it's a string)
+					if (typeof value === 'string' && value.trim() === '') return false;
+					
+					// Include everything else (numbers, booleans, non-empty strings)
+					return true;
+				})
+			);
 
-				const queryParams = Object.fromEntries(
-					Object.entries({
-						idPais,
-						codigo,
-						razonSocial,
-						direccion,
-						localidad,
-						telefono,
-						telefonoAlt,
-						codigoPostal,
-						cuit,
-						email,
-						idProvincia,
-						IdClaseProveedor,
-						activo,
-						FechaActualizacionDesde,
-					}).filter(([, value]) => {
-						if (value === undefined || value === null) return false;
-						if (typeof value === 'string' && value.trim() === '') return false;
-						return true;
-					})
-				);
-
-				console.log(queryParams)
-				
-				try{
-					const proveedores = await apiRequest<any>(`${centumUrl}/Proveedores`, {
-						method: "GET",
-						headers,
-						queryParams,
-					});
-					return [this.helpers.returnJsonArray(proveedores)];
-				}catch(err){
-
-				}
-
+			console.log('Final queryParams:', queryParams);
+			
+			try {
+				const proveedores = await apiRequest<any>(`${centumUrl}/Proveedores`, {
+					method: "GET",
+					headers,
+					queryParams,
+				});
+				return [this.helpers.returnJsonArray(proveedores)];
+			} catch (err) {
+				console.error('Error in listarProveedores:', err);
+				throw err; // Don't swallow the error
 			}
+		}
 
 			case "listarRegimenesEspeciales": {
 				try {
