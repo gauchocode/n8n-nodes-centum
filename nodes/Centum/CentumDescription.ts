@@ -257,6 +257,11 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obtiene una lista con el listado de los precios sugeridos'
 			},
 			{
+				name: 'Proveedores - Listar',
+				value: 'listarProveedores',
+				description: 'Obtiene una lista entera de los proveedores'
+			},
+			{
 				name: 'Proceso Binario a Imagen',
 				value: 'sincronizarImagenes',
 				action: 'Procesar imágenes binarias',
@@ -338,7 +343,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'boolean',
 		default: false,
 		displayOptions: {
-			show: { resource: ['crearProveedor'] },
+			show: { resource: ['crearProveedor', 'listarProveedores'] },
 		},
 	},
 	{
@@ -538,7 +543,8 @@ const getArticulo: INodeProperties[] = [
 					'buscarContribuyente',
 					'crearContribuyente',
 					'buscarClientePorCuit',
-					'buscarClientes',
+					'buscarClientes',,
+					'listarProveedores'
 				],
 			},
 		},
@@ -966,15 +972,15 @@ const getArticulo: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		description: 'ID del país por la cual se buscarán las provincias',
-		displayOptions: { show: { resource: ['listarProvincias', 'crearProveedor'] } },
+		displayOptions: { show: { resource: ['listarProvincias', 'crearProveedor', 'listarProveedores'] } },
 	},
 	{
 		displayName: 'ID Provincia',
 		name: 'idProvincia',
 		type: 'string',
 		default: '',
-		description: 'ID de la provincia por la cual se buscarán los departamentos',
-		displayOptions: { show: { resource: ['listarDepartamentos', 'crearProveedor'] } },
+		description: 'ID de la provincia por la cual se buscarán la información',
+		displayOptions: { show: { resource: ['listarDepartamentos', 'crearProveedor', 'listarProveedores'] } },
 	},
 	{
 		displayName: 'ID Sucursal Física',
@@ -1124,7 +1130,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		description: 'Razón social del cliente para buscar',
 		displayOptions: {
-			show: { resource: ['buscarContribuyente', 'buscarClientes', 'crearProveedor', 'crearPedidoVenta'] },
+			show: { resource: ['buscarContribuyente', 'buscarClientes', 'crearProveedor', 'crearPedidoVenta', 'listarProveedores'] },
 		},
 	},
 	// {
@@ -1175,6 +1181,116 @@ const getArticulo: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		displayOptions: { show: { resource: ['verificarCredencialesOperador'] } },
+	},
+	{
+		displayName: 'Código Desde',
+		name: 'codigoDesde',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['listarProveedores']
+			}
+		}
+	},
+	{
+		displayName: 'Código Hasta',
+		name: 'codigoHasta',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['listarProveedores']
+			}
+		}
+	},
+	{
+		displayName: 'Dirección',
+		name: 'direccion',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['listarProveedores']
+			}
+		}
+	},
+	{
+		displayName: 'Localidad',
+		name: 'localidad',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['listarProveedores']
+			}
+		}
+	},
+	{
+		displayName: 'Teléfono',
+		name: 'telefono',
+		type: 'number',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['listarProveedores']
+			}
+		}
+	},
+	{
+		displayName: 'Teléfono Alternativo',
+		name: 'telefonoAlt',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['listarProveedores']
+			}
+		}
+	},
+	{
+		displayName: 'Código Postal',
+		name: 'codigoPostal',
+		type: 'number',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['listarProveedores']
+			}
+		}
+	},
+	{
+		displayName: 'Correo',
+		name: 'email',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['listarProveedores']
+			}
+		}
+	},
+	{
+		displayName: 'ID Clase Proveedor',
+		name: 'idClaseProveedor',
+		type: 'number',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['listarProveedores']
+			}
+		}
+	},
+		{
+		displayName: 'Fecha Actualización Desde',
+		name: 'fechaActualizacionDesde',
+		type: 'dateTime',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['listarProveedores']
+			}
+		}
 	},
 ];
 

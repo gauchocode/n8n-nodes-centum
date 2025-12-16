@@ -23,7 +23,8 @@ import {
 	IProvincias,
 	CondicionIVANombre
 } from '../interfaces';
-import { NodeParameterValue, IExecuteFunctions, NodeOperationError } from 'n8n-workflow';
+import { NodeParameterValue, IExecuteFunctions, NodeOperationError, NodeParameterValueType } from 'n8n-workflow';
+
 
 export const createHash = (publicAccessKey: string): string => {
 	const uuid = randomUUID().replace(/-/gi, '');
@@ -960,8 +961,11 @@ export function getHttpSettings(this: IExecuteFunctions): HttpSettings & { inter
 export interface FetchOptions {
 	method?: 'GET' | 'POST';
 	headers?: Record<string, string>;
-	queryParams?: Record<string, string | number | boolean>;
-	body?: any; // <-- explícito
+	//queryParams?: Record<string, string | number | boolean> ;
+	queryParams?: {
+  [key: string]: object | NodeParameterValueType;
+},
+	body?: any;
 	cantidadItemsPorPagina?: number;
 	itemsField?: string;
 	intervaloPagina?: number;
