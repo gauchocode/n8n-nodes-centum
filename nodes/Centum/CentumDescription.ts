@@ -798,15 +798,6 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Cantidad De Items',
-		name: 'cantidadDeItems',
-		type: 'number',
-		default: 1,
-		displayOptions:{
-			show: { resource: ['estadisticaVentaRanking'] }
-		}
-	},
-	{
 		displayName: 'Forma De Pago Proveedor',
 		name: 'formaPagoProveedor',
 		type: 'number',
@@ -972,7 +963,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		description: 'ID del país por la cual se buscarán las provincias',
-		displayOptions: { show: { resource: ['listarProvincias', 'crearProveedor', 'listarProveedores'] } },
+		displayOptions: { show: { resource: ['listarProvincias', 'crearProveedor'] } },
 	},
 	{
 		displayName: 'ID Provincia',
@@ -980,7 +971,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		description: 'ID de la provincia por la cual se buscarán la información',
-		displayOptions: { show: { resource: ['listarDepartamentos', 'crearProveedor', 'listarProveedores'] } },
+		displayOptions: { show: { resource: ['listarDepartamentos', 'crearProveedor'] } },
 	},
 	{
 		displayName: 'ID Sucursal Física',
@@ -1182,83 +1173,83 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: { show: { resource: ['verificarCredencialesOperador'] } },
 	},
-	{
-		displayName: 'Código Desde',
-		name: 'codigoDesde',
-		type: 'string',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['listarProveedores']
-			}
-		}
-	},
-	{
-		displayName: 'Código Hasta',
-		name: 'codigoHasta',
-		type: 'string',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['listarProveedores']
-			}
-		}
-	},
-	{
-		displayName: 'Dirección',
-		name: 'direccion',
-		type: 'string',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['listarProveedores']
-			}
-		}
-	},
-	{
-		displayName: 'Localidad',
-		name: 'localidad',
-		type: 'string',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['listarProveedores']
-			}
-		}
-	},
-	{
-		displayName: 'Teléfono',
-		name: 'telefono',
-		type: 'number',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['listarProveedores']
-			}
-		}
-	},
-	{
-		displayName: 'Teléfono Alternativo',
-		name: 'telefonoAlt',
-		type: 'string',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['listarProveedores']
-			}
-		}
-	},
-	{
-		displayName: 'Código Postal',
-		name: 'codigoPostal',
-		type: 'number',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['listarProveedores']
-			}
-		}
-	},
+	// {
+	// 	displayName: 'Código Desde',
+	// 	name: 'codigoDesde',
+	// 	type: 'string',
+	// 	default: '',
+	// 	displayOptions: {
+	// 		show: {
+	// 			resource: ['listarProveedores']
+	// 		}
+	// 	}
+	// },
+	// {
+	// 	displayName: 'Código Hasta',
+	// 	name: 'codigoHasta',
+	// 	type: 'string',
+	// 	default: '',
+	// 	displayOptions: {
+	// 		show: {
+	// 			resource: ['listarProveedores']
+	// 		}
+	// 	}
+	// },
+	// {
+	// 	displayName: 'Dirección',
+	// 	name: 'direccion',
+	// 	type: 'string',
+	// 	default: '',
+	// 	displayOptions: {
+	// 		show: {
+	// 			resource: ['listarProveedores']
+	// 		}
+	// 	}
+	// },
+	// {
+	// 	displayName: 'Localidad',
+	// 	name: 'localidad',
+	// 	type: 'string',
+	// 	default: '',
+	// 	displayOptions: {
+	// 		show: {
+	// 			resource: ['listarProveedores']
+	// 		}
+	// 	}
+	// },
+	// {
+	// 	displayName: 'Teléfono',
+	// 	name: 'telefono',
+	// 	type: 'number',
+	// 	default: '',
+	// 	displayOptions: {
+	// 		show: {
+	// 			resource: ['listarProveedores']
+	// 		}
+	// 	}
+	// },
+	// {
+	// 	displayName: 'Teléfono Alternativo',
+	// 	name: 'telefonoAlt',
+	// 	type: 'string',
+	// 	default: '',
+	// 	displayOptions: {
+	// 		show: {
+	// 			resource: ['listarProveedores']
+	// 		}
+	// 	}
+	// },
+	// {
+	// 	displayName: 'Código Postal',
+	// 	name: 'codigoPostal',
+	// 	type: 'number',
+	// 	default: '',
+	// 	displayOptions: {
+	// 		show: {
+	// 			resource: ['listarProveedores']
+	// 		}
+	// 	}
+	// },
 	{
 		displayName: 'Código',
 		name: 'codigo',
@@ -1270,40 +1261,40 @@ const getArticulo: INodeProperties[] = [
 			}
 		}
 	},
-	{
-		displayName: 'Correo',
-		name: 'email',
-		type: 'string',
-		placeholder: 'name@email.com',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['listarProveedores']
-			}
-		}
-	},
-	{
-		displayName: 'ID Clase Proveedor',
-		name: 'idClaseProveedor',
-		type: 'number',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['listarProveedores']
-			}
-		}
-	},
-		{
-		displayName: 'Fecha Actualización Desde',
-		name: 'fechaActualizacionDesde',
-		type: 'dateTime',
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['listarProveedores']
-			}
-		}
-	},
+	// {
+	// 	displayName: 'Correo',
+	// 	name: 'email',
+	// 	type: 'string',
+	// 	placeholder: 'name@email.com',
+	// 	default: '',
+	// 	displayOptions: {
+	// 		show: {
+	// 			resource: ['listarProveedores']
+	// 		}
+	// 	}
+	// },
+	// {
+	// 	displayName: 'ID Clase Proveedor',
+	// 	name: 'idClaseProveedor',
+	// 	type: 'number',
+	// 	default: '',
+	// 	displayOptions: {
+	// 		show: {
+	// 			resource: ['listarProveedores']
+	// 		}
+	// 	}
+	// },
+	// 	{
+	// 	displayName: 'Fecha Actualización Desde',
+	// 	name: 'fechaActualizacionDesde',
+	// 	type: 'dateTime',
+	// 	default: '',
+	// 	displayOptions: {
+	// 		show: {
+	// 			resource: ['listarProveedores']
+	// 		}
+	// 	}
+	// },
 ];
 
 

@@ -1176,9 +1176,9 @@ export class Centum implements INodeType {
 					});
 					return [this.helpers.returnJsonArray(response)];
 				} catch (error) {
-					console.log("Error en solicitud de promociones para el cliente:", error);
+					console.log("Error en solicitud de estadisticas de ventas:", error);
 					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
-					throw new NodeOperationError(this.getNode(), `Error obteniendo el listado de precios. \n ${errorMessage}`);
+					throw new NodeOperationError(this.getNode(), `Error obteniendo las estadisticas de ranking. \n ${errorMessage}`);
 				}
 
 			}
@@ -1842,41 +1842,17 @@ export class Centum implements INodeType {
 
 			case "listarProveedores": {
 			const codigo = this.getNodeParameter('codigo', 0) as string | undefined;
-			const codigoDesde = this.getNodeParameter('codigoDesde', 0) as string | undefined;
-			const codigoHasta = this.getNodeParameter('codigoHasta', 0) as string | undefined;
 			const razonSocial = this.getNodeParameter('razonSocial', 0) as string | undefined;
-			const direccion = this.getNodeParameter('direccion', 0) as string | undefined;
-			const localidad = this.getNodeParameter('localidad', 0) as string | undefined;
-			const telefono = this.getNodeParameter('telefono', 0) as string | undefined;
-			const telefonoAlt = this.getNodeParameter('telefonoAlt', 0) as string | undefined;
-			const codigoPostal = this.getNodeParameter('codigoPostal', 0) as string | undefined;
 			const cuit = this.getNodeParameter('cuit', 0) as string | undefined;
-			const email = this.getNodeParameter('email', 0) as string | undefined;
-			const idProvincia = this.getNodeParameter('idProvincia', 0) as number | undefined;
-			const idPais = this.getNodeParameter('idPais', 0) as number | undefined;
-			const IdClaseProveedor = this.getNodeParameter('idClaseProveedor', 0) as number | undefined;
 			const activo = this.getNodeParameter("active", 0) as boolean | undefined;
-			const FechaActualizacionDesde = this.getNodeParameter('fechaActualizacionDesde', 0) as string | undefined;
 
 			// Better filtering function
 			const queryParams = Object.fromEntries(
 				Object.entries({
-					idPais,
 					codigo,
 					razonSocial,
-					direccion,
-					localidad,
-					telefono,
-					telefonoAlt,
-					codigoPostal,
 					cuit,
-					email,
-					idProvincia,
-					IdClaseProveedor,
-					activo,
-					codigoDesde,
-					codigoHasta,
-					FechaActualizacionDesde,
+					activo
 				}).filter(([key, value]) => {
 					// Debug: log each parameter
 					console.log(`Param ${key}:`, value, typeof value);
