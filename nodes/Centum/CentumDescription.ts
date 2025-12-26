@@ -1124,6 +1124,15 @@ const getArticulo: INodeProperties[] = [
 			show: { resource: ['buscarContribuyente', 'buscarClientes', 'crearProveedor', 'crearPedidoVenta', 'listarProveedores'] },
 		},
 	},
+		{
+		displayName: 'Cantidad De Items',
+		name: 'cantidadDeItems',
+		type: 'number',
+		default: 1,
+		displayOptions:{
+			show: { resource: ['estadisticaVentaRanking'] }
+		}
+	},
 	// {
 	// 	displayName: 'Rubros IDs',
 	// 	name: 'idsRubros',
