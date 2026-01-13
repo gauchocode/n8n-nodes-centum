@@ -208,6 +208,11 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obtiene todos los datos de un operador móvil en base a las credenciales'
 			},
 			{
+				name: 'Obtener Operadores Móviles',
+				value: 'listarOperadoresMoviles',
+				description: 'Obtiene el listado de todos los operadores moviles. Si desea puede filtrar por nombre / usuario'
+			},
+			{
 				name: 'Orden De Compra - Generar',
 				value: 'crearOrdenCompra',
 				description: 'Genera una orden de compra en base a ciertos parametros'
@@ -266,6 +271,12 @@ export const CentumOperations: INodeProperties[] = [
 				name: 'Productos WooCommerce - Generar (JSON Producto)',
 				value: 'convertirProductosParaWooCommerce',
 				description: 'Genera un JSON estructurado para productos WooCommerce a partir de artículos Centum',
+			},
+			{
+				name: 'Promociones - Lista',
+				value: 'listarPromociones',
+				description: 'Obtiene las promociones disponibles',
+				action: 'Obtener promociones disponibles'
 			},
 			{
 				name: 'Proveedor - Buscar',
@@ -353,7 +364,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'json',
 		default: {},
 		displayOptions: {
-			show: { resource: ['registrarCobro', 'crearPedidoVenta'] },
+			show: { resource: ['registrarCobro', 'crearPedidoVenta', 'crearOrdenCompra'] },
 		},
 	},
 	{
@@ -654,7 +665,29 @@ const getArticulo: INodeProperties[] = [
 		default: undefined,
 		description: 'Parametro fecha del body para las solicitudes',
 		displayOptions: {
-			show: { resource: ['listarProductosDisponibles', 'listarPromocionesCliente', 'crearCompra', 'crearPedidoVenta'] },
+			show: { resource: ['listarProductosDisponibles', 'listarPromocionesCliente', 'crearCompra', 'crearPedidoVenta', 'crearOrdenCompra', 'listarPromociones'] },
+		},
+	},
+	{
+		displayName: 'Fecha Entrega',
+		name: 'deliveryDate',
+		type: 'dateTime',
+		required: true,
+		default: undefined,
+		description: 'Fecha de entrega',
+		displayOptions: {
+			show: { resource: ['crearOrdenCompra'] },
+		},
+	},
+	{
+		displayName: 'Fecha Vencimiento',
+		name: 'dueDate',
+		type: 'dateTime',
+		required: true,
+		default: undefined,
+		description: 'Fecha de vencimiento',
+		displayOptions: {
+			show: { resource: ['crearOrdenCompra'] },
 		},
 	},
 	{
@@ -771,7 +804,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		description: 'ID del turno de entrega',
 		displayOptions: {
-			show: { resource: ['crearPedidoVenta'] },
+			show: { resource: ['crearPedidoVenta', 'crearOrdenCompra'] },
 		},
 	},
 	{
@@ -918,7 +951,7 @@ const getArticulo: INodeProperties[] = [
 		name: 'sucursalId',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['listarFacturasVenta'] } },
+		displayOptions: { show: { resource: [] } },
 	},
 	{
 		displayName: 'Incluir Pedidos Anulados',
@@ -981,16 +1014,9 @@ const getArticulo: INodeProperties[] = [
 		description: 'The ID of the physical branch to filter stock (optional)',
 		displayOptions: {
 			show: {
-				resource: ['searchArticleBySKU', 'buscarProductoEnSucursal', 'crearCompra'],
+				resource: ['searchArticleBySKU', 'buscarProductoEnSucursal', 'crearCompra', 'crearOrdenCompra', 'listarProductosPorSucursal', 'listarFacturasVenta'],
 			},
 		},
-	},
-	{
-		displayName: 'ID Sucursal Física',
-		name: 'IdSucursalFisica',
-		type: 'string',
-		default: '',
-		displayOptions: { show: { resource: ['listarProductosPorSucursal'] } },
 	},
 	{
 		displayName: 'ID Valor Efectivo',
@@ -1044,7 +1070,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: 'A',
 		description: 'Letra del documento de la compra de la factura',
-		displayOptions: { show: { resource: ['crearCompra'] } },
+		displayOptions: { show: { resource: ['crearCompra', 'crearOrdenCompra'] } },
 	},
 	// {
 	// 	displayName: 'Migración Completa',
@@ -1087,7 +1113,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: '1',
 		description: 'Numero del documento de la compra de la factura',
-		displayOptions: { show: { resource: ['crearCompra'] } },
+		displayOptions: { show: { resource: ['crearCompra', 'crearOrdenCompra'] } },
 	},
 	{
 		displayName: 'Observaciones',
@@ -1103,7 +1129,7 @@ const getArticulo: INodeProperties[] = [
 		required: true,
 		default: '',
 		description: 'ID del proveedor usado para buscar dentro del sistema',
-		displayOptions: { show: { resource: ['buscarProveedor', 'listarOrdenesCompra'] } },
+		displayOptions: { show: { resource: ['crearOrdenCompra','buscarProveedor', 'listarOrdenesCompra'] } },
 	},
 	{
 		displayName: 'Punto De Venta',
@@ -1112,7 +1138,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: '1',
 		description: 'Numero del punto de venta del documento',
-		displayOptions: { show: { resource: ['generarCompras', 'generarVentas'] } },
+		displayOptions: { show: { resource: ['generarCompras', 'generarVentas', 'crearOrdenCompra'] } },
 	},
 	{
 		displayName: 'Razón Social',
@@ -1121,7 +1147,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		description: 'Razón social del cliente para buscar',
 		displayOptions: {
-			show: { resource: ['buscarContribuyente', 'buscarClientes', 'crearProveedor', 'crearPedidoVenta', 'listarProveedores'] },
+			show: { resource: ['buscarContribuyente', 'buscarClientes', 'crearProveedor', 'crearPedidoVenta', 'listarProveedores', 'crearOrdenCompra'] },
 		},
 	},
 		{
@@ -1180,7 +1206,7 @@ const getArticulo: INodeProperties[] = [
 		name: 'username',
 		type: 'string',
 		default: '',
-		displayOptions: { show: { resource: ['verificarCredencialesOperador'] } },
+		displayOptions: { show: { resource: ['verificarCredencialesOperador', 'listarOperadoresMoviles'] } },
 	},
 	// {
 	// 	displayName: 'Código Desde',
@@ -1270,18 +1296,18 @@ const getArticulo: INodeProperties[] = [
 			}
 		}
 	},
-	// {
-	// 	displayName: 'Correo',
-	// 	name: 'email',
-	// 	type: 'string',
-	// 	placeholder: 'name@email.com',
-	// 	default: '',
-	// 	displayOptions: {
-	// 		show: {
-	// 			resource: ['listarProveedores']
-	// 		}
-	// 	}
-	// },
+	{
+	 	displayName: 'Correo',
+	 	name: 'email',
+	 	type: 'string',
+	 	placeholder: 'name@email.com',
+	 	default: '',
+	 	displayOptions: {
+	 		show: {
+	 			resource: ['listarOperadoresMoviles']
+	 		}
+	 	}
+	},
 	// {
 	// 	displayName: 'ID Clase Proveedor',
 	// 	name: 'idClaseProveedor',

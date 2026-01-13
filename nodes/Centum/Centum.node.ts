@@ -541,161 +541,188 @@ export class Centum implements INodeType {
 			}
 
 			case "crearOrdenCompra": {
+				type ArticuloInput = {
+					ID?: number;
+					Codigo?: string;
+					Cantidad: number;
+				};
+
+				type NodeErr = any;
+
+				const razonSocial = (this.getNodeParameter('razonSocial', 0) as string) ?? '';
+				const letraDocumento = (this.getNodeParameter('letraDocumento', 0) as string) ?? '';
+				const puntoDeVenta = (this.getNodeParameter('puntoDeVenta', 0) as string) ?? '';
+				const numero = (this.getNodeParameter('numeroFactura', 0) as string) ?? '';
+				const articulosRaw = this.getNodeParameter('articulo', 0);
+				const fechaDocumento = this.getNodeParameter('documentDate', 0) as string;
+				const formattedDocumentDate = String(fechaDocumento).split('T')[0];
+				const fechaDelivery = this.getNodeParameter('deliveryDate', 0) as string;
+				const formattedDeliveryDate = String(fechaDelivery).split('T')[0];
+				const fechaVencimiento = this.getNodeParameter('dueDate', 0) as string;
+				const formattedDueDate = String(fechaVencimiento).split('T')[0];
+				const proveedorIdRaw = this.getNodeParameter('proveedorId', 0);
+				const proveedorId = String(proveedorIdRaw ?? '').trim();
+				const turnoEntregaId = this.getNodeParameter('turnoEntrega', 0) as string;
+				const sucursalId = this.getNodeParameter('idSucursalFisica', 0);
+
+				if (!proveedorId) {
+					throw new NodeOperationError(this.getNode(), 'Debe especificarse idProveedor.');
+				}
+
+				// Parse artículos (tipado seguro)
+				let articulos: ArticuloInput[] = [];
+
+				const parseInvalidMsg =
+					'Formato de artículos inválido. Ej: {"ID": 1271, "Cantidad": 10} o {"Codigo": "ABC123", "Cantidad": 10} o arrays de estos objetos';
+
+				const toArticuloInput = (x: any): ArticuloInput => ({
+					ID: typeof x?.ID === 'number' ? x.ID : undefined,
+					Codigo: typeof x?.Codigo === 'string' ? x.Codigo : undefined,
+					Cantidad: Number(x?.Cantidad),
+				});
+
+				const isArticuloInput = (x: any): x is ArticuloInput => {
+					if (!x || typeof x !== 'object') return false;
+					const hasIdOrCodigo = typeof x.ID === 'number' || (typeof x.Codigo === 'string' && x.Codigo.trim().length > 0);
+					const cant = x.Cantidad;
+					const cantOk = typeof cant === 'number' && Number.isFinite(cant) && cant > 0;
+					return hasIdOrCodigo && cantOk;
+				};
+
+				if (typeof articulosRaw === 'string') {
+					try {
+						const parsed = JSON.parse(articulosRaw);
+						const arr = Array.isArray(parsed) ? parsed : [parsed];
+						articulos = arr.map(toArticuloInput).filter(isArticuloInput);
+					} catch {
+						throw new NodeOperationError(this.getNode(), parseInvalidMsg);
+					}
+				} else if (Array.isArray(articulosRaw)) {
+					// Evita TS2322: no asignar directamente; normalizar y filtrar
+					articulos = (articulosRaw as any[]).map(toArticuloInput).filter(isArticuloInput);
+				} else if (typeof articulosRaw === 'object' && articulosRaw !== null) {
+					const one = toArticuloInput(articulosRaw as any);
+					articulos = isArticuloInput(one) ? [one] : [];
+				} else {
+					throw new NodeOperationError(this.getNode(), `Tipo de dato inesperado: ${typeof articulosRaw}`);
+				}
+
+				if (!razonSocial.trim()) {
+					throw new NodeOperationError(this.getNode(), 'La razón social es obligatoria.');
+				}
+
+				if (!articulos.length) {
+					throw new NodeOperationError(this.getNode(), 'Debe enviarse al menos un artículo válido con Cantidad > 0.');
+				}
+
+				// 1) Cliente (solo para /Articulos/Venta)
+				let clientId: number;
 
 				try {
-					const response = await apiRequest<any>(`${centumUrl}/OrdenesCompra`, {
-						method: "POST",
-						headers,
-						body: {
-							// "DivisionEmpresaGrupoEconomico": {
-							// 	"IdDivisionEmpresaGrupoEconomico": 1,
-							// 	"RazonSocialEmpresaGrupoEconomico": null,
-							// 	"NombreDivisionEmpresa": null
-							// },
-							"SucursalFisica": {
-								"IdSucursalFisica": 6084
-							},
-							"NumeroDocumento": {
-								"LetraDocumento": "O",
-								"PuntoVenta": 1,
-								"Numero": 6
-							},
-							"FechaDocumento": "2025-11-07T00:00:00",
-							// "FechaEmbarque": "2020-06-02T00:00:00",
-							"FechaEntrega": "2026-06-02T00:00:00",
-							// "FechaImputacion": "2020-06-02T00:00:00",
-							// "TurnoEntrega": {
-							// 	"IdTurnoEntrega": 6083,
-							// 	"Nombre": "Maniana"
-							// },
-							"Proveedor": {
-								"IdProveedor": 6283,
-								"Codigo": "006283",
-								"RazonSocial": "Proveedores Río 240 EIRL",
-								"CUIT": "27260404100",
-								"Direccion": null,
-								"Localidad": "CONCEPCION ARENAL 7350",
-								"CodigoPostal": "7600",
-								"Provincia": {
-									"IdProvincia": 4876,
-									"Codigo": "BSAS",
-									"Nombre": "Buenos Aires"
-								},
-								"Pais": {
-									"IdPais": 4657,
-									"Codigo": "ARG",
-									"Nombre": "Argentina"
-								},
-								"Telefono": "541166778899",
-								"TelefonoAlternativo": "541166778899",
-								"Fax": null,
-								"Interno": null,
-								"Email": "matjul.mdq@hotmail.com",
-								"OperadorCompra": {
-									"IdOperadorCompra": 1,
-									"Codigo": "Operador de Compras Defecto",
-									"Nombre": "Operador de Compras Defecto",
-									"EsSupervisor": true
-								},
-								"CondicionIVA": {
-									"IdCondicionIVA": 1895,
-									"Codigo": "RI",
-									"Nombre": "Responsable Inscripto"
-								},
-								"CondicionIIBB": {
-									"IdCondicionIIBB": 6051,
-									"Codigo": "Responsable Inscript"
-								},
-								"NumeroIIBB": "30716828820",
-								"FormaPagoProveedor": {
-									"IdFormaPagoProveedor": 6091,
-									"Nombre": "Efectivo"
-								},
-								"DiasMorosidad": null,
-								"DiasIncobrables": null,
-								"CondicionPago": {
-									"IdCondicionPago": 4,
-									"Codigo": "CC1",
-									"Nombre": "7 Dias"
-								},
-								"CategoriaImpuestoGanancias": {
-									"IdCategoriaImpuestoGanancia": 6065,
-									"Nombre": "Exento"
-								},
-								"CategoriaRetencionIVA": null,
-								"CategoriaRetencionSUSS": null,
-								"ClaseProveedor": {
-									"IdClaseProveedor": 8609,
-									"Codigo": "02",
-									"Nombre": "DISTRIBUIDOR"
-								},
-								"Zona": {
-									"IdZona": 6095,
-									"Codigo": "Zona Defecto",
-									"Nombre": "Zona Defecto",
-									"Activo": true,
-									"EntregaLunes": false,
-									"EntregaMartes": false,
-									"EntregaMiercoles": false,
-									"EntregaJueves": false,
-									"EntregaViernes": false,
-									"EntregaSabado": false,
-									"EntregaDomingo": false,
-									"DemoraEnHorasFechaEntrega": 24,
-									"CostoEntrega": 10000
-								},
-								"DescuentoProveedor": null,
-								"DiasEntrega": 0,
-								"Activo": true
-							},
-							"PorcentajeDescuento": 0.000000,
-							"Observaciones": "",
-							"OrdenCompraArticulos": [
-								{
-									"IdArticulo": 2757,
-									"Codigo": "00002757",
-									"Nombre": "GALL MARYSOL MARINERAS 300gr",
-									"Cantidad": 1.000,
-									"SegundoControlStock": 0.000,
-									"Precio": 7.0,
-									"PorcentajeDescuento1": 0.000,
-									"PorcentajeDescuento2": 0.000,
-									"PorcentajeDescuento3": 0.000,
-									"DescuentoCalculado": 0.000000,
-									"CategoriaImpuestoIVA": {
-										"IdCategoriaImpuestoIVA": 4,
-										"Codigo": "5",
-										"Nombre": "IVA 21.00",
+					const dataCliente = await apiRequest<any>(
+						`${centumUrl}/Clientes?razonSocial=${encodeURIComponent(razonSocial)}`,
+						{ method: 'GET', headers }
+					);
 
-										"Tasa": 21.000
-									},
-									"ImpuestoInterno": 0.000,
-									"Observaciones": ""
-								}
-							],
-							"FechaVencimiento": "2029-11-07T00:00:00",
-							// "CondicionPago": {
-							// 	"IdCondicionPago": 2,
-							// 	"Codigo": "PAG1",
-							// 	"Nombre": "Contado"
-							// },
-							// "FormaPagoProveedor": {
+					const cliente = dataCliente?.Items?.[0];
+					if (!cliente?.IdCliente) throw new Error('Cliente no encontrado');
 
-							// },
-							"OperadorCompra": {
-								"IdOperadorCompra": 1,
-								"Codigo": "1",
-								"Nombre": "Operador de Compras Defecto",
-								"EsSupervisor": false
-							},
+					clientId = cliente.IdCliente;
+				} catch (error: NodeErr) {
+					const msg = error?.response?.data?.Message || error?.message || 'Error obteniendo cliente';
+					throw new NodeOperationError(this.getNode(), msg);
+				}
+
+				// 2) Artículos (sin mapping, tal cual; sólo agregar Cantidad)
+				const ordenCompraArticulos: any[] = [];
+
+				for (const articuloInput of articulos) {
+					try {
+						const bodyArticulo: any = {
+							IdCliente: clientId,
+							FechaDocumento: formattedDocumentDate,
+						};
+
+						if (articuloInput.ID) bodyArticulo.Ids = [articuloInput.ID];
+						else bodyArticulo.Codigo = articuloInput.Codigo;
+
+						const dataArticulo = await apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
+							method: 'POST',
+							headers,
+							body: bodyArticulo,
+						});
+
+						const items = dataArticulo?.Articulos?.Items ?? [];
+						if (!Array.isArray(items) || items.length === 0) throw new Error('Artículo no encontrado');
+
+						for (const item of items) {
+							ordenCompraArticulos.push({
+								...item,
+								Cantidad: articuloInput.Cantidad,
+							});
 						}
+					} catch (error: NodeErr) {
+						const msg = error?.response?.data?.Message || error?.message || 'Error resolviendo artículo';
+						throw new NodeOperationError(this.getNode(), msg);
+					}
+				}
+
+				// 3) Proveedor (entidad completa)
+				let proveedorInfo: any;
+
+				try {
+					const response = await apiRequest<any>(
+						`${centumUrl}/Proveedores/${encodeURIComponent(proveedorId)}`,
+						{ method: 'GET', headers }
+					);
+
+					if (!response?.IdProveedor) throw new Error('Proveedor no encontrado');
+					proveedorInfo = response;
+				} catch (error: NodeErr) {
+					const msg = error?.response?.data?.Message || error?.message || 'Error obteniendo proveedor';
+					throw new NodeOperationError(this.getNode(), msg);
+				}
+
+				// 4) Body final
+				const bodyOrdenCompra = {
+					SucursalFisica: { 
+						IdSucursalFisica: sucursalId 
+					},
+					NumeroDocumento: { 
+						LetraDocumento: letraDocumento, 
+						PuntoVenta: puntoDeVenta, 
+						Numero: numero
+					},
+					TurnoEntrega: {
+						IdTurnoEntrega: turnoEntregaId
+					},
+					FechaDocumento: `${formattedDocumentDate}T00:00:00`,
+					FechaEntrega: `${formattedDeliveryDate}T00:00:00`,
+					Proveedor: proveedorInfo,
+					OrdenCompraArticulos: ordenCompraArticulos,
+					FechaVencimiento: `${formattedDueDate}T00:00:00`,
+					OperadorCompra: {
+						IdOperadorCompra: 1,
+						Codigo: "1",
+						Nombre: "Operador de Compras Defecto",
+						EsSupervisor: false
+					},
+				};
+
+				// 5) POST final
+				try {
+					const response = await apiRequest<any>(`${centumUrl}/OrdenesCompra`, {
+						method: 'POST',
+						headers,
+						body: bodyOrdenCompra,
 					});
 					return [this.helpers.returnJsonArray(response)];
-				} catch (error) {
-					const errorMessage = (error as any)?.response?.data?.Message || (error as any).message || "Error desconocido";
-					throw new NodeOperationError(this.getNode(), `Error creando la compra.\n ${errorMessage}`);
+				} catch (error: NodeErr) {
+					const msg = error?.response?.data?.Message || error?.message || 'Error creando la orden de compra';
+					throw new NodeOperationError(this.getNode(), msg);
 				}
 			}
+
 
 			case "crearPedidoVenta": {
 				type ArticuloInput = {
@@ -1423,7 +1450,7 @@ export class Centum implements INodeType {
 			case "listarFacturasVenta": {
 				const idCliente = this.getNodeParameter('clienteId', 0) as string;
 				const idVenta = this.getNodeParameter('ventaId', 0);
-				const idSucursal = this.getNodeParameter('sucursalId', 0);
+				const idSucursal = this.getNodeParameter('idSucursalFisica', 0);
 				const idDivisionEmpresa = this.getNodeParameter('divisionEmpresaId', 0);
 				const incluirAnulados = this.getNodeParameter('incluirAnulados', 0);
 				const idUsuarioCreador = this.getNodeParameter('usuarioCreadorId', 0);
@@ -1531,6 +1558,32 @@ export class Centum implements INodeType {
 				} catch (error) {
 					console.log("Error en obtener el listado de marcas:", error);
 					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+					throw new NodeOperationError(this.getNode(), `Error en obtener el listado de marcas. \n ${errorMessage}`);
+				}
+			}
+
+			case "listarOperadoresMoviles":{
+					
+				const username = this.getNodeParameter('username', 0) as string;
+				const email = this.getNodeParameter('email', 0) as string;
+
+				let params = '';
+				if(username){
+					params = `?usuario=${username}`;
+				}
+				if(email){
+					params = `?email=${email}`;
+				}
+
+				try{
+					const response = await apiRequest<any>(`${centumUrl}/OperadoresMoviles${params}`, {
+						headers,
+						method: 'GET'
+					});
+					return [this.helpers.returnJsonArray(response)];
+				}catch(err){
+					console.log('Error al obtener el listado de operadores moviles.', err);
+					const errorMessage = err?.response?.data?.Message || err.message || "Error Desconocido";
 					throw new NodeOperationError(this.getNode(), `Error en obtener el listado de marcas. \n ${errorMessage}`);
 				}
 			}
@@ -1648,7 +1701,7 @@ export class Centum implements INodeType {
 					});
 					return [this.helpers.returnJsonArray(response)];
 				} catch (error) {
-					console.log("Error en solicitud de promociones para el cliente:", error);
+					console.log("Error al intentar obtener el listado de precios:", error);
 					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
 					throw new NodeOperationError(this.getNode(), `Error obteniendo el listado de precios. \n ${errorMessage}`);
 				}
@@ -1752,7 +1805,7 @@ export class Centum implements INodeType {
 			}
 
 			case "listarProductosPorSucursal": {
-				const IdSucursalFisica = this.getNodeParameter("IdSucursalFisica", 0) as string;
+				const IdSucursalFisica = this.getNodeParameter("idSucursalFisica", 0) as string;
 
 				const queryParams: { idsSucursalesFisicas?: string } = {
 					idsSucursalesFisicas: IdSucursalFisica,
@@ -1773,6 +1826,33 @@ export class Centum implements INodeType {
 					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
 					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
+			}
+
+			case "listarPromociones": {
+				const documentDate = this.getNodeParameter("documentDate", 0) as string;
+				const formattedDocumentDate = String(documentDate).split("T")[0];
+
+				const body = {
+					FechaDocumento: formattedDocumentDate
+				}
+				try {
+					const response = await apiRequest<any>(`${centumUrl}/PromocionesComerciales/FiltrosPromocionComercial`, {
+						method: "POST",
+						headers,
+						body
+					})
+
+					if (response.Items && Array.isArray(response.Items)) {
+						return [this.helpers.returnJsonArray(response.Items)];
+					}
+
+					return [this.helpers.returnJsonArray(response)];
+				}catch(error){
+					console.log("Error en solicitud de promociones:", error);
+					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+					throw new NodeOperationError(this.getNode(), `Error obteniendo promociones: \n ${errorMessage}`);
+				}
+				
 			}
 
 			case "listarPromocionesCliente": {
