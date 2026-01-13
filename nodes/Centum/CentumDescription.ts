@@ -204,13 +204,8 @@ export const CentumOperations: INodeProperties[] = [
 			},
 			{
 				name: 'Obtener Operador Móvil',
-				value: 'verificarCredencialesOperador',
-				description: 'Obtiene todos los datos de un operador móvil en base a las credenciales'
-			},
-			{
-				name: 'Obtener Operadores Móviles',
-				value: 'listarOperadoresMoviles',
-				description: 'Obtiene el listado de todos los operadores moviles. Si desea puede filtrar por nombre / usuario'
+				value: 'listarOperadorMovil',
+				description: 'Obtiene el listado de todos los operadores moviles. Si desea puede filtrar por nombre / usuario.'
 			},
 			{
 				name: 'Orden De Compra - Generar',
@@ -336,12 +331,16 @@ export const CentumOperations: INodeProperties[] = [
 				value: 'listarVendedores',
 				description: 'Obtiene una lista de todos los vendedores disponibles'
 			},
-			 {
+			{
 			 	name: 'Ventas - Generar',
 			 	value: 'crearVenta',
 				description: 'Genera una venta en base a unos parametros completados'
-			 }
-
+			},
+			{
+				name: 'Verificar Operador Movil',
+				value: 'verificarCredencialesOperador',
+				description: 'Obtiene todos los datos de un operador móvil en base a las credenciales'
+			},
 		],
 		default: 'verDetallePedidoVenta',
 	},

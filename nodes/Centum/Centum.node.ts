@@ -625,7 +625,7 @@ export class Centum implements INodeType {
 					);
 
 					const cliente = dataCliente?.Items?.[0];
-					if (!cliente?.IdCliente) throw new Error('Cliente no encontrado');
+					if (!cliente?.IdCliente) throw new NodeOperationError( this.getNode(), 'Cliente no encontrado');
 
 					clientId = cliente.IdCliente;
 				} catch (error: NodeErr) {
@@ -653,7 +653,7 @@ export class Centum implements INodeType {
 						});
 
 						const items = dataArticulo?.Articulos?.Items ?? [];
-						if (!Array.isArray(items) || items.length === 0) throw new Error('Artículo no encontrado');
+						if (!Array.isArray(items) || items.length === 0) throw new NodeOperationError(this.getNode(), 'Artículo no encontrado');
 
 						for (const item of items) {
 							ordenCompraArticulos.push({
@@ -676,7 +676,7 @@ export class Centum implements INodeType {
 						{ method: 'GET', headers }
 					);
 
-					if (!response?.IdProveedor) throw new Error('Proveedor no encontrado');
+					if (!response?.IdProveedor) throw new NodeOperationError(this.getNode(), 'Proveedor no encontrado');
 					proveedorInfo = response;
 				} catch (error: NodeErr) {
 					const msg = error?.response?.data?.Message || error?.message || 'Error obteniendo proveedor';
