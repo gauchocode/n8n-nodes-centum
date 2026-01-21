@@ -223,11 +223,6 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Genera una orden de compra en base a ciertos parametros'
 			},
 			{
-				name: 'Obtener Paises',
-				value: 'listarPaises',
-				description: 'Obtiene el listado de paises disponibles'
-			},
-			{
 				name: 'Orden De Compra - Obtener',
 				value: 'verDetalleOrdenCompra',
 				description: 'Obtiene una unica orden de compra en base al ID'
@@ -236,6 +231,11 @@ export const CentumOperations: INodeProperties[] = [
 				name: 'Ordenes De Compra - Obtener',
 				value: 'listarOrdenesCompra',
 				description: 'Obtiene todas las ordenes de compra en base a ciertos filtros'
+			},
+			{
+				name: 'Pais- Obtener Listado',
+				value: 'listarPaises',
+				description: 'Obtiene el listado de paises disponibles'
 			},
 			{
 				name: 'Pedido De Venta - Actividad',
@@ -432,9 +432,8 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Fecha de Entrega Desde',
+		displayName: 'Fecha De Entrega Desde',
 		name: 'fromDeliveryDate',
-		required: false,
 		type: 'dateTime',
 		default: {},
 		displayOptions: {
@@ -442,9 +441,8 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Fecha de Entrega Hasta',
+		displayName: 'Fecha De Entrega Hasta',
 		name: 'sinceDeliveryDate',
-		required: false,
 		type: 'dateTime',
 		default: {},
 		displayOptions: {
