@@ -195,22 +195,16 @@ export class Centum implements INodeType {
 			case "buscarProductoEnSucursal": {
 				const IdSucursalFisica = this.getNodeParameter("idSucursalFisica", 0) as string;
 				const idArticulo = this.getNodeParameter("articleId", 0) as string;
-				const codigo = this.getNodeParameter("codigoArticulo", 0) as string;
-				const nombre = this.getNodeParameter("nombreArticulo", 0) as string;
 				const queryParams: {
 					IdSucursalFisica?: string;
-					codigoExacto?: string;
 					idsArticulos: string;
-					nombre: string;
 				} = {
 					IdSucursalFisica: IdSucursalFisica,
-					codigoExacto: codigo,
 					idsArticulos: idArticulo,
-					nombre
 				};
 
-				if (!IdSucursalFisica || (!idArticulo && !codigo && !nombre)) {
-					throw new NodeOperationError(this.getNode(), "El id de la sucursal fisica y el id del articulo o el codigo son obligatorios");
+				if (!IdSucursalFisica || (!idArticulo)) {
+					throw new NodeOperationError(this.getNode(), "El id de la sucursal fisica y el id del articulo son obligatorios");
 				}
 				try {
 					const dataArticulosExistencias = await apiRequest<any>(`${centumUrl}/ArticulosSucursalesFisicas`, {
@@ -306,24 +300,29 @@ export class Centum implements INodeType {
 			}
 
 			case "consultarPrecioProducto": {
-				const idArticulos = this.getNodeParameter("codigoArticulo", 0) as string;
-				const idLista = this.getNodeParameter("idList", 0) as string;
+				const idArticulos = this.getNodeParameter("articleId", 0);
+				const idLista = this.getNodeParameter("idList", 0);
+				const clienteId = this.getNodeParameter("clienteId", 0);
+				const fechaDocumento = this.getNodeParameter("documentDate", 0);
+				const formattedDocumentDate = String(fechaDocumento).split('T')[0];
+				const idsNum = String(idArticulos).split(',').map(s => s.trim()).filter(Boolean);
+				console.log(idsNum);
 
 				if (!idLista || !idArticulos) {
 					throw new NodeOperationError(this.getNode(), "El id de la lista y el artículo son obligatorios.");
 				}
 				try {
-					const articulo = await apiRequest<any>(`${centumUrl}/Articulos/FiltrosPrecios`, {
+					const articulo = await apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
 						method: "POST",
 						headers,
-						body: { IdsArticulos: idArticulos, IdLista: idLista },
+						body: {  IdLista: idLista, IdCliente: clienteId, fechaDocumento: formattedDocumentDate, Ids: idsNum },
 					});
 
 					return [this.helpers.returnJsonArray(articulo)];
 				} catch (error) {
 					console.log("Error en solicitud de artículo por ID:", error);
-					//const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
-					//throw new NodeOperationError(this.getNode(), errorMessage);
+					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 			}
 
@@ -1143,72 +1142,158 @@ export class Centum implements INodeType {
 				return [this.helpers.returnJsonArray(arrResult)];
 			}
 
+			// case "estadisticaVentaRanking": {
+			// 	const fechaDesdeString = this.getNodeParameter('startDate', 0);
+			// 	const fechaHastaString = this.getNodeParameter('endDate', 0);
+			// 	const tipoDeRanking = this.getNodeParameter('tipoDeRanking', 0);
+			// 	const orderByRanking = this.getNodeParameter('ventaRankingOrderBy', 0)
+			// 	const orderAsc = this.getNodeParameter('orderAsc', 0);
+			// 	const cantItems = this.getNodeParameter('cantidadDeItems', 0);
+			// 	const fechaDesde = String(fechaDesdeString).split("T")[0];
+			// 	const fechaHasta = String(fechaHastaString).split("T")[0];
+
+
+			// 	let url = `${centumUrl}/EstadisticaVentaRanking/${cantItems}`;
+
+			// 	if (fechaDesde && fechaHasta) {
+			// 		url += `?fechaDocumentoDesde=${fechaDesde}&fechaDocumentoHasta=${fechaHasta}`
+			// 	} else {
+			// 		throw new NodeOperationError(this.getNode(), 'Ambos periodos de fecha son necesarios.')
+			// 	}
+
+			// 	if (tipoDeRanking) {
+			// 		if (tipoDeRanking === 'esRankingClientes') {
+			// 			url += `&${tipoDeRanking}=true`
+			// 		}
+			// 		if (tipoDeRanking === 'esRankingArticulos') {
+			// 			url += `&${tipoDeRanking}=true`
+			// 		}
+			// 		if (tipoDeRanking === 'esRankingVendedores') {
+			// 			url += `&${tipoDeRanking}=true`
+			// 		}
+			// 	}
+
+			// 	if (orderByRanking) {
+			// 		if (orderByRanking === 'CantidadUnidadNivel0') {
+			// 			url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`
+			// 		}
+			// 		if (orderByRanking === 'CantidadUnidadNivel1') {
+			// 			url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`
+			// 		}
+			// 		if (orderByRanking === 'CantidadUnidadNivel2') {
+			// 			url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`
+			// 		}
+			// 		if (orderByRanking === 'ImporteTotalNeto') {
+			// 			url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`
+			// 		}
+			// 		if (orderByRanking === 'ImporteTotalFinal') {
+			// 			url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`
+			// 		}
+			// 	}
+
+			// 	if (orderAsc !== null) {
+			// 		url += `&ordenEstadisticaVentaRankingAscendente=${orderAsc}`
+			// 	}
+
+			// 	try {
+			// 		const response = await apiRequest<any>(`${url}`, {
+			// 			method: "GET",
+			// 			headers,
+			// 		});
+			// 		return [this.helpers.returnJsonArray(response)];
+			// 	} catch (error) {
+			// 		console.log("Error en solicitud de estadisticas de ventas:", error);
+			// 		const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+			// 		throw new NodeOperationError(this.getNode(), `Error obteniendo las estadisticas de ranking. \n ${errorMessage}`);
+			// 	}
+
+			// }
+
 			case "estadisticaVentaRanking": {
-				const fechaDesdeString = this.getNodeParameter('startDate', 0);
-				const fechaHastaString = this.getNodeParameter('endDate', 0);
-				const tipoDeRanking = this.getNodeParameter('tipoDeRanking', 0);
-				const orderByRanking = this.getNodeParameter('ventaRankingOrderBy', 0)
-				const orderAsc = this.getNodeParameter('orderAsc', 0);
-				const cantItems = this.getNodeParameter('cantidadDeItems', 0);
-				const fechaDesde = String(fechaDesdeString).split("T")[0];
-				const fechaHasta = String(fechaHastaString).split("T")[0];
+	const fechaDesdeString = this.getNodeParameter('startDate', 0);
+	const fechaHastaString = this.getNodeParameter('endDate', 0);
+	const tipoDeRanking = this.getNodeParameter('tipoDeRanking', 0);
+	const orderByRanking = this.getNodeParameter('ventaRankingOrderBy', 0);
+	const orderAsc = this.getNodeParameter('orderAsc', 0);
+	const cantItems = this.getNodeParameter('cantidadDeItems', 0);
 
+	const fechaDesde = String(fechaDesdeString).split("T")[0];
+	const fechaHasta = String(fechaHastaString).split("T")[0];
 
-				let url = `${centumUrl}/EstadisticaVentaRanking/${cantItems}`;
+	let url = `${centumUrl}/EstadisticaVentaRanking/${cantItems}`;
 
-				if (fechaDesde && fechaHasta) {
-					url += `?fechaDocumentoDesde=${fechaDesde}&fechaDocumentoHasta=${fechaHasta}`
-				} else {
-					throw new NodeOperationError(this.getNode(), 'Ambos periodos de fecha son necesarios.')
-				}
+	if (fechaDesde && fechaHasta) {
+		url += `?fechaDocumentoDesde=${fechaDesde}&fechaDocumentoHasta=${fechaHasta}`;
+	} else {
+		throw new NodeOperationError(this.getNode(), 'Ambos periodos de fecha son necesarios.');
+	}
 
-				if (tipoDeRanking) {
-					if (tipoDeRanking === 'esRankingClientes') {
-						url += `&${tipoDeRanking}=true`
-					}
-					if (tipoDeRanking === 'esRankingArticulos') {
-						url += `&${tipoDeRanking}=true`
-					}
-					if (tipoDeRanking === 'esRankingVendedores') {
-						url += `&${tipoDeRanking}=true`
-					}
-				}
+	// Ranking (manteniendo la lógica de ifs actuales)
+	if (tipoDeRanking) {
+		if (tipoDeRanking === 'esRankingClientes') {
+			url += `&${tipoDeRanking}=true`;
+		}
+		if (tipoDeRanking === 'esRankingArticulos') {
+			url += `&${tipoDeRanking}=true`;
+		}
+		if (tipoDeRanking === 'esRankingVendedores') {
+			url += `&${tipoDeRanking}=true`;
+		}
+	}
 
-				if (orderByRanking) {
-					if (orderByRanking === 'CantidadUnidadNivel0') {
-						url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`
-					}
-					if (orderByRanking === 'CantidadUnidadNivel1') {
-						url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`
-					}
-					if (orderByRanking === 'CantidadUnidadNivel2') {
-						url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`
-					}
-					if (orderByRanking === 'ImporteTotalNeto') {
-						url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`
-					}
-					if (orderByRanking === 'ImporteTotalFinal') {
-						url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`
-					}
-				}
+	// OrderBy (manteniendo la lógica de ifs actuales)
+	if (orderByRanking) {
+		if (orderByRanking === 'CantidadUnidadNivel0') {
+			url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
+		}
+		if (orderByRanking === 'CantidadUnidadNivel1') {
+			url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
+		}
+		if (orderByRanking === 'CantidadUnidadNivel2') {
+			url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
+		}
+		if (orderByRanking === 'ImporteTotalNeto') {
+			url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
+		}
+		if (orderByRanking === 'ImporteTotalFinal') {
+			url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
+		}
+	}
 
-				if (orderAsc !== null) {
-					url += `&ordenEstadisticaVentaRankingAscendente=${orderAsc}`
-				}
+	/**
+	 * Regla backend:
+	 * Si se especifica ordenEstadisticaVentaRankingAscendente (true/false),
+	 * se debe especificar tipoOrdenEstadisticaVentaRanking.
+	 *
+	 * Correcciones:
+	 * 1) Solo agregamos ordenEstadisticaVentaRankingAscendente si orderAsc es boolean
+	 *    (evita mandar "undefined" o "" y disparar validaciones).
+	 * 2) Si orderAsc es boolean pero NO se especificó orderByRanking, se lanza error
+	 *    para exigir que el usuario agregue lo necesario.
+	 */
+	if (typeof orderAsc === 'boolean') {
+		if (!orderByRanking) {
+			throw new NodeOperationError(
+				this.getNode(),
+				'Debe especificar "ventaRankingOrderBy" cuando se especifica "orderAsc" (por requerimiento del endpoint EstadisticaVentaRanking).',
+			);
+		}
+		url += `&ordenEstadisticaVentaRankingAscendente=${orderAsc}`;
+	}
 
-				try {
-					const response = await apiRequest<any>(`${url}`, {
-						method: "GET",
-						headers,
-					});
-					return [this.helpers.returnJsonArray(response)];
-				} catch (error) {
-					console.log("Error en solicitud de estadisticas de ventas:", error);
-					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
-					throw new NodeOperationError(this.getNode(), `Error obteniendo las estadisticas de ranking. \n ${errorMessage}`);
-				}
+	try {
+		const response = await apiRequest<any>(`${url}`, {
+			method: "GET",
+			headers,
+		});
+		return [this.helpers.returnJsonArray(response)];
+	} catch (error) {
+		console.log("Error en solicitud de estadisticas de ventas:", error);
+		const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+		throw new NodeOperationError(this.getNode(), `Error obteniendo las estadisticas de ranking. \n ${errorMessage}`);
+	}
+}
 
-			}
 
 			case "generarTokenSeguridad": {
 				try {
@@ -1349,6 +1434,34 @@ export class Centum implements INodeType {
 				}
 			}
 
+			case "listarComprobantesCompra": {
+				try {
+					const response = await apiRequest<any>(`${centumUrl}/TiposComprobanteCompra`, {
+						method: "GET",
+						headers,
+					});
+					return [this.helpers.returnJsonArray(response)];
+				} catch (error) {
+					console.log("Error en obtener el listado de comprobantes de compra:", error);
+					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+					throw new NodeOperationError(this.getNode(), `Error en obtener el listado de Comprobantes de Compra: ${errorMessage}`);
+				}
+			}
+
+			case "listarComprobantesVenta": {
+				try {
+					const response = await apiRequest<any>(`${centumUrl}/TiposComprobanteVenta`, {
+						method: "GET",
+						headers,
+					});
+					return [this.helpers.returnJsonArray(response)];
+				} catch (error) {
+					console.log("Error en obtener el listado de comprobantes de compra:", error);
+					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+					throw new NodeOperationError(this.getNode(), `Error en obtener el listado de Comprobantes de Venta: ${errorMessage}`);
+				}
+			}
+
 			case "listarConceptos": {
 				let url = `${centumUrl}/Conceptos`;
 
@@ -1363,7 +1476,7 @@ export class Centum implements INodeType {
 				}
 			}
 
-			case "listarDepartamentos": {
+			case "listarMunicipios": {
 				const idProvincia = this.getNodeParameter("idProvincia", 0, "") as string;
 
 				try {
@@ -1592,8 +1705,12 @@ export class Centum implements INodeType {
 				const idProveedor = this.getNodeParameter("proveedorId", 0);
 				const desdeSaldoFecha = this.getNodeParameter("startDate", 0);
 				const hastaSaldoFecha = this.getNodeParameter("endDate", 0);
+				const fechaEntregaDesde = this.getNodeParameter("fromDeliveryDate", 0);
+				const fechaEntregaHasta = this.getNodeParameter("sinceDeliveryDate", 0);
 				const separarFechaDesde = String(desdeSaldoFecha).split("T")[0];
 				const separarFechaHasta = String(hastaSaldoFecha).split("T")[0];
+				const separarFechaEntregaDesde = String(fechaEntregaDesde).split("T")[0];
+				const separarFechaEntregaHasta = String(fechaEntregaHasta).split("T")[0];
 
 				if (!desdeSaldoFecha) {
 					throw new NodeOperationError(this.getNode(), "priceDateModified (fecha desde) es requerido");
@@ -1604,10 +1721,12 @@ export class Centum implements INodeType {
 				}
 
 				try {
-					const body = {
+					const body = {	
 						fechaDocumentoDesde: separarFechaDesde,
 						fechaDocumentoHasta: separarFechaHasta,
-						idProveedor
+						idProveedor,
+						fechaEntregaDesde: separarFechaEntregaDesde,
+						fechaEntregaHasta: separarFechaEntregaHasta
 					};
 
 					const response = await apiRequest<any>(`${centumUrl}/OrdenesCompra/FiltrosOrdenCompra`, {
@@ -1629,13 +1748,35 @@ export class Centum implements INodeType {
 				}
 			}
 
+			case "listarPaises": {
+				try{
+
+					const response = await apiRequest<any>(`${centumUrl}/Paises`, {
+						headers,
+						method: "GET"
+					});
+					return [this.helpers.returnJsonArray(response)];
+				}catch(error){
+					console.log("Error en obtener el listado de paises:", error);
+					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+					throw new NodeOperationError(this.getNode(), `Error obteniendo el listado de paises: ${errorMessage}`);
+				}
+			}
+
 			case "listarPedidosVenta": {
-				const idCliente = this.getNodeParameter("clienteId", 0);
+
+				const idCliente = this.getNodeParameter('clienteId', 0) as string;
+				const idPedidoDeVenta = this.getNodeParameter('ventaId', 0);
+				const idSucursal = this.getNodeParameter('idSucursalFisica', 0);
+				const incluirAnulados = this.getNodeParameter('incluirAnulados', 0);
+				const idUsuarioCreador = this.getNodeParameter('usuarioCreadorId', 0);
+				const idTransporte = this.getNodeParameter('transporteId', 0);
 				const idsEstado = this.getNodeParameter("statusId", 0);
 				const fechaDesde = this.getNodeParameter("startDate", 0, "") as string;
 				const fechaHasta = this.getNodeParameter("endDate", 0, "") as string;
 				const separarFechaDesde = String(fechaDesde).split("T")[0];
 				const separarFechaHasta = String(fechaHasta).split("T")[0];
+
 				if (!idCliente && !idsEstado && !separarFechaDesde && !separarFechaHasta) {
 					throw new NodeOperationError(this.getNode(), "Debes ingresar almenos un parametro para realizar la búsqueda.");
 				}
@@ -1645,6 +1786,11 @@ export class Centum implements INodeType {
 					fechaDocumentoDesde: separarFechaDesde,
 					fechaDocumentoHasta: separarFechaHasta,
 					idsEstado,
+					idPedidoDeVenta,
+					idSucursal,
+					incluirAnulados,
+					idUsuarioCreador,
+					idTransporte
 				};
 
 				try {
@@ -1855,7 +2001,7 @@ export class Centum implements INodeType {
 				
 			}
 
-			case "listarPromocionesCliente": {
+			case "listarPromocionesComercialesCliente": {
 				const clientIdParam = this.getNodeParameter("clienteId", 0);
 				const documentDate = this.getNodeParameter("documentDate", 0) as string;
 				const diaSemana = this.getNodeParameter("diaSemana", 0);
@@ -2201,8 +2347,8 @@ export class Centum implements INodeType {
 
 			case "verDetalleSaldoCliente": {
 				const clientIdParam = this.getNodeParameter("clienteId", 0);
-				const desdeSaldoFecha = this.getNodeParameter("priceDateModified", 0);
-				const separarFecha = String(desdeSaldoFecha).split("T")[0];
+				const hastaSaldoFecha = this.getNodeParameter("priceDateModified", 0);
+				const separarFecha = String(hastaSaldoFecha).split("T")[0];
 
 				// Validación de parámetros
 				const clientId = Number(clientIdParam);

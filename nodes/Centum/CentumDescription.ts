@@ -134,9 +134,9 @@ export const CentumOperations: INodeProperties[] = [
 				action: 'Obtener facturas de pedidos de ventas del cliente'
 			},
 			{
-				name: 'Cliente - Obtener Promoción',
-				value: 'listarPromocionesCliente',
-				description: 'Obtiene las promociones aplicadas a un cliente desde una fecha seleccionada',
+				name: 'Cliente - Obtener Promoción Comercial',
+				value: 'listarPromocionesComercialesCliente',
+				description: 'Obtiene las promociones comerciales aplicadas a un cliente desde una fecha seleccionada',
 				action: 'Obtener promociones aplicadas a un cliente'
 			},
 			{
@@ -182,14 +182,19 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obtener un listado de las compras en base a ciertos parametros'
 			},
 			{
+				name: 'Comprobante De Compra - Obtener Listado',
+				value: 'listarComprobantesCompra',
+				description: 'Obtener un listado de los comprobantes de compra en base a ciertos parametros'
+			},
+			{
+				name: 'Comprobante De Venta - Obtener Listado',
+				value: 'listarComprobantesVenta',
+				description: 'Obtener un listado de los comprobante de venta en base a ciertos parametros'
+			},
+			{
 				name: 'Conceptos - Obtener Listado',
 				value: 'listarConceptos',
 				action: 'Obtener un listado de conceptos'
-			},
-			{
-				name: 'Departamentos - Lista',
-				value: 'listarDepartamentos',
-				description: 'Obtiene un listado de departamentos, normalmente filtrado por provincia'
 			},
 			{
 				name: 'Estadística Ranking - Venta',
@@ -203,6 +208,11 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obten el listado completo de todas las marcas de los articulos'
 			},
 			{
+				name: 'Municipios - Lista',
+				value: 'listarMunicipios',
+				description: 'Obtiene un listado de los municipios, normalmente filtrado por provincia'
+			},
+			{
 				name: 'Obtener Operador Móvil',
 				value: 'listarOperadorMovil',
 				description: 'Obtiene el listado de todos los operadores moviles. Si desea puede filtrar por nombre / usuario.'
@@ -211,6 +221,11 @@ export const CentumOperations: INodeProperties[] = [
 				name: 'Orden De Compra - Generar',
 				value: 'crearOrdenCompra',
 				description: 'Genera una orden de compra en base a ciertos parametros'
+			},
+			{
+				name: 'Obtener Paises',
+				value: 'listarPaises',
+				description: 'Obtiene el listado de paises disponibles'
 			},
 			{
 				name: 'Orden De Compra - Obtener',
@@ -268,9 +283,9 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Genera un JSON estructurado para productos WooCommerce a partir de artículos Centum',
 			},
 			{
-				name: 'Promociones - Lista',
+				name: 'Promociones Comerciales - Lista',
 				value: 'listarPromociones',
-				description: 'Obtiene las promociones disponibles',
+				description: 'Obtiene las promociones comerciales disponibles',
 				action: 'Obtener promociones disponibles'
 			},
 			{
@@ -417,6 +432,26 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'Fecha de Entrega Desde',
+		name: 'fromDeliveryDate',
+		required: false,
+		type: 'dateTime',
+		default: {},
+		displayOptions: {
+			show: { resource: ['listarOrdenesCompra'] },
+		},
+	},
+	{
+		displayName: 'Fecha de Entrega Hasta',
+		name: 'sinceDeliveryDate',
+		required: false,
+		type: 'dateTime',
+		default: {},
+		displayOptions: {
+			show: { resource: ['listarOrdenesCompra'] },
+		},
+	},
+	{
 		displayName: 'Cliente ID',
 		name: 'clienteId',
 		type: 'number',
@@ -434,13 +469,14 @@ const getArticulo: INodeProperties[] = [
 					'listarFacturasVentasPorCliente',
 					'listarFacturasVenta',
 					'listarFacturasCobros',
-					'listarPromocionesCliente',
+					'listarPromocionesComercialesCliente',
 					'listarPedidosVenta',
 					'listarOrdenesCompra',
 					'listarCobros',
 					'listarCompras',
 					'crearVenta',
-					'listarPedidosVentaFiltrados'
+					'listarPedidosVentaFiltrados',
+					'consultarPrecioProducto'
 				],
 			},
 		},
@@ -457,8 +493,6 @@ const getArticulo: INodeProperties[] = [
 				resource: [
 					'crearProveedor',
 					'buscarProductoPorCodigo',
-					'consultarPrecioProducto',
-					'buscarProductoEnSucursal',
 					'buscarProductos'
 				],
 			},
@@ -573,7 +607,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'number',
 		default: 0,
 		description: 'Numero de la semana por el cual filtrar promociones aplicadas (0 es Lunes)',
-		displayOptions: { show: { resource: ['listarPromocionesCliente'] } },
+		displayOptions: { show: { resource: ['listarPromocionesComercialesCliente'] } },
 	},
 	{
 		displayName: 'DNI',
@@ -664,7 +698,7 @@ const getArticulo: INodeProperties[] = [
 		default: undefined,
 		description: 'Parametro fecha del body para las solicitudes',
 		displayOptions: {
-			show: { resource: ['listarProductosDisponibles', 'listarPromocionesCliente', 'crearCompra', 'crearPedidoVenta', 'crearOrdenCompra', 'listarPromociones'] },
+			show: { resource: ['listarProductosDisponibles', 'listarPromocionesComercialesCliente', 'crearCompra', 'crearPedidoVenta', 'crearOrdenCompra', 'listarPromociones', 'consultarPrecioProducto'] },
 		},
 	},
 	{
@@ -821,7 +855,7 @@ const getArticulo: INodeProperties[] = [
 	// 	displayOptions: { show: { resource: ['articulo'] } },
 	// },
 	{
-		displayName: 'Fecha Precio Actualizado Desde',
+		displayName: 'Fecha Precio Actualizado Hasta',
 		name: 'priceDateModified',
 		type: 'dateTime',
 		default: '',
@@ -849,12 +883,13 @@ const getArticulo: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'ID Articulo',
+		displayName: 'ID Articulos',
 		name: 'articleId',
 		type: 'string',
 		default: '',
+		placeholder: '1467',
 		displayOptions: {
-			show: { resource: ['descargarImagenesProductos', 'buscarProductoPorCodigo', 'buscarProductoEnSucursal'] },
+			show: { resource: ['descargarImagenesProductos', 'buscarProductoPorCodigo', 'buscarProductoEnSucursal', 'consultarPrecioProducto'] },
 		},
 	},
 	{
@@ -886,7 +921,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'number',
 		default: false,
 		description: 'Número del estado del pedido',
-		displayOptions: { show: { resource: ['listarPedidosVenta', 'obtenerOrdenesCompra', 'listarPedidosVentaFiltrados'] } },
+		displayOptions: { show: { resource: ['listarPedidosVenta', 'obtenerOrdenesCompra', 'listarPedidosVentaFiltrados', 'listarPedidosVenta'] } },
 	},
 	{
 		displayName: 'ID Del Operador Compra',
@@ -943,7 +978,7 @@ const getArticulo: INodeProperties[] = [
 		name: 'ventaId',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['listarFacturasVenta'] } },
+		displayOptions: { show: { resource: ['listarFacturasVenta', 'listarPedidosVenta'] } },
 	},
 	{
 		displayName: 'ID De La Sucursal',
@@ -957,7 +992,7 @@ const getArticulo: INodeProperties[] = [
 		name: 'incluirAnulados',
 		type: 'boolean',
 		default: false,
-		displayOptions: { show: { resource: ['listarFacturasVenta'] } },
+		displayOptions: { show: { resource: ['listarFacturasVenta', 'listarPedidosVenta'] } },
 	},
 	{
 		displayName: 'ID Del Canal De Venta',
@@ -979,15 +1014,15 @@ const getArticulo: INodeProperties[] = [
 		type: 'number',
 		description: 'ID Del usuario que creo el comprobante de venta',
 		default: '',
-		displayOptions: { show: { resource: ['listarFacturasVenta'] } },
+		displayOptions: { show: { resource: ['listarFacturasVenta', 'listarPedidosVenta'] } },
 	},
-	{
+	{	
 		displayName: 'ID Del Transporte',
 		name: 'transporteId',
 		type: 'number',
 		description: 'ID del transporte asociado al comprobante de venta',
 		default: '',
-		displayOptions: { show: { resource: ['listarFacturasVenta'] } },
+		displayOptions: { show: { resource: ['listarFacturasVenta', 'listarPedidosVenta'] } },
 	},
 	{
 		displayName: 'ID Pais',
@@ -1003,7 +1038,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		description: 'ID de la provincia por la cual se buscarán la información',
-		displayOptions: { show: { resource: ['listarDepartamentos', 'crearProveedor'] } },
+		displayOptions: { show: { resource: ['listarMunicipios', 'crearProveedor'] } },
 	},
 	{
 		displayName: 'ID Sucursal Física',
@@ -1013,7 +1048,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'The ID of the physical branch to filter stock (optional)',
 		displayOptions: {
 			show: {
-				resource: ['searchArticleBySKU', 'buscarProductoEnSucursal', 'crearCompra', 'crearOrdenCompra', 'listarProductosPorSucursal', 'listarFacturasVenta'],
+				resource: ['searchArticleBySKU', 'buscarProductoEnSucursal', 'crearCompra', 'crearOrdenCompra', 'listarProductosPorSucursal', 'listarFacturasVenta', 'listarPedidosVenta'],
 			},
 		},
 	},
@@ -1094,7 +1129,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		placeholder: 'Alfajores',
-		displayOptions: { show: { resource: ['buscarProductos', 'buscarProductoEnSucursal'] } },
+		displayOptions: { show: { resource: ['buscarProductos'] } },
 		description: 'El nombre del producto a buscar',
 	},
 	// {
@@ -1137,7 +1172,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: '1',
 		description: 'Numero del punto de venta del documento',
-		displayOptions: { show: { resource: ['generarCompras', 'generarVentas', 'crearOrdenCompra'] } },
+		displayOptions: { show: { resource: ['generarCompras', 'generarVentas', 'crearOrdenCompra', 'crearCompra'] } },
 	},
 	{
 		displayName: 'Razón Social',
