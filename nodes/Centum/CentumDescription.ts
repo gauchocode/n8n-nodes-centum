@@ -129,7 +129,7 @@ export const CentumOperations: INodeProperties[] = [
 			},
 			{
 				name: 'Cliente - Obtener Facturas De Venta Por ID',
-				value: 'listarFacturasVentasPorCliente',
+				value: 'listarFacturasVentasPorID',
 				description: 'Obtiene la totalidad de las facturas de los pedido de ventas del cliente especificado',
 				action: 'Obtener facturas de pedidos de ventas del cliente'
 			},
@@ -464,7 +464,6 @@ const getArticulo: INodeProperties[] = [
 					'listarProductosDisponibles',
 					'consultarSaldoCliente',
 					'verDetalleSaldoCliente',
-					'listarFacturasVentasPorCliente',
 					'listarFacturasVenta',
 					'listarFacturasCobros',
 					'listarPromocionesComercialesCliente',
@@ -651,7 +650,7 @@ const getArticulo: INodeProperties[] = [
 			show: {
 				resource: [
 					'crearCompra',
-					'listarFacturasVentasPorCliente',
+					'listarFacturasVentasPorID',
 					'listarFacturasVenta',
 					'listarFacturasCobros',
 					'listarPedidosVenta',
@@ -674,7 +673,7 @@ const getArticulo: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: [
-					'listarFacturasVentasPorCliente',
+					'listarFacturasVentasPorID',
 					'listarFacturasVenta',
 					'listarFacturasCobros',
 					'listarPedidosVenta',
@@ -976,7 +975,7 @@ const getArticulo: INodeProperties[] = [
 		name: 'ventaId',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['listarFacturasVenta', 'listarPedidosVenta'] } },
+		displayOptions: { show: { resource: ['listarFacturasVenta', 'listarPedidosVenta', 'listarFacturasVentasPorID'] } },
 	},
 	{
 		displayName: 'ID De La Sucursal',

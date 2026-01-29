@@ -1610,16 +1610,16 @@ export class Centum implements INodeType {
 
 			}
 
-			case "listarFacturasVentasPorCliente": {
-				const clientIdParam = this.getNodeParameter("clienteId", 0);
+			case "listarFacturasVentasPorID": {
+				const ventaIdParam= this.getNodeParameter("ventaId", 0);
 				const desdeSaldoFecha = this.getNodeParameter("startDate", 0);
 				const hastaSaldoFecha = this.getNodeParameter("endDate", 0);
 				const separarFechaDesde = String(desdeSaldoFecha).split("T")[0];
 				const separarFechaHasta = String(hastaSaldoFecha).split("T")[0];
 
 				// Validación de parámetros
-				const clientId = Number(clientIdParam);
-				if (isNaN(clientId) || clientId <= 0) {
+				const ventaId = Number(ventaIdParam);
+				if (isNaN(ventaId) || ventaId <= 0) {
 					throw new NodeOperationError(this.getNode(), "clienteId debe ser un número positivo");
 				}
 
@@ -1635,7 +1635,7 @@ export class Centum implements INodeType {
 					const body = {
 						fechaDocumentoDesde: separarFechaDesde,
 						fechaDocumentoHasta: separarFechaHasta,
-						IdCliente: clientId,
+						IdCliente: ventaId,
 					};
 
 					const response = await apiRequest<any>(`${centumUrl}/Ventas/FiltrosVenta`, {
@@ -1651,9 +1651,9 @@ export class Centum implements INodeType {
 
 					return [this.helpers.returnJsonArray(response)];
 				} catch (error) {
-					console.log("Error en solicitud de facturas pedidos ventas:", error);
+					console.log("Error en solicitud de facturas de ventas:", error);
 					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
-					throw new NodeOperationError(this.getNode(), `Error obteniendo facturas pedidos ventas para cliente ${clientId}: ${errorMessage}`);
+					throw new NodeOperationError(this.getNode(), `Error obteniendo facturas de ventas para cliente ${ventaId}: ${errorMessage}`);
 				}
 			}
 
