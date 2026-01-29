@@ -1635,7 +1635,7 @@ export class Centum implements INodeType {
 					const body = {
 						fechaDocumentoDesde: separarFechaDesde,
 						fechaDocumentoHasta: separarFechaHasta,
-						IdCliente: ventaId,
+						idVenta: ventaId,
 					};
 
 					const response = await apiRequest<any>(`${centumUrl}/Ventas/FiltrosVenta`, {
