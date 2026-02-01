@@ -1016,7 +1016,7 @@ export async function apiGetRequest<T = any>(
 		method = 'GET',
 		queryParams = {},
 		cantidadItemsPorPagina,
-		itemsField = 'items',
+		itemsField = 'Items',
 		numeroPagina,
 		context,
 		pagination = 'all',
@@ -1027,69 +1027,43 @@ export async function apiGetRequest<T = any>(
 	if (!url.trim()) safeThrow(context, 'El Endpoint es obligatorio.');
 
 	if (!options.method || options.method === 'POST') safeThrow(context, 'Se está intentando hacer una solicitud GET sin un metodo asignado o se asignó el metodo equivocado.');
-	// const fetchOptions: RequestInit = {
-	// 	method,
-	// 	headers: { 'Content-Type': 'application/json', ...headers },
-	// };
 
-	// // Sin paginación (aún en desarrollo actualmente se usa otro metodo)
-	// if (pagination === 'default' || (!cantidadItemsPorPagina && !numeroPagina)) {
-	// 	const finalUrl = buildUrl(url, queryParams);
-	// 	const response = await fetch(finalUrl, fetchOptions);
+	// Para Centum API (y APIs que no soportan paginación), siempre usar paginación interna
+	// Una sola request para obtener todos los datos, luego paginar internamente
+	console.log('apiGetRequest => Single request with internal pagination');
 
-	// 	if (!response.ok) {
-	// 		const errorText = await response.text();
-	// 		safeThrow(context, `Error GET: ${response.status} - ${errorText}`);
-	// 	}
+	const finalUrl = buildUrl(url, queryParams); // Sin parámetros de paginación
+	const requestHeaders = buildCentumHeaders(headers.CentumSuiteConsumidorApiPublicaId, headers.publicAccessKey);
 
-	// 	const data = await response.json();
-	// 	return extractItems<T>(data, itemsField);
-	// }
+	const response = await fetch(finalUrl, {
+		method,
+		headers: { ...requestHeaders }
+	});
 
-	console.log('apiGetRequest => options:  ', options)
-	const allItems: T[] = [];
-	let currentPage = numeroPagina || 1;
-	const itemsPerPage = pagination === 'all' ? 1000 : cantidadItemsPorPagina || 100;
-	const intervaloMs = pagination === 'all' ? 1000 : intervaloPagina ?? 1000;
-
-	while (true) {
-		const totalStart = Date.now();
-		const paginatedParams = {
-			...queryParams,
-			numeroPagina: currentPage,
-			cantidadItemsPorPagina: itemsPerPage,
-		};
-
-		const finalUrl = buildUrl(url, paginatedParams);
-		const requestHeaders = buildCentumHeaders(headers.CentumSuiteConsumidorApiPublicaId, headers.publicAccessKey);
-
-		const response = await fetch(finalUrl, {
-			method,
-			headers: { ...requestHeaders }
-		});
-
-		if (!response.ok) {
-			const errorText = await response.text();
-			safeThrow(context, `Error GET (pág ${currentPage}): ${response.status} - ${errorText}`);
-		}
-
-		const data = await response.json();
-		const pageItems = extractItems<T>(data, itemsField);
-		allItems.push(...pageItems);
-
-		const processingDuration = Date.now() - totalStart;
-		const nextPage = pageItems.length >= itemsPerPage;
-
-		const logMsg = `[paginación] página: ${currentPage} - Items recibidos: ${pageItems.length} (sincronia: ${processingDuration}ms${nextPage ? '  espera ' + intervaloMs + 'ms' : ''})`;
-		context?.logger ? context.logger.info(logMsg) : console.log(logMsg);
-
-		if (!nextPage) break;
-
-		await new Promise((resolve) => setTimeout(resolve, intervaloMs));
-		currentPage++;
+	if (!response.ok) {
+		const errorText = await response.text();
+		safeThrow(context, `Error GET: ${response.status} - ${errorText}`);
 	}
 
-	return allItems;
+	const data = await response.json();
+	const allItems = extractItems<T>(data, itemsField);
+
+	// Si no hay paginación configurada o es 'all', devolver todo
+	if (pagination === 'all' || !cantidadItemsPorPagina) {
+		const logMsg = `[paginación interna] Total items: ${allItems.length}, Retornando todos los items`;
+		context?.logger ? context.logger.info(logMsg) : console.log(logMsg);
+		return allItems;
+	}
+
+	// Paginación interna: dividir el array en chunks
+	const itemsPerPage = cantidadItemsPorPagina;
+	const startIndex = ((numeroPagina || 1) - 1) * itemsPerPage;
+	const endIndex = startIndex + itemsPerPage;
+
+	const logMsg = `[paginación interna] Total items: ${allItems.length}, Página: ${numeroPagina || 1}, Items por página: ${itemsPerPage}, Retornando: ${Math.min(endIndex, allItems.length) - startIndex} items`;
+	context?.logger ? context.logger.info(logMsg) : console.log(logMsg);
+
+	return allItems.slice(startIndex, endIndex);
 }
 
 
