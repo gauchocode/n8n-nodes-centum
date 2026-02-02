@@ -1020,7 +1020,7 @@ export async function apiGetRequest<T = any>(
 		numeroPagina,
 		context,
 		pagination = 'all',
-		intervaloPagina,
+		// intervaloPagina,
 	} = options;
 
 	console.log('options getRequest: ', options)
