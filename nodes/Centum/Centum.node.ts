@@ -220,28 +220,81 @@ export class Centum implements INodeType {
 			}
 
 			case "buscarProductoPorCodigo": {
-				const codigo = this.getNodeParameter("codigoArticulo", 0) as string;
-				const articleId = this.getNodeParameter("articleId", 0) as string;
-				const fechaCreacionDesde = this.getNodeParameter("startDate", 0) as string;
-				const fechaCreacionHasta = this.getNodeParameter("endDate", 0) as string;
+				const codigoRaw = this.getNodeParameter("codigoArticulo", 0) as string;
+				const articleIdRaw = this.getNodeParameter("articleId", 0) as string;
 
-				if (!codigo && !articleId) {
+				const codigo = codigoRaw.trim();
+				const ids = articleIdRaw
+					.split(",")
+					.map(s => s.trim())
+					.filter(Boolean);
+
+				if (!codigo && ids.length === 0) {
 					throw new NodeOperationError(this.getNode(), "El id o codigo del articulo es obligatorio");
 				}
+
 				try {
-					const articulo = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
+					let articulo: any;
+
+					// 1) Prioridad: buscar por IDs
+					if (ids.length > 0) {
+					articulo = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
 						method: "POST",
 						headers,
-						body: { CodigoExacto: codigo, Ids: articleId, FechaCreacionDesde: fechaCreacionDesde, FechaCreacionHasta: fechaCreacionHasta },
+						body: { Ids: ids },
 					});
+
+					const empty =
+						!articulo ||
+						(Array.isArray(articulo) && articulo.length === 0);
+
+					// 2) Fallback: si no encontró nada, buscar por código
+					if (empty && codigo) {
+						articulo = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
+						method: "POST",
+						headers,
+						body: { CodigoExacto: codigo },
+						});
+					}
+					} else {
+					// Solo código
+					articulo = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
+						method: "POST",
+						headers,
+						body: { CodigoExacto: codigo },
+					});
+					}
 
 					return [this.helpers.returnJsonArray(articulo)];
 				} catch (error) {
-					console.log("Error en solicitud de artículo por ID:", error);
-					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+					console.log("Error en solicitud de artículo:", error);
+					const errorMessage =
+					error?.response?.data?.Message ||
+					error.message ||
+					"Error desconocido";
+
 					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
-			}
+				}
+
+				// const parseArticle = articleId.split(',')
+
+				// if (!codigo && !articleId) {
+				// 	throw new NodeOperationError(this.getNode(), "El id o codigo del articulo es obligatorio");
+				// }
+				// try {
+				// 	const articulo = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
+				// 		method: "POST",
+				// 		headers,
+				// 		body: { CodigoExacto: codigo, Ids: parseArticle },
+				// 	});
+
+				// 	return [this.helpers.returnJsonArray(articulo)];
+				// } catch (error) {
+				// 	console.log("Error en solicitud de artículo por ID:", error);
+				// 	const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+				// 	throw new NodeOperationError(this.getNode(), errorMessage);
+				// }
 
 			case "buscarProductoPorNombre": {
 				const nombre = this.getNodeParameter("nombre", 0) as string;
@@ -1336,7 +1389,10 @@ export class Centum implements INodeType {
 				}
 
 				try {
-					const response = await apiRequest<any>(url);
+					const response = await apiRequest<any>(url, {
+						method: "GET",
+						headers
+					});
 
 					return [this.helpers.returnJsonArray(response)];
 				} catch (error) {
