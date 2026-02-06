@@ -823,7 +823,7 @@ const getArticulo: INodeProperties[] = [
 		default: 0,
 		description: 'ID de la bonificación',
 		displayOptions: {
-			show: { resource: ['crearPedidoVenta'] },
+			show: { resource: ['crearPedidoVenta', 'crearVenta'] },
 		},
 	},
 	{
@@ -943,7 +943,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: '1',
 		description: 'ID del tipo de comprobante de la factura',
-		displayOptions: { show: { resource: ['crearCompra', 'listarFacturasVenta'] } },
+		displayOptions: { show: { resource: ['crearCompra', 'listarFacturasVenta', 'crearVenta'] } },
 	},
 	{
 		displayName: 'ID Del Tipo De Comprobante',
@@ -1169,7 +1169,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: '1',
 		description: 'Numero del punto de venta del documento',
-		displayOptions: { show: { resource: ['generarCompras', 'generarVentas', 'crearOrdenCompra', 'crearCompra'] } },
+		displayOptions: { show: { resource: ['generarCompras', 'generarVentas', 'crearOrdenCompra', 'crearVenta'] } },
 	},
 	{
 		displayName: 'Razón Social',

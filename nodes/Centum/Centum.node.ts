@@ -1106,8 +1106,8 @@ export class Centum implements INodeType {
 
 				// 3) Solo agrego VentaValoresEfectivos si corresponde y con valores válidos
 				if (esContado === true) {
-					const cotizacion = !cotizacionValorEfectivo || cotizacionValorEfectivo <= 0 ? 1 : Number(cotizacionValorEfectivo);
-					const cuotas = !cantidadCuotasValorEfectivo || cantidadCuotasValorEfectivo <= 0 ? 1 : Number(cantidadCuotasValorEfectivo);
+					const cotizacion = !cotizacionValorEfectivo || cotizacionValorEfectivo <= 0 ? 0 : Number(cotizacionValorEfectivo);
+					const cuotas = !cantidadCuotasValorEfectivo || cantidadCuotasValorEfectivo <= 0 ? 0 : Number(cantidadCuotasValorEfectivo);
 
 					bodyVenta.VentaValoresEfectivos = [
 						{
