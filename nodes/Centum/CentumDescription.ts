@@ -543,14 +543,6 @@ const getArticulo: INodeProperties[] = [
 		displayOptions: { show: { resource: ['proveedorCrear'] } },
 	},
 	{
-		displayName: 'Contraseña',
-		name: 'password',
-		type: 'string',
-		typeOptions: { password: true },
-		default: '',
-		displayOptions: { show: { resource: ['verificarCredencialesOperador'] } },
-	},
-	{
 		displayName: 'Cotizacion',
 		name: 'cotizacionValorEfectivo',
 		type: 'number',

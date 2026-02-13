@@ -2437,12 +2437,10 @@ export class Centum implements INodeType {
 
 			case "verificarCredencialesOperador": {
 				const username = this.getNodeParameter("username", 0, "") as string;
-				const password = this.getNodeParameter("password", 0, "") as string;
-
 				try {
 					const operadoresActividad = await apiRequest<any>(
 						`
-						${centumUrl}/OperadoresMoviles/Credenciales?Usuario=${username}&Contrasena=${password}`,
+						${centumUrl}/OperadoresMoviles?Usuario=${username}`,
 						{
 							method: "GET",
 							headers,
