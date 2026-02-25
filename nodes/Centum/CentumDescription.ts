@@ -1084,7 +1084,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'number',
 		default: '',
 		description: 'ID de la lista para buscar los precios de los articulos',
-		displayOptions: { show: { resource: ['consultarPrecioProducto', 'crearVenta'] } },
+		displayOptions: { show: { resource: ['consultarPrecioProducto', 'crearVenta', 'estadisticaVentaRanking'] } },
 	},
 	{
 		displayName: 'Letra Del Documento De La Compra',
@@ -1182,14 +1182,14 @@ const getArticulo: INodeProperties[] = [
 			show: { resource: ['estadisticaVentaRanking'] }
 		}
 	},
-	// {
-	// 	displayName: 'Rubros IDs',
-	// 	name: 'idsRubros',
-	// 	type: 'string',
-	// 	default: '',
-	// 	description: 'ID Rubros used to search the articles',
-	// 	displayOptions: { show: { resource: ['articulo'] } },
-	// },
+	{
+		displayName: 'Rubro ID',
+		name: 'rubroId',
+		type: 'string',
+		default: '',
+		description: 'ID Rubros used to search the articles',
+		displayOptions: { show: { resource: ['estadisticaVentaRanking'] } },
+	},
 	{
 		displayName: 'SKU',
 		name: 'sku',

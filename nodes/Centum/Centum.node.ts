@@ -1194,158 +1194,87 @@ export class Centum implements INodeType {
 
 				return [this.helpers.returnJsonArray(arrResult)];
 			}
-
-			// case "estadisticaVentaRanking": {
-			// 	const fechaDesdeString = this.getNodeParameter('startDate', 0);
-			// 	const fechaHastaString = this.getNodeParameter('endDate', 0);
-			// 	const tipoDeRanking = this.getNodeParameter('tipoDeRanking', 0);
-			// 	const orderByRanking = this.getNodeParameter('ventaRankingOrderBy', 0)
-			// 	const orderAsc = this.getNodeParameter('orderAsc', 0);
-			// 	const cantItems = this.getNodeParameter('cantidadDeItems', 0);
-			// 	const fechaDesde = String(fechaDesdeString).split("T")[0];
-			// 	const fechaHasta = String(fechaHastaString).split("T")[0];
-
-
-			// 	let url = `${centumUrl}/EstadisticaVentaRanking/${cantItems}`;
-
-			// 	if (fechaDesde && fechaHasta) {
-			// 		url += `?fechaDocumentoDesde=${fechaDesde}&fechaDocumentoHasta=${fechaHasta}`
-			// 	} else {
-			// 		throw new NodeOperationError(this.getNode(), 'Ambos periodos de fecha son necesarios.')
-			// 	}
-
-			// 	if (tipoDeRanking) {
-			// 		if (tipoDeRanking === 'esRankingClientes') {
-			// 			url += `&${tipoDeRanking}=true`
-			// 		}
-			// 		if (tipoDeRanking === 'esRankingArticulos') {
-			// 			url += `&${tipoDeRanking}=true`
-			// 		}
-			// 		if (tipoDeRanking === 'esRankingVendedores') {
-			// 			url += `&${tipoDeRanking}=true`
-			// 		}
-			// 	}
-
-			// 	if (orderByRanking) {
-			// 		if (orderByRanking === 'CantidadUnidadNivel0') {
-			// 			url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`
-			// 		}
-			// 		if (orderByRanking === 'CantidadUnidadNivel1') {
-			// 			url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`
-			// 		}
-			// 		if (orderByRanking === 'CantidadUnidadNivel2') {
-			// 			url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`
-			// 		}
-			// 		if (orderByRanking === 'ImporteTotalNeto') {
-			// 			url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`
-			// 		}
-			// 		if (orderByRanking === 'ImporteTotalFinal') {
-			// 			url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`
-			// 		}
-			// 	}
-
-			// 	if (orderAsc !== null) {
-			// 		url += `&ordenEstadisticaVentaRankingAscendente=${orderAsc}`
-			// 	}
-
-			// 	try {
-			// 		const response = await apiRequest<any>(`${url}`, {
-			// 			method: "GET",
-			// 			headers,
-			// 		});
-			// 		return [this.helpers.returnJsonArray(response)];
-			// 	} catch (error) {
-			// 		console.log("Error en solicitud de estadisticas de ventas:", error);
-			// 		const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
-			// 		throw new NodeOperationError(this.getNode(), `Error obteniendo las estadisticas de ranking. \n ${errorMessage}`);
-			// 	}
-
-			// }
-
 			case "estadisticaVentaRanking": {
-	const fechaDesdeString = this.getNodeParameter('startDate', 0);
-	const fechaHastaString = this.getNodeParameter('endDate', 0);
-	const tipoDeRanking = this.getNodeParameter('tipoDeRanking', 0);
-	const orderByRanking = this.getNodeParameter('ventaRankingOrderBy', 0);
-	const orderAsc = this.getNodeParameter('orderAsc', 0);
-	const cantItems = this.getNodeParameter('cantidadDeItems', 0);
+        const fechaDesdeString = this.getNodeParameter('startDate', 0);
+        const fechaHastaString = this.getNodeParameter('endDate', 0);
+        const tipoDeRanking = this.getNodeParameter('tipoDeRanking', 0);
+        const orderByRanking = this.getNodeParameter('ventaRankingOrderBy', 0);
+        const orderAsc = this.getNodeParameter('orderAsc', 0);
+        const cantItems = this.getNodeParameter('cantidadDeItems', 0);
+        const rubroId = this.getNodeParameter('rubroId', 0);
+        const idListaPrecio = this.getNodeParameter('idList', 0);
 
-	const fechaDesde = String(fechaDesdeString).split("T")[0];
-	const fechaHasta = String(fechaHastaString).split("T")[0];
+        const fechaDesde = String(fechaDesdeString).split("T")[0];
+        const fechaHasta = String(fechaHastaString).split("T")[0];
 
-	let url = `${centumUrl}/EstadisticaVentaRanking/${cantItems}`;
+        let url = `${centumUrl}/EstadisticaVentaRanking/${cantItems}`;
 
-	if (fechaDesde && fechaHasta) {
-		url += `?fechaDocumentoDesde=${fechaDesde}&fechaDocumentoHasta=${fechaHasta}`;
-	} else {
-		throw new NodeOperationError(this.getNode(), 'Ambos periodos de fecha son necesarios.');
-	}
+        if (fechaDesde && fechaHasta) {
+          url += `?fechaDocumentoDesde=${fechaDesde}&fechaDocumentoHasta=${fechaHasta}`;
+        } else {
+          throw new NodeOperationError(this.getNode(), 'Ambos periodos de fecha son necesarios.');
+        }
 
-	// Ranking (manteniendo la lógica de ifs actuales)
-	if (tipoDeRanking) {
-		if (tipoDeRanking === 'esRankingClientes') {
-			url += `&${tipoDeRanking}=true`;
-		}
-		if (tipoDeRanking === 'esRankingArticulos') {
-			url += `&${tipoDeRanking}=true`;
-		}
-		if (tipoDeRanking === 'esRankingVendedores') {
-			url += `&${tipoDeRanking}=true`;
-		}
-	}
+        if(rubroId){
+          url += `&idsRubro=${rubroId}`; 
+        }
 
-	// OrderBy (manteniendo la lógica de ifs actuales)
-	if (orderByRanking) {
-		if (orderByRanking === 'CantidadUnidadNivel0') {
-			url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
-		}
-		if (orderByRanking === 'CantidadUnidadNivel1') {
-			url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
-		}
-		if (orderByRanking === 'CantidadUnidadNivel2') {
-			url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
-		}
-		if (orderByRanking === 'ImporteTotalNeto') {
-			url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
-		}
-		if (orderByRanking === 'ImporteTotalFinal') {
-			url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
-		}
-	}
+        if(idListaPrecio){
+          url += `&idsListaPrecio=${idListaPrecio}`;
+        }
 
-	/**
-	 * Regla backend:
-	 * Si se especifica ordenEstadisticaVentaRankingAscendente (true/false),
-	 * se debe especificar tipoOrdenEstadisticaVentaRanking.
-	 *
-	 * Correcciones:
-	 * 1) Solo agregamos ordenEstadisticaVentaRankingAscendente si orderAsc es boolean
-	 *    (evita mandar "undefined" o "" y disparar validaciones).
-	 * 2) Si orderAsc es boolean pero NO se especificó orderByRanking, se lanza error
-	 *    para exigir que el usuario agregue lo necesario.
-	 */
-	if (typeof orderAsc === 'boolean') {
-		if (!orderByRanking) {
-			throw new NodeOperationError(
-				this.getNode(),
-				'Debe especificar "ventaRankingOrderBy" cuando se especifica "orderAsc" (por requerimiento del endpoint EstadisticaVentaRanking).',
-			);
-		}
-		url += `&ordenEstadisticaVentaRankingAscendente=${orderAsc}`;
-	}
+        if (tipoDeRanking) {
+          if (tipoDeRanking === 'esRankingClientes') {
+            url += `&${tipoDeRanking}=true`;
+          }
+          if (tipoDeRanking === 'esRankingArticulos') {
+            url += `&${tipoDeRanking}=true`;
+          }
+          if (tipoDeRanking === 'esRankingVendedores') {
+            url += `&${tipoDeRanking}=true`;
+          }
+        }
 
-	try {
-		const response = await apiRequest<any>(`${url}`, {
-			method: "GET",
-			headers,
-		});
-		return [this.helpers.returnJsonArray(response)];
-	} catch (error) {
-		console.log("Error en solicitud de estadisticas de ventas:", error);
-		const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
-		throw new NodeOperationError(this.getNode(), `Error obteniendo las estadisticas de ranking. \n ${errorMessage}`);
-	}
-}
+        // OrderBy (manteniendo la lógica de ifs actuales)
+        if (orderByRanking) {
+          if (orderByRanking === 'CantidadUnidadNivel0') {
+            url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
+          }
+          if (orderByRanking === 'CantidadUnidadNivel1') {
+            url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
+          }
+          if (orderByRanking === 'CantidadUnidadNivel2') {
+            url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
+          }
+          if (orderByRanking === 'ImporteTotalNeto') {
+            url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
+          }
+          if (orderByRanking === 'ImporteTotalFinal') {
+            url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
+          }
+        }
+        if (typeof orderAsc === 'boolean') {
+          if (!orderByRanking) {
+            throw new NodeOperationError(
+              this.getNode(),
+              'Debe especificar "ventaRankingOrderBy" cuando se especifica "orderAsc" (por requerimiento del endpoint EstadisticaVentaRanking).',
+            );
+          }
+          url += `&ordenEstadisticaVentaRankingAscendente=${orderAsc}`;
+        }
+
+        try {
+          const response = await apiRequest<any>(`${url}`, {
+            method: "GET",
+            headers,
+          });
+          return [this.helpers.returnJsonArray(response)];
+        } catch (error) {
+          console.log("Error en solicitud de estadisticas de ventas:", error);
+          const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+          throw new NodeOperationError(this.getNode(), `Error obteniendo las estadisticas de ranking. \n ${errorMessage}`);
+        }
+      }
 
 
 			case "generarTokenSeguridad": {
@@ -2242,10 +2171,18 @@ export class Centum implements INodeType {
 					const paginated = await apiPostRequestPaginated<IArticulos>(articulosURL, fetchOptions);
 					return [this.helpers.returnJsonArray(paginated as any)];
 				} catch (error) {
-					console.log("Error en solicitud de artículos", error);
-					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
-					throw new NodeOperationError(this.getNode(), errorMessage);
-				}
+          console.error("Error en solicitud de artículos:", error);
+
+          let errorMessage = "Error desconocido";
+
+          if ((error as any)?.response?.data?.Message) {
+            errorMessage = (error as any).response.data.Message;
+          } else if (error instanceof Error) {
+            errorMessage = error.message;
+          }
+
+          throw new NodeOperationError(this.getNode(), errorMessage);
+        }
 			}
 
 			case 'listarTurnosEntrega': {
