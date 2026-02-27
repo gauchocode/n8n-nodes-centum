@@ -1935,29 +1935,49 @@ export class Centum implements INodeType {
 				}
 			}
 
-			case "listarProductosPorSucursal": {
-				const IdSucursalFisica = this.getNodeParameter("idSucursalFisica", 0) as string;
+      case "listarProductosPorSucursal": {
+          const IdSucursalFisica = this.getNodeParameter("idSucursalFisica", 0) as string;
+          const IdArticulo = this.getNodeParameter("articleId", 0) as string;
+          const NombreArticulo = this.getNodeParameter("nombreArticulo", 0) as string;
+          const IdRubro = this.getNodeParameter("rubroId", 0) as string;
+          const IdSubRubro = this.getNodeParameter("idsSubRubros", 0) as string;
+          const IdCategoriaArticulo = this.getNodeParameter("IdCategoriaArticulo", 0) as string;
+          const IdMarcaArticulo = this.getNodeParameter("IdMarcaArticulo", 0) as string;
 
-				const queryParams: { idsSucursalesFisicas?: string } = {
-					idsSucursalesFisicas: IdSucursalFisica,
-				};
+          // Si no filtra por artículo, sucursal + al menos una segmentación son obligatorios
+          if (!IdArticulo) {
+              if (!IdSucursalFisica) {
+                  throw new NodeOperationError(this.getNode(), "Si no filtra por artículo, el id de la sucursal física es obligatorio");
+              }
 
-				if (!IdSucursalFisica) {
-					throw new NodeOperationError(this.getNode(), "El id de la sucursal fisica es obligatorio");
-				}
+              const tieneSegmentacion = NombreArticulo || IdRubro || IdSubRubro || IdCategoriaArticulo || IdMarcaArticulo;
+              if (!tieneSegmentacion) {
+                  throw new NodeOperationError(this.getNode(), "Si no filtra por artículo, debe especificar al menos una segmentación: Nombre, IdRubro, IdSubRubro, IdCategoriaArticulo o IdMarcaArticulo");
+              }
+          }
 
-				try {
-					const dataArticulosExistencias = await apiRequest<any>(`${centumUrl}/ArticulosSucursalesFisicas`, {
-						headers,
-						queryParams,
-					});
-					return [this.helpers.returnJsonArray(dataArticulosExistencias.Items as any)];
-				} catch (error) {
-					console.log(error);
-					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
-					throw new NodeOperationError(this.getNode(), errorMessage);
-				}
-			}
+          const queryParams: Record<string, string> = {};
+
+          if (IdSucursalFisica) queryParams.idsSucursalesFisicas = IdSucursalFisica;
+          if (IdArticulo) queryParams.idsArticulos = IdArticulo;
+          if (NombreArticulo) queryParams.nombre = NombreArticulo;
+          if (IdRubro) queryParams.idRubro = IdRubro;
+          if (IdSubRubro) queryParams.idSubRubro = IdSubRubro;
+          if (IdCategoriaArticulo) queryParams.idCategoriaArticulo = IdCategoriaArticulo;
+          if (IdMarcaArticulo) queryParams.idMarcaArticulo = IdMarcaArticulo;
+
+          try {
+              const dataArticulosExistencias = await apiRequest<any>(`${centumUrl}/ArticulosSucursalesFisicas`, {
+                  headers,
+                  queryParams,
+              });
+              return [this.helpers.returnJsonArray(dataArticulosExistencias.Items as any)];
+          } catch (error) {
+              console.log(error);
+              const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+              throw new NodeOperationError(this.getNode(), errorMessage);
+          }
+      }
 
 			case "listarPromociones": {
 				const documentDate = this.getNodeParameter("documentDate", 0) as string;
@@ -2119,6 +2139,24 @@ export class Centum implements INodeType {
 
 				} catch (error) {
 					console.log(error);
+					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+					throw new NodeOperationError(this.getNode(), errorMessage);
+				}
+			}
+      case "listarSubRubros": {
+        const idRubro = this.getNodeParameter('rubroId', 0) as string;
+        const queryParams: Record<string, string> = {};
+        
+        if(idRubro) queryParams.idRubro = idRubro;
+        
+				try {
+					const response = await apiRequest<any>(`${centumUrl}/SubRubros`, {
+						method: 'GET',
+						headers,
+            queryParams
+					});
+					return [this.helpers.returnJsonArray(response)];
+				} catch (error) {
 					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
 					throw new NodeOperationError(this.getNode(), errorMessage);
 				}

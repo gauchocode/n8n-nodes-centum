@@ -326,6 +326,11 @@ export const CentumOperations: INodeProperties[] = [
 				action: 'Obten el listado de los rubros',
 				description: 'Obten el listado completo de todos los rubros de los articulos'
 			},
+      {
+        name: 'Sub Rubros - Listar',
+        value: 'listarSubRubros',
+        description: 'Obten el listado completo de los sub rubros o filtralo por ID'
+      },
 			{
 				name: 'Sucursales Físicas - Lista',
 				value: 'listarSucursales',
@@ -878,7 +883,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: '1467',
 		displayOptions: {
-			show: { resource: ['descargarImagenesProductos', 'buscarProductoPorCodigo', 'buscarProductoEnSucursal', 'consultarPrecioProducto'] },
+			show: { resource: ['listarProductosPorSucursal', 'descargarImagenesProductos', 'buscarProductoPorCodigo', 'buscarProductoEnSucursal', 'consultarPrecioProducto'] },
 		},
 	},
 	{
@@ -1118,7 +1123,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		placeholder: 'Alfajores',
-		displayOptions: { show: { resource: ['buscarProductos'] } },
+		displayOptions: { show: { resource: ['buscarProductos', 'listarProductosPorSucursal'] } },
 		description: 'El nombre del producto a buscar',
 	},
 	// {
@@ -1188,7 +1193,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		description: 'ID Rubros used to search the articles',
-		displayOptions: { show: { resource: ['estadisticaVentaRanking'] } },
+		displayOptions: { show: { resource: ['estadisticaVentaRanking', 'listarProductosPorSucursal', 'listarSubRubros'] } },
 	},
 	{
 		displayName: 'SKU',
@@ -1205,7 +1210,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		description: 'Client ID used to search the articles',
-		displayOptions: { show: { resource: ['listarCategorias'] } },
+		displayOptions: { show: { resource: ['listarCategorias', 'listarProductosPorSucursal'] } },
 	},
 	{
 		displayName: 'Sucursales Físicas - IDs Lista',
@@ -1231,83 +1236,6 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: { show: { resource: ['verificarCredencialesOperador', 'listarOperadoresMoviles'] } },
 	},
-	// {
-	// 	displayName: 'Código Desde',
-	// 	name: 'codigoDesde',
-	// 	type: 'string',
-	// 	default: '',
-	// 	displayOptions: {
-	// 		show: {
-	// 			resource: ['listarProveedores']
-	// 		}
-	// 	}
-	// },
-	// {
-	// 	displayName: 'Código Hasta',
-	// 	name: 'codigoHasta',
-	// 	type: 'string',
-	// 	default: '',
-	// 	displayOptions: {
-	// 		show: {
-	// 			resource: ['listarProveedores']
-	// 		}
-	// 	}
-	// },
-	// {
-	// 	displayName: 'Dirección',
-	// 	name: 'direccion',
-	// 	type: 'string',
-	// 	default: '',
-	// 	displayOptions: {
-	// 		show: {
-	// 			resource: ['listarProveedores']
-	// 		}
-	// 	}
-	// },
-	// {
-	// 	displayName: 'Localidad',
-	// 	name: 'localidad',
-	// 	type: 'string',
-	// 	default: '',
-	// 	displayOptions: {
-	// 		show: {
-	// 			resource: ['listarProveedores']
-	// 		}
-	// 	}
-	// },
-	// {
-	// 	displayName: 'Teléfono',
-	// 	name: 'telefono',
-	// 	type: 'number',
-	// 	default: '',
-	// 	displayOptions: {
-	// 		show: {
-	// 			resource: ['listarProveedores']
-	// 		}
-	// 	}
-	// },
-	// {
-	// 	displayName: 'Teléfono Alternativo',
-	// 	name: 'telefonoAlt',
-	// 	type: 'string',
-	// 	default: '',
-	// 	displayOptions: {
-	// 		show: {
-	// 			resource: ['listarProveedores']
-	// 		}
-	// 	}
-	// },
-	// {
-	// 	displayName: 'Código Postal',
-	// 	name: 'codigoPostal',
-	// 	type: 'number',
-	// 	default: '',
-	// 	displayOptions: {
-	// 		show: {
-	// 			resource: ['listarProveedores']
-	// 		}
-	// 	}
-	// },
 	{
 		displayName: 'Código',
 		name: 'codigo',
@@ -1331,28 +1259,30 @@ const getArticulo: INodeProperties[] = [
 	 		}
 	 	}
 	},
-	// {
-	// 	displayName: 'ID Clase Proveedor',
-	// 	name: 'idClaseProveedor',
-	// 	type: 'number',
-	// 	default: '',
-	// 	displayOptions: {
-	// 		show: {
-	// 			resource: ['listarProveedores']
-	// 		}
-	// 	}
-	// },
-	// 	{
-	// 	displayName: 'Fecha Actualización Desde',
-	// 	name: 'fechaActualizacionDesde',
-	// 	type: 'dateTime',
-	// 	default: '',
-	// 	displayOptions: {
-	// 		show: {
-	// 			resource: ['listarProveedores']
-	// 		}
-	// 	}
-	// },
+  {
+    displayName: 'ID Marca Articulo',
+    name: 'IdMarcaArticulo',
+    type: 'string',
+    placeholder: '3',
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['listarProductosPorSucursal']
+      }
+    }
+  },
+    {
+    displayName: 'ID Categoria Articulo',
+    name: 'IdCategoriaArticulo',
+    type: 'string',
+    placeholder: '3',
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['listarProductosPorSucursal']
+      }
+    }
+  }
 ];
 
 
