@@ -80,6 +80,11 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obten el listado completo de todas las categorías de los articulos'
 			},
 			{
+				name: 'Choferes - Obtener Listado',
+				value: 'listarChoferes',
+				description: 'Obtiene un listado completo de los choferes disponibles'
+			},
+			{
 				name: 'Cliente - Actualizar',
 				value: 'actualizarCliente',
 				action: 'Actualizar cliente',
@@ -228,6 +233,11 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Obtiene una unica orden de compra en base al ID'
 			},
 			{
+				name: 'Orden De Traspaso - Generar',
+				value: 'crearMovimientoStock',
+				description: 'Crea un ajuste de movimiendo de stock'
+			},
+			{
 				name: 'Ordenes De Compra - Obtener',
 				value: 'listarOrdenesCompra',
 				description: 'Obtiene todas las ordenes de compra en base a ciertos filtros'
@@ -321,6 +331,16 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Trae un listado entero de los regímenes especiales'
 			},
 			{
+				name: 'Remito De Compra - Crear',
+				value: 'crearRemitoCompra',
+				description: 'Crea un remito de compra en base a los parametros enviados'
+			},
+			{
+				name: 'Remito De Venta - Crear',
+				value: 'crearRemitoVenta',
+				description: 'Crea un remito de compra en base a los parametros enviados'
+			},
+			{
 				name: 'Rubros - Obtener',
 				value: 'listarRubros',
 				action: 'Obten el listado de los rubros',
@@ -345,6 +365,11 @@ export const CentumOperations: INodeProperties[] = [
 				name: 'Turno De Entrega - Obtener',
 				value: 'listarTurnosEntrega',
 				description: 'Obtiene el listado total disponible de turnos de entrega'	
+			},
+			{
+				name: 'Ubicaciones De Articulos - Listar',
+				value: 'listarUbicacionArticulos',
+				description: 'Obtiene un listado total de las ubicaciones de los articulos'
 			},
 			{
 				name: 'Vendedores - Obtener',
@@ -383,7 +408,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'json',
 		default: {},
 		displayOptions: {
-			show: { resource: ['registrarCobro', 'crearPedidoVenta', 'crearOrdenCompra'] },
+			show: { resource: ['registrarCobro', 'crearPedidoVenta', 'crearOrdenCompra', 'crearRemitoCompra'] },
 		},
 	},
 	{
@@ -394,7 +419,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		description: 'Lista de artículos en formato JSON',
 		displayOptions: {
-			show: { resource: ['crearCompra', 'crearVenta'] },
+			show: { resource: ['crearCompra', 'crearVenta', 'crearRemitoVenta'] },
 		},
 	},
 	{
@@ -478,7 +503,9 @@ const getArticulo: INodeProperties[] = [
 					'listarCompras',
 					'crearVenta',
 					'listarPedidosVentaFiltrados',
-					'consultarPrecioProducto'
+					'consultarPrecioProducto',
+					'crearRemitoVenta',
+					'crearRemitoCompra'
 				],
 			},
 		},
@@ -692,7 +719,7 @@ const getArticulo: INodeProperties[] = [
 		default: undefined,
 		description: 'Parametro fecha del body para las solicitudes',
 		displayOptions: {
-			show: { resource: ['listarProductosDisponibles', 'listarPromocionesComercialesCliente', 'crearCompra', 'crearPedidoVenta', 'crearOrdenCompra', 'listarPromociones', 'consultarPrecioProducto'] },
+			show: { resource: ['crearRemitoVenta', 'listarProductosDisponibles', 'crearRemitoCompra' , 'listarPromocionesComercialesCliente', 'crearCompra', 'crearPedidoVenta', 'crearOrdenCompra', 'listarPromociones', 'consultarPrecioProducto'] },
 		},
 	},
 	{
@@ -703,7 +730,29 @@ const getArticulo: INodeProperties[] = [
 		default: undefined,
 		description: 'Fecha de entrega',
 		displayOptions: {
-			show: { resource: ['crearOrdenCompra'] },
+			show: { resource: ['crearOrdenCompra', 'crearRemitoCompra', 'crearRemitoVenta'] },
+		},
+	},
+	{
+		displayName: 'Fecha Embarque',
+		name: 'shipmentDate',
+		type: 'dateTime',
+		required: true,
+		default: undefined,
+		description: 'Fecha de embarque',
+		displayOptions: {
+			show: { resource: ['crearRemitoVenta'] },
+		},
+	},
+	{
+		displayName: 'Fecha De Imputacion',
+		name: 'indictmentDate',
+		type: 'dateTime',
+		required: true,
+		default: undefined,
+		description: 'Fecha de imputación',
+		displayOptions: {
+			show: { resource: ['crearRemitoVenta', 'crearMovimientoStock'] },
 		},
 	},
 	{
@@ -714,7 +763,7 @@ const getArticulo: INodeProperties[] = [
 		default: undefined,
 		description: 'Fecha de vencimiento',
 		displayOptions: {
-			show: { resource: ['crearOrdenCompra'] },
+			show: { resource: ['crearOrdenCompra', 'crearRemitoCompra'] },
 		},
 	},
 	{
@@ -831,7 +880,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		description: 'ID del turno de entrega',
 		displayOptions: {
-			show: { resource: ['crearPedidoVenta', 'crearOrdenCompra'] },
+			show: { resource: ['crearPedidoVenta', 'crearOrdenCompra', 'crearRemitoCompra', 'crearRemitoVenta'] },
 		},
 	},
 	{
@@ -865,6 +914,13 @@ const getArticulo: INodeProperties[] = [
 		displayOptions: { show: { resource: ['proveedorCrear'] } },
 	},
 	{
+		displayName: 'ID Del Chofer',
+		name: 'choferId',
+		type: 'number',
+		default: '',
+		displayOptions: { show: { resource: ['crearRemitoVenta'] } },
+	},
+	{
 		displayName: 'ID',
 		name: 'id',
 		required: true,
@@ -884,6 +940,7 @@ const getArticulo: INodeProperties[] = [
 		placeholder: '1467',
 		displayOptions: {
 			show: { resource: ['listarProductosPorSucursal', 'descargarImagenesProductos', 'buscarProductoPorCodigo', 'buscarProductoEnSucursal', 'consultarPrecioProducto'] },
+			show: { resource: ['crearMovimientoStock', 'descargarImagenesProductos', 'buscarProductoPorCodigo', 'buscarProductoEnSucursal', 'consultarPrecioProducto'] },
 		},
 	},
 	{
@@ -892,6 +949,13 @@ const getArticulo: INodeProperties[] = [
 		type: 'number',
 		default: 0,
 		displayOptions: { show: { resource: ['crearVenta'] } },
+	},
+	{
+		displayName: 'Ubicacion Articulo',
+		name: 'ubicacionArticulo',
+		type: 'number',
+		default: 0,
+		displayOptions: { show: { resource: ['crearMovimientoStock'] } },
 	},
 	{
 		displayName: 'ID De Cobro',
@@ -965,7 +1029,7 @@ const getArticulo: INodeProperties[] = [
 		name: 'idVendedor',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['crearVenta', 'listarFacturasVenta'] } },
+		displayOptions: { show: { resource: ['crearVenta', 'listarFacturasVenta', 'crearRemitoVenta'] } },
 	},
 	{
 		displayName: 'ID De La Venta',
@@ -1042,7 +1106,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'The ID of the physical branch to filter stock (optional)',
 		displayOptions: {
 			show: {
-				resource: ['searchArticleBySKU', 'buscarProductoEnSucursal', 'crearCompra', 'crearOrdenCompra', 'listarProductosPorSucursal', 'listarFacturasVenta', 'listarPedidosVenta'],
+				resource: ['crearMovimientoStock', 'crearMovimientoStock','crearRemitoVenta','searchArticleBySKU', 'crearRemitoCompra' ,'buscarProductoEnSucursal', 'crearCompra', 'crearOrdenCompra', 'listarProductosPorSucursal', 'listarFacturasVenta', 'listarPedidosVenta'],
 			},
 		},
 	},
@@ -1098,7 +1162,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: 'A',
 		description: 'Letra del documento de la compra de la factura',
-		displayOptions: { show: { resource: ['crearCompra', 'crearOrdenCompra'] } },
+		displayOptions: { show: { resource: ['crearCompra', 'crearOrdenCompra', 'crearRemitoCompra', 'crearRemitoVenta'] } },
 	},
 	// {
 	// 	displayName: 'Migración Completa',
@@ -1126,14 +1190,6 @@ const getArticulo: INodeProperties[] = [
 		displayOptions: { show: { resource: ['buscarProductos', 'listarProductosPorSucursal'] } },
 		description: 'El nombre del producto a buscar',
 	},
-	// {
-	// 	displayName: 'Número De Página',
-	// 	name: 'numeroPagina',
-	// 	type: 'number',
-	// 	default: 1,
-	// 	description: 'Número de página para la paginación de artículos',
-	// 	displayOptions: { show: { resource: ['articulo'] } },
-	// },
 	{
 		displayName: 'Numero Del Documento De La Compra',
 		name: 'numeroFactura',
@@ -1141,7 +1197,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: '1',
 		description: 'Numero del documento de la compra de la factura',
-		displayOptions: { show: { resource: ['crearCompra', 'crearOrdenCompra'] } },
+		displayOptions: { show: { resource: ['crearCompra', 'crearOrdenCompra', 'crearRemitoCompra', 'crearRemitoVenta'] } },
 	},
 	{
 		displayName: 'Observaciones',
@@ -1157,7 +1213,7 @@ const getArticulo: INodeProperties[] = [
 		required: true,
 		default: '',
 		description: 'ID del proveedor usado para buscar dentro del sistema',
-		displayOptions: { show: { resource: ['crearOrdenCompra','buscarProveedor', 'listarOrdenesCompra'] } },
+		displayOptions: { show: { resource: ['crearOrdenCompra','buscarProveedor', 'listarOrdenesCompra', 'crearRemitoCompra'] } },
 	},
 	{
 		displayName: 'Punto De Venta',
@@ -1167,6 +1223,7 @@ const getArticulo: INodeProperties[] = [
 		placeholder: '1',
 		description: 'Numero del punto de venta del documento',
 		displayOptions: { show: { resource: ['generarCompras', 'generarVentas', 'crearOrdenCompra', 'crearVenta'] } },
+		displayOptions: { show: { resource: ['crearRemitoVenta', 'generarCompras',, 'generarVentas', 'crearOrdenCompra', 'crearCompra', 'crearRemitoCompra'] } },
 	},
 	{
 		displayName: 'Razón Social',
