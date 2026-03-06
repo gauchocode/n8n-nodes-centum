@@ -939,8 +939,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: '1467',
 		displayOptions: {
-			show: { resource: ['listarProductosPorSucursal', 'descargarImagenesProductos', 'buscarProductoPorCodigo', 'buscarProductoEnSucursal', 'consultarPrecioProducto'] },
-			show: { resource: ['crearMovimientoStock', 'descargarImagenesProductos', 'buscarProductoPorCodigo', 'buscarProductoEnSucursal', 'consultarPrecioProducto'] },
+			show: { resource: ['descargarImagenesProductos', 'buscarProductoPorCodigo', 'buscarProductoEnSucursal', 'consultarPrecioProducto',  'listarProductosPorSucursal', 'crearMovimientoStock', ] },
 		},
 	},
 	{
@@ -1222,8 +1221,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: '1',
 		description: 'Numero del punto de venta del documento',
-		displayOptions: { show: { resource: ['generarCompras', 'generarVentas', 'crearOrdenCompra', 'crearVenta'] } },
-		displayOptions: { show: { resource: ['crearRemitoVenta', 'generarCompras',, 'generarVentas', 'crearOrdenCompra', 'crearCompra', 'crearRemitoCompra'] } },
+		displayOptions: { show: { resource: ['generarCompras', 'generarVentas', 'crearOrdenCompra', 'crearVenta', 'crearCompra', 'crearRemitoCompra', 'crearRemitoVenta'] } },
 	},
 	{
 		displayName: 'Razón Social',
