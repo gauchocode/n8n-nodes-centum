@@ -20,17 +20,19 @@ The node is built to be extensible, making it easy to add new operations for spe
 
 ## Available Operations
 
-**42 endpoints organized into 5 categories:**
+**55 endpoints organized into 5 categories:**
 
 ### 📦 Articles
 - `articulo`: Search articles with filters (categories, dates, stock)
 - `articuloPorId`: Query by exact ID or code
+- `articuloPorNombre`: Query by article name
 - `articulosDatosGenerales`: Retrieve general article data
 - `articulosExistencia`: Stock availability by branch
 - `articulosImagenes`: Download and process article images
 - `articulosPrecioPorLista`: Prices by price list
 - `articulosSucursalesFisicas`: Articles grouped by branch
 - `articuloSucursalFisica`: Specific article in branch
+- `buscarArticulo`: Search article by name or code
 - `categoriasObtener`: List categories
 - `marcasObtener`: List brands
 - `rubrosObtener`: List product groups
@@ -53,11 +55,16 @@ The node is built to be extensible, making it easy to add new operations for spe
 - `crearPedidoVenta`: Create a sales order
 - `obtenerPedidosDeVenta`: List sales orders
 - `obtenerFacturasPedidosVentas`: Sales order invoice history
+- `obtenerFacturasPedidosVentasPorID`: Sales order invoice history by ID
 - `obtenerEstadosPedidosDeVenta`: Available sales order statuses
 - `pedidoVentaActividad`: Check sales order activity
 - `generarVentas`: Generate a sale
 - `generarCompras`: Generate a purchase
 - `obtenerCompras`: Filter purchases
+- `generarOrdenCompra`: Generate a purchase order
+- `obtenerOrdenCompra`: Get purchase order by ID
+- `obtenerOrdenesCompras`: Filter purchase orders
+- `obtenerBonificaciones`: Get available discounts
 
 ### 🌍 Catalogs
 - `provinciasLista`: List of provinces (Argentina)
@@ -68,12 +75,16 @@ The node is built to be extensible, making it easy to add new operations for spe
 - `regimenesEspecialesLista`: Special tax regimes
 - `regimenesEspecialesPorId`: Special regime by ID
 - `tipoComprobante`: Voucher types
+- `obtenerTurnoEntrega`: Get delivery time slots
+- `obtenerVendedores`: Get sales representatives
 
 ### ⚙️ Utilities
 - `generarProductosWoo`: Transform data to WooCommerce format
 - `procesarImagenes`: Image processing and synchronization
 - `generarToken`: Authentication token generation
 - `operadoresMoviles`: Retrieve mobile operator data based on credentials
+- `proveedorBuscar`: Search supplier by ID
+- `proveedorCrear`: Create a new supplier
 
 ## Prerequisites
 

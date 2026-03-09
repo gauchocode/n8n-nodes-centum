@@ -23,7 +23,8 @@ import {
 	IProvincias,
 	CondicionIVANombre
 } from '../interfaces';
-import { NodeParameterValue, IExecuteFunctions, NodeOperationError } from 'n8n-workflow';
+import { NodeParameterValue, IExecuteFunctions, NodeOperationError, NodeParameterValueType } from 'n8n-workflow';
+
 
 export const createHash = (publicAccessKey: string): string => {
 	const uuid = randomUUID().replace(/-/gi, '');
@@ -651,6 +652,38 @@ function centumGetArticleAttributes(article: { json: { AtributosArticulo: any[] 
 	}));
 }
 
+// function centumGetArticleVariations(groupId: number, arrArticles: any) {
+// 	const allAttributes: any = [];
+// 	const articlesWithSameGroupId = arrArticles.filter(
+// 		(article: { json: { GrupoArticulo: { IdGrupoArticulo: number } | null } }) =>
+// 			article.json.GrupoArticulo !== null && article.json.GrupoArticulo.IdGrupoArticulo === groupId,
+// 	);
+
+// 	articlesWithSameGroupId.forEach((article: { json: { AtributosArticulo: any[] } }) => {
+// 		allAttributes.push(...centumGetArticleAttributes(article));
+// 	});
+
+// 	const variations = articlesWithSameGroupId.map((article: { json: any }) => ({
+// 		sku: article.json.Codigo,
+// 		regular_price: article.json.Precio,
+// 		enabled: article.json.Habilitado === true && article.json.ActivoWeb === true,
+// 		attributes: centumGetArticleAttributes(article),
+// 		stock: article.json.ExistenciasSucursales,
+// 		dimensions: {
+// 			height: article.json.Alto * 100,
+// 			length: article.json.Largo * 100,
+// 			width: article.json.Ancho * 100,
+// 			weight: article.json.Masa,
+// 		},
+// 		images: article.json.images?.map((image: any) => image.data.fileName) || [],
+// 		description: article.json.Detalle ?? '',
+// 	}));
+
+// 	const allUniqueAttributes = getUniqueValues(allAttributes, 'value');
+
+// 	return [variations, allUniqueAttributes];
+// }
+
 function centumGetArticleVariations(groupId: number, arrArticles: any) {
 	const allAttributes: any = [];
 	const articlesWithSameGroupId = arrArticles.filter(
@@ -662,21 +695,35 @@ function centumGetArticleVariations(groupId: number, arrArticles: any) {
 		allAttributes.push(...centumGetArticleAttributes(article));
 	});
 
-	const variations = articlesWithSameGroupId.map((article: { json: any }) => ({
-		sku: article.json.Codigo,
-		regular_price: article.json.Precio,
-		enabled: article.json.Habilitado === true && article.json.ActivoWeb === true,
-		attributes: centumGetArticleAttributes(article),
-		stock: article.json.ExistenciasSucursales,
-		dimensions: {
-			height: article.json.Alto * 100,
-			length: article.json.Largo * 100,
-			width: article.json.Ancho * 100,
-			weight: article.json.Masa,
-		},
-		images: article.json.images?.map((image: any) => image.data.fileName) || [],
-		description: article.json.Detalle ?? '',
-	}));
+	const variations = articlesWithSameGroupId.map((article: { json: any }) => {
+		const regular = Number(article.json.Precio);
+		const variation: any = {
+			sku: article.json.Codigo,
+			regular_price: regular,
+			enabled: article.json.Habilitado === true && article.json.ActivoWeb === true,
+			attributes: centumGetArticleAttributes(article),
+			stock: article.json.ExistenciasSucursales,
+			dimensions: {
+				height: article.json.Alto * 100,
+				length: article.json.Largo * 100,
+				width: article.json.Ancho * 100,
+				weight: article.json.Masa,
+			},
+			images: article.json.images?.map((image: any) => image.data.fileName) || [],
+			description: article.json.Detalle ?? '',
+		};
+
+		// ⬇️ Solo setear sale_price si existe la propiedad y es válido (< regular)
+		if (article.json.DescuentoPromocion != null) {
+			const desc = Math.abs(Number(article.json.DescuentoPromocion));
+			const sale = regular - desc;
+			if (Number.isFinite(sale) && sale > 0 && sale < regular) {
+				variation.sale_price = sale;
+			}
+		}
+
+		return variation;
+	});
 
 	const allUniqueAttributes = getUniqueValues(allAttributes, 'value');
 
@@ -704,7 +751,15 @@ export const createJsonProducts = (arrArticles: IMergeArticulos[]) => {
 			width: article.json.Ancho * 100,
 			weight: article.json.Masa,
 		};
+
+		if(article.json.DescuentoPromocion){
+			console.log(article.json.Precio)
+			console.log(article.json.DescuentoPromocion)
+  			obj.sale_price = article.json.Precio - Math.abs(article.json.DescuentoPromocion);
+		}
 		obj.regular_price = article.json.Precio;
+
+		
 		// Actualización de description para no hacer match sobre undefined
 		const description = article?.json?.Detalle || '';
 
@@ -798,6 +853,7 @@ export const createJsonProducts = (arrArticles: IMergeArticulos[]) => {
 	const uniqueArticles = getUniqueValues(wooProducts.products, 'name');
 
 	wooProducts.products = uniqueArticles;
+	console.log(wooProducts)
 
 	return wooProducts;
 };
@@ -905,8 +961,11 @@ export function getHttpSettings(this: IExecuteFunctions): HttpSettings & { inter
 export interface FetchOptions {
 	method?: 'GET' | 'POST';
 	headers?: Record<string, string>;
-	queryParams?: Record<string, string | number | boolean>;
-	body?: any; // <-- explícito
+	//queryParams?: Record<string, string | number | boolean> ;
+	queryParams?: {
+  [key: string]: object | NodeParameterValueType;
+},
+	body?: any;
 	cantidadItemsPorPagina?: number;
 	itemsField?: string;
 	intervaloPagina?: number;
@@ -957,80 +1016,54 @@ export async function apiGetRequest<T = any>(
 		method = 'GET',
 		queryParams = {},
 		cantidadItemsPorPagina,
-		itemsField = 'items',
+		itemsField = 'Items',
 		numeroPagina,
 		context,
 		pagination = 'all',
-		intervaloPagina,
+		// intervaloPagina,
 	} = options;
 
 	console.log('options getRequest: ', options)
 	if (!url.trim()) safeThrow(context, 'El Endpoint es obligatorio.');
 
 	if (!options.method || options.method === 'POST') safeThrow(context, 'Se está intentando hacer una solicitud GET sin un metodo asignado o se asignó el metodo equivocado.');
-	// const fetchOptions: RequestInit = {
-	// 	method,
-	// 	headers: { 'Content-Type': 'application/json', ...headers },
-	// };
 
-	// // Sin paginación (aún en desarrollo actualmente se usa otro metodo)
-	// if (pagination === 'default' || (!cantidadItemsPorPagina && !numeroPagina)) {
-	// 	const finalUrl = buildUrl(url, queryParams);
-	// 	const response = await fetch(finalUrl, fetchOptions);
+	// Para Centum API (y APIs que no soportan paginación), siempre usar paginación interna
+	// Una sola request para obtener todos los datos, luego paginar internamente
+	console.log('apiGetRequest => Single request with internal pagination');
 
-	// 	if (!response.ok) {
-	// 		const errorText = await response.text();
-	// 		safeThrow(context, `Error GET: ${response.status} - ${errorText}`);
-	// 	}
+	const finalUrl = buildUrl(url, queryParams); // Sin parámetros de paginación
+	const requestHeaders = buildCentumHeaders(headers.CentumSuiteConsumidorApiPublicaId, headers.publicAccessKey);
 
-	// 	const data = await response.json();
-	// 	return extractItems<T>(data, itemsField);
-	// }
+	const response = await fetch(finalUrl, {
+		method,
+		headers: { ...requestHeaders }
+	});
 
-	console.log('apiGetRequest => options:  ', options)
-	const allItems: T[] = [];
-	let currentPage = numeroPagina || 1;
-	const itemsPerPage = pagination === 'all' ? 1000 : cantidadItemsPorPagina || 100;
-	const intervaloMs = pagination === 'all' ? 1000 : intervaloPagina ?? 1000;
-
-	while (true) {
-		const totalStart = Date.now();
-		const paginatedParams = {
-			...queryParams,
-			numeroPagina: currentPage,
-			cantidadItemsPorPagina: itemsPerPage,
-		};
-
-		const finalUrl = buildUrl(url, paginatedParams);
-		const requestHeaders = buildCentumHeaders(headers.CentumSuiteConsumidorApiPublicaId, headers.publicAccessKey);
-
-		const response = await fetch(finalUrl, {
-			method,
-			headers: { ...requestHeaders }
-		});
-
-		if (!response.ok) {
-			const errorText = await response.text();
-			safeThrow(context, `Error GET (pág ${currentPage}): ${response.status} - ${errorText}`);
-		}
-
-		const data = await response.json();
-		const pageItems = extractItems<T>(data, itemsField);
-		allItems.push(...pageItems);
-
-		const processingDuration = Date.now() - totalStart;
-		const nextPage = pageItems.length >= itemsPerPage;
-
-		const logMsg = `[paginación] página: ${currentPage} - Items recibidos: ${pageItems.length} (sincronia: ${processingDuration}ms${nextPage ? '  espera ' + intervaloMs + 'ms' : ''})`;
-		context?.logger ? context.logger.info(logMsg) : console.log(logMsg);
-
-		if (!nextPage) break;
-
-		await new Promise((resolve) => setTimeout(resolve, intervaloMs));
-		currentPage++;
+	if (!response.ok) {
+		const errorText = await response.text();
+		safeThrow(context, `Error GET: ${response.status} - ${errorText}`);
 	}
 
-	return allItems;
+	const data = await response.json();
+	const allItems = extractItems<T>(data, itemsField);
+
+	// Si no hay paginación configurada o es 'all', devolver todo
+	if (pagination === 'all' || !cantidadItemsPorPagina) {
+		const logMsg = `[paginación interna] Total items: ${allItems.length}, Retornando todos los items`;
+		context?.logger ? context.logger.info(logMsg) : console.log(logMsg);
+		return allItems;
+	}
+
+	// Paginación interna: dividir el array en chunks
+	const itemsPerPage = cantidadItemsPorPagina;
+	const startIndex = ((numeroPagina || 1) - 1) * itemsPerPage;
+	const endIndex = startIndex + itemsPerPage;
+
+	const logMsg = `[paginación interna] Total items: ${allItems.length}, Página: ${numeroPagina || 1}, Items por página: ${itemsPerPage}, Retornando: ${Math.min(endIndex, allItems.length) - startIndex} items`;
+	context?.logger ? context.logger.info(logMsg) : console.log(logMsg);
+
+	return allItems.slice(startIndex, endIndex);
 }
 
 
