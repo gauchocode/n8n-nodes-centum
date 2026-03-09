@@ -5,7 +5,7 @@ tmp
 .idea
 .vscode
 .prettierrc
-.claude/settings.local.json
+settings.local*
 
 
 
