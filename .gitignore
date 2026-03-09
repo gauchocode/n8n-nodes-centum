@@ -5,6 +5,9 @@ tmp
 .idea
 .vscode
 .prettierrc
+.claude/settings.local.json
+
+
 
 npm-debug.log*
 yarn.lock
