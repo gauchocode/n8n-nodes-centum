@@ -951,8 +951,8 @@ export function buildCentumHeaders(consumerId: string, publicKey: string): Recor
 	};
 }
 
-export function getHttpSettings(this: IExecuteFunctions): HttpSettings & { intervaloPagina?: number } {
-	const httpSettings = this.getNodeParameter('httpSettings', 0, {}) as HttpSettings & { intervaloPagina?: number };
+export function getHttpSettings(this: IExecuteFunctions): HttpSettings & { intervaloPagina?: number; numeroPagina?: number } {
+	const httpSettings = this.getNodeParameter('httpSettings', 0, {}) as HttpSettings & { intervaloPagina?: number; numeroPagina?: number };
 	console.log('http settings: ', httpSettings)
 
 	return httpSettings;

@@ -206,6 +206,11 @@ export const CentumOperations: INodeProperties[] = [
 				value: 'estadisticaVentaRanking',
 				description: 'Obtiene un listado de clientes, articulos, vendedores o sucursales fisicas según un ranking de venta'
 			},
+      {
+        name: 'Frecuencias Clientes Listar',
+        value: 'frecuenciasCliente',
+        description: 'Obtiene un listado con las frecuencias de los clientes'
+      },
 			{
 				name: 'Marcas - Obtener',
 				value: 'listarMarcas',
@@ -442,14 +447,14 @@ const getArticulo: INodeProperties[] = [
 		name: 'categoriaImpuestosGanancias',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['proveedorCrear'] } },
+		displayOptions: { show: { resource: ['crearProveedor'] } },
 	},
 	{
 		displayName: 'Clase De Proveedor',
 		name: 'claseProveedor',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['proveedorCrear'] } },
+		displayOptions: { show: { resource: ['crearProveedor'] } },
 	},
 	{
 		displayName: 'Cliente',
@@ -520,7 +525,6 @@ const getArticulo: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: [
-					'crearProveedor',
 					'buscarProductoPorCodigo',
 					'buscarProductos'
 				],
@@ -557,22 +561,21 @@ const getArticulo: INodeProperties[] = [
 		name: 'idCondicionVenta',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['crearVenta'] } },
+		displayOptions: { show: { resource: ['crearVenta', 'crearCliente'] } },
 	},
 	{
 		displayName: 'Condición De Pago',
 		name: 'condicionDePago',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['proveedorCrear'] } },
+		displayOptions: { show: { resource: ['crearProveedor'] } },
 	},
-	{
-		displayName: 'Condición IVA',
+  {
+		displayName: 'ID Condición IVA',
 		name: 'condicionIVA',
-		type: 'string',
+		type: 'number',
 		default: '',
-		placeholder: 'Consumidor Final, Exento, Monotributo...',
-		displayOptions: { show: { resource: ['proveedorCrear'] } },
+		displayOptions: { show: { resource: ['crearProveedor', 'crearCliente'] } },
 	},
 	{
 		displayName: 'Cotizacion',
@@ -581,19 +584,19 @@ const getArticulo: INodeProperties[] = [
 		default: 0,
 		displayOptions: { show: { esContado: [true] } },
 	},
-	{
-		displayName: 'Cuerpo Del Pedido',
-		name: 'cuerpoHTTP',
-		type: 'json',
-		required: true,
-		default: "",
-		displayOptions: {
-			show: {
-				resource: ['crearCliente', 'actualizarCliente', 'crearContribuyente'],
-			},
-		},
-		description: 'Información en formato JSON para crear o actualizar un cliente',
-	},
+	// {
+	// 	displayName: 'Cuerpo Del Pedido',
+	// 	name: 'cuerpoHTTP',
+	// 	type: 'json',
+	// 	required: true,
+	// 	default: "",
+	// 	displayOptions: {
+	// 		show: {
+	// 			resource: ['crearCliente', 'actualizarCliente', 'crearContribuyente'],
+	// 		},
+	// 	},
+	// 	description: 'Información en formato JSON para crear o actualizar un cliente',
+	// },
 	{
 		displayName: 'CUIT',
 		name: 'cuit',
@@ -630,13 +633,13 @@ const getArticulo: INodeProperties[] = [
 		description: 'Numero de la semana por el cual filtrar promociones aplicadas (0 es Lunes)',
 		displayOptions: { show: { resource: ['listarPromocionesComercialesCliente'] } },
 	},
-	{
-		displayName: 'DNI',
-		name: 'dni',
-		type: 'string',
-		default: '',
-		displayOptions: { show: { resource: ['crearCliente'] } },
-	},
+	// {
+	// 	displayName: 'DNI',
+	// 	name: 'dni',
+	// 	type: 'string',
+	// 	default: '',
+	// 	displayOptions: { show: { resource: ['crearCliente'] } },
+	// },
 	// {
 	// 	displayName: 'Documento',
 	// 	name: 'documentDate',
@@ -869,7 +872,7 @@ const getArticulo: INodeProperties[] = [
 		default: 0,
 		description: 'ID de la bonificación',
 		displayOptions: {
-			show: { resource: ['crearPedidoVenta', 'crearVenta'] },
+			show: { resource: ['crearPedidoVenta', 'crearVenta', 'crearCliente'] },
 		},
 	},
 	{
@@ -911,7 +914,7 @@ const getArticulo: INodeProperties[] = [
 		name: 'formaPagoProveedor',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['proveedorCrear'] } },
+		displayOptions: { show: { resource: ['crearProveedor'] } },
 	},
 	{
 		displayName: 'ID Del Chofer',
@@ -985,7 +988,7 @@ const getArticulo: INodeProperties[] = [
 		name: 'idOperadorCompra',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['proveedorCrear'] } },
+		displayOptions: { show: { resource: ['crearProveedor'] } },
 	},
 	{
 		displayName: 'ID Del Proveedor',
@@ -1087,7 +1090,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		description: 'ID del país por la cual se buscarán las provincias',
-		displayOptions: { show: { resource: ['listarProvincias', 'crearProveedor'] } },
+		displayOptions: { show: { resource: ['listarProvincias', 'crearProveedor', 'crearCliente'] } },
 	},
 	{
 		displayName: 'ID Provincia',
@@ -1095,7 +1098,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		description: 'ID de la provincia por la cual se buscarán la información',
-		displayOptions: { show: { resource: ['listarMunicipios', 'crearProveedor'] } },
+		displayOptions: { show: { resource: ['listarMunicipios', 'crearProveedor', 'crearCliente'] } },
 	},
 	{
 		displayName: 'ID Sucursal Física',
@@ -1121,14 +1124,14 @@ const getArticulo: INodeProperties[] = [
 		name: 'idZona',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['proveedorCrear'] } },
+		displayOptions: { show: { resource: ['crearProveedor', 'crearCliente'] } },
 	},
 		{
 		displayName: 'ID del descuento del proveedor',
 		name: 'idDescuentoProveedor',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['proveedorCrear'] } },
+		displayOptions: { show: { resource: ['crearProveedor'] } },
 	},
 	{
 		displayName: 'Importe',
@@ -1230,7 +1233,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		description: 'Razón social del cliente para buscar',
 		displayOptions: {
-			show: { resource: ['buscarContribuyente', 'buscarClientes', 'crearProveedor', 'crearPedidoVenta', 'listarProveedores', 'crearOrdenCompra'] },
+			show: { resource: ['buscarContribuyente', 'buscarClientes', 'crearProveedor', 'crearPedidoVenta', 'listarProveedores', 'crearOrdenCompra', 'crearCliente'] },
 		},
 	},
 		{
@@ -1400,6 +1403,21 @@ export const HttpOptions: INodeProperties[] = [
 					},
 				},
 				description: 'Intervalo de tiempo entre cada solicitud (En milisegundos)',
+			},
+			{
+				displayName: 'Número De Página Inicial',
+				name: 'numeroPagina',
+				type: 'number',
+				default: 1,
+				typeOptions: {
+					minValue: 1,
+				},
+				displayOptions: {
+					show: {
+						pagination: ['custom'],
+					},
+				},
+				description: 'Número de página desde donde comenzar la paginación (por defecto comienza desde la página 1)',
 			},
 		],
 		displayOptions: {

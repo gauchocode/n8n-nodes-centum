@@ -7,7 +7,7 @@ import {
 	IArticulosExistencias,
 	IResponseCustomer,
 	Cliente,
-	IWoo,
+	// IWoo,
 	LineItem,
 	IMergeArticulos,
 	ShippingLine,
@@ -18,7 +18,7 @@ import {
 
 import {
 	createChargeJson,
-	createCustomerJson,
+	// createCustomerJson,
 	createHash,
 	createJsonProducts,
 	// createOrderSaleJson,
@@ -323,6 +323,7 @@ export class Centum implements INodeType {
 				const nombreArticulo = this.getNodeParameter('nombreArticulo', 0, '') as string;
 				const codigoArticulo = this.getNodeParameter('codigoArticulo', 0, '') as string;
 
+        
 
 				try {
 					const response = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
@@ -426,6 +427,20 @@ export class Centum implements INodeType {
 				}
 			}
 
+      case "frecuenciasCliente": {
+				try {
+					const frecuenciasCliente = await apiRequest<any>(`${centumUrl}/FrecuenciasCliente`, {
+						headers,
+					});
+
+					return [this.helpers.returnJsonArray(frecuenciasCliente)];
+				} catch (error) {
+					console.log("ArticulosExistencias error: ", error);
+					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+					throw new NodeOperationError(this.getNode(), errorMessage);
+				}
+			}
+
 			case "convertirProductosParaWooCommerce": {
 				const data = this.getInputData();
 
@@ -435,24 +450,85 @@ export class Centum implements INodeType {
 			}
 
 			case "crearCliente": {
-				const datosCliente = this.getNodeParameter("cuerpoHTTP", 0);
-				const clienteDNI = this.getNodeParameter("dni", 0);
-				const datosJSON = createCustomerJson(datosCliente as IWoo, clienteDNI as string);
+				const razonSocial = this.getNodeParameter("razonSocial", 0);
+        const cuit = this.getNodeParameter('cuit', 0);
+        const provincia = this.getNodeParameter('idProvincia', 0);
+        const pais = this.getNodeParameter('idPais', 0);
+        const zona = this.getNodeParameter('idZona', 0);
+        const condicionIVA = this.getNodeParameter('condicionIVA', 0);
+        const condicionVentaId = this.getNodeParameter('idCondicionVenta', 0);
+        const bonificacionId = this.getNodeParameter('idBonificacion', 0);
 
 				try {
 					const crearCliente = await apiRequest<any>(`${centumUrl}/Clientes`, {
 						method: "POST",
-						body: datosJSON,
-						headers,
+            headers,
+						body: {
+              RazonSocial: razonSocial,
+              CUIT: cuit,
+              Provincia:{
+                IdProvincia: provincia
+              },
+              Pais: {
+                IdPais: pais
+              },
+              Zona: {
+                IdZona: zona
+              },
+              CondicionIVA: {
+                IdCondicionIVA: condicionIVA
+              },
+              CondicionVenta: {
+                IdCondicionVenta: condicionVentaId
+              },
+              Vendedor: {
+                IdVendedor: 2 //Esto hay que reemplazarlo por el body entero del vendedor
+              },
+              Transporte: {
+                IdTransporte: 1
+              },
+              Bonificacion: {
+                IdBonificacion: bonificacionId
+              },
+              LimiteCredito: {
+                IdLimiteCredito: 46002
+              },
+              ClaseCliente: {
+                IdClaseCliente: 6087
+              },
+              FrecuenciaCliente: {
+                IdFrecuenciaCliente: 6891
+              },
+              CanalCliente: {
+                IdCanalCliente: 6904
+              },
+              CadenaCliente: {
+                IdCadenaCliente: 6920
+              },
+              UbicacionCliente: {
+                IdUbicacionCliente: 6942
+              },
+              EdadesPromedioConsumidoresCliente: {
+                IdEdadesPromedioConsumidoresCliente: 6951
+              },
+              GeneroPromedioConsumidoresCliente: {
+                IdGeneroPromedioConsumidoresCliente: 6964
+              },
+              DiasAtencionCliente: {
+                IdDiasAtencionCliente: 6969
+              },
+              HorarioAtencionCliente: {
+                IdHorarioAtencionCliente: 6970
+              },
+              CigarreraCliente: {
+                IdCigarreraCliente: 6972
+              }
+            },
 					});
 					return [this.helpers.returnJsonArray(crearCliente)];
 				} catch (error) {
 					console.log(error);
-					const obj = {
-						...error.response.data,
-						IdCliente: -1,
-					};
-					return [this.helpers.returnJsonArray(obj)];
+					throw new NodeOperationError(this.getNode(), `Error al obtener la informacion de los articulos ${error}`);
 				}
 			}
 
@@ -2551,6 +2627,7 @@ export class Centum implements INodeType {
 						pagination: ajustesHTTP.pagination,
 						cantidadItemsPorPagina: ajustesHTTP.cantidadItemsPorPagina,
 						intervaloPagina: ajustesHTTP.intervaloPagina,
+						numeroPagina: ajustesHTTP.numeroPagina,
 					};
 					const paginated = await apiPostRequestPaginated<IArticulos>(articulosURL, fetchOptions);
 					return [this.helpers.returnJsonArray(paginated as any)];
