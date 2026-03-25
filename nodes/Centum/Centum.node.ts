@@ -203,7 +203,7 @@ export class Centum implements INodeType {
 					idsArticulos: idArticulo,
 				};
 
-				if (!IdSucursalFisica || (!idArticulo)) {
+				if (!IdSucursalFisica || !idArticulo) {
 					throw new NodeOperationError(this.getNode(), "El id de la sucursal fisica y el id del articulo son obligatorios");
 				}
 				try {
@@ -226,7 +226,7 @@ export class Centum implements INodeType {
 				const codigo = codigoRaw.trim();
 				const ids = articleIdRaw
 					.split(",")
-					.map(s => s.trim())
+					.map((s) => s.trim())
 					.filter(Boolean);
 
 				if (!codigo && ids.length === 0) {
@@ -238,63 +238,58 @@ export class Centum implements INodeType {
 
 					// 1) Prioridad: buscar por IDs
 					if (ids.length > 0) {
-					articulo = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
-						method: "POST",
-						headers,
-						body: { Ids: ids },
-					});
-
-					const empty =
-						!articulo ||
-						(Array.isArray(articulo) && articulo.length === 0);
-
-					// 2) Fallback: si no encontró nada, buscar por código
-					if (empty && codigo) {
 						articulo = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
-						method: "POST",
-						headers,
-						body: { CodigoExacto: codigo },
+							method: "POST",
+							headers,
+							body: { Ids: ids },
 						});
-					}
+
+						const empty = !articulo || (Array.isArray(articulo) && articulo.length === 0);
+
+						// 2) Fallback: si no encontró nada, buscar por código
+						if (empty && codigo) {
+							articulo = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
+								method: "POST",
+								headers,
+								body: { CodigoExacto: codigo },
+							});
+						}
 					} else {
-					// Solo código
-					articulo = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
-						method: "POST",
-						headers,
-						body: { CodigoExacto: codigo },
-					});
+						// Solo código
+						articulo = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
+							method: "POST",
+							headers,
+							body: { CodigoExacto: codigo },
+						});
 					}
 
 					return [this.helpers.returnJsonArray(articulo)];
 				} catch (error) {
 					console.log("Error en solicitud de artículo:", error);
-					const errorMessage =
-					error?.response?.data?.Message ||
-					error.message ||
-					"Error desconocido";
+					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
 
 					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
-				}
+			}
 
-				// const parseArticle = articleId.split(',')
+			// const parseArticle = articleId.split(',')
 
-				// if (!codigo && !articleId) {
-				// 	throw new NodeOperationError(this.getNode(), "El id o codigo del articulo es obligatorio");
-				// }
-				// try {
-				// 	const articulo = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
-				// 		method: "POST",
-				// 		headers,
-				// 		body: { CodigoExacto: codigo, Ids: parseArticle },
-				// 	});
+			// if (!codigo && !articleId) {
+			// 	throw new NodeOperationError(this.getNode(), "El id o codigo del articulo es obligatorio");
+			// }
+			// try {
+			// 	const articulo = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
+			// 		method: "POST",
+			// 		headers,
+			// 		body: { CodigoExacto: codigo, Ids: parseArticle },
+			// 	});
 
-				// 	return [this.helpers.returnJsonArray(articulo)];
-				// } catch (error) {
-				// 	console.log("Error en solicitud de artículo por ID:", error);
-				// 	const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
-				// 	throw new NodeOperationError(this.getNode(), errorMessage);
-				// }
+			// 	return [this.helpers.returnJsonArray(articulo)];
+			// } catch (error) {
+			// 	console.log("Error en solicitud de artículo por ID:", error);
+			// 	const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+			// 	throw new NodeOperationError(this.getNode(), errorMessage);
+			// }
 
 			case "buscarProductoPorNombre": {
 				const nombre = this.getNodeParameter("nombre", 0) as string;
@@ -307,8 +302,8 @@ export class Centum implements INodeType {
 						method: "POST",
 						headers,
 						body: {
-							Nombre: nombre
-						}
+							Nombre: nombre,
+						},
 					});
 
 					return [this.helpers.returnJsonArray(articulo)];
@@ -319,15 +314,13 @@ export class Centum implements INodeType {
 				}
 			}
 
-			case 'buscarProductos': {
-				const nombreArticulo = this.getNodeParameter('nombreArticulo', 0, '') as string;
-				const codigoArticulo = this.getNodeParameter('codigoArticulo', 0, '') as string;
-
-        
+			case "buscarProductos": {
+				const nombreArticulo = this.getNodeParameter("nombreArticulo", 0, "") as string;
+				const codigoArticulo = this.getNodeParameter("codigoArticulo", 0, "") as string;
 
 				try {
 					const response = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
-						method: 'POST',
+						method: "POST",
 						headers,
 						body: { Nombre: nombreArticulo, Codigo: codigoArticulo },
 					});
@@ -338,13 +331,13 @@ export class Centum implements INodeType {
 				}
 			}
 
-			case 'buscarProveedor': {
-				const proveedorId = this.getNodeParameter('proveedorId', 0);
+			case "buscarProveedor": {
+				const proveedorId = this.getNodeParameter("proveedorId", 0);
 
 				try {
 					const response = await apiRequest<any>(`${centumUrl}/Proveedores/${proveedorId}`, {
-						method: 'GET',
-						headers
+						method: "GET",
+						headers,
 					});
 					return [this.helpers.returnJsonArray(response)];
 				} catch (error) {
@@ -358,8 +351,11 @@ export class Centum implements INodeType {
 				const idLista = this.getNodeParameter("idList", 0);
 				const clienteId = this.getNodeParameter("clienteId", 0);
 				const fechaDocumento = this.getNodeParameter("documentDate", 0);
-				const formattedDocumentDate = String(fechaDocumento).split('T')[0];
-				const idsNum = String(idArticulos).split(',').map(s => s.trim()).filter(Boolean);
+				const formattedDocumentDate = String(fechaDocumento).split("T")[0];
+				const idsNum = String(idArticulos)
+					.split(",")
+					.map((s) => s.trim())
+					.filter(Boolean);
 				console.log(idsNum);
 
 				if (!idLista || !idArticulos) {
@@ -369,13 +365,13 @@ export class Centum implements INodeType {
 					const articulo = await apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
 						method: "POST",
 						headers,
-						body: {  IdLista: idLista, IdCliente: clienteId, fechaDocumento: formattedDocumentDate, Ids: idsNum },
+						body: { IdLista: idLista, IdCliente: clienteId, fechaDocumento: formattedDocumentDate, Ids: idsNum },
 					});
 
 					return [this.helpers.returnJsonArray(articulo)];
 				} catch (error) {
 					console.log("Error en solicitud de artículo por ID:", error);
-					const errorMessage = error?.response?.data?.Message || error.message || 'Error desconocido';
+					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
 					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 			}
@@ -427,7 +423,7 @@ export class Centum implements INodeType {
 				}
 			}
 
-      case "frecuenciasCliente": {
+			case "frecuenciasCliente": {
 				try {
 					const frecuenciasCliente = await apiRequest<any>(`${centumUrl}/FrecuenciasCliente`, {
 						headers,
@@ -451,79 +447,79 @@ export class Centum implements INodeType {
 
 			case "crearCliente": {
 				const razonSocial = this.getNodeParameter("razonSocial", 0);
-        const cuit = this.getNodeParameter('cuit', 0);
-        const provincia = this.getNodeParameter('idProvincia', 0);
-        const pais = this.getNodeParameter('idPais', 0);
-        const zona = this.getNodeParameter('idZona', 0);
-        const condicionIVA = this.getNodeParameter('condicionIVA', 0);
-        const condicionVentaId = this.getNodeParameter('idCondicionVenta', 0);
-        const bonificacionId = this.getNodeParameter('idBonificacion', 0);
+				const cuit = this.getNodeParameter("cuit", 0);
+				const provincia = this.getNodeParameter("idProvincia", 0);
+				const pais = this.getNodeParameter("idPais", 0);
+				const zona = this.getNodeParameter("idZona", 0);
+				const condicionIVA = this.getNodeParameter("condicionIVA", 0);
+				const condicionVentaId = this.getNodeParameter("idCondicionVenta", 0);
+				const bonificacionId = this.getNodeParameter("idBonificacion", 0);
 
 				try {
 					const crearCliente = await apiRequest<any>(`${centumUrl}/Clientes`, {
 						method: "POST",
-            headers,
+						headers,
 						body: {
-              RazonSocial: razonSocial,
-              CUIT: cuit,
-              Provincia:{
-                IdProvincia: provincia
-              },
-              Pais: {
-                IdPais: pais
-              },
-              Zona: {
-                IdZona: zona
-              },
-              CondicionIVA: {
-                IdCondicionIVA: condicionIVA
-              },
-              CondicionVenta: {
-                IdCondicionVenta: condicionVentaId
-              },
-              Vendedor: {
-                IdVendedor: 2 //Esto hay que reemplazarlo por el body entero del vendedor
-              },
-              Transporte: {
-                IdTransporte: 1
-              },
-              Bonificacion: {
-                IdBonificacion: bonificacionId
-              },
-              LimiteCredito: {
-                IdLimiteCredito: 46002
-              },
-              ClaseCliente: {
-                IdClaseCliente: 6087
-              },
-              FrecuenciaCliente: {
-                IdFrecuenciaCliente: 6891
-              },
-              CanalCliente: {
-                IdCanalCliente: 6904
-              },
-              CadenaCliente: {
-                IdCadenaCliente: 6920
-              },
-              UbicacionCliente: {
-                IdUbicacionCliente: 6942
-              },
-              EdadesPromedioConsumidoresCliente: {
-                IdEdadesPromedioConsumidoresCliente: 6951
-              },
-              GeneroPromedioConsumidoresCliente: {
-                IdGeneroPromedioConsumidoresCliente: 6964
-              },
-              DiasAtencionCliente: {
-                IdDiasAtencionCliente: 6969
-              },
-              HorarioAtencionCliente: {
-                IdHorarioAtencionCliente: 6970
-              },
-              CigarreraCliente: {
-                IdCigarreraCliente: 6972
-              }
-            },
+							RazonSocial: razonSocial,
+							CUIT: cuit,
+							Provincia: {
+								IdProvincia: provincia,
+							},
+							Pais: {
+								IdPais: pais,
+							},
+							Zona: {
+								IdZona: zona,
+							},
+							CondicionIVA: {
+								IdCondicionIVA: condicionIVA,
+							},
+							CondicionVenta: {
+								IdCondicionVenta: condicionVentaId,
+							},
+							Vendedor: {
+								IdVendedor: 2, //Esto hay que reemplazarlo por el body entero del vendedor
+							},
+							Transporte: {
+								IdTransporte: 1,
+							},
+							Bonificacion: {
+								IdBonificacion: bonificacionId,
+							},
+							LimiteCredito: {
+								IdLimiteCredito: 46002,
+							},
+							ClaseCliente: {
+								IdClaseCliente: 6087,
+							},
+							FrecuenciaCliente: {
+								IdFrecuenciaCliente: 6891,
+							},
+							CanalCliente: {
+								IdCanalCliente: 6904,
+							},
+							CadenaCliente: {
+								IdCadenaCliente: 6920,
+							},
+							UbicacionCliente: {
+								IdUbicacionCliente: 6942,
+							},
+							EdadesPromedioConsumidoresCliente: {
+								IdEdadesPromedioConsumidoresCliente: 6951,
+							},
+							GeneroPromedioConsumidoresCliente: {
+								IdGeneroPromedioConsumidoresCliente: 6964,
+							},
+							DiasAtencionCliente: {
+								IdDiasAtencionCliente: 6969,
+							},
+							HorarioAtencionCliente: {
+								IdHorarioAtencionCliente: 6970,
+							},
+							CigarreraCliente: {
+								IdCigarreraCliente: 6972,
+							},
+						},
 					});
 					return [this.helpers.returnJsonArray(crearCliente)];
 				} catch (error) {
@@ -677,47 +673,46 @@ export class Centum implements INodeType {
 
 				type NodeErr = any;
 
-				const razonSocial = (this.getNodeParameter('razonSocial', 0) as string) ?? '';
-				const letraDocumento = (this.getNodeParameter('letraDocumento', 0) as string) ?? '';
-				const puntoDeVenta = (this.getNodeParameter('puntoDeVenta', 0) as string) ?? '';
-				const numero = (this.getNodeParameter('numeroFactura', 0) as string) ?? '';
-				const articulosRaw = this.getNodeParameter('articulo', 0);
-				const fechaDocumento = this.getNodeParameter('documentDate', 0) as string;
-				const formattedDocumentDate = String(fechaDocumento).split('T')[0];
-				const fechaDelivery = this.getNodeParameter('deliveryDate', 0) as string;
-				const formattedDeliveryDate = String(fechaDelivery).split('T')[0];
-				const fechaVencimiento = this.getNodeParameter('dueDate', 0) as string;
-				const formattedDueDate = String(fechaVencimiento).split('T')[0];
-				const proveedorIdRaw = this.getNodeParameter('proveedorId', 0);
-				const proveedorId = String(proveedorIdRaw ?? '').trim();
-				const turnoEntregaId = this.getNodeParameter('turnoEntrega', 0) as string;
-				const sucursalId = this.getNodeParameter('idSucursalFisica', 0);
+				const razonSocial = (this.getNodeParameter("razonSocial", 0) as string) ?? "";
+				const letraDocumento = (this.getNodeParameter("letraDocumento", 0) as string) ?? "";
+				const puntoDeVenta = (this.getNodeParameter("puntoDeVenta", 0) as string) ?? "";
+				const numero = (this.getNodeParameter("numeroFactura", 0) as string) ?? "";
+				const articulosRaw = this.getNodeParameter("articulo", 0);
+				const fechaDocumento = this.getNodeParameter("documentDate", 0) as string;
+				const formattedDocumentDate = String(fechaDocumento).split("T")[0];
+				const fechaDelivery = this.getNodeParameter("deliveryDate", 0) as string;
+				const formattedDeliveryDate = String(fechaDelivery).split("T")[0];
+				const fechaVencimiento = this.getNodeParameter("dueDate", 0) as string;
+				const formattedDueDate = String(fechaVencimiento).split("T")[0];
+				const proveedorIdRaw = this.getNodeParameter("proveedorId", 0);
+				const proveedorId = String(proveedorIdRaw ?? "").trim();
+				const turnoEntregaId = this.getNodeParameter("turnoEntrega", 0) as string;
+				const sucursalId = this.getNodeParameter("idSucursalFisica", 0);
 
 				if (!proveedorId) {
-					throw new NodeOperationError(this.getNode(), 'Debe especificarse idProveedor.');
+					throw new NodeOperationError(this.getNode(), "Debe especificarse idProveedor.");
 				}
 
 				// Parse artículos (tipado seguro)
 				let articulos: ArticuloInput[] = [];
 
-				const parseInvalidMsg =
-					'Formato de artículos inválido. Ej: {"ID": 1271, "Cantidad": 10} o {"Codigo": "ABC123", "Cantidad": 10} o arrays de estos objetos';
+				const parseInvalidMsg = 'Formato de artículos inválido. Ej: {"ID": 1271, "Cantidad": 10} o {"Codigo": "ABC123", "Cantidad": 10} o arrays de estos objetos';
 
 				const toArticuloInput = (x: any): ArticuloInput => ({
-					ID: typeof x?.ID === 'number' ? x.ID : undefined,
-					Codigo: typeof x?.Codigo === 'string' ? x.Codigo : undefined,
+					ID: typeof x?.ID === "number" ? x.ID : undefined,
+					Codigo: typeof x?.Codigo === "string" ? x.Codigo : undefined,
 					Cantidad: Number(x?.Cantidad),
 				});
 
 				const isArticuloInput = (x: any): x is ArticuloInput => {
-					if (!x || typeof x !== 'object') return false;
-					const hasIdOrCodigo = typeof x.ID === 'number' || (typeof x.Codigo === 'string' && x.Codigo.trim().length > 0);
+					if (!x || typeof x !== "object") return false;
+					const hasIdOrCodigo = typeof x.ID === "number" || (typeof x.Codigo === "string" && x.Codigo.trim().length > 0);
 					const cant = x.Cantidad;
-					const cantOk = typeof cant === 'number' && Number.isFinite(cant) && cant > 0;
+					const cantOk = typeof cant === "number" && Number.isFinite(cant) && cant > 0;
 					return hasIdOrCodigo && cantOk;
 				};
 
-				if (typeof articulosRaw === 'string') {
+				if (typeof articulosRaw === "string") {
 					try {
 						const parsed = JSON.parse(articulosRaw);
 						const arr = Array.isArray(parsed) ? parsed : [parsed];
@@ -728,7 +723,7 @@ export class Centum implements INodeType {
 				} else if (Array.isArray(articulosRaw)) {
 					// Evita TS2322: no asignar directamente; normalizar y filtrar
 					articulos = (articulosRaw as any[]).map(toArticuloInput).filter(isArticuloInput);
-				} else if (typeof articulosRaw === 'object' && articulosRaw !== null) {
+				} else if (typeof articulosRaw === "object" && articulosRaw !== null) {
 					const one = toArticuloInput(articulosRaw as any);
 					articulos = isArticuloInput(one) ? [one] : [];
 				} else {
@@ -736,28 +731,25 @@ export class Centum implements INodeType {
 				}
 
 				if (!razonSocial.trim()) {
-					throw new NodeOperationError(this.getNode(), 'La razón social es obligatoria.');
+					throw new NodeOperationError(this.getNode(), "La razón social es obligatoria.");
 				}
 
 				if (!articulos.length) {
-					throw new NodeOperationError(this.getNode(), 'Debe enviarse al menos un artículo válido con Cantidad > 0.');
+					throw new NodeOperationError(this.getNode(), "Debe enviarse al menos un artículo válido con Cantidad > 0.");
 				}
 
 				// 1) Cliente (solo para /Articulos/Venta)
 				let clientId: number;
 
 				try {
-					const dataCliente = await apiRequest<any>(
-						`${centumUrl}/Clientes?razonSocial=${encodeURIComponent(razonSocial)}`,
-						{ method: 'GET', headers }
-					);
+					const dataCliente = await apiRequest<any>(`${centumUrl}/Clientes?razonSocial=${encodeURIComponent(razonSocial)}`, { method: "GET", headers });
 
 					const cliente = dataCliente?.Items?.[0];
-					if (!cliente?.IdCliente) throw new NodeOperationError( this.getNode(), 'Cliente no encontrado');
+					if (!cliente?.IdCliente) throw new NodeOperationError(this.getNode(), "Cliente no encontrado");
 
 					clientId = cliente.IdCliente;
 				} catch (error: NodeErr) {
-					const msg = error?.response?.data?.Message || error?.message || 'Error obteniendo cliente';
+					const msg = error?.response?.data?.Message || error?.message || "Error obteniendo cliente";
 					throw new NodeOperationError(this.getNode(), msg);
 				}
 
@@ -775,13 +767,13 @@ export class Centum implements INodeType {
 						else bodyArticulo.Codigo = articuloInput.Codigo;
 
 						const dataArticulo = await apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
-							method: 'POST',
+							method: "POST",
 							headers,
 							body: bodyArticulo,
 						});
 
 						const items = dataArticulo?.Articulos?.Items ?? [];
-						if (!Array.isArray(items) || items.length === 0) throw new NodeOperationError(this.getNode(), 'Artículo no encontrado');
+						if (!Array.isArray(items) || items.length === 0) throw new NodeOperationError(this.getNode(), "Artículo no encontrado");
 
 						for (const item of items) {
 							ordenCompraArticulos.push({
@@ -790,7 +782,7 @@ export class Centum implements INodeType {
 							});
 						}
 					} catch (error: NodeErr) {
-						const msg = error?.response?.data?.Message || error?.message || 'Error resolviendo artículo';
+						const msg = error?.response?.data?.Message || error?.message || "Error resolviendo artículo";
 						throw new NodeOperationError(this.getNode(), msg);
 					}
 				}
@@ -799,30 +791,27 @@ export class Centum implements INodeType {
 				let proveedorInfo: any;
 
 				try {
-					const response = await apiRequest<any>(
-						`${centumUrl}/Proveedores/${encodeURIComponent(proveedorId)}`,
-						{ method: 'GET', headers }
-					);
+					const response = await apiRequest<any>(`${centumUrl}/Proveedores/${encodeURIComponent(proveedorId)}`, { method: "GET", headers });
 
-					if (!response?.IdProveedor) throw new NodeOperationError(this.getNode(), 'Proveedor no encontrado');
+					if (!response?.IdProveedor) throw new NodeOperationError(this.getNode(), "Proveedor no encontrado");
 					proveedorInfo = response;
 				} catch (error: NodeErr) {
-					const msg = error?.response?.data?.Message || error?.message || 'Error obteniendo proveedor';
+					const msg = error?.response?.data?.Message || error?.message || "Error obteniendo proveedor";
 					throw new NodeOperationError(this.getNode(), msg);
 				}
 
 				// 4) Body final
 				const bodyOrdenCompra = {
-					SucursalFisica: { 
-						IdSucursalFisica: sucursalId 
+					SucursalFisica: {
+						IdSucursalFisica: sucursalId,
 					},
-					NumeroDocumento: { 
-						LetraDocumento: letraDocumento, 
-						PuntoVenta: puntoDeVenta, 
-						Numero: numero
+					NumeroDocumento: {
+						LetraDocumento: letraDocumento,
+						PuntoVenta: puntoDeVenta,
+						Numero: numero,
 					},
 					TurnoEntrega: {
-						IdTurnoEntrega: turnoEntregaId
+						IdTurnoEntrega: turnoEntregaId,
 					},
 					FechaDocumento: `${formattedDocumentDate}T00:00:00`,
 					FechaEntrega: `${formattedDeliveryDate}T00:00:00`,
@@ -833,24 +822,23 @@ export class Centum implements INodeType {
 						IdOperadorCompra: 1,
 						Codigo: "1",
 						Nombre: "Operador de Compras Defecto",
-						EsSupervisor: false
+						EsSupervisor: false,
 					},
 				};
 
 				// 5) POST final
 				try {
 					const response = await apiRequest<any>(`${centumUrl}/OrdenesCompra`, {
-						method: 'POST',
+						method: "POST",
 						headers,
 						body: bodyOrdenCompra,
 					});
 					return [this.helpers.returnJsonArray(response)];
 				} catch (error: NodeErr) {
-					const msg = error?.response?.data?.Message || error?.message || 'Error creando la orden de compra';
+					const msg = error?.response?.data?.Message || error?.message || "Error creando la orden de compra";
 					throw new NodeOperationError(this.getNode(), msg);
 				}
 			}
-
 
 			case "crearPedidoVenta": {
 				type ArticuloInput = {
@@ -858,37 +846,38 @@ export class Centum implements INodeType {
 					Codigo?: string;
 					Cantidad: number;
 				};
-				const razonSocial = this.getNodeParameter('razonSocial', 0) as string;
-				const articulosRaw = this.getNodeParameter('articulo', 0);
-				const codigoCliente = this.getNodeParameter('codigoCliente', 0) as string;
-				const fechaDocumento = this.getNodeParameter('documentDate', 0) as string;
+				const razonSocial = this.getNodeParameter("razonSocial", 0) as string;
+				const articulosRaw = this.getNodeParameter("articulo", 0);
+				const codigoCliente = this.getNodeParameter("codigoCliente", 0) as string;
+				const fechaDocumento = this.getNodeParameter("documentDate", 0) as string;
 				const formattedDocumentDate = String(fechaDocumento).split("T")[0];
-				const bonificacion = this.getNodeParameter('idBonificacion', 0);
-				const turnoEntrega = this.getNodeParameter('turnoEntrega', 0);
-				const fechaEntrega = this.getNodeParameter('deliveryDate', 0);
-				const vendedor = this.getNodeParameter('vendedorID', 0);
+				const bonificacion = this.getNodeParameter("idBonificacion", 0);
+				const turnoEntrega = this.getNodeParameter("turnoEntrega", 0);
+				const fechaEntrega = this.getNodeParameter("deliveryDate", 0);
+				const vendedor = this.getNodeParameter("vendedorID", 0);
 
 				let articulos: ArticuloInput[];
 
-				if (typeof articulosRaw === 'string') {
+				if (typeof articulosRaw === "string") {
 					try {
 						const parsed = JSON.parse(articulosRaw);
 
-						if (typeof parsed === 'object' && !Array.isArray(parsed)) {
+						if (typeof parsed === "object" && !Array.isArray(parsed)) {
 							articulos = [parsed] as ArticuloInput[];
-						}
-						else if (Array.isArray(parsed)) {
+						} else if (Array.isArray(parsed)) {
 							articulos = parsed as ArticuloInput[];
-						}
-						else {
-							throw new NodeOperationError(this.getNode(), 'Formato Inválido');
+						} else {
+							throw new NodeOperationError(this.getNode(), "Formato Inválido");
 						}
 					} catch (error) {
-						throw new NodeOperationError(this.getNode(), 'El formato de artículos no es válido. Ejemplos válidos: {"ID": 1271, "Cantidad": 10} o {"Codigo": "ABC123", "Cantidad": 10} o arrays de estos objetos');
+						throw new NodeOperationError(
+							this.getNode(),
+							'El formato de artículos no es válido. Ejemplos válidos: {"ID": 1271, "Cantidad": 10} o {"Codigo": "ABC123", "Cantidad": 10} o arrays de estos objetos',
+						);
 					}
 				} else if (Array.isArray(articulosRaw)) {
 					articulos = articulosRaw as ArticuloInput[];
-				} else if (typeof articulosRaw === 'object' && articulosRaw !== null) {
+				} else if (typeof articulosRaw === "object" && articulosRaw !== null) {
 					articulos = [articulosRaw as ArticuloInput];
 				} else {
 					throw new NodeOperationError(this.getNode(), `Tipo de dato inesperado: ${typeof articulosRaw}`);
@@ -897,20 +886,17 @@ export class Centum implements INodeType {
 				let clientId, queryParams;
 
 				if (!razonSocial.trim() && !codigoCliente.trim()) {
-					throw new NodeOperationError(this.getNode(), 'El código o la razón social del cliente es obligatorio.');
+					throw new NodeOperationError(this.getNode(), "El código o la razón social del cliente es obligatorio.");
 				}
 
 				if (!Array.isArray(articulos) || articulos.length === 0) {
-					throw new NodeOperationError(this.getNode(), 'Debes enviar al menos un artículo con su cantidad.');
+					throw new NodeOperationError(this.getNode(), "Debes enviar al menos un artículo con su cantidad.");
 				}
 
 				// Validar que cada artículo tenga ID o Codigo
 				for (const art of articulos) {
 					if (!art.ID && !art.Codigo) {
-						throw new NodeOperationError(
-							this.getNode(),
-							'Cada artículo debe tener al menos un ID o un Codigo'
-						);
+						throw new NodeOperationError(this.getNode(), "Cada artículo debe tener al menos un ID o un Codigo");
 					}
 				}
 
@@ -921,12 +907,12 @@ export class Centum implements INodeType {
 				try {
 					const dataCliente = await apiRequest<any>(`${centumUrl}/Clientes?${queryParams}`, {
 						method: "GET",
-						headers
-					})
+						headers,
+					});
 
-					const cliente = dataCliente?.Items?.[0]
+					const cliente = dataCliente?.Items?.[0];
 					if (!cliente?.IdCliente) {
-						throw new NodeOperationError(this.getNode(), 'El cliente no fue encontrado');
+						throw new NodeOperationError(this.getNode(), "El cliente no fue encontrado");
 					}
 					clientId = cliente.IdCliente;
 				} catch (error) {
@@ -954,7 +940,7 @@ export class Centum implements INodeType {
 						}
 
 						const dataArticulo = await apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
-							method: 'POST',
+							method: "POST",
 							headers,
 							body: bodyArticulo,
 						});
@@ -977,34 +963,34 @@ export class Centum implements INodeType {
 						resultados.push({
 							id: articuloInput.ID,
 							codigo: articuloInput.Codigo,
-							error: error.message || 'Error desconocido',
+							error: error.message || "Error desconocido",
 						});
 					}
 				}
 
 				const bodyPedidoVenta = {
 					Bonificacion: {
-						IdBonificacion: bonificacion
+						IdBonificacion: bonificacion,
 					},
 					PedidoVentaArticulos: resultados,
 					Cliente: {
-						IdCliente: clientId
+						IdCliente: clientId,
 					},
 					Vendedor: {
-						IdVendedor: vendedor
+						IdVendedor: vendedor,
 					},
 					TurnoEntrega: {
-						IdTurnoEntrega: turnoEntrega
+						IdTurnoEntrega: turnoEntrega,
 					},
-					FechaEntrega: fechaEntrega
-				}
+					FechaEntrega: fechaEntrega,
+				};
 
 				try {
 					const pedidoVenta = await apiRequest<any>(`${centumUrl}/PedidosVenta`, {
 						method: "POST",
 						headers,
-						body: bodyPedidoVenta
-					})
+						body: bodyPedidoVenta,
+					});
 					return [this.helpers.returnJsonArray(pedidoVenta)];
 				} catch (error) {
 					const errorMessage = error?.response?.data?.Message || error.message || "Error al crear el pedido de venta.";
@@ -1012,66 +998,64 @@ export class Centum implements INodeType {
 				}
 			}
 
-			case 'crearProveedor': {
-
-				const codigo = this.getNodeParameter('codigoArticulo', 0, '') as string;
-				const razonSocial = this.getNodeParameter('razonSocial', 0, '') as string;
-				const cuit = this.getNodeParameter('cuit', 0);
-				const provincia = this.getNodeParameter('idProvincia', 0);
-				const pais = this.getNodeParameter('idPais', 0);
-				const condicionIVA = this.getNodeParameter('condicionIVA', 0, '') as string;
-				const formaPagoProveedor = this.getNodeParameter('formaPagoProveedor', 0);
-				const condicionPago = this.getNodeParameter('condicionDePago', 0);
-				const categoriaImpuestoGanancias = this.getNodeParameter('categoriaImpuestosGanancias', 0);
-				const claseProveedor = this.getNodeParameter('claseProveedor', 0);
-				const activo = this.getNodeParameter('active', 0);
-				const idOperadorCompra = this.getNodeParameter('idOperadorCompra', 0);
-				const idZona = this.getNodeParameter('idZona', 0);
-				const idDescuentoProveedor = this.getNodeParameter('idDescuentoProveedor', 0);
+			case "crearProveedor": {
+				const codigo = this.getNodeParameter("codigoArticulo", 0, "") as string;
+				const razonSocial = this.getNodeParameter("razonSocial", 0, "") as string;
+				const cuit = this.getNodeParameter("cuit", 0);
+				const provincia = this.getNodeParameter("idProvincia", 0);
+				const pais = this.getNodeParameter("idPais", 0);
+				const condicionIVA = this.getNodeParameter("condicionIVA", 0, "") as string;
+				const formaPagoProveedor = this.getNodeParameter("formaPagoProveedor", 0);
+				const condicionPago = this.getNodeParameter("condicionDePago", 0);
+				const categoriaImpuestoGanancias = this.getNodeParameter("categoriaImpuestosGanancias", 0);
+				const claseProveedor = this.getNodeParameter("claseProveedor", 0);
+				const activo = this.getNodeParameter("active", 0);
+				const idOperadorCompra = this.getNodeParameter("idOperadorCompra", 0);
+				const idZona = this.getNodeParameter("idZona", 0);
+				const idDescuentoProveedor = this.getNodeParameter("idDescuentoProveedor", 0);
 
 				const body = {
 					Codigo: codigo,
 					RazonSocial: razonSocial,
 					CUIT: cuit,
 					Provincia: {
-						IdProvincia: provincia
+						IdProvincia: provincia,
 					},
 					Pais: {
-						IdPais: pais
+						IdPais: pais,
 					},
 					CondicionIVA: {
-						IdCondicionIVA: condicionIVA
+						IdCondicionIVA: condicionIVA,
 					},
 					FormaPagoProveedor: {
-						IdFormaPagoProveedor: formaPagoProveedor
+						IdFormaPagoProveedor: formaPagoProveedor,
 					},
 					CondicionPago: {
-						IdCondicionPago: condicionPago
+						IdCondicionPago: condicionPago,
 					},
 					CategoriaImpuestoGanancias: {
-						IdCategoriaImpuestoGanancia: categoriaImpuestoGanancias
+						IdCategoriaImpuestoGanancia: categoriaImpuestoGanancias,
 					},
 					ClaseProveedor: {
-						IdClaseProveedor: claseProveedor
+						IdClaseProveedor: claseProveedor,
 					},
 					OperadorCompra: {
-						IdOperadorCompra: idOperadorCompra
+						IdOperadorCompra: idOperadorCompra,
 					},
 					Activo: activo,
 					Zona: {
-						IdZona: idZona
+						IdZona: idZona,
 					},
 					DescuentoProveedor: {
-						IdDescuentoProveedor: idDescuentoProveedor
-					}
-				}
-
+						IdDescuentoProveedor: idDescuentoProveedor,
+					},
+				};
 
 				try {
 					const response = await apiRequest<any>(`${centumUrl}/Proveedores/`, {
-						method: 'POST',
+						method: "POST",
 						headers,
-						body
+						body,
 					});
 					return [this.helpers.returnJsonArray(response)];
 				} catch (error) {
@@ -1089,47 +1073,46 @@ export class Centum implements INodeType {
 
 				type NodeErr = any;
 
-				const idCliente = (this.getNodeParameter('clienteId', 0)) ?? '';
-				const letraDocumento = (this.getNodeParameter('letraDocumento', 0) as string) ?? '';
-				const puntoDeVenta = (this.getNodeParameter('puntoDeVenta', 0) as string) ?? '';
-				const numero = (this.getNodeParameter('numeroFactura', 0) as string) ?? '';
-				const articulosRaw = this.getNodeParameter('articulo', 0);
-				const fechaDocumento = this.getNodeParameter('documentDate', 0) as string;
-				const formattedDocumentDate = String(fechaDocumento).split('T')[0];
-				const fechaDelivery = this.getNodeParameter('deliveryDate', 0) as string;
-				const formattedDeliveryDate = String(fechaDelivery).split('T')[0];
-				const fechaVencimiento = this.getNodeParameter('dueDate', 0) as string;
-				const formattedDueDate = String(fechaVencimiento).split('T')[0];
-				const proveedorIdRaw = this.getNodeParameter('proveedorId', 0);
-				const proveedorId = String(proveedorIdRaw ?? '').trim();
-				const turnoEntregaId = this.getNodeParameter('turnoEntrega', 0) as string;
-				const sucursalId = this.getNodeParameter('idSucursalFisica', 0);
+				const idCliente = this.getNodeParameter("clienteId", 0) ?? "";
+				const letraDocumento = (this.getNodeParameter("letraDocumento", 0) as string) ?? "";
+				const puntoDeVenta = (this.getNodeParameter("puntoDeVenta", 0) as string) ?? "";
+				const numero = (this.getNodeParameter("numeroFactura", 0) as string) ?? "";
+				const articulosRaw = this.getNodeParameter("articulo", 0);
+				const fechaDocumento = this.getNodeParameter("documentDate", 0) as string;
+				const formattedDocumentDate = String(fechaDocumento).split("T")[0];
+				const fechaDelivery = this.getNodeParameter("deliveryDate", 0) as string;
+				const formattedDeliveryDate = String(fechaDelivery).split("T")[0];
+				const fechaVencimiento = this.getNodeParameter("dueDate", 0) as string;
+				const formattedDueDate = String(fechaVencimiento).split("T")[0];
+				const proveedorIdRaw = this.getNodeParameter("proveedorId", 0);
+				const proveedorId = String(proveedorIdRaw ?? "").trim();
+				const turnoEntregaId = this.getNodeParameter("turnoEntrega", 0) as string;
+				const sucursalId = this.getNodeParameter("idSucursalFisica", 0);
 
 				if (!proveedorId) {
-					throw new NodeOperationError(this.getNode(), 'Debe especificarse idProveedor.');
+					throw new NodeOperationError(this.getNode(), "Debe especificarse idProveedor.");
 				}
 
 				// Parse artículos (tipado seguro)
 				let articulos: ArticuloInput[] = [];
 
-				const parseInvalidMsg =
-					'Formato de artículos inválido. Ej: {"ID": 1271, "Cantidad": 10} o {"Codigo": "ABC123", "Cantidad": 10} o arrays de estos objetos';
+				const parseInvalidMsg = 'Formato de artículos inválido. Ej: {"ID": 1271, "Cantidad": 10} o {"Codigo": "ABC123", "Cantidad": 10} o arrays de estos objetos';
 
 				const toArticuloInput = (x: any): ArticuloInput => ({
-					ID: typeof x?.ID === 'number' ? x.ID : undefined,
-					Codigo: typeof x?.Codigo === 'string' ? x.Codigo : undefined,
+					ID: typeof x?.ID === "number" ? x.ID : undefined,
+					Codigo: typeof x?.Codigo === "string" ? x.Codigo : undefined,
 					Cantidad: Number(x?.Cantidad),
 				});
 
 				const isArticuloInput = (x: any): x is ArticuloInput => {
-					if (!x || typeof x !== 'object') return false;
-					const hasIdOrCodigo = typeof x.ID === 'number' || (typeof x.Codigo === 'string' && x.Codigo.trim().length > 0);
+					if (!x || typeof x !== "object") return false;
+					const hasIdOrCodigo = typeof x.ID === "number" || (typeof x.Codigo === "string" && x.Codigo.trim().length > 0);
 					const cant = x.Cantidad;
-					const cantOk = typeof cant === 'number' && Number.isFinite(cant) && cant > 0;
+					const cantOk = typeof cant === "number" && Number.isFinite(cant) && cant > 0;
 					return hasIdOrCodigo && cantOk;
 				};
 
-				if (typeof articulosRaw === 'string') {
+				if (typeof articulosRaw === "string") {
 					try {
 						const parsed = JSON.parse(articulosRaw);
 						const arr = Array.isArray(parsed) ? parsed : [parsed];
@@ -1140,7 +1123,7 @@ export class Centum implements INodeType {
 				} else if (Array.isArray(articulosRaw)) {
 					// Evita TS2322: no asignar directamente; normalizar y filtrar
 					articulos = (articulosRaw as any[]).map(toArticuloInput).filter(isArticuloInput);
-				} else if (typeof articulosRaw === 'object' && articulosRaw !== null) {
+				} else if (typeof articulosRaw === "object" && articulosRaw !== null) {
 					const one = toArticuloInput(articulosRaw as any);
 					articulos = isArticuloInput(one) ? [one] : [];
 				} else {
@@ -1148,24 +1131,20 @@ export class Centum implements INodeType {
 				}
 
 				if (!idCliente) {
-					throw new NodeOperationError(this.getNode(), 'El ID del cliente es obligatorio.');
+					throw new NodeOperationError(this.getNode(), "El ID del cliente es obligatorio.");
 				}
 
 				if (!articulos.length) {
-					throw new NodeOperationError(this.getNode(), 'Debe enviarse al menos un artículo válido con Cantidad > 0.');
+					throw new NodeOperationError(this.getNode(), "Debe enviarse al menos un artículo válido con Cantidad > 0.");
 				}
 
 				try {
-					const dataCliente = await apiRequest<any>(
-						`${centumUrl}/Clientes/${idCliente}`,
-						{ method: 'GET', headers }
-					);
+					const dataCliente = await apiRequest<any>(`${centumUrl}/Clientes/${idCliente}`, { method: "GET", headers });
 
 					const cliente = dataCliente;
-					if (!cliente) throw new NodeOperationError( this.getNode(), 'Cliente no encontrado');
-
+					if (!cliente) throw new NodeOperationError(this.getNode(), "Cliente no encontrado");
 				} catch (error: NodeErr) {
-					const msg = error?.response?.data?.Message || error?.message || 'Error obteniendo cliente';
+					const msg = error?.response?.data?.Message || error?.message || "Error obteniendo cliente";
 					throw new NodeOperationError(this.getNode(), msg);
 				}
 
@@ -1183,13 +1162,13 @@ export class Centum implements INodeType {
 						else bodyArticulo.Codigo = articuloInput.Codigo;
 
 						const dataArticulo = await apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
-							method: 'POST',
+							method: "POST",
 							headers,
 							body: bodyArticulo,
 						});
 
 						const items = dataArticulo?.Articulos?.Items ?? [];
-						if (!Array.isArray(items) || items.length === 0) throw new NodeOperationError(this.getNode(), 'Artículo no encontrado');
+						if (!Array.isArray(items) || items.length === 0) throw new NodeOperationError(this.getNode(), "Artículo no encontrado");
 
 						for (const item of items) {
 							RemitoCompraArticulos.push({
@@ -1198,7 +1177,7 @@ export class Centum implements INodeType {
 							});
 						}
 					} catch (error: NodeErr) {
-						const msg = error?.response?.data?.Message || error?.message || 'Error resolviendo artículo';
+						const msg = error?.response?.data?.Message || error?.message || "Error resolviendo artículo";
 						throw new NodeOperationError(this.getNode(), msg);
 					}
 				}
@@ -1207,41 +1186,39 @@ export class Centum implements INodeType {
 				let proveedorInfo: any;
 
 				try {
-					const response = await apiRequest<any>(
-						`${centumUrl}/Proveedores/${encodeURIComponent(proveedorId)}`,
-						{ method: 'GET', headers }
-					);
+					const response = await apiRequest<any>(`${centumUrl}/Proveedores/${encodeURIComponent(proveedorId)}`, { method: "GET", headers });
 
-					if (!response?.IdProveedor) throw new NodeOperationError(this.getNode(), 'Proveedor no encontrado');
+					if (!response?.IdProveedor) throw new NodeOperationError(this.getNode(), "Proveedor no encontrado");
 					proveedorInfo = response;
 				} catch (error: NodeErr) {
-					const msg = error?.response?.data?.Message || error?.message || 'Error obteniendo proveedor';
+					const msg = error?.response?.data?.Message || error?.message || "Error obteniendo proveedor";
 					throw new NodeOperationError(this.getNode(), msg);
 				}
 
 				// 4) Body final
 				const bodyRemitoCompra = {
-					SucursalFisica: { 
-						IdSucursalFisica: sucursalId 
+					SucursalFisica: {
+						IdSucursalFisica: sucursalId,
 					},
-					NumeroDocumento: { 
-						LetraDocumento: letraDocumento, 
-						PuntoVenta: puntoDeVenta, 
-						Numero: numero
+					NumeroDocumento: {
+						LetraDocumento: letraDocumento,
+						PuntoVenta: puntoDeVenta,
+						Numero: numero,
 					},
 					TurnoEntrega: {
-						IdTurnoEntrega: turnoEntregaId
+						IdTurnoEntrega: turnoEntregaId,
 					},
 					FechaDocumento: formattedDocumentDate,
 					FechaEntrega: formattedDeliveryDate,
 					Proveedor: proveedorInfo,
 					RemitoCompraArticulos,
 					FechaVencimiento: formattedDueDate,
-					OperadorCompra: { //Obligatorio
+					OperadorCompra: {
+						//Obligatorio
 						IdOperadorCompra: 1,
 						Codigo: "1",
 						Nombre: "Operador de Compras Defecto",
-						EsSupervisor: false
+						EsSupervisor: false,
 					},
 					IdChofer: 1, //Obligatorio,
 				};
@@ -1255,27 +1232,27 @@ export class Centum implements INodeType {
 					});
 					return [this.helpers.returnJsonArray(response)];
 				} catch (error) {
-					const msg = error?.response?.data?.Message || error?.message || 'Error creando la orden de compra';
+					const msg = error?.response?.data?.Message || error?.message || "Error creando la orden de compra";
 					throw new NodeOperationError(this.getNode(), msg);
 				}
 			}
 
 			case "crearRemitoVenta": {
-				const idSucursalFisica = this.getNodeParameter('idSucursalFisica', 0);
-				const puntoDeVenta = this.getNodeParameter('puntoDeVenta', 0) as string;
-				const letraDocumento = this.getNodeParameter('letraDocumento', 0) as string;
-				const numeroDocumento = this.getNodeParameter('numeroFactura', 0); 
-				const turnoDeEntrega = this.getNodeParameter('turnoEntrega', 0);
-				const fechaDocumento = this.getNodeParameter('documentDate', 0) as string;
+				const idSucursalFisica = this.getNodeParameter("idSucursalFisica", 0);
+				const puntoDeVenta = this.getNodeParameter("puntoDeVenta", 0) as string;
+				const letraDocumento = this.getNodeParameter("letraDocumento", 0) as string;
+				const numeroDocumento = this.getNodeParameter("numeroFactura", 0);
+				const turnoDeEntrega = this.getNodeParameter("turnoEntrega", 0);
+				const fechaDocumento = this.getNodeParameter("documentDate", 0) as string;
 				const fechaDocumentoFormateada = fechaDocumento.replace(/\..+/, "");
-				const fechaEmbarque = this.getNodeParameter('shipmentDate', 0) as string;
+				const fechaEmbarque = this.getNodeParameter("shipmentDate", 0) as string;
 				const fechaEmbarqueFormateada = fechaEmbarque.replace(/\..+/, "");
-				const fechaImputacion = this.getNodeParameter('indictmentDate', 0) as string;;
+				const fechaImputacion = this.getNodeParameter("indictmentDate", 0) as string;
 				const fechaImputacionFormateada = fechaImputacion.replace(/\..+/, "");
-				const fechaEntrega = this.getNodeParameter('deliveryDate', 0) as string;
+				const fechaEntrega = this.getNodeParameter("deliveryDate", 0) as string;
 				const fechaEntregaFormateada = fechaEntrega.replace(/\..+/, "");
-				const idVendedor = this.getNodeParameter('idVendedor', 0);
-				const idCliente = this.getNodeParameter('clienteId', 0);
+				const idVendedor = this.getNodeParameter("idVendedor", 0);
+				const idCliente = this.getNodeParameter("clienteId", 0);
 				const rawArticles = this.getNodeParameter("articlesCollection", 0);
 
 				let articulosArray: { ID: string; Cantidad: number }[] = [];
@@ -1284,9 +1261,9 @@ export class Centum implements INodeType {
 					articulosArray = JSON.parse(rawArticles);
 				} else {
 					articulosArray = rawArticles as { ID: string; Cantidad: number }[];
-				}	
+				}
 
-				// Sólo los IDs para el request a /Articulos/Venta	
+				// Sólo los IDs para el request a /Articulos/Venta
 				const ids = articulosArray.map((a) => a.ID);
 				// Mapa id -> cantidad
 				const qtyById: Record<string, number> = Object.fromEntries(articulosArray.map((a) => [a.ID, a.Cantidad]));
@@ -1294,7 +1271,7 @@ export class Centum implements INodeType {
 					IdCliente: idCliente,
 					FechaDocumento: fechaDocumentoFormateada,
 					Ids: ids,
-				};	
+				};
 
 				let articulosVenta: any;
 				try {
@@ -1323,11 +1300,11 @@ export class Centum implements INodeType {
 				try {
 					const dataCliente = await apiRequest<any>(`${centumUrl}/Clientes/${idCliente}`, {
 						method: "GET",
-						headers
-					})
+						headers,
+					});
 					const cliente = dataCliente;
 					if (!cliente?.IdCliente) {
-						throw new NodeOperationError(this.getNode(), 'El cliente no fue encontrado');
+						throw new NodeOperationError(this.getNode(), "El cliente no fue encontrado");
 					}
 					clientInfo = cliente;
 				} catch (error) {
@@ -1336,8 +1313,7 @@ export class Centum implements INodeType {
 					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 
-
-				try{
+				try {
 					const response = await apiRequest<any>(`${centumUrl}/RemitosVenta`, {
 						headers,
 						method: "POST",
@@ -1345,7 +1321,8 @@ export class Centum implements INodeType {
 							SucursalFisica: {
 								IdSucursalFisica: idSucursalFisica, //Opcional
 							},
-							NumeroDocumento: { //Opcional
+							NumeroDocumento: {
+								//Opcional
 								LetraDocumento: letraDocumento,
 								PuntoVenta: puntoDeVenta,
 								Numero: numeroDocumento,
@@ -1359,17 +1336,17 @@ export class Centum implements INodeType {
 							},
 							Cliente: clientInfo,
 							Vendedor: {
-								IdVendedor: idVendedor
+								IdVendedor: idVendedor,
 							},
 							IdChofer: 1, //Opcional
 							PorcentajeDescuento: 0.0, //Opcional
 							Observaciones: "Remito creado desde n8n.",
-							RemitoVentaArticulos: compraConCantidad
+							RemitoVentaArticulos: compraConCantidad,
 						},
 					});
 					return [this.helpers.returnJsonArray(response)];
-				}catch(error){
-					const msg = error?.response?.data?.Message || error?.message || 'Error creando el Remito De Venta';
+				} catch (error) {
+					const msg = error?.response?.data?.Message || error?.message || "Error creando el Remito De Venta";
 					throw new NodeOperationError(this.getNode(), msg);
 				}
 			}
@@ -1508,14 +1485,14 @@ export class Centum implements INodeType {
 			}
 
 			case "crearMovimientoStock": {
-				const idSucursalFisica = this.getNodeParameter('idSucursalFisica', 0);
-				const articleId = this.getNodeParameter('articleId', 0);
-				const fechaImputacion = this.getNodeParameter('indictmentDate', 0) as string;
+				const idSucursalFisica = this.getNodeParameter("idSucursalFisica", 0);
+				const articleId = this.getNodeParameter("articleId", 0);
+				const fechaImputacion = this.getNodeParameter("indictmentDate", 0) as string;
 				const fechaImputacionFormateada = fechaImputacion.replace(/\..+/, "");
 
 				// const ubicacionArticle = this.getNodeParameter('', 0);
 
-				if(!articleId){
+				if (!articleId) {
 					throw new NodeOperationError(this.getNode(), "El ID del articulo es obligatorio.");
 				}
 
@@ -1532,20 +1509,20 @@ export class Centum implements INodeType {
 								},
 							],
 							SucursalFisica: {
-								IdSucursalFisica: idSucursalFisica
+								IdSucursalFisica: idSucursalFisica,
 							},
 							ConceptoVarios: {
-								IdConceptoVarios: 1
+								IdConceptoVarios: 1,
 							},
-					 		FechaImputacion: fechaImputacionFormateada,
+							FechaImputacion: fechaImputacionFormateada,
 						},
 					});
 					return [this.helpers.returnJsonArray(response)];
 				} catch (error) {
-					const msg = error?.response?.data?.Message || error?.message || 'Error creando el ajuste de stock';
+					const msg = error?.response?.data?.Message || error?.message || "Error creando el ajuste de stock";
 					throw new NodeOperationError(this.getNode(), msg);
+				}
 			}
-		}
 
 			case "descargarImagenesProductos": {
 				const arrResult: any[] = [];
@@ -1605,87 +1582,86 @@ export class Centum implements INodeType {
 				return [this.helpers.returnJsonArray(arrResult)];
 			}
 			case "estadisticaVentaRanking": {
-        const fechaDesdeString = this.getNodeParameter('startDate', 0);
-        const fechaHastaString = this.getNodeParameter('endDate', 0);
-        const tipoDeRanking = this.getNodeParameter('tipoDeRanking', 0);
-        const orderByRanking = this.getNodeParameter('ventaRankingOrderBy', 0);
-        const orderAsc = this.getNodeParameter('orderAsc', 0);
-        const cantItems = this.getNodeParameter('cantidadDeItems', 0);
-        const rubroId = this.getNodeParameter('rubroId', 0);
-        const idListaPrecio = this.getNodeParameter('idList', 0);
+				const fechaDesdeString = this.getNodeParameter("startDate", 0);
+				const fechaHastaString = this.getNodeParameter("endDate", 0);
+				const tipoDeRanking = this.getNodeParameter("tipoDeRanking", 0);
+				const orderByRanking = this.getNodeParameter("ventaRankingOrderBy", 0);
+				const orderAsc = this.getNodeParameter("orderAsc", 0);
+				const cantItems = this.getNodeParameter("cantidadDeItems", 0);
+				const rubroId = this.getNodeParameter("rubroId", 0);
+				const idListaPrecio = this.getNodeParameter("idList", 0);
 
-        const fechaDesde = String(fechaDesdeString).split("T")[0];
-        const fechaHasta = String(fechaHastaString).split("T")[0];
+				const fechaDesde = String(fechaDesdeString).split("T")[0];
+				const fechaHasta = String(fechaHastaString).split("T")[0];
 
-        let url = `${centumUrl}/EstadisticaVentaRanking/${cantItems}`;
+				let url = `${centumUrl}/EstadisticaVentaRanking/${cantItems}`;
 
-        if (fechaDesde && fechaHasta) {
-          url += `?fechaDocumentoDesde=${fechaDesde}&fechaDocumentoHasta=${fechaHasta}`;
-        } else {
-          throw new NodeOperationError(this.getNode(), 'Ambos periodos de fecha son necesarios.');
-        }
+				if (fechaDesde && fechaHasta) {
+					url += `?fechaDocumentoDesde=${fechaDesde}&fechaDocumentoHasta=${fechaHasta}`;
+				} else {
+					throw new NodeOperationError(this.getNode(), "Ambos periodos de fecha son necesarios.");
+				}
 
-        if(rubroId){
-          url += `&idsRubro=${rubroId}`; 
-        }
+				if (rubroId) {
+					url += `&idsRubro=${rubroId}`;
+				}
 
-        if(idListaPrecio){
-          url += `&idsListaPrecio=${idListaPrecio}`;
-        }
+				if (idListaPrecio) {
+					url += `&idsListaPrecio=${idListaPrecio}`;
+				}
 
-        if (tipoDeRanking) {
-          if (tipoDeRanking === 'esRankingClientes') {
-            url += `&${tipoDeRanking}=true`;
-          }
-          if (tipoDeRanking === 'esRankingArticulos') {
-            url += `&${tipoDeRanking}=true`;
-          }
-          if (tipoDeRanking === 'esRankingVendedores') {
-            url += `&${tipoDeRanking}=true`;
-          }
-        }
+				if (tipoDeRanking) {
+					if (tipoDeRanking === "esRankingClientes") {
+						url += `&${tipoDeRanking}=true`;
+					}
+					if (tipoDeRanking === "esRankingArticulos") {
+						url += `&${tipoDeRanking}=true`;
+					}
+					if (tipoDeRanking === "esRankingVendedores") {
+						url += `&${tipoDeRanking}=true`;
+					}
+				}
 
-        // OrderBy (manteniendo la lógica de ifs actuales)
-        if (orderByRanking) {
-          if (orderByRanking === 'CantidadUnidadNivel0') {
-            url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
-          }
-          if (orderByRanking === 'CantidadUnidadNivel1') {
-            url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
-          }
-          if (orderByRanking === 'CantidadUnidadNivel2') {
-            url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
-          }
-          if (orderByRanking === 'ImporteTotalNeto') {
-            url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
-          }
-          if (orderByRanking === 'ImporteTotalFinal') {
-            url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
-          }
-        }
-        if (typeof orderAsc === 'boolean') {
-          if (!orderByRanking) {
-            throw new NodeOperationError(
-              this.getNode(),
-              'Debe especificar "ventaRankingOrderBy" cuando se especifica "orderAsc" (por requerimiento del endpoint EstadisticaVentaRanking).',
-            );
-          }
-          url += `&ordenEstadisticaVentaRankingAscendente=${orderAsc}`;
-        }
+				// OrderBy (manteniendo la lógica de ifs actuales)
+				if (orderByRanking) {
+					if (orderByRanking === "CantidadUnidadNivel0") {
+						url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
+					}
+					if (orderByRanking === "CantidadUnidadNivel1") {
+						url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
+					}
+					if (orderByRanking === "CantidadUnidadNivel2") {
+						url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
+					}
+					if (orderByRanking === "ImporteTotalNeto") {
+						url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
+					}
+					if (orderByRanking === "ImporteTotalFinal") {
+						url += `&tipoOrdenEstadisticaVentaRanking=${orderByRanking}`;
+					}
+				}
+				if (typeof orderAsc === "boolean") {
+					if (!orderByRanking) {
+						throw new NodeOperationError(
+							this.getNode(),
+							'Debe especificar "ventaRankingOrderBy" cuando se especifica "orderAsc" (por requerimiento del endpoint EstadisticaVentaRanking).',
+						);
+					}
+					url += `&ordenEstadisticaVentaRankingAscendente=${orderAsc}`;
+				}
 
-        try {
-          const response = await apiRequest<any>(`${url}`, {
-            method: "GET",
-            headers,
-          });
-          return [this.helpers.returnJsonArray(response)];
-        } catch (error) {
-          console.log("Error en solicitud de estadisticas de ventas:", error);
-          const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
-          throw new NodeOperationError(this.getNode(), `Error obteniendo las estadisticas de ranking. \n ${errorMessage}`);
-        }
-      }
-
+				try {
+					const response = await apiRequest<any>(`${url}`, {
+						method: "GET",
+						headers,
+					});
+					return [this.helpers.returnJsonArray(response)];
+				} catch (error) {
+					console.log("Error en solicitud de estadisticas de ventas:", error);
+					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+					throw new NodeOperationError(this.getNode(), `Error obteniendo las estadisticas de ranking. \n ${errorMessage}`);
+				}
+			}
 
 			case "generarTokenSeguridad": {
 				try {
@@ -1699,12 +1675,12 @@ export class Centum implements INodeType {
 				}
 			}
 
-			case 'listarBonificaciones': {
+			case "listarBonificaciones": {
 				try {
 					const bonificaciones = await apiRequest<any>(`${centumUrl}/Bonificaciones`, {
 						method: "GET",
-						headers
-					})
+						headers,
+					});
 					return [this.helpers.returnJsonArray([bonificaciones])];
 				} catch (error) {
 					console.error("Error al obtener las bonificaciones:", error);
@@ -1719,18 +1695,17 @@ export class Centum implements INodeType {
 			}
 
 			case "listarCategorias": {
-
-				const subRubro = this.getNodeParameter('idsSubRubros', 0);
+				const subRubro = this.getNodeParameter("idsSubRubros", 0);
 				let url = `${centumUrl}/CategoriasArticulo`;
 
 				if (subRubro) {
-					url = `${url}?idSubRubro=${subRubro}`
+					url = `${url}?idSubRubro=${subRubro}`;
 				}
 
 				try {
 					const response = await apiRequest<any>(url, {
 						method: "GET",
-						headers
+						headers,
 					});
 
 					return [this.helpers.returnJsonArray(response)];
@@ -1740,13 +1715,13 @@ export class Centum implements INodeType {
 			}
 
 			case "listarChoferes": {
-				try{
+				try {
 					const response = await apiRequest<any>(`${centumUrl}/GuiaLogisticaChoferes`, {
-						method: 'GET',
-						headers
+						method: "GET",
+						headers,
 					});
-					return [this.helpers.returnJsonArray(response)]
-				}catch(error){
+					return [this.helpers.returnJsonArray(response)];
+				} catch (error) {
 					throw new NodeOperationError(this.getNode(), `Hubo un error al obtener el listado de choferes. Error: ${error}`);
 				}
 			}
@@ -1875,7 +1850,7 @@ export class Centum implements INodeType {
 				try {
 					const response = await apiRequest<any>(url, {
 						method: "GET",
-						headers
+						headers,
 					});
 					return [this.helpers.returnJsonArray(response)];
 				} catch (error) {
@@ -1968,17 +1943,17 @@ export class Centum implements INodeType {
 			}
 
 			case "listarFacturasVenta": {
-				const idCliente = this.getNodeParameter('clienteId', 0) as string;
-				const idVenta = this.getNodeParameter('ventaId', 0);
-				const idSucursal = this.getNodeParameter('idSucursalFisica', 0);
-				const idDivisionEmpresa = this.getNodeParameter('divisionEmpresaId', 0);
-				const incluirAnulados = this.getNodeParameter('incluirAnulados', 0);
-				const idUsuarioCreador = this.getNodeParameter('usuarioCreadorId', 0);
-				const idTransporte = this.getNodeParameter('transporteId', 0);
-				const idTipoComprobante = this.getNodeParameter('idTipoComprobante', 0);
-				const idClienteCuentaCorriente = this.getNodeParameter('cuentaCorrienteId', 0);
-				const idVendedor = this.getNodeParameter('idVendedor', 0);
-				const idCanalVenta = this.getNodeParameter('canalVentaId', 0);
+				const idCliente = this.getNodeParameter("clienteId", 0) as string;
+				const idVenta = this.getNodeParameter("ventaId", 0);
+				const idSucursal = this.getNodeParameter("idSucursalFisica", 0);
+				const idDivisionEmpresa = this.getNodeParameter("divisionEmpresaId", 0);
+				const incluirAnulados = this.getNodeParameter("incluirAnulados", 0);
+				const idUsuarioCreador = this.getNodeParameter("usuarioCreadorId", 0);
+				const idTransporte = this.getNodeParameter("transporteId", 0);
+				const idTipoComprobante = this.getNodeParameter("idTipoComprobante", 0);
+				const idClienteCuentaCorriente = this.getNodeParameter("cuentaCorrienteId", 0);
+				const idVendedor = this.getNodeParameter("idVendedor", 0);
+				const idCanalVenta = this.getNodeParameter("canalVentaId", 0);
 				const desdeSaldoFecha = this.getNodeParameter("startDate", 0);
 				const hastaSaldoFecha = this.getNodeParameter("endDate", 0);
 
@@ -2001,7 +1976,7 @@ export class Centum implements INodeType {
 				idClienteCuentaCorriente && (body.idClienteCuentaCorriente = idClienteCuentaCorriente);
 				idVendedor && (body.idVendedor = idVendedor);
 				idCanalVenta && (body.idCanalVenta = idCanalVenta);
-				incluirAnulados && (body.incluirAnulados = incluirAnulados)
+				incluirAnulados && (body.incluirAnulados = incluirAnulados);
 
 				const response = await apiRequest<any>(`${centumUrl}/Ventas/FiltrosVentaConsulta`, {
 					method: "POST",
@@ -2014,11 +1989,10 @@ export class Centum implements INodeType {
 				}
 
 				return [this.helpers.returnJsonArray(response)];
-
 			}
 
 			case "listarFacturasVentasPorID": {
-				const ventaIdParam= this.getNodeParameter("ventaId", 0);
+				const ventaIdParam = this.getNodeParameter("ventaId", 0);
 				const desdeSaldoFecha = this.getNodeParameter("startDate", 0);
 				const hastaSaldoFecha = this.getNodeParameter("endDate", 0);
 				const separarFechaDesde = String(desdeSaldoFecha).split("T")[0];
@@ -2065,16 +2039,13 @@ export class Centum implements INodeType {
 			}
 
 			case "listarMarcas": {
-
 				try {
-
 					const response = await apiRequest<any>(`${centumUrl}/MarcasArticulo`, {
-						method: 'GET',
-						headers
-					})
+						method: "GET",
+						headers,
+					});
 
 					return [this.helpers.returnJsonArray(response)];
-
 				} catch (error) {
 					console.log("Error en obtener el listado de marcas:", error);
 					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
@@ -2082,27 +2053,26 @@ export class Centum implements INodeType {
 				}
 			}
 
-			case "listarOperadoresMoviles":{
-					
-				const username = this.getNodeParameter('username', 0) as string;
-				const email = this.getNodeParameter('email', 0) as string;
+			case "listarOperadoresMoviles": {
+				const username = this.getNodeParameter("username", 0) as string;
+				const email = this.getNodeParameter("email", 0) as string;
 
-				let params = '';
-				if(username){
+				let params = "";
+				if (username) {
 					params = `?usuario=${username}`;
 				}
-				if(email){
+				if (email) {
 					params = `?email=${email}`;
 				}
 
-				try{
+				try {
 					const response = await apiRequest<any>(`${centumUrl}/OperadoresMoviles${params}`, {
 						headers,
-						method: 'GET'
+						method: "GET",
 					});
 					return [this.helpers.returnJsonArray(response)];
-				}catch(err){
-					console.log('Error al obtener el listado de operadores moviles.', err);
+				} catch (err) {
+					console.log("Error al obtener el listado de operadores moviles.", err);
 					const errorMessage = err?.response?.data?.Message || err.message || "Error Desconocido";
 					throw new NodeOperationError(this.getNode(), `Error en obtener el listado de marcas. \n ${errorMessage}`);
 				}
@@ -2128,12 +2098,12 @@ export class Centum implements INodeType {
 				}
 
 				try {
-					const body = {	
+					const body = {
 						fechaDocumentoDesde: separarFechaDesde,
 						fechaDocumentoHasta: separarFechaHasta,
 						idProveedor,
 						fechaEntregaDesde: separarFechaEntregaDesde,
-						fechaEntregaHasta: separarFechaEntregaHasta
+						fechaEntregaHasta: separarFechaEntregaHasta,
 					};
 
 					const response = await apiRequest<any>(`${centumUrl}/OrdenesCompra/FiltrosOrdenCompra`, {
@@ -2156,14 +2126,13 @@ export class Centum implements INodeType {
 			}
 
 			case "listarPaises": {
-				try{
-
+				try {
 					const response = await apiRequest<any>(`${centumUrl}/Paises`, {
 						headers,
-						method: "GET"
+						method: "GET",
 					});
 					return [this.helpers.returnJsonArray(response)];
-				}catch(error){
+				} catch (error) {
 					console.log("Error en obtener el listado de paises:", error);
 					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
 					throw new NodeOperationError(this.getNode(), `Error obteniendo el listado de paises: ${errorMessage}`);
@@ -2171,13 +2140,12 @@ export class Centum implements INodeType {
 			}
 
 			case "listarPedidosVenta": {
-
-				const idCliente = this.getNodeParameter('clienteId', 0) as string;
-				const idPedidoDeVenta = this.getNodeParameter('ventaId', 0);
-				const idSucursal = this.getNodeParameter('idSucursalFisica', 0);
-				const incluirAnulados = this.getNodeParameter('incluirAnulados', 0);
-				const idUsuarioCreador = this.getNodeParameter('usuarioCreadorId', 0);
-				const idTransporte = this.getNodeParameter('transporteId', 0);
+				const idCliente = this.getNodeParameter("clienteId", 0) as string;
+				const idPedidoDeVenta = this.getNodeParameter("ventaId", 0);
+				const idSucursal = this.getNodeParameter("idSucursalFisica", 0);
+				const incluirAnulados = this.getNodeParameter("incluirAnulados", 0);
+				const idUsuarioCreador = this.getNodeParameter("usuarioCreadorId", 0);
+				const idTransporte = this.getNodeParameter("transporteId", 0);
 				const idsEstado = this.getNodeParameter("statusId", 0);
 				const fechaDesde = this.getNodeParameter("startDate", 0, "") as string;
 				const fechaHasta = this.getNodeParameter("endDate", 0, "") as string;
@@ -2197,7 +2165,7 @@ export class Centum implements INodeType {
 					idSucursal,
 					incluirAnulados,
 					idUsuarioCreador,
-					idTransporte
+					idTransporte,
 				};
 
 				try {
@@ -2357,75 +2325,77 @@ export class Centum implements INodeType {
 				}
 			}
 
-      case "listarProductosPorSucursal": {
-          const IdSucursalFisica = this.getNodeParameter("idSucursalFisica", 0) as string;
-          const IdArticulo = this.getNodeParameter("articleId", 0) as string;
-          const NombreArticulo = this.getNodeParameter("nombreArticulo", 0) as string;
-          const IdRubro = this.getNodeParameter("rubroId", 0) as string;
-          const IdSubRubro = this.getNodeParameter("idsSubRubros", 0) as string;
-          const IdCategoriaArticulo = this.getNodeParameter("IdCategoriaArticulo", 0) as string;
-          const IdMarcaArticulo = this.getNodeParameter("IdMarcaArticulo", 0) as string;
+			case "listarProductosPorSucursal": {
+				const IdSucursalFisica = this.getNodeParameter("idSucursalFisica", 0) as string;
+				const IdArticulo = this.getNodeParameter("articleId", 0) as string;
+				const NombreArticulo = this.getNodeParameter("nombreArticulo", 0) as string;
+				const IdRubro = this.getNodeParameter("rubroId", 0) as string;
+				const IdSubRubro = this.getNodeParameter("idsSubRubros", 0) as string;
+				const IdCategoriaArticulo = this.getNodeParameter("IdCategoriaArticulo", 0) as string;
+				const IdMarcaArticulo = this.getNodeParameter("IdMarcaArticulo", 0) as string;
 
-          // Si no filtra por artículo, sucursal + al menos una segmentación son obligatorios
-          if (!IdArticulo) {
-              if (!IdSucursalFisica) {
-                  throw new NodeOperationError(this.getNode(), "Si no filtra por artículo, el id de la sucursal física es obligatorio");
-              }
+				// Si no filtra por artículo, sucursal + al menos una segmentación son obligatorios
+				if (!IdArticulo) {
+					if (!IdSucursalFisica) {
+						throw new NodeOperationError(this.getNode(), "Si no filtra por artículo, el id de la sucursal física es obligatorio");
+					}
 
-              const tieneSegmentacion = NombreArticulo || IdRubro || IdSubRubro || IdCategoriaArticulo || IdMarcaArticulo;
-              if (!tieneSegmentacion) {
-                  throw new NodeOperationError(this.getNode(), "Si no filtra por artículo, debe especificar al menos una segmentación: Nombre, IdRubro, IdSubRubro, IdCategoriaArticulo o IdMarcaArticulo");
-              }
-          }
+					const tieneSegmentacion = NombreArticulo || IdRubro || IdSubRubro || IdCategoriaArticulo || IdMarcaArticulo;
+					if (!tieneSegmentacion) {
+						throw new NodeOperationError(
+							this.getNode(),
+							"Si no filtra por artículo, debe especificar al menos una segmentación: Nombre, IdRubro, IdSubRubro, IdCategoriaArticulo o IdMarcaArticulo",
+						);
+					}
+				}
 
-          const queryParams: Record<string, string> = {};
+				const queryParams: Record<string, string> = {};
 
-          if (IdSucursalFisica) queryParams.idsSucursalesFisicas = IdSucursalFisica;
-          if (IdArticulo) queryParams.idsArticulos = IdArticulo;
-          if (NombreArticulo) queryParams.nombre = NombreArticulo;
-          if (IdRubro) queryParams.idRubro = IdRubro;
-          if (IdSubRubro) queryParams.idSubRubro = IdSubRubro;
-          if (IdCategoriaArticulo) queryParams.idCategoriaArticulo = IdCategoriaArticulo;
-          if (IdMarcaArticulo) queryParams.idMarcaArticulo = IdMarcaArticulo;
+				if (IdSucursalFisica) queryParams.idsSucursalesFisicas = IdSucursalFisica;
+				if (IdArticulo) queryParams.idsArticulos = IdArticulo;
+				if (NombreArticulo) queryParams.nombre = NombreArticulo;
+				if (IdRubro) queryParams.idRubro = IdRubro;
+				if (IdSubRubro) queryParams.idSubRubro = IdSubRubro;
+				if (IdCategoriaArticulo) queryParams.idCategoriaArticulo = IdCategoriaArticulo;
+				if (IdMarcaArticulo) queryParams.idMarcaArticulo = IdMarcaArticulo;
 
-          try {
-              const dataArticulosExistencias = await apiRequest<any>(`${centumUrl}/ArticulosSucursalesFisicas`, {
-                  headers,
-                  queryParams,
-              });
-              return [this.helpers.returnJsonArray(dataArticulosExistencias.Items as any)];
-          } catch (error) {
-              console.log(error);
-              const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
-              throw new NodeOperationError(this.getNode(), errorMessage);
-          }
-      }
+				try {
+					const dataArticulosExistencias = await apiRequest<any>(`${centumUrl}/ArticulosSucursalesFisicas`, {
+						headers,
+						queryParams,
+					});
+					return [this.helpers.returnJsonArray(dataArticulosExistencias.Items as any)];
+				} catch (error) {
+					console.log(error);
+					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
+					throw new NodeOperationError(this.getNode(), errorMessage);
+				}
+			}
 
 			case "listarPromociones": {
 				const documentDate = this.getNodeParameter("documentDate", 0) as string;
 				const formattedDocumentDate = String(documentDate).split("T")[0];
 
 				const body = {
-					FechaDocumento: formattedDocumentDate
-				}
+					FechaDocumento: formattedDocumentDate,
+				};
 				try {
 					const response = await apiRequest<any>(`${centumUrl}/PromocionesComerciales/FiltrosPromocionComercial`, {
 						method: "POST",
 						headers,
-						body
-					})
+						body,
+					});
 
 					if (response.Items && Array.isArray(response.Items)) {
 						return [this.helpers.returnJsonArray(response.Items)];
 					}
 
 					return [this.helpers.returnJsonArray(response)];
-				}catch(error){
+				} catch (error) {
 					console.log("Error en solicitud de promociones:", error);
 					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
 					throw new NodeOperationError(this.getNode(), `Error obteniendo promociones: \n ${errorMessage}`);
 				}
-				
 			}
 
 			case "listarPromocionesComercialesCliente": {
@@ -2494,47 +2464,47 @@ export class Centum implements INodeType {
 			}
 
 			case "listarProveedores": {
-			const codigo = this.getNodeParameter('codigo', 0) as string | undefined;
-			const razonSocial = this.getNodeParameter('razonSocial', 0) as string | undefined;
-			const cuit = this.getNodeParameter('cuit', 0) as string | undefined;
-			const activo = this.getNodeParameter("active", 0) as boolean | undefined;
+				const codigo = this.getNodeParameter("codigo", 0) as string | undefined;
+				const razonSocial = this.getNodeParameter("razonSocial", 0) as string | undefined;
+				const cuit = this.getNodeParameter("cuit", 0) as string | undefined;
+				const activo = this.getNodeParameter("active", 0) as boolean | undefined;
 
-			// Better filtering function
-			const queryParams = Object.fromEntries(
-				Object.entries({
-					codigo,
-					razonSocial,
-					cuit,
-					activo
-				}).filter(([key, value]) => {
-					// Debug: log each parameter
-					console.log(`Param ${key}:`, value, typeof value);
-					
-					// Exclude undefined and null
-					if (value === undefined || value === null) return false;
-					
-					// Exclude empty strings (after trimming if it's a string)
-					if (typeof value === 'string' && value.trim() === '') return false;
-					
-					// Include everything else (numbers, booleans, non-empty strings)
-					return true;
-				})
-			);
+				// Better filtering function
+				const queryParams = Object.fromEntries(
+					Object.entries({
+						codigo,
+						razonSocial,
+						cuit,
+						activo,
+					}).filter(([key, value]) => {
+						// Debug: log each parameter
+						console.log(`Param ${key}:`, value, typeof value);
 
-			console.log('Final queryParams:', queryParams);
-			
-			try {
-				const proveedores = await apiRequest<any>(`${centumUrl}/Proveedores`, {
-					method: "GET",
-					headers,
-					queryParams,
-				});
-				return [this.helpers.returnJsonArray(proveedores)];
-			} catch (err) {
-				console.error('Error in listarProveedores:', err);
-				throw err; // Don't swallow the error
+						// Exclude undefined and null
+						if (value === undefined || value === null) return false;
+
+						// Exclude empty strings (after trimming if it's a string)
+						if (typeof value === "string" && value.trim() === "") return false;
+
+						// Include everything else (numbers, booleans, non-empty strings)
+						return true;
+					}),
+				);
+
+				console.log("Final queryParams:", queryParams);
+
+				try {
+					const proveedores = await apiRequest<any>(`${centumUrl}/Proveedores`, {
+						method: "GET",
+						headers,
+						queryParams,
+					});
+					return [this.helpers.returnJsonArray(proveedores)];
+				} catch (err) {
+					console.error("Error in listarProveedores:", err);
+					throw err; // Don't swallow the error
+				}
 			}
-		}
 
 			case "listarRegimenesEspeciales": {
 				try {
@@ -2553,29 +2523,28 @@ export class Centum implements INodeType {
 			case "listarRubros": {
 				try {
 					const response = await apiRequest<any>(`${centumUrl}/Rubros`, {
-						method: 'GET',
-						headers
+						method: "GET",
+						headers,
 					});
 
 					return [this.helpers.returnJsonArray(response)];
-
 				} catch (error) {
 					console.log(error);
 					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
 					throw new NodeOperationError(this.getNode(), errorMessage);
 				}
 			}
-      case "listarSubRubros": {
-        const idRubro = this.getNodeParameter('rubroId', 0) as string;
-        const queryParams: Record<string, string> = {};
-        
-        if(idRubro) queryParams.idRubro = idRubro;
-        
+			case "listarSubRubros": {
+				const idRubro = this.getNodeParameter("rubroId", 0) as string;
+				const queryParams: Record<string, string> = {};
+
+				if (idRubro) queryParams.idRubro = idRubro;
+
 				try {
 					const response = await apiRequest<any>(`${centumUrl}/SubRubros`, {
-						method: 'GET',
+						method: "GET",
 						headers,
-            queryParams
+						queryParams,
 					});
 					return [this.helpers.returnJsonArray(response)];
 				} catch (error) {
@@ -2632,26 +2601,26 @@ export class Centum implements INodeType {
 					const paginated = await apiPostRequestPaginated<IArticulos>(articulosURL, fetchOptions);
 					return [this.helpers.returnJsonArray(paginated as any)];
 				} catch (error) {
-          console.error("Error en solicitud de artículos:", error);
+					console.error("Error en solicitud de artículos:", error);
 
-          let errorMessage = "Error desconocido";
+					let errorMessage = "Error desconocido";
 
-          if ((error as any)?.response?.data?.Message) {
-            errorMessage = (error as any).response.data.Message;
-          } else if (error instanceof Error) {
-            errorMessage = error.message;
-          }
+					if ((error as any)?.response?.data?.Message) {
+						errorMessage = (error as any).response.data.Message;
+					} else if (error instanceof Error) {
+						errorMessage = error.message;
+					}
 
-          throw new NodeOperationError(this.getNode(), errorMessage);
-        }
+					throw new NodeOperationError(this.getNode(), errorMessage);
+				}
 			}
 
-			case 'listarTurnosEntrega': {
+			case "listarTurnosEntrega": {
 				try {
 					const turnoEntrega = await apiRequest<any>(`${centumUrl}/TurnosEntrega`, {
-						method: 'GET',
-						headers
-					})
+						method: "GET",
+						headers,
+					});
 					return [this.helpers.returnJsonArray(turnoEntrega)];
 				} catch (error) {
 					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
@@ -2659,32 +2628,31 @@ export class Centum implements INodeType {
 				}
 			}
 
-			case 'listarUbicacionArticulos': {
-				try{
+			case "listarUbicacionArticulos": {
+				try {
 					const ubicacionArticulos = await apiRequest<any>(`${centumUrl}/UbicacionesArticulos`, {
-						method: 'GET',
-						headers
+						method: "GET",
+						headers,
 					});
-					return [this.helpers.returnJsonArray(ubicacionArticulos)]
-				}catch(error){
+					return [this.helpers.returnJsonArray(ubicacionArticulos)];
+				} catch (error) {
 					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
-					throw new NodeOperationError(this.getNode(), `Error obteniendo las ubicaciones de los articulos: ${errorMessage}`)
+					throw new NodeOperationError(this.getNode(), `Error obteniendo las ubicaciones de los articulos: ${errorMessage}`);
 				}
 			}
 
-			case 'listarVendedores': {
+			case "listarVendedores": {
 				try {
 					const turnoEntrega = await apiRequest<any>(`${centumUrl}/Vendedores`, {
-						method: 'GET',
-						headers
-					})
+						method: "GET",
+						headers,
+					});
 					return [this.helpers.returnJsonArray(turnoEntrega)];
 				} catch (error) {
 					const errorMessage = error?.response?.data?.Message || error.message || "Error desconocido";
 					throw new NodeOperationError(this.getNode(), `Error obteniendo los vendedores: ${errorMessage}`);
 				}
 			}
-
 
 			case "registrarCobro": {
 				const ordenCliente = this.getNodeParameter("cliente", 0);
@@ -2762,7 +2730,7 @@ export class Centum implements INodeType {
 
 					const response = await apiRequest<any>(`${url}`, {
 						method: "GET",
-						headers
+						headers,
 					});
 
 					// Validación de la respuesta

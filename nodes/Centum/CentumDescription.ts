@@ -206,11 +206,11 @@ export const CentumOperations: INodeProperties[] = [
 				value: 'estadisticaVentaRanking',
 				description: 'Obtiene un listado de clientes, articulos, vendedores o sucursales fisicas según un ranking de venta'
 			},
-      {
-        name: 'Frecuencias Clientes Listar',
-        value: 'frecuenciasCliente',
-        description: 'Obtiene un listado con las frecuencias de los clientes'
-      },
+			{
+				name: 'Frecuencias Clientes - Listar',
+				value: 'frecuenciasCliente',
+				description: 'Obtiene un listado con las frecuencias de los clientes'
+			},
 			{
 				name: 'Marcas - Obtener',
 				value: 'listarMarcas',
@@ -224,7 +224,7 @@ export const CentumOperations: INodeProperties[] = [
 			},
 			{
 				name: 'Obtener Operador Móvil',
-				value: 'listarOperadorMovil',
+				value: 'listarOperadoresMoviles',
 				description: 'Obtiene el listado de todos los operadores moviles. Si desea puede filtrar por nombre / usuario.'
 			},
 			{
