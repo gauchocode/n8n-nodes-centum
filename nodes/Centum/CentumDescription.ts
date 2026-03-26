@@ -8,394 +8,603 @@ export const CentumOperations: INodeProperties[] = [
 		noDataExpression: true,
 		options: [
 			{
-				name: '_Token De Acceso - Generación',
-				value: 'generarTokenSeguridad',
-				action: 'Genera un nuevo token',
-				description: 'Genera un nuevo token para utilizarlo con una herramienta externa como postman'
+				name: 'Artículos',
+				value: 'articulos',
 			},
 			{
-				name: 'Articulo - Buscar',
+				name: 'Clientes',
+				value: 'clientes',
+			},
+			{
+				name: 'Ventas',
+				value: 'ventas',
+			},
+			{
+				name: 'Cobros',
+				value: 'cobros',
+			},
+			{
+				name: 'Compras',
+				value: 'compras',
+			},
+			{
+				name: 'Proveedores',
+				value: 'proveedores',
+			},
+			{
+				name: 'Logística',
+				value: 'logistica',
+			},
+			{
+				name: 'Stock',
+				value: 'stock',
+			},
+			{
+				name: 'Geografía',
+				value: 'geografia',
+			},
+			{
+				name: 'Extras',
+				value: 'extras',
+			},
+		],
+		default: 'ventas',
+	},
+	{
+		displayName: 'Operación',
+		name: 'operation',
+		type: 'options',
+		noDataExpression: true,
+		displayOptions: {
+			show: {
+				resource: ['articulos'],
+			},
+		},
+		options: [
+			{
+				name: 'Artículo - Buscar',
 				value: 'buscarProductos',
-				action: 'Busca un articulo por nombre',
-				description: 'Busca un articulo por nombre y retorna todas las ocurrencias'
+				action: 'Busca artículos por nombre',
+				description: 'Busca un artículo por nombre y retorna todas las ocurrencias',
 			},
 			{
-				name: 'Articulo - Por ID',
+				name: 'Artículo - Por ID',
 				value: 'buscarProductoPorCodigo',
-				action: 'Buscar artículo por ID',
-				description: 'Retorna un artículo específico basado en su ID único'
-			},
-			{
-				name: 'Artículos - Existencia',
-				value: 'consultarStock',
-				action: 'Obtener existencias de artículos',
-				description: 'Retorna un listado de las existencias de los artículos en base a ciertos filtros'
+				action: 'Busca artículo por ID',
+				description: 'Retorna un artículo específico basado en su ID único',
 			},
 			{
 				name: 'Artículos - Filtrado',
 				value: 'listarProductosDisponibles',
-				action: 'Buscar artículos con filtros',
-				description: 'Retorna un listado de artículos para vender en base a ciertos filtros'
+				action: 'Lista artículos con filtros',
+				description: 'Retorna un listado de artículos para vender en base a ciertos filtros',
 			},
 			{
 				name: 'Artículos - Imagen',
 				value: 'descargarImagenesProductos',
-				action: 'Obtener imagen de artículo',
-				description: 'Retorna la imagen (binario) de un artículo'
+				action: 'Obtiene imagen de artículo',
+				description: 'Retorna la imagen binaria de un artículo',
 			},
 			{
 				name: 'Artículos - Listado',
 				value: 'listarTodosLosProductos',
-				action: 'Obtener datos generales de artículos',
-				description: 'Retorna un listado de los artículos y sus datos generales'
+				action: 'Lista datos generales de artículos',
+				description: 'Retorna un listado de los artículos y sus datos generales',
 			},
 			{
 				name: 'Artículos - Precio Por Lista',
 				value: 'consultarPrecioProducto',
-				action: 'Obtén el precio de un artículo según la lista',
-				description: 'Devuelve el valor de un artículo, según la lista indicada'
+				action: 'Obtiene precio por lista',
+				description: 'Devuelve el valor de un artículo según la lista indicada',
 			},
 			{
 				name: 'Artículos - Stock Sucursal Física',
 				value: 'listarProductosPorSucursal',
-				action: 'Obtener stock por sucursal física',
-				description: 'Retorna el stock de artículos en una sucursal física específica'
+				action: 'Lista stock por sucursal física',
+				description: 'Retorna el stock de artículos en una sucursal física específica',
 			},
 			{
 				name: 'Artículos - Stock Sucursal Física Por ID Artículo',
 				value: 'buscarProductoEnSucursal',
-				action: 'Obtener el stock por artículo individual por sucursal física',
-				description: 'Retorna el stock de un artículo en específico de una sucursal física'
+				action: 'Obtiene stock por artículo en sucursal',
+				description: 'Retorna el stock de un artículo específico en una sucursal física',
 			},
 			{
 				name: 'Bonificaciones - Obtener',
 				value: 'listarBonificaciones',
-				action: 'Obtiene el listado de bonificaciones disponibles',
-				description: 'Obtiene el listado completo de bonificaciones disponibles'
+				action: 'Lista bonificaciones',
+				description: 'Obtiene el listado completo de bonificaciones disponibles',
 			},
 			{
 				name: 'Categorías - Obtener',
 				value: 'listarCategorias',
-				action: 'Obten el listado de las categorías',
-				description: 'Obten el listado completo de todas las categorías de los articulos'
-			},
-			{
-				name: 'Choferes - Obtener Listado',
-				value: 'listarChoferes',
-				description: 'Obtiene un listado completo de los choferes disponibles'
-			},
-			{
-				name: 'Cliente - Actualizar',
-				value: 'actualizarCliente',
-				action: 'Actualizar cliente',
-				description: 'Actualiza un cliente y retorna su información con la URL para acceder al recurso'
-			},
-			{
-				name: 'Cliente - Búsqueda',
-				value: 'buscarClientes',
-				action: 'Buscar cliente',
-				description: 'Retorna un listado de clientes en base a ciertos filtros'
-			},
-			{
-				name: 'Cliente - Búsqueda Por CUIT',
-				value: 'buscarClientePorCuit',
-				action: 'Buscar clientes por CUIT',
-				description: 'Retorna un listado de clientes basado en el CUIT proporcionado'
-			},
-			{
-				name: 'Cliente - Lista',
-				value: 'listarClientes',
-				action: 'Obtener lista de clientes',
-				description: 'Retorna una lista con todos los clientes registrados'
-			},
-			{
-				name: 'Cliente - Nuevo',
-				value: 'crearCliente',
-				action: 'Crear nuevo cliente',
-				description: 'Da de alta un cliente. Retornará el cliente creado (con su ID cargado) y la URL para acceder al nuevo recurso.'
-			},
-			{
-				name: 'Cliente - Obtener Composición Del Saldo',
-				value: 'verDetalleSaldoCliente',
-				description: 'Obtiene la composición del saldo de la cuenta corriente del cliente especificado',
-				action: 'Obtener composición del saldo del cliente'
-			},
-			{
-				name: 'Cliente - Obtener Facturas De Cobro',
-				value: 'listarFacturasCobros',
-				description: 'Obtiene la totalidad de las facturas de los cobros del cliente especificado',
-				action: 'Obtener facturas de cobros del cliente'
-			},
-			{
-				name: 'Cliente - Obtener Facturas De Venta',
-				value: 'listarFacturasVenta',
-				description: 'Obtiene la totalidad de las facturas de los pedido de ventas del cliente especificado',
-				action: 'Obtener facturas de pedidos de ventas del cliente'
-			},
-			{
-				name: 'Cliente - Obtener Facturas De Venta Por ID',
-				value: 'listarFacturasVentasPorID',
-				description: 'Obtiene la totalidad de las facturas de los pedido de ventas del cliente especificado',
-				action: 'Obtener facturas de pedidos de ventas del cliente'
-			},
-			{
-				name: 'Cliente - Obtener Promoción Comercial',
-				value: 'listarPromocionesComercialesCliente',
-				description: 'Obtiene las promociones comerciales aplicadas a un cliente desde una fecha seleccionada',
-				action: 'Obtener promociones aplicadas a un cliente'
-			},
-			{
-				name: 'Cliente - Obtener Saldo',
-				value: 'consultarSaldoCliente',
-				description: 'Obtiene el saldo del cliente especificado',
-				action: 'Obtener saldo del cliente'
-			},
-			{
-				name: 'Cliente Contribuyente - Búsqueda',
-				value: 'buscarContribuyente',
-				description: 'Retorna los datos del contribuyente por medio de una búsqueda por CUIT o Razón Social',
-				action: 'Buscar cliente contribuyente'
-			},
-			{
-				name: 'Cliente Contribuyente - Nuevo',
-				value: 'crearContribuyente',
-				description: 'Da de alta un cliente contribuyente nuevo. Retornará al cliente creado (con su ID cargado) y la URL para acceder al nuevo recurso.',
-				action: 'Crear nuevo cliente contribuyente'
-			},
-			{
-				name: 'Cobro - Nuevo',
-				value: 'registrarCobro',
-				action: 'Registrar nuevo cobro',
-				description: 'Da de alta el comprobante. Retornará el comprobante creado con su información y una URL.'
-			},
-			{
-				name: 'Cobro - Obtener Listado',
-				value: 'listarCobros',
-				action: 'Obtener un listado de cobro',
-				description: 'Obtener un listado de cobros en base a ciertos parametros'
-			},
-			{
-			 	name: 'Compras - Generar Compra',
-			 	value: 'crearCompra',
-			 	action: 'Genera una compra',
-			 	description: 'Genera una compra desde los parametros especificados'
-			},
-			{
-				name: 'Compras - Obtener Listado',
-				value: 'listarCompras',
-				action: 'Obtener un listado de las compras',
-				description: 'Obtener un listado de las compras en base a ciertos parametros'
-			},
-			{
-				name: 'Comprobante De Compra - Obtener Listado',
-				value: 'listarComprobantesCompra',
-				description: 'Obtener un listado de los comprobantes de compra en base a ciertos parametros'
-			},
-			{
-				name: 'Comprobante De Venta - Obtener Listado',
-				value: 'listarComprobantesVenta',
-				description: 'Obtener un listado de los comprobante de venta en base a ciertos parametros'
-			},
-			{
-				name: 'Conceptos - Obtener Listado',
-				value: 'listarConceptos',
-				action: 'Obtener un listado de conceptos'
-			},
-			{
-				name: 'Estadística Ranking - Venta',
-				value: 'estadisticaVentaRanking',
-				description: 'Obtiene un listado de clientes, articulos, vendedores o sucursales fisicas según un ranking de venta'
-			},
-			{
-				name: 'Frecuencias Clientes - Listar',
-				value: 'frecuenciasCliente',
-				description: 'Obtiene un listado con las frecuencias de los clientes'
+				action: 'Lista categorías',
+				description: 'Obtiene el listado completo de todas las categorías de los artículos',
 			},
 			{
 				name: 'Marcas - Obtener',
 				value: 'listarMarcas',
-				action: 'Obten el listado de las marcas',
-				description: 'Obten el listado completo de todas las marcas de los articulos'
-			},
-			{
-				name: 'Municipios - Lista',
-				value: 'listarMunicipios',
-				description: 'Obtiene un listado de los municipios, normalmente filtrado por provincia'
-			},
-			{
-				name: 'Obtener Operador Móvil',
-				value: 'listarOperadoresMoviles',
-				description: 'Obtiene el listado de todos los operadores moviles. Si desea puede filtrar por nombre / usuario.'
-			},
-			{
-				name: 'Orden De Compra - Generar',
-				value: 'crearOrdenCompra',
-				description: 'Genera una orden de compra en base a ciertos parametros'
-			},
-			{
-				name: 'Orden De Compra - Obtener',
-				value: 'verDetalleOrdenCompra',
-				description: 'Obtiene una unica orden de compra en base al ID'
-			},
-			{
-				name: 'Orden De Traspaso - Generar',
-				value: 'crearMovimientoStock',
-				description: 'Crea un ajuste de movimiendo de stock'
-			},
-			{
-				name: 'Ordenes De Compra - Obtener',
-				value: 'listarOrdenesCompra',
-				description: 'Obtiene todas las ordenes de compra en base a ciertos filtros'
-			},
-			{
-				name: 'Pais- Obtener Listado',
-				value: 'listarPaises',
-				description: 'Obtiene el listado de paises disponibles'
-			},
-			{
-				name: 'Pedido De Venta - Actividad',
-				value: 'verDetallePedidoVenta',
-				action: 'Obtener actividad de pedido de venta',
-				description: 'Trae un pedido de venta por un identificador único'
-			},
-			{
-				name: 'Pedido De Venta - Nuevo',
-				value: 'crearPedidoVenta',
-				action: 'Crear nuevo pedido de venta',
-				description: 'Realiza pedidos de venta de los artículos'
-			},
-			{
-				name: 'Pedidos De Venta - Estado',
-				value: 'listarEstadosPedidosVenta',
-				description: 'Obtiene todos los estados disponibles de los pedidos de ventas'
-			},
-			{
-				name: 'Pedidos De Venta - Listar',
-				value: 'listarPedidosVenta',
-				description: 'Obtiene todos los pedidos de ventas en base a ciertos parámetros'
-			},
-			{
-				name: 'Pedidos De Venta - Resumido',
-				value: 'listarPedidosVentaFiltrados',
-				action: 'Obtiene todos los pedidos de venta en base a ciertos parametros',
-				description: 'Obtiene todos los pedidos de venta con un cuerpo de respuesta mas ligero',
+				action: 'Lista marcas',
+				description: 'Obtiene el listado completo de las marcas de los artículos',
 			},
 			{
 				name: 'Precios De Productos - Lista',
 				value: 'listarPrecios',
-				action: 'Obtener lista de precios de productos',
-				description: 'Obtiene una lista con el listado de los precios sugeridos'
-			},
-			{
-				name: 'Proceso Binario a Imagen',
-				value: 'sincronizarImagenes',
-				action: 'Procesar imágenes binarias',
-				description: 'Procesa datos binarios de imágenes para su uso en WooCommerce'
-			},
-			{
-				name: 'Productos WooCommerce - Generar (JSON Producto)',
-				value: 'convertirProductosParaWooCommerce',
-				description: 'Genera un JSON estructurado para productos WooCommerce a partir de artículos Centum',
-			},
-			{
-				name: 'Promociones Comerciales - Lista',
-				value: 'listarPromociones',
-				description: 'Obtiene las promociones comerciales disponibles',
-				action: 'Obtener promociones disponibles'
-			},
-			{
-				name: 'Proveedor - Buscar',
-				value: 'buscarProveedor',
-				action: 'Obtén el proveedor segun el ID',
-				description: 'Retorna la información del proveedor en base al ID'
-			},
-			{
-				name: 'Proveedor - Crear',
-				value: 'crearProveedor',
-				action: 'Obtén el proveedor segun el ID',
-				description: 'Retorna la información del proveedor en base al ID'
-			},
-			{
-				name: 'Proveedores - Listar',
-				value: 'listarProveedores',
-				description: 'Obtiene una lista entera de los proveedores'
-			},
-			{
-				name: 'Provincias - Lista',
-				value: 'listarProvincias',
-				description: 'Obtiene un listado de provincias, normalmente filtrado por país'
-			},
-			{
-				name: 'Regímenes Especiales - ID',
-				value: 'verDetalleRegimenEspecial',
-				description: 'Trae un listado entero de los regímenes especiales'
-			},
-			{
-				name: 'Regímenes Especiales - Lista',
-				value: 'listarRegimenesEspeciales',
-				description: 'Trae un listado entero de los regímenes especiales'
-			},
-			{
-				name: 'Remito De Compra - Crear',
-				value: 'crearRemitoCompra',
-				description: 'Crea un remito de compra en base a los parametros enviados'
-			},
-			{
-				name: 'Remito De Venta - Crear',
-				value: 'crearRemitoVenta',
-				description: 'Crea un remito de compra en base a los parametros enviados'
+				action: 'Lista precios de productos',
+				description: 'Obtiene una lista con los precios sugeridos',
 			},
 			{
 				name: 'Rubros - Obtener',
 				value: 'listarRubros',
-				action: 'Obten el listado de los rubros',
-				description: 'Obten el listado completo de todos los rubros de los articulos'
+				action: 'Lista rubros',
+				description: 'Obtiene el listado completo de los rubros de los artículos',
 			},
-      {
-        name: 'Sub Rubros - Listar',
-        value: 'listarSubRubros',
-        description: 'Obten el listado completo de los sub rubros o filtralo por ID'
-      },
+			{
+				name: 'Sub Rubros - Listar',
+				value: 'listarSubRubros',
+				action: 'Lista sub rubros',
+				description: 'Obtiene el listado completo de los sub rubros o los filtra por ID',
+			},
+		],
+		default: 'buscarProductos',
+	},
+	{
+		displayName: 'Operación',
+		name: 'operation',
+		type: 'options',
+		noDataExpression: true,
+		displayOptions: {
+			show: {
+				resource: ['clientes'],
+			},
+		},
+		options: [
+			{
+				name: 'Cliente - Actualizar',
+				value: 'actualizarCliente',
+				action: 'Actualiza cliente',
+				description: 'Actualiza un cliente y retorna su información con la URL para acceder al recurso',
+			},
+			{
+				name: 'Cliente - Búsqueda',
+				value: 'buscarClientes',
+				action: 'Busca clientes',
+				description: 'Retorna un listado de clientes en base a ciertos filtros',
+			},
+			{
+				name: 'Cliente - Búsqueda Por CUIT',
+				value: 'buscarClientePorCuit',
+				action: 'Busca clientes por CUIT',
+				description: 'Retorna un listado de clientes basado en el CUIT proporcionado',
+			},
+			{
+				name: 'Cliente - Lista',
+				value: 'listarClientes',
+				action: 'Lista clientes',
+				description: 'Retorna una lista con todos los clientes registrados',
+			},
+			{
+				name: 'Cliente - Nuevo',
+				value: 'crearCliente',
+				action: 'Crea cliente',
+				description: 'Da de alta un cliente nuevo',
+			},
+			{
+				name: 'Cliente - Obtener Composición Del Saldo',
+				value: 'verDetalleSaldoCliente',
+				action: 'Obtiene composición del saldo',
+				description: 'Obtiene la composición del saldo de la cuenta corriente del cliente especificado',
+			},
+			{
+				name: 'Cliente - Obtener Facturas De Cobro',
+				value: 'listarFacturasCobros',
+				action: 'Obtiene facturas de cobro',
+				description: 'Obtiene la totalidad de las facturas de los cobros del cliente especificado',
+			},
+			{
+				name: 'Cliente - Obtener Facturas De Venta',
+				value: 'listarFacturasVenta',
+				action: 'Obtiene facturas de venta',
+				description: 'Obtiene la totalidad de las facturas de los pedidos de venta del cliente especificado',
+			},
+			{
+				name: 'Cliente - Obtener Facturas De Venta Por ID',
+				value: 'listarFacturasVentasPorID',
+				action: 'Obtiene facturas de venta por ID',
+				description: 'Obtiene la totalidad de las facturas de ventas del cliente especificado',
+			},
+			{
+				name: 'Cliente - Obtener Promoción Comercial',
+				value: 'listarPromocionesComercialesCliente',
+				action: 'Obtiene promociones comerciales del cliente',
+				description: 'Obtiene las promociones comerciales aplicadas a un cliente desde una fecha seleccionada',
+			},
+			{
+				name: 'Cliente - Obtener Saldo',
+				value: 'consultarSaldoCliente',
+				action: 'Obtiene saldo del cliente',
+				description: 'Obtiene el saldo del cliente especificado',
+			},
+			{
+				name: 'Cliente Contribuyente - Búsqueda',
+				value: 'buscarContribuyente',
+				action: 'Busca cliente contribuyente',
+				description: 'Retorna los datos del contribuyente por CUIT o razón social',
+			},
+			{
+				name: 'Cliente Contribuyente - Nuevo',
+				value: 'crearContribuyente',
+				action: 'Crea cliente contribuyente',
+				description: 'Da de alta un cliente contribuyente nuevo',
+			},
+			{
+				name: 'Frecuencias Clientes - Listar',
+				value: 'frecuenciasCliente',
+				action: 'Lista frecuencias de clientes',
+				description: 'Obtiene un listado con las frecuencias de los clientes',
+			},
+		],
+		default: 'actualizarCliente',
+	},
+	{
+		displayName: 'Operación',
+		name: 'operation',
+		type: 'options',
+		noDataExpression: true,
+		displayOptions: {
+			show: {
+				resource: ['ventas'],
+			},
+		},
+		options: [
+			{
+				name: 'Comprobante De Venta - Obtener Listado',
+				value: 'listarComprobantesVenta',
+				action: 'Lista comprobantes de venta',
+				description: 'Obtiene un listado de los comprobantes de venta en base a ciertos parámetros',
+			},
+			{
+				name: 'Estadística Ranking - Venta',
+				value: 'estadisticaVentaRanking',
+				action: 'Obtiene ranking de ventas',
+				description: 'Obtiene un listado de clientes, artículos, vendedores o sucursales según un ranking de venta',
+			},
+			{
+				name: 'Pedido De Venta - Actividad',
+				value: 'verDetallePedidoVenta',
+				action: 'Obtiene pedido de venta',
+				description: 'Trae un pedido de venta por un identificador único',
+			},
+			{
+				name: 'Pedido De Venta - Nuevo',
+				value: 'crearPedidoVenta',
+				action: 'Crea pedido de venta',
+				description: 'Realiza pedidos de venta de los artículos',
+			},
+			{
+				name: 'Pedidos De Venta - Estado',
+				value: 'listarEstadosPedidosVenta',
+				action: 'Lista estados de pedidos de venta',
+				description: 'Obtiene todos los estados disponibles de los pedidos de venta',
+			},
+			{
+				name: 'Pedidos De Venta - Listar',
+				value: 'listarPedidosVenta',
+				action: 'Lista pedidos de venta',
+				description: 'Obtiene todos los pedidos de venta en base a ciertos parámetros',
+			},
+			{
+				name: 'Pedidos De Venta - Resumido',
+				value: 'listarPedidosVentaFiltrados',
+				action: 'Lista pedidos de venta resumidos',
+				description: 'Obtiene todos los pedidos de venta con un cuerpo de respuesta más ligero',
+			},
+			{
+				name: 'Promociones Comerciales - Lista',
+				value: 'listarPromociones',
+				action: 'Lista promociones comerciales',
+				description: 'Obtiene las promociones comerciales disponibles',
+			},
+			{
+				name: 'Ventas - Generar',
+				value: 'crearVenta',
+				action: 'Genera venta',
+				description: 'Genera una venta en base a parámetros completados',
+			},
+		],
+		default: 'listarComprobantesVenta',
+	},
+	{
+		displayName: 'Operación',
+		name: 'operation',
+		type: 'options',
+		noDataExpression: true,
+		displayOptions: {
+			show: {
+				resource: ['cobros'],
+			},
+		},
+		options: [
+			{
+				name: 'Cobro - Nuevo',
+				value: 'registrarCobro',
+				action: 'Registra cobro',
+				description: 'Da de alta el comprobante de cobro',
+			},
+			{
+				name: 'Cobro - Obtener Listado',
+				value: 'listarCobros',
+				action: 'Lista cobros',
+				description: 'Obtiene un listado de cobros en base a ciertos parámetros',
+			},
+		],
+		default: 'registrarCobro',
+	},
+	{
+		displayName: 'Operación',
+		name: 'operation',
+		type: 'options',
+		noDataExpression: true,
+		displayOptions: {
+			show: {
+				resource: ['compras'],
+			},
+		},
+		options: [
+			{
+				name: 'Compras - Generar Compra',
+				value: 'crearCompra',
+				action: 'Genera compra',
+				description: 'Genera una compra desde los parámetros especificados',
+			},
+			{
+				name: 'Compras - Obtener Listado',
+				value: 'listarCompras',
+				action: 'Lista compras',
+				description: 'Obtiene un listado de las compras en base a ciertos parámetros',
+			},
+			{
+				name: 'Comprobante De Compra - Obtener Listado',
+				value: 'listarComprobantesCompra',
+				action: 'Lista comprobantes de compra',
+				description: 'Obtiene un listado de los comprobantes de compra en base a ciertos parámetros',
+			},
+			{
+				name: 'Orden De Compra - Generar',
+				value: 'crearOrdenCompra',
+				action: 'Genera orden de compra',
+				description: 'Genera una orden de compra en base a ciertos parámetros',
+			},
+			{
+				name: 'Orden De Compra - Obtener',
+				value: 'verDetalleOrdenCompra',
+				action: 'Obtiene orden de compra',
+				description: 'Obtiene una única orden de compra en base al ID',
+			},
+			{
+				name: 'Órdenes De Compra - Obtener',
+				value: 'listarOrdenesCompra',
+				action: 'Lista órdenes de compra',
+				description: 'Obtiene todas las órdenes de compra en base a ciertos filtros',
+			},
+			{
+				name: 'Remito De Compra - Crear',
+				value: 'crearRemitoCompra',
+				action: 'Crea remito de compra',
+				description: 'Crea un remito de compra en base a los parámetros enviados',
+			},
+		],
+		default: 'crearCompra',
+	},
+	{
+		displayName: 'Operación',
+		name: 'operation',
+		type: 'options',
+		noDataExpression: true,
+		displayOptions: {
+			show: {
+				resource: ['proveedores'],
+			},
+		},
+		options: [
+			{
+				name: 'Proveedor - Buscar',
+				value: 'buscarProveedor',
+				action: 'Busca proveedor',
+				description: 'Retorna la información del proveedor en base al ID',
+			},
+			{
+				name: 'Proveedor - Crear',
+				value: 'crearProveedor',
+				action: 'Crea proveedor',
+				description: 'Crea un proveedor en base a los datos enviados',
+			},
+			{
+				name: 'Proveedores - Listar',
+				value: 'listarProveedores',
+				action: 'Lista proveedores',
+				description: 'Obtiene una lista completa de los proveedores',
+			},
+		],
+		default: 'buscarProveedor',
+	},
+	{
+		displayName: 'Operación',
+		name: 'operation',
+		type: 'options',
+		noDataExpression: true,
+		displayOptions: {
+			show: {
+				resource: ['logistica'],
+			},
+		},
+		options: [
+			{
+				name: 'Choferes - Obtener Listado',
+				value: 'listarChoferes',
+				action: 'Lista choferes',
+				description: 'Obtiene un listado completo de los choferes disponibles',
+			},
+			{
+				name: 'Remito De Venta - Crear',
+				value: 'crearRemitoVenta',
+				action: 'Crea remito de venta',
+				description: 'Crea un remito de venta en base a los parámetros enviados',
+			},
 			{
 				name: 'Sucursales Físicas - Lista',
 				value: 'listarSucursales',
+				action: 'Lista sucursales físicas',
 				description: 'Obtiene un listado de las sucursales físicas disponibles',
-			},
-			{
-				name: 'Tipo De Comprobante - Lista',
-				value: 'listarTiposComprobante',
-				description: 'Obtiene un listado de todos los tipos de comprobantes'
 			},
 			{
 				name: 'Turno De Entrega - Obtener',
 				value: 'listarTurnosEntrega',
-				description: 'Obtiene el listado total disponible de turnos de entrega'	
-			},
-			{
-				name: 'Ubicaciones De Articulos - Listar',
-				value: 'listarUbicacionArticulos',
-				description: 'Obtiene un listado total de las ubicaciones de los articulos'
+				action: 'Lista turnos de entrega',
+				description: 'Obtiene el listado total disponible de turnos de entrega',
 			},
 			{
 				name: 'Vendedores - Obtener',
 				value: 'listarVendedores',
-				description: 'Obtiene una lista de todos los vendedores disponibles'
-			},
-			{
-			 	name: 'Ventas - Generar',
-			 	value: 'crearVenta',
-				description: 'Genera una venta en base a unos parametros completados'
-			},
-			{
-				name: 'Verificar Operador Movil',
-				value: 'verificarCredencialesOperador',
-				description: 'Obtiene todos los datos de un operador móvil en base a las credenciales'
+				action: 'Lista vendedores',
+				description: 'Obtiene una lista de todos los vendedores disponibles',
 			},
 		],
-		default: 'verDetallePedidoVenta',
+		default: 'listarChoferes',
+	},
+	{
+		displayName: 'Operación',
+		name: 'operation',
+		type: 'options',
+		noDataExpression: true,
+		displayOptions: {
+			show: {
+				resource: ['stock'],
+			},
+		},
+		options: [
+			{
+				name: 'Artículos - Existencia',
+				value: 'consultarStock',
+				action: 'Consulta existencias de artículos',
+				description: 'Retorna un listado de las existencias de los artículos en base a ciertos filtros',
+			},
+			{
+				name: 'Orden De Traspaso - Generar',
+				value: 'crearMovimientoStock',
+				action: 'Genera movimiento de stock',
+				description: 'Crea un ajuste de movimiento de stock',
+			},
+			{
+				name: 'Ubicaciones De Artículos - Listar',
+				value: 'listarUbicacionArticulos',
+				action: 'Lista ubicaciones de artículos',
+				description: 'Obtiene un listado total de las ubicaciones de los artículos',
+			},
+		],
+		default: 'consultarStock',
+	},
+	{
+		displayName: 'Operación',
+		name: 'operation',
+		type: 'options',
+		noDataExpression: true,
+		displayOptions: {
+			show: {
+				resource: ['geografia'],
+			},
+		},
+		options: [
+			{
+				name: 'Municipios - Lista',
+				value: 'listarMunicipios',
+				action: 'Lista municipios',
+				description: 'Obtiene un listado de los municipios, normalmente filtrado por provincia',
+			},
+			{
+				name: 'País - Obtener Listado',
+				value: 'listarPaises',
+				action: 'Lista países',
+				description: 'Obtiene el listado de países disponibles',
+			},
+			{
+				name: 'Provincias - Lista',
+				value: 'listarProvincias',
+				action: 'Lista provincias',
+				description: 'Obtiene un listado de provincias, normalmente filtrado por país',
+			},
+		],
+		default: 'listarMunicipios',
+	},
+	{
+		displayName: 'Operación',
+		name: 'operation',
+		type: 'options',
+		noDataExpression: true,
+		displayOptions: {
+			show: {
+				resource: ['extras'],
+			},
+		},
+		options: [
+			{
+				name: '_Token De Acceso - Generación',
+				value: 'generarTokenSeguridad',
+				action: 'Genera un nuevo token',
+				description: 'Genera un nuevo token para utilizarlo con una herramienta externa como Postman',
+			},
+			{
+				name: 'Conceptos - Obtener Listado',
+				value: 'listarConceptos',
+				action: 'Lista conceptos',
+				description: 'Obtiene un listado de conceptos',
+			},
+			{
+				name: 'Obtener Operador Móvil',
+				value: 'listarOperadoresMoviles',
+				action: 'Lista operadores móviles',
+				description: 'Obtiene el listado de todos los operadores móviles',
+			},
+			{
+				name: 'Proceso Binario a Imagen',
+				value: 'sincronizarImagenes',
+				action: 'Procesa imágenes binarias',
+				description: 'Procesa datos binarios de imágenes para su uso en WooCommerce',
+			},
+			{
+				name: 'Productos WooCommerce - Generar (JSON Producto)',
+				value: 'convertirProductosParaWooCommerce',
+				action: 'Convierte productos para WooCommerce',
+				description: 'Genera un JSON estructurado para productos WooCommerce a partir de artículos Centum',
+			},
+			{
+				name: 'Regímenes Especiales - ID',
+				value: 'verDetalleRegimenEspecial',
+				action: 'Obtiene régimen especial por ID',
+				description: 'Trae un régimen especial por ID',
+			},
+			{
+				name: 'Regímenes Especiales - Lista',
+				value: 'listarRegimenesEspeciales',
+				action: 'Lista regímenes especiales',
+				description: 'Trae un listado completo de los regímenes especiales',
+			},
+			{
+				name: 'Tipo De Comprobante - Lista',
+				value: 'listarTiposComprobante',
+				action: 'Lista tipos de comprobante',
+				description: 'Obtiene un listado de todos los tipos de comprobantes',
+			},
+			{
+				name: 'Verificar Operador Móvil',
+				value: 'verificarCredencialesOperador',
+				action: 'Verifica operador móvil',
+				description: 'Obtiene todos los datos de un operador móvil en base a las credenciales',
+			},
+		],
+		default: 'generarTokenSeguridad',
 	},
 ];
-
 const getArticulo: INodeProperties[] = [
 	{
 		displayName: 'Activo',
@@ -403,7 +612,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'boolean',
 		default: false,
 		displayOptions: {
-			show: { resource: ['crearProveedor', 'listarProveedores'] },
+			show: { operation: ['crearProveedor', 'listarProveedores'] },
 		},
 	},
 	{
@@ -413,7 +622,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'json',
 		default: {},
 		displayOptions: {
-			show: { resource: ['registrarCobro', 'crearPedidoVenta', 'crearOrdenCompra', 'crearRemitoCompra'] },
+			show: { operation: ['registrarCobro', 'crearPedidoVenta', 'crearOrdenCompra', 'crearRemitoCompra'] },
 		},
 	},
 	{
@@ -424,7 +633,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		description: 'Lista de artículos en formato JSON',
 		displayOptions: {
-			show: { resource: ['crearCompra', 'crearVenta', 'crearRemitoVenta'] },
+			show: { operation: ['crearCompra', 'crearVenta', 'crearRemitoVenta'] },
 		},
 	},
 	{
@@ -440,21 +649,21 @@ const getArticulo: INodeProperties[] = [
 	// 	type: 'number',
 	// 	default: 50,
 	// 	description: 'Cantidad de artículos por página',
-	// 	displayOptions: { show: { resource: ['articulo'] } },
+	// 	displayOptions: { show: { operation: ['articulo'] } },
 	// },
 	{
 		displayName: 'Categoría De Impuestos A Las Ganancias',
 		name: 'categoriaImpuestosGanancias',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['crearProveedor'] } },
+		displayOptions: { show: { operation: ['crearProveedor'] } },
 	},
 	{
 		displayName: 'Clase De Proveedor',
 		name: 'claseProveedor',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['crearProveedor'] } },
+		displayOptions: { show: { operation: ['crearProveedor'] } },
 	},
 	{
 		displayName: 'Cliente',
@@ -463,7 +672,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'json',
 		default: {},
 		displayOptions: {
-			show: { resource: ['registrarCobro'] },
+			show: { operation: ['registrarCobro'] },
 		},
 	},
 	{
@@ -472,7 +681,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'dateTime',
 		default: {},
 		displayOptions: {
-			show: { resource: ['listarOrdenesCompra'] },
+			show: { operation: ['listarOrdenesCompra'] },
 		},
 	},
 	{
@@ -481,7 +690,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'dateTime',
 		default: {},
 		displayOptions: {
-			show: { resource: ['listarOrdenesCompra'] },
+			show: { operation: ['listarOrdenesCompra'] },
 		},
 	},
 	{
@@ -494,7 +703,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Client ID used to search the articles',
 		displayOptions: {
 			show: {
-				resource: [
+				operation: [
 					'crearCompra',
 					'listarProductosDisponibles',
 					'consultarSaldoCliente',
@@ -524,7 +733,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Codigo del articulo a buscar. (Separa con "," si necesitas mas de uno.',
 		displayOptions: {
 			show: {
-				resource: [
+				operation: [
 					'buscarProductoPorCodigo',
 					'buscarProductos'
 				],
@@ -541,7 +750,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'Codigo del cliente a buscar',
 		displayOptions: {
 			show: {
-				resource: [
+				operation: [
 					'buscarClientes', 'crearPedidoVenta'
 				],
 			},
@@ -554,28 +763,28 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: 'Codigo de la compra (FCC)',
 		description: 'Codigo del comprobante de la compra',
-		displayOptions: { show: { resource: ['crearCompra'] } },
+		displayOptions: { show: { operation: ['crearCompra'] } },
 	},
 		{
 		displayName: 'Condicion De Venta',
 		name: 'idCondicionVenta',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['crearVenta', 'crearCliente'] } },
+		displayOptions: { show: { operation: ['crearVenta', 'crearCliente'] } },
 	},
 	{
 		displayName: 'Condición De Pago',
 		name: 'condicionDePago',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['crearProveedor'] } },
+		displayOptions: { show: { operation: ['crearProveedor'] } },
 	},
   {
 		displayName: 'ID Condición IVA',
 		name: 'condicionIVA',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['crearProveedor', 'crearCliente'] } },
+		displayOptions: { show: { operation: ['crearProveedor', 'crearCliente'] } },
 	},
 	{
 		displayName: 'Cotizacion',
@@ -592,7 +801,7 @@ const getArticulo: INodeProperties[] = [
 	// 	default: "",
 	// 	displayOptions: {
 	// 		show: {
-	// 			resource: ['crearCliente', 'actualizarCliente', 'crearContribuyente'],
+	// 			operation: ['crearCliente', 'actualizarCliente', 'crearContribuyente'],
 	// 		},
 	// 	},
 	// 	description: 'Información en formato JSON para crear o actualizar un cliente',
@@ -605,13 +814,13 @@ const getArticulo: INodeProperties[] = [
 		placeholder: 'Ingresá el CUIT...',
 		displayOptions: {
 			show: {
-				resource: [
+				operation: [
 					'crearProveedor',
 					'crearCliente',
 					'buscarContribuyente',
 					'crearContribuyente',
 					'buscarClientePorCuit',
-					'buscarClientes',,
+					'buscarClientes',
 					'listarProveedores'
 				],
 			},
@@ -623,7 +832,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'json',
 		required: true,
 		default: '',
-		displayOptions: { show: { resource: ['sincronizarImagenes'] } },
+		displayOptions: { show: { operation: ['sincronizarImagenes'] } },
 	},
 	{
 		displayName: 'Dia De La Semana',
@@ -631,14 +840,14 @@ const getArticulo: INodeProperties[] = [
 		type: 'number',
 		default: 0,
 		description: 'Numero de la semana por el cual filtrar promociones aplicadas (0 es Lunes)',
-		displayOptions: { show: { resource: ['listarPromocionesComercialesCliente'] } },
+		displayOptions: { show: { operation: ['listarPromocionesComercialesCliente'] } },
 	},
 	// {
 	// 	displayName: 'DNI',
 	// 	name: 'dni',
 	// 	type: 'string',
 	// 	default: '',
-	// 	displayOptions: { show: { resource: ['crearCliente'] } },
+	// 	displayOptions: { show: { operation: ['crearCliente'] } },
 	// },
 	// {
 	// 	displayName: 'Documento',
@@ -648,7 +857,7 @@ const getArticulo: INodeProperties[] = [
 	// 	default: undefined,
 	// 	description: 'Parametro fecha del body para las solicitudes',
 	// 	displayOptions: {
-	// 		show: { resource: ['articulo', 'promocionesCliente', 'generarCompras'] },
+	// 		show: { operation: ['articulo', 'promocionesCliente', 'generarCompras'] },
 	// 	},
 	// },
 	{
@@ -659,14 +868,14 @@ const getArticulo: INodeProperties[] = [
 		required: true,
 		placeholder: '/Clientes, /Articulos/Venta, etc.',
 		description: 'Ruta del endpoint a utilizar',
-		displayOptions: { show: { resource: [] } },
+		displayOptions: { show: { operation: [] } },
 	},
 	{
 		displayName: 'Es Contado',
 		name: 'esContado',
 		type: 'boolean',
 		default: false,
-		displayOptions: { show: { resource: ['crearVenta'] } },
+		displayOptions: { show: { operation: ['crearVenta'] } },
 	},
 	{
 		displayName: 'Fecha Desde',
@@ -675,7 +884,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: [
+				operation: [
 					'crearCompra',
 					'listarFacturasVentasPorID',
 					'listarFacturasVenta',
@@ -699,7 +908,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: [
+				operation: [
 					'listarFacturasVentasPorID',
 					'listarFacturasVenta',
 					'listarFacturasCobros',
@@ -722,7 +931,7 @@ const getArticulo: INodeProperties[] = [
 		default: undefined,
 		description: 'Parametro fecha del body para las solicitudes',
 		displayOptions: {
-			show: { resource: ['crearRemitoVenta', 'listarProductosDisponibles', 'crearRemitoCompra' , 'listarPromocionesComercialesCliente', 'crearCompra', 'crearPedidoVenta', 'crearOrdenCompra', 'listarPromociones', 'consultarPrecioProducto'] },
+			show: { operation: ['crearRemitoVenta', 'listarProductosDisponibles', 'crearRemitoCompra' , 'listarPromocionesComercialesCliente', 'crearCompra', 'crearPedidoVenta', 'crearOrdenCompra', 'listarPromociones', 'consultarPrecioProducto'] },
 		},
 	},
 	{
@@ -733,7 +942,7 @@ const getArticulo: INodeProperties[] = [
 		default: undefined,
 		description: 'Fecha de entrega',
 		displayOptions: {
-			show: { resource: ['crearOrdenCompra', 'crearRemitoCompra', 'crearRemitoVenta'] },
+			show: { operation: ['crearOrdenCompra', 'crearRemitoCompra', 'crearRemitoVenta'] },
 		},
 	},
 	{
@@ -744,7 +953,7 @@ const getArticulo: INodeProperties[] = [
 		default: undefined,
 		description: 'Fecha de embarque',
 		displayOptions: {
-			show: { resource: ['crearRemitoVenta'] },
+			show: { operation: ['crearRemitoVenta'] },
 		},
 	},
 	{
@@ -755,7 +964,7 @@ const getArticulo: INodeProperties[] = [
 		default: undefined,
 		description: 'Fecha de imputación',
 		displayOptions: {
-			show: { resource: ['crearRemitoVenta', 'crearMovimientoStock'] },
+			show: { operation: ['crearRemitoVenta', 'crearMovimientoStock'] },
 		},
 	},
 	{
@@ -766,7 +975,7 @@ const getArticulo: INodeProperties[] = [
 		default: undefined,
 		description: 'Fecha de vencimiento',
 		displayOptions: {
-			show: { resource: ['crearOrdenCompra', 'crearRemitoCompra'] },
+			show: { operation: ['crearOrdenCompra', 'crearRemitoCompra'] },
 		},
 	},
 	{
@@ -794,7 +1003,7 @@ const getArticulo: INodeProperties[] = [
 			}
 		],
 		displayOptions: {
-			show: { resource: ['estadisticaVentaRanking']}
+			show: { operation: ['estadisticaVentaRanking']}
 		}
 	},
 {
@@ -804,7 +1013,7 @@ const getArticulo: INodeProperties[] = [
 	default: false,
 	description: 'Whether to order the sales statistics in ascending mode',
 	displayOptions: {
-		show: { resource: ['estadisticaVentaRanking'] }
+		show: { operation: ['estadisticaVentaRanking'] }
 	}
 },
 
@@ -817,7 +1026,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'ID del vendedor utilizado para generar ventas',
 		displayOptions: {
 			show: {
-				resource: ['crearPedidoVenta']
+				operation: ['crearPedidoVenta']
 			}
 		}
 	},
@@ -850,7 +1059,7 @@ const getArticulo: INodeProperties[] = [
 			}
 		],
 		displayOptions: {
-			show: { resource: ['estadisticaVentaRanking'] }
+			show: { operation: ['estadisticaVentaRanking'] }
 		}
 	},
 	{
@@ -861,7 +1070,7 @@ const getArticulo: INodeProperties[] = [
 		default: undefined,
 		description: 'Parametro fecha del body para las solicitudes',
 		displayOptions: {
-			show: { resource: ['crearPedidoVenta'] },
+			show: { operation: ['crearPedidoVenta'] },
 		},
 	},
 		{
@@ -872,7 +1081,7 @@ const getArticulo: INodeProperties[] = [
 		default: 0,
 		description: 'ID de la bonificación',
 		displayOptions: {
-			show: { resource: ['crearPedidoVenta', 'crearVenta', 'crearCliente'] },
+			show: { operation: ['crearPedidoVenta', 'crearVenta', 'crearCliente'] },
 		},
 	},
 	{
@@ -883,7 +1092,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		description: 'ID del turno de entrega',
 		displayOptions: {
-			show: { resource: ['crearPedidoVenta', 'crearOrdenCompra', 'crearRemitoCompra', 'crearRemitoVenta'] },
+			show: { operation: ['crearPedidoVenta', 'crearOrdenCompra', 'crearRemitoCompra', 'crearRemitoVenta'] },
 		},
 	},
 	{
@@ -891,14 +1100,14 @@ const getArticulo: INodeProperties[] = [
 		name: 'dateModified',
 		type: 'dateTime',
 		default: '',
-		displayOptions: { show: { resource: ['listarProductosDisponibles'] } },
+		displayOptions: { show: { operation: ['listarProductosDisponibles'] } },
 	},
 	// {
 	// 	displayName: 'Fecha Modificación Imagen Desde',
 	// 	name: 'dateModifiedImage',
 	// 	type: 'dateTime',
 	// 	default: '',
-	// 	displayOptions: { show: { resource: ['articulo'] } },
+	// 	displayOptions: { show: { operation: ['articulo'] } },
 	// },
 	{
 		displayName: 'Fecha Precio Actualizado Hasta',
@@ -906,7 +1115,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'dateTime',
 		default: '',
 		displayOptions: {
-			show: { resource: ['consultarSaldoCliente', 'verDetalleSaldoCliente'] },
+			show: { operation: ['consultarSaldoCliente', 'verDetalleSaldoCliente'] },
 		},
 	},
 	{
@@ -914,14 +1123,14 @@ const getArticulo: INodeProperties[] = [
 		name: 'formaPagoProveedor',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['crearProveedor'] } },
+		displayOptions: { show: { operation: ['crearProveedor'] } },
 	},
 	{
 		displayName: 'ID Del Chofer',
 		name: 'choferId',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['crearRemitoVenta'] } },
+		displayOptions: { show: { operation: ['crearRemitoVenta'] } },
 	},
 	{
 		displayName: 'ID',
@@ -932,7 +1141,7 @@ const getArticulo: INodeProperties[] = [
 		placeholder: 'Ej. 27231',
 		description: 'Identificador unico con el cual hacer solicitudes a la API',
 		displayOptions: {
-			show: { resource: ['verDetallePedidoVenta', 'verDetalleRegimenEspecial'] },
+			show: { operation: ['verDetallePedidoVenta', 'verDetalleRegimenEspecial'] },
 		},
 	},
 	{
@@ -942,7 +1151,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: '1467',
 		displayOptions: {
-			show: { resource: ['descargarImagenesProductos', 'buscarProductoPorCodigo', 'buscarProductoEnSucursal', 'consultarPrecioProducto',  'listarProductosPorSucursal', 'crearMovimientoStock', ] },
+			show: { operation: ['descargarImagenesProductos', 'buscarProductoPorCodigo', 'buscarProductoEnSucursal', 'consultarPrecioProducto',  'listarProductosPorSucursal', 'crearMovimientoStock', ] },
 		},
 	},
 	{
@@ -950,14 +1159,14 @@ const getArticulo: INodeProperties[] = [
 		name: 'bonificacion',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { resource: ['crearVenta'] } },
+		displayOptions: { show: { operation: ['crearVenta'] } },
 	},
 	{
 		displayName: 'Ubicacion Articulo',
 		name: 'ubicacionArticulo',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { resource: ['crearMovimientoStock'] } },
+		displayOptions: { show: { operation: ['crearMovimientoStock'] } },
 	},
 	{
 		displayName: 'ID De Cobro',
@@ -966,14 +1175,14 @@ const getArticulo: INodeProperties[] = [
 		type: 'number',
 		default: 0,
 		description: 'ID del cobro',
-		displayOptions: { show: { resource: ['listarCobros'] } },
+		displayOptions: { show: { operation: ['listarCobros'] } },
 	},
 	{
 		displayName: 'ID De La Compra',
 		name: 'idCompra',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['listarCompras', 'verDetalleOrdenCompra'] } },
+		displayOptions: { show: { operation: ['listarCompras', 'verDetalleOrdenCompra'] } },
 	},
 	{
 		displayName: 'ID Del Estado',
@@ -981,14 +1190,14 @@ const getArticulo: INodeProperties[] = [
 		type: 'number',
 		default: false,
 		description: 'Número del estado del pedido',
-		displayOptions: { show: { resource: ['listarPedidosVenta', 'obtenerOrdenesCompra', 'listarPedidosVentaFiltrados', 'listarPedidosVenta'] } },
+		displayOptions: { show: { operation: ['listarPedidosVenta', 'listarOrdenesCompra', 'listarPedidosVentaFiltrados', 'listarPedidosVenta'] } },
 	},
 	{
 		displayName: 'ID Del Operador Compra',
 		name: 'idOperadorCompra',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['crearProveedor'] } },
+		displayOptions: { show: { operation: ['crearProveedor'] } },
 	},
 	{
 		displayName: 'ID Del Proveedor',
@@ -997,7 +1206,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: '2',
 		description: 'ID Del proveedor de la compra',
-		displayOptions: { show: { resource: ['crearCompra'] } },
+		displayOptions: { show: { operation: ['crearCompra'] } },
 	},
 	{
 		displayName: 'ID Del Tipo De Comprobante',
@@ -1006,7 +1215,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: '1',
 		description: 'ID del tipo de comprobante de la factura',
-		displayOptions: { show: { resource: ['crearCompra', 'listarFacturasVenta', 'crearVenta'] } },
+		displayOptions: { show: { operation: ['crearCompra', 'listarFacturasVenta', 'crearVenta'] } },
 	},
 	{
 		displayName: 'ID Del Tipo De Comprobante',
@@ -1015,7 +1224,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: '1',
 		description: 'ID del tipo de comprobante de la venta',
-		displayOptions: { show: { resource: ['listarFacturasVenta'] } }
+		displayOptions: { show: { operation: ['listarFacturasVenta'] } }
 	},
 	{
 		displayName: 'ID Cuenta Corriente',
@@ -1024,49 +1233,49 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: '1',
 		description: 'ID del cliente cuenta corriente del comprobante de venta',
-		displayOptions: { show: { resource: ['listarFacturasVenta'] } }
+		displayOptions: { show: { operation: ['listarFacturasVenta'] } }
 	},
 	{
 		displayName: 'ID Del Vendedor',
 		name: 'idVendedor',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['crearVenta', 'listarFacturasVenta', 'crearRemitoVenta'] } },
+		displayOptions: { show: { operation: ['crearVenta', 'listarFacturasVenta', 'crearRemitoVenta'] } },
 	},
 	{
 		displayName: 'ID De La Venta',
 		name: 'ventaId',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['listarFacturasVenta', 'listarPedidosVenta', 'listarFacturasVentasPorID'] } },
+		displayOptions: { show: { operation: ['listarFacturasVenta', 'listarPedidosVenta', 'listarFacturasVentasPorID'] } },
 	},
 	{
 		displayName: 'ID De La Sucursal',
 		name: 'sucursalId',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: [] } },
+		displayOptions: { show: { operation: [] } },
 	},
 	{
 		displayName: 'Incluir Pedidos Anulados',
 		name: 'incluirAnulados',
 		type: 'boolean',
 		default: false,
-		displayOptions: { show: { resource: ['listarFacturasVenta', 'listarPedidosVenta'] } },
+		displayOptions: { show: { operation: ['listarFacturasVenta', 'listarPedidosVenta'] } },
 	},
 	{
 		displayName: 'ID Del Canal De Venta',
 		name: 'canalVentaId',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['listarFacturasVenta'] } },
+		displayOptions: { show: { operation: ['listarFacturasVenta'] } },
 	},
 	{
 		displayName: 'ID De La Division Empresa',
 		name: 'divisionEmpresaId',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['listarFacturasVenta'] } },
+		displayOptions: { show: { operation: ['listarFacturasVenta'] } },
 	},
 	{
 		displayName: 'ID Usuario Creador',
@@ -1074,7 +1283,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'number',
 		description: 'ID Del usuario que creo el comprobante de venta',
 		default: '',
-		displayOptions: { show: { resource: ['listarFacturasVenta', 'listarPedidosVenta'] } },
+		displayOptions: { show: { operation: ['listarFacturasVenta', 'listarPedidosVenta'] } },
 	},
 	{	
 		displayName: 'ID Del Transporte',
@@ -1082,7 +1291,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'number',
 		description: 'ID del transporte asociado al comprobante de venta',
 		default: '',
-		displayOptions: { show: { resource: ['listarFacturasVenta', 'listarPedidosVenta'] } },
+		displayOptions: { show: { operation: ['listarFacturasVenta', 'listarPedidosVenta'] } },
 	},
 	{
 		displayName: 'ID Pais',
@@ -1090,7 +1299,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		description: 'ID del país por la cual se buscarán las provincias',
-		displayOptions: { show: { resource: ['listarProvincias', 'crearProveedor', 'crearCliente'] } },
+		displayOptions: { show: { operation: ['listarProvincias', 'crearProveedor', 'crearCliente'] } },
 	},
 	{
 		displayName: 'ID Provincia',
@@ -1098,7 +1307,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		description: 'ID de la provincia por la cual se buscarán la información',
-		displayOptions: { show: { resource: ['listarMunicipios', 'crearProveedor', 'crearCliente'] } },
+		displayOptions: { show: { operation: ['listarMunicipios', 'crearProveedor', 'crearCliente'] } },
 	},
 	{
 		displayName: 'ID Sucursal Física',
@@ -1108,7 +1317,7 @@ const getArticulo: INodeProperties[] = [
 		description: 'The ID of the physical branch to filter stock (optional)',
 		displayOptions: {
 			show: {
-				resource: ['crearMovimientoStock', 'crearMovimientoStock','crearRemitoVenta','searchArticleBySKU', 'crearRemitoCompra' ,'buscarProductoEnSucursal', 'crearCompra', 'crearOrdenCompra', 'listarProductosPorSucursal', 'listarFacturasVenta', 'listarPedidosVenta'],
+				operation: ['crearMovimientoStock', 'crearMovimientoStock','crearRemitoVenta','crearRemitoCompra' ,'buscarProductoEnSucursal', 'crearCompra', 'crearOrdenCompra', 'listarProductosPorSucursal', 'listarFacturasVenta', 'listarPedidosVenta'],
 			},
 		},
 	},
@@ -1124,14 +1333,14 @@ const getArticulo: INodeProperties[] = [
 		name: 'idZona',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['crearProveedor', 'crearCliente'] } },
+		displayOptions: { show: { operation: ['crearProveedor', 'crearCliente'] } },
 	},
 		{
 		displayName: 'ID del descuento del proveedor',
 		name: 'idDescuentoProveedor',
 		type: 'number',
 		default: '',
-		displayOptions: { show: { resource: ['crearProveedor'] } },
+		displayOptions: { show: { operation: ['crearProveedor'] } },
 	},
 	{
 		displayName: 'Importe',
@@ -1147,7 +1356,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'json',
 		default: {},
 		description: 'Shipping info from the order',
-		displayOptions: { show: { resource: ['cobros'] } },
+		displayOptions: { show: { operation: ['registrarCobro'] } },
 	},
 	{
 		displayName: 'Lista ID',
@@ -1155,7 +1364,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'number',
 		default: '',
 		description: 'ID de la lista para buscar los precios de los articulos',
-		displayOptions: { show: { resource: ['consultarPrecioProducto', 'crearVenta', 'estadisticaVentaRanking'] } },
+		displayOptions: { show: { operation: ['consultarPrecioProducto', 'crearVenta', 'estadisticaVentaRanking'] } },
 	},
 	{
 		displayName: 'Letra Del Documento De La Compra',
@@ -1164,7 +1373,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: 'A',
 		description: 'Letra del documento de la compra de la factura',
-		displayOptions: { show: { resource: ['crearCompra', 'crearOrdenCompra', 'crearRemitoCompra', 'crearRemitoVenta'] } },
+		displayOptions: { show: { operation: ['crearCompra', 'crearOrdenCompra', 'crearRemitoCompra', 'crearRemitoVenta'] } },
 	},
 	// {
 	// 	displayName: 'Migración Completa',
@@ -1172,7 +1381,7 @@ const getArticulo: INodeProperties[] = [
 	// 	type: 'boolean',
 	// 	default: false,
 	// 	description: 'Whether complete articles migration or partial',
-	// 	displayOptions: { show: { resource: ['articulo'] } },
+	// 	displayOptions: { show: { operation: ['articulo'] } },
 	// },
 	{
 		displayName: 'Nombre Del Tipo De Comprobante',
@@ -1181,7 +1390,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: 'Factura de compras',
 		description: 'Nombre del tipo de comprobante de la factura',
-		displayOptions: { show: { resource: ['crearCompra'] } },
+		displayOptions: { show: { operation: ['crearCompra'] } },
 	},
 	{
 		displayName: 'Nombre Del Articulo',
@@ -1189,7 +1398,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		placeholder: 'Alfajores',
-		displayOptions: { show: { resource: ['buscarProductos', 'listarProductosPorSucursal'] } },
+		displayOptions: { show: { operation: ['buscarProductos', 'listarProductosPorSucursal'] } },
 		description: 'El nombre del producto a buscar',
 	},
 	{
@@ -1199,7 +1408,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: '1',
 		description: 'Numero del documento de la compra de la factura',
-		displayOptions: { show: { resource: ['crearCompra', 'crearOrdenCompra', 'crearRemitoCompra', 'crearRemitoVenta'] } },
+		displayOptions: { show: { operation: ['crearCompra', 'crearOrdenCompra', 'crearRemitoCompra', 'crearRemitoVenta'] } },
 	},
 	{
 		displayName: 'Observaciones',
@@ -1215,7 +1424,7 @@ const getArticulo: INodeProperties[] = [
 		required: true,
 		default: '',
 		description: 'ID del proveedor usado para buscar dentro del sistema',
-		displayOptions: { show: { resource: ['crearOrdenCompra','buscarProveedor', 'listarOrdenesCompra', 'crearRemitoCompra'] } },
+		displayOptions: { show: { operation: ['crearOrdenCompra','buscarProveedor', 'listarOrdenesCompra', 'crearRemitoCompra'] } },
 	},
 	{
 		displayName: 'Punto De Venta',
@@ -1224,7 +1433,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		placeholder: '1',
 		description: 'Numero del punto de venta del documento',
-		displayOptions: { show: { resource: ['generarCompras', 'generarVentas', 'crearOrdenCompra', 'crearVenta', 'crearCompra', 'crearRemitoCompra', 'crearRemitoVenta'] } },
+		displayOptions: { show: { operation: ['crearOrdenCompra', 'crearVenta', 'crearCompra', 'crearRemitoCompra', 'crearRemitoVenta'] } },
 	},
 	{
 		displayName: 'Razón Social',
@@ -1233,7 +1442,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		description: 'Razón social del cliente para buscar',
 		displayOptions: {
-			show: { resource: ['buscarContribuyente', 'buscarClientes', 'crearProveedor', 'crearPedidoVenta', 'listarProveedores', 'crearOrdenCompra', 'crearCliente'] },
+			show: { operation: ['buscarContribuyente', 'buscarClientes', 'crearProveedor', 'crearPedidoVenta', 'listarProveedores', 'crearOrdenCompra', 'crearCliente'] },
 		},
 	},
 		{
@@ -1242,7 +1451,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'number',
 		default: 1,
 		displayOptions:{
-			show: { resource: ['estadisticaVentaRanking'] }
+			show: { operation: ['estadisticaVentaRanking'] }
 		}
 	},
 	{
@@ -1251,7 +1460,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		description: 'ID Rubros used to search the articles',
-		displayOptions: { show: { resource: ['estadisticaVentaRanking', 'listarProductosPorSucursal', 'listarSubRubros'] } },
+		displayOptions: { show: { operation: ['estadisticaVentaRanking', 'listarProductosPorSucursal', 'listarSubRubros'] } },
 	},
 	{
 		displayName: 'SKU',
@@ -1260,7 +1469,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		required: true,
 		description: 'The SKU (product code) to search for',
-		displayOptions: { show: { resource: ['searchArticleBySKU'] } },
+		displayOptions: { show: { operation: ['buscarProductoPorCodigo'] } },
 	},
 	{
 		displayName: 'Sub-Rubros IDs',
@@ -1268,7 +1477,7 @@ const getArticulo: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		description: 'Client ID used to search the articles',
-		displayOptions: { show: { resource: ['listarCategorias', 'listarProductosPorSucursal'] } },
+		displayOptions: { show: { operation: ['listarCategorias', 'listarProductosPorSucursal'] } },
 	},
 	{
 		displayName: 'Sucursales Físicas - IDs Lista',
@@ -1277,7 +1486,7 @@ const getArticulo: INodeProperties[] = [
 		required: true,
 		default: '7345',
 		description: 'Physical branch ID separated by comma',
-		displayOptions: { show: { resource: ['consultarStock'] } },
+		displayOptions: { show: { operation: ['consultarStock'] } },
 	},
 	{
 		displayName: 'Ultima Modificacion Imagenes',
@@ -1285,14 +1494,14 @@ const getArticulo: INodeProperties[] = [
 		type: 'json',
 		required: true,
 		default: '',
-		displayOptions: { show: { resource: ['sincronizarImagenes'] } },
+		displayOptions: { show: { operation: ['sincronizarImagenes'] } },
 	},
 	{
 		displayName: 'Usuario',
 		name: 'username',
 		type: 'string',
 		default: '',
-		displayOptions: { show: { resource: ['verificarCredencialesOperador', 'listarOperadoresMoviles'] } },
+		displayOptions: { show: { operation: ['verificarCredencialesOperador', 'listarOperadoresMoviles'] } },
 	},
 	{
 		displayName: 'Código',
@@ -1301,7 +1510,7 @@ const getArticulo: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['listarProveedores']
+				operation: ['listarProveedores']
 			}
 		}
 	},
@@ -1313,7 +1522,7 @@ const getArticulo: INodeProperties[] = [
 	 	default: '',
 	 	displayOptions: {
 	 		show: {
-	 			resource: ['listarOperadoresMoviles']
+	 			operation: ['listarOperadoresMoviles']
 	 		}
 	 	}
 	},
@@ -1325,7 +1534,7 @@ const getArticulo: INodeProperties[] = [
     default: '',
     displayOptions: {
       show: {
-        resource: ['listarProductosPorSucursal']
+        operation: ['listarProductosPorSucursal']
       }
     }
   },
@@ -1337,7 +1546,7 @@ const getArticulo: INodeProperties[] = [
     default: '',
     displayOptions: {
       show: {
-        resource: ['listarProductosPorSucursal']
+        operation: ['listarProductosPorSucursal']
       }
     }
   }
@@ -1422,7 +1631,7 @@ export const HttpOptions: INodeProperties[] = [
 		],
 		displayOptions: {
 			show: {
-				resource: [
+				operation: [
 					'listarClientes',
 					'listarTodosLosProductos'
 				],
