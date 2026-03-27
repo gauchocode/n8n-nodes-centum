@@ -3,6 +3,7 @@ import { NodeConnectionType, NodeOperationError } from "n8n-workflow";
 
 import { CentumFields, CentumOperations, HttpOptions } from "./CentumDescription";
 import { resourceHandlers } from "./resources";
+import type { CentumApiCredentials, CentumHeaders } from "./resources/tipos";
 
 const resourceCategoryMap: Record<string, string> = {
 	generarTokenSeguridad: "extras",
@@ -101,32 +102,51 @@ export class Centum implements INodeType {
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
-		const centumApiCredentials = await this.getCredentials("centumApi");
+		const centumApiCredentials = (await this.getCredentials("centumApi")) as unknown as CentumApiCredentials;
 		const centumUrl = String(centumApiCredentials.centumUrl);
 		const consumerApiPublicId = centumApiCredentials.consumerApiPublicId as string | number;
+		const items = this.getInputData();
+		const returnData: INodeExecutionData[] = [];
 
-		const headers = {
+		const headers: CentumHeaders = {
 			CentumSuiteConsumidorApiPublicaId: consumerApiPublicId,
-			publicAccessKey: centumApiCredentials.publicAccessKey,
+			publicAccessKey: String(centumApiCredentials.publicAccessKey),
 		};
 
 		const nodeParameters = this.getNode().parameters as Record<string, unknown>;
-		const resource = this.getNodeParameter("resource", 0) as string;
 		const hasOperation = typeof nodeParameters.operation !== "undefined";
-		const operation = hasOperation ? (this.getNodeParameter("operation", 0) as string) : resource;
-		const resolvedResource = hasOperation && resourceHandlers[resource] && !resourceCategoryMap[resource] ? resource : operation;
-		const handler = resourceHandlers[resolvedResource];
 
-		if (!handler) {
-			throw new NodeOperationError(this.getNode(), `Operación no implementada: ${resolvedResource}`);
+		for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
+			try {
+				const resource = this.getNodeParameter("resource", itemIndex) as string;
+				const operation = hasOperation ? (this.getNodeParameter("operation", itemIndex) as string) : resource;
+				const resolvedResource = hasOperation && resourceHandlers[resource] && !resourceCategoryMap[resource] ? resource : operation;
+				const handler = resourceHandlers[resolvedResource];
+
+				if (!handler) {
+					throw new NodeOperationError(this.getNode(), `Operación no implementada: ${resolvedResource}`, { itemIndex });
+				}
+
+				const handlerResult = await handler({
+					executeFunctions: this,
+					centumUrl,
+					headers,
+					centumApiCredentials,
+					consumerApiPublicId,
+					itemIndex,
+				});
+
+				returnData.push(...handlerResult[0]);
+			} catch (error) {
+				if (error instanceof NodeOperationError) {
+					throw error;
+				}
+
+				const message = error instanceof Error ? error.message : String(error);
+				throw new NodeOperationError(this.getNode(), message, { itemIndex });
+			}
 		}
 
-		return await handler({
-			executeFunctions: this,
-			centumUrl,
-			headers,
-			centumApiCredentials,
-			consumerApiPublicId,
-		});
+		return [returnData];
 	}
 }

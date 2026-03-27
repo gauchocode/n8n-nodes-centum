@@ -1,36 +1,36 @@
-import { IAuthenticateGeneric, ICredentialType, INodeProperties } from 'n8n-workflow';
+import { IAuthenticateGeneric, ICredentialType, INodeProperties } from "n8n-workflow";
 
 export class CentumApi implements ICredentialType {
-	name = 'centumApi';
-	displayName = 'Centum API';
-	documentationUrl = 'http://www.centum.com.ar/ApiPublica.pdf';
+	name = "centumApi";
+	displayName = "Centum API";
+	documentationUrl = "https://www.centum.com.ar/ApiPublica.pdf";
 	properties: INodeProperties[] = [
 		{
-			displayName: 'Public Access Key',
-			name: 'publicAccessKey',
-			type: 'string',
+			displayName: "Public Access Key",
+			name: "publicAccessKey",
+			type: "string",
 			typeOptions: { password: true },
-			default: '',
+			default: "",
 		},
 		{
-			displayName: 'CentumSuiteConsumidorApiPublicaId',
-			name: 'consumerApiPublicId',
-			type: 'number',
+			displayName: "CentumSuiteConsumidorApiPublicaId",
+			name: "consumerApiPublicId",
+			type: "number",
 			default: 0,
 		},
 		{
-			displayName: 'Centum URL',
-			name: 'centumUrl',
-			type: 'string',
-			default: 'https://plataforma1.centum.com.ar:23990/BL2',
+			displayName: "Centum URL",
+			name: "centumUrl",
+			type: "string",
+			default: "https://plataforma1.centum.com.ar:23990/BL2",
 		},
 	];
 	authenticate: IAuthenticateGeneric = {
-		type: 'generic',
+		type: "generic",
 		properties: {
 			headers: {
-				CentumSuiteAccessToken: '={{$credentials.publicAccessKey}}',
-				CentumSuiteConsumidorApiPublicaId: '={{credentials.consumerApiPublicId}}',
+				CentumSuiteAccessToken: "={{$credentials.publicAccessKey}}",
+				CentumSuiteConsumidorApiPublicaId: "={{$credentials.consumerApiPublicId}}",
 			},
 		},
 	};

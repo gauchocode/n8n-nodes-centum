@@ -3,17 +3,20 @@ import * as helperFns from "../helpers/functions";
 import type { ResourceHandler, ResourceHandlerMap } from "./tipos";
 
 const buscarProductos: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId } = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const nombreArticulo = executeFunctions.getNodeParameter("nombreArticulo", 0, "") as string;
-	const codigoArticulo = executeFunctions.getNodeParameter("codigoArticulo", 0, "") as string;
+	const nombreArticulo = executeFunctions.getNodeParameter("nombreArticulo", itemIndex, "") as string;
+	const codigoArticulo = executeFunctions.getNodeParameter("codigoArticulo", itemIndex, "") as string;
 
 	try {
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
 			method: "POST",
 			headers,
 			body: { Nombre: nombreArticulo, Codigo: codigoArticulo },
@@ -26,14 +29,15 @@ const buscarProductos: ResourceHandler = async (context) => {
 };
 
 const buscarProductoPorCodigo: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId } = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const codigoRaw = executeFunctions.getNodeParameter("codigoArticulo", 0) as string;
-	const articleIdRaw = executeFunctions.getNodeParameter("articleId", 0) as string;
+	const codigoRaw = executeFunctions.getNodeParameter("codigoArticulo", itemIndex) as string;
+	const articleIdRaw = executeFunctions.getNodeParameter("articleId", itemIndex) as string;
 
 	const codigo = codigoRaw.trim();
 	const ids = articleIdRaw
@@ -51,6 +55,8 @@ const buscarProductoPorCodigo: ResourceHandler = async (context) => {
 		// 1) Prioridad: buscar por IDs
 		if (ids.length > 0) {
 			articulo = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
+				context: executeFunctions,
+				debugItemIndex: itemIndex,
 				method: "POST",
 				headers,
 				body: { Ids: ids },
@@ -61,6 +67,8 @@ const buscarProductoPorCodigo: ResourceHandler = async (context) => {
 			// 2) Fallback: si no encontró nada, buscar por código
 			if (empty && codigo) {
 				articulo = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
+					context: executeFunctions,
+					debugItemIndex: itemIndex,
 					method: "POST",
 					headers,
 					body: { CodigoExacto: codigo },
@@ -69,6 +77,8 @@ const buscarProductoPorCodigo: ResourceHandler = async (context) => {
 		} else {
 			// Solo código
 			articulo = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
+				context: executeFunctions,
+				debugItemIndex: itemIndex,
 				method: "POST",
 				headers,
 				body: { CodigoExacto: codigo },
@@ -77,7 +87,6 @@ const buscarProductoPorCodigo: ResourceHandler = async (context) => {
 
 		return [executeFunctions.helpers.returnJsonArray(articulo)];
 	} catch (error) {
-		console.log("Error en solicitud de artículo:", error);
 		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
 
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
@@ -85,15 +94,18 @@ const buscarProductoPorCodigo: ResourceHandler = async (context) => {
 };
 
 const consultarStock: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId } = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const branchOfficeIds = String(executeFunctions.getNodeParameter("branchOfficeIds", 0));
+	const branchOfficeIds = String(executeFunctions.getNodeParameter("branchOfficeIds", itemIndex));
 	try {
 		const dataArticulosExistencia = await helperFns.apiRequest<any>(`${centumUrl}/ArticulosExistencias`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
 			headers,
 			queryParams: {
 				idsSucursalesFisicas: branchOfficeIds,
@@ -102,30 +114,30 @@ const consultarStock: ResourceHandler = async (context) => {
 
 		return [executeFunctions.helpers.returnJsonArray(dataArticulosExistencia.Items as any)];
 	} catch (error) {
-		console.log("ArticulosExistencias error: ", error);
 		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
 const listarProductosDisponibles: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId } = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const clientId = executeFunctions.getNodeParameter("clienteId", 0);
-	const documentDate: any = executeFunctions.getNodeParameter("documentDate", 0);
-	const IdsRubro = executeFunctions.getNodeParameter("idsRubros", 0);
-	const completeMigration = executeFunctions.getNodeParameter("migracionCompleta", 0);
-	const IdsSubRubro = executeFunctions.getNodeParameter("idsSubRubros", 0);
+	const clientId = executeFunctions.getNodeParameter("clienteId", itemIndex);
+	const documentDate: any = executeFunctions.getNodeParameter("documentDate", itemIndex);
+	const IdsRubro = executeFunctions.getNodeParameter("idsRubros", itemIndex);
+	const completeMigration = executeFunctions.getNodeParameter("migracionCompleta", itemIndex);
+	const IdsSubRubro = executeFunctions.getNodeParameter("idsSubRubros", itemIndex);
 	const formattedDocumentDate = documentDate.replace(/\..+/, "");
-	const dateModified = executeFunctions.getNodeParameter("dateModified", 0);
-	const dateModifiedImage = executeFunctions.getNodeParameter("dateModifiedImage", 0);
-	const priceDateModified = executeFunctions.getNodeParameter("priceDateModified", 0);
-	const numeroPagina = executeFunctions.getNodeParameter("numeroPagina", 0);
-	const cantidadPorPagina = executeFunctions.getNodeParameter("cantidadPorPagina", 0);
+	const dateModified = executeFunctions.getNodeParameter("dateModified", itemIndex);
+	const dateModifiedImage = executeFunctions.getNodeParameter("dateModifiedImage", itemIndex);
+	const priceDateModified = executeFunctions.getNodeParameter("priceDateModified", itemIndex);
+	const numeroPagina = executeFunctions.getNodeParameter("numeroPagina", itemIndex);
+	const cantidadPorPagina = executeFunctions.getNodeParameter("cantidadPorPagina", itemIndex);
 	const bodyToSend = {
 		idCliente: clientId,
 		FechaDocumento: formattedDocumentDate,
@@ -141,6 +153,8 @@ const listarProductosDisponibles: ResourceHandler = async (context) => {
 
 	try {
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
 			method: "POST",
 			body: bodyToSend,
 			headers,
@@ -150,7 +164,7 @@ const listarProductosDisponibles: ResourceHandler = async (context) => {
 		if (response.Articulos.Items.length > 0) {
 			const items = response.Articulos.Items;
 			if (!completeMigration) {
-				const acc = [];
+				const acc: Array<Record<string, unknown>> = [];
 				for (const item of items) {
 					const groupArticle = item.GrupoArticulo;
 					if (!groupArticle) continue;
@@ -175,6 +189,8 @@ const listarProductosDisponibles: ResourceHandler = async (context) => {
 
 					try {
 						const response = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
+							context: executeFunctions,
+							debugItemIndex: itemIndex,
 							method: "POST",
 							headers: { ...headers }, // reusar headers de la primera request
 							body,
@@ -185,7 +201,6 @@ const listarProductosDisponibles: ResourceHandler = async (context) => {
 							acc.push(...response.Articulos.Items);
 						}
 					} catch (error) {
-						console.log("Error en solicitud de grupo de artículos", { error });
 						const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
 						throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 					}
@@ -202,17 +217,17 @@ const listarProductosDisponibles: ResourceHandler = async (context) => {
 			}
 			return [executeFunctions.helpers.returnJsonArray(items as any)];
 		} else {
-			return [executeFunctions.helpers.returnJsonArray({ json: {} })];
+			return [executeFunctions.helpers.returnJsonArray([{}])];
 		}
 	} catch (error) {
-		console.log("Error en solicitud de artículos", error);
 		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
 const descargarImagenesProductos: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId } = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
@@ -242,7 +257,6 @@ const descargarImagenesProductos: ResourceHandler = async (context) => {
 		);
 
 		if (allArticleImages instanceof Error) {
-			console.error(`Failed to download images for article ${element.json.IdArticulo}`, allArticleImages);
 			continue;
 		}
 
@@ -276,7 +290,8 @@ const descargarImagenesProductos: ResourceHandler = async (context) => {
 };
 
 const listarTodosLosProductos: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId } = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
@@ -288,6 +303,8 @@ const listarTodosLosProductos: ResourceHandler = async (context) => {
 
 		const fetchOptions: any = {
 			method: "POST",
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
 			headers,
 			body: {},
 			queryParams: { tipoOrdenArticulos: "Nombre" },
@@ -299,8 +316,6 @@ const listarTodosLosProductos: ResourceHandler = async (context) => {
 		const paginated = await helperFns.apiPostRequestPaginated<any>(articulosURL, fetchOptions);
 		return [executeFunctions.helpers.returnJsonArray(paginated as any)];
 	} catch (error) {
-		console.error("Error en solicitud de artículos:", error);
-
 		let errorMessage = "Error desconocido";
 
 		if ((error as any)?.response?.data?.Message) {
@@ -314,55 +329,57 @@ const listarTodosLosProductos: ResourceHandler = async (context) => {
 };
 
 const consultarPrecioProducto: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId } = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const idArticulos = executeFunctions.getNodeParameter("articleId", 0);
-	const idLista = executeFunctions.getNodeParameter("idList", 0);
-	const clienteId = executeFunctions.getNodeParameter("clienteId", 0);
-	const fechaDocumento = executeFunctions.getNodeParameter("documentDate", 0);
+	const idArticulos = executeFunctions.getNodeParameter("articleId", itemIndex);
+	const idLista = executeFunctions.getNodeParameter("idList", itemIndex);
+	const clienteId = executeFunctions.getNodeParameter("clienteId", itemIndex);
+	const fechaDocumento = executeFunctions.getNodeParameter("documentDate", itemIndex);
 	const formattedDocumentDate = String(fechaDocumento).split("T")[0];
 	const idsNum = String(idArticulos)
 		.split(",")
 		.map((s) => s.trim())
 		.filter(Boolean);
-	console.log(idsNum);
 
 	if (!idLista || !idArticulos) {
 		throw new NodeOperationError(executeFunctions.getNode(), "El id de la lista y el artículo son obligatorios.");
 	}
 	try {
 		const articulo = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
 			method: "POST",
 			headers,
-			body: { IdLista: idLista, IdCliente: clienteId, fechaDocumento: formattedDocumentDate, Ids: idsNum },
+			body: { IdLista: idLista, IdCliente: clienteId, FechaDocumento: formattedDocumentDate, Ids: idsNum },
 		});
 
 		return [executeFunctions.helpers.returnJsonArray(articulo)];
 	} catch (error) {
-		console.log("Error en solicitud de artículo por ID:", error);
 		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
 const listarProductosPorSucursal: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId } = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const IdSucursalFisica = executeFunctions.getNodeParameter("idSucursalFisica", 0) as string;
-	const IdArticulo = executeFunctions.getNodeParameter("articleId", 0) as string;
-	const NombreArticulo = executeFunctions.getNodeParameter("nombreArticulo", 0) as string;
-	const IdRubro = executeFunctions.getNodeParameter("rubroId", 0) as string;
-	const IdSubRubro = executeFunctions.getNodeParameter("idsSubRubros", 0) as string;
-	const IdCategoriaArticulo = executeFunctions.getNodeParameter("IdCategoriaArticulo", 0) as string;
-	const IdMarcaArticulo = executeFunctions.getNodeParameter("IdMarcaArticulo", 0) as string;
+	const IdSucursalFisica = executeFunctions.getNodeParameter("idSucursalFisica", itemIndex) as string;
+	const IdArticulo = executeFunctions.getNodeParameter("articleId", itemIndex) as string;
+	const NombreArticulo = executeFunctions.getNodeParameter("nombreArticulo", itemIndex) as string;
+	const IdRubro = executeFunctions.getNodeParameter("rubroId", itemIndex) as string;
+	const IdSubRubro = executeFunctions.getNodeParameter("idsSubRubros", itemIndex) as string;
+	const IdCategoriaArticulo = executeFunctions.getNodeParameter("IdCategoriaArticulo", itemIndex) as string;
+	const IdMarcaArticulo = executeFunctions.getNodeParameter("IdMarcaArticulo", itemIndex) as string;
 
 	// Si no filtra por artículo, sucursal + al menos una segmentación son obligatorios
 	if (!IdArticulo) {
@@ -391,26 +408,28 @@ const listarProductosPorSucursal: ResourceHandler = async (context) => {
 
 	try {
 		const dataArticulosExistencias = await helperFns.apiRequest<any>(`${centumUrl}/ArticulosSucursalesFisicas`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
 			headers,
 			queryParams,
 		});
 		return [executeFunctions.helpers.returnJsonArray(dataArticulosExistencias.Items as any)];
 	} catch (error) {
-		console.log(error);
 		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
 const buscarProductoEnSucursal: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId } = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const IdSucursalFisica = executeFunctions.getNodeParameter("idSucursalFisica", 0) as string;
-	const idArticulo = executeFunctions.getNodeParameter("articleId", 0) as string;
+	const IdSucursalFisica = executeFunctions.getNodeParameter("idSucursalFisica", itemIndex) as string;
+	const idArticulo = executeFunctions.getNodeParameter("articleId", itemIndex) as string;
 	const queryParams: {
 		IdSucursalFisica?: string;
 		idsArticulos: string;
@@ -424,25 +443,27 @@ const buscarProductoEnSucursal: ResourceHandler = async (context) => {
 	}
 	try {
 		const dataArticulosExistencias = await helperFns.apiRequest<any>(`${centumUrl}/ArticulosSucursalesFisicas`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
 			headers,
 			queryParams,
 		});
 		return [executeFunctions.helpers.returnJsonArray(dataArticulosExistencias.Items as any)];
 	} catch (error) {
-		console.log(error);
 		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
 const listarCategorias: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId } = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const subRubro = executeFunctions.getNodeParameter("idsSubRubros", 0);
+	const subRubro = executeFunctions.getNodeParameter("idsSubRubros", itemIndex);
 	let url = `${centumUrl}/CategoriasArticulo`;
 
 	if (subRubro) {
@@ -451,6 +472,8 @@ const listarCategorias: ResourceHandler = async (context) => {
 
 	try {
 		const response = await helperFns.apiRequest<any>(url, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
 			method: "GET",
 			headers,
 		});
@@ -462,7 +485,8 @@ const listarCategorias: ResourceHandler = async (context) => {
 };
 
 const listarMarcas: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId } = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
@@ -470,20 +494,22 @@ const listarMarcas: ResourceHandler = async (context) => {
 
 	try {
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/MarcasArticulo`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
 			method: "GET",
 			headers,
 		});
 
 		return [executeFunctions.helpers.returnJsonArray(response)];
 	} catch (error) {
-		console.log("Error en obtener el listado de marcas:", error);
 		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
 		throw new NodeOperationError(executeFunctions.getNode(), `Error en obtener el listado de marcas. \n ${errorMessage}`);
 	}
 };
 
 const listarRubros: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId } = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
@@ -491,32 +517,36 @@ const listarRubros: ResourceHandler = async (context) => {
 
 	try {
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/Rubros`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
 			method: "GET",
 			headers,
 		});
 
 		return [executeFunctions.helpers.returnJsonArray(response)];
 	} catch (error) {
-		console.log(error);
 		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
 const listarSubRubros: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId } = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const idRubro = executeFunctions.getNodeParameter("rubroId", 0) as string;
+	const idRubro = executeFunctions.getNodeParameter("rubroId", itemIndex) as string;
 	const queryParams: Record<string, string> = {};
 
 	if (idRubro) queryParams.idRubro = idRubro;
 
 	try {
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/SubRubros`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
 			method: "GET",
 			headers,
 			queryParams,
@@ -529,7 +559,8 @@ const listarSubRubros: ResourceHandler = async (context) => {
 };
 
 const listarUbicacionArticulos: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId } = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
@@ -537,6 +568,8 @@ const listarUbicacionArticulos: ResourceHandler = async (context) => {
 
 	try {
 		const ubicacionArticulos = await helperFns.apiRequest<any>(`${centumUrl}/UbicacionesArticulos`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
 			method: "GET",
 			headers,
 		});
@@ -548,7 +581,8 @@ const listarUbicacionArticulos: ResourceHandler = async (context) => {
 };
 
 const convertirProductosParaWooCommerce: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId } = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
@@ -562,20 +596,21 @@ const convertirProductosParaWooCommerce: ResourceHandler = async (context) => {
 };
 
 const sincronizarImagenes: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId } = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const dataImages = executeFunctions.getNodeParameter("dataImg", 0) as {
+	const dataImages = executeFunctions.getNodeParameter("dataImg", itemIndex) as {
 		json: {
 			idArticulo: number;
 			images: any[];
 			infoImages: { lastModified: string; orderNumber: number }[];
 		};
 	}[];
-	const db = executeFunctions.getNodeParameter("lastModifiedImg", 0) as {
+	const db = executeFunctions.getNodeParameter("lastModifiedImg", itemIndex) as {
 		articleId: number;
 		dataImage: { orderNumber: number; lastModified: string }[];
 	}[];
@@ -604,10 +639,10 @@ const sincronizarImagenes: ResourceHandler = async (context) => {
 	}
 
 	if (result.length === 0) {
-		result.push([]);
+		result.push({ json: {} });
 	}
 
-	return [executeFunctions.helpers.returnJsonArray(result)];
+	return [result];
 };
 
 export const articulosHandlers: ResourceHandlerMap = {

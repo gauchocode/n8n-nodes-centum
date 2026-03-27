@@ -9,20 +9,19 @@ The node is built to be extensible, making it easy to add new operations for spe
 
 ## Requires 3 parameters in the **Centum API** credential:
 
-| Field                             | Type       | Example                                                     | Required |
-|-----------------------------------|------------|-------------------------------------------------------------|----------|
-| Public Access Key                 | Password   | a1b2c3d4e5f6g7h8i9j0...                                     | Yes      |
-| CentumSuiteConsumidorApiPublicaId | Number     | 12345                                                       | Yes      |
-| Centum URL                        | Text (URL) | https://plataformaX.centum.com.ar:23990/BLX                 | Yes      |
-|-----------------------------------|------------|-------------------------------------------------------------|----------|
-
-
+| Field                               | Type         | Example                                                       | Required   |
+| ----------------------------------- | ------------ | ------------------------------------------------------------- | ---------- |
+| Public Access Key                   | Password     | a1b2c3d4e5f6g7h8i9j0...                                       | Yes        |
+| CentumSuiteConsumidorApiPublicaId   | Number       | 12345                                                         | Yes        |
+| Centum URL                          | Text (URL)   | https://plataformaX.centum.com.ar:23990/BLX                   | Yes        |
+| ----------------------------------- | ------------ | ------------------------------------------------------------- | ---------- |
 
 ## Available Operations
 
 **55 endpoints organized into 5 categories:**
 
 ### 📦 Articles
+
 - `articulo`: Search articles with filters (categories, dates, stock)
 - `articuloPorId`: Query by exact ID or code
 - `articuloPorNombre`: Query by article name
@@ -38,6 +37,7 @@ The node is built to be extensible, making it easy to add new operations for spe
 - `rubrosObtener`: List product groups
 
 ### 👤 Customers
+
 - `clienteNuevo`: Create a new customer
 - `nuevoContribuyente`: Register a taxpayer with CUIT
 - `clientes`: Paginated customer list
@@ -49,6 +49,7 @@ The node is built to be extensible, making it easy to add new operations for spe
 - `obtenerSaldoCliente`: Current account balance
 
 ### 💳 Orders and Payments
+
 - `cobros`: Register a payment
 - `obtenerCobros`: Filter payments
 - `obtenerFacturasCobros`: Payment invoice history
@@ -67,6 +68,7 @@ The node is built to be extensible, making it easy to add new operations for spe
 - `obtenerBonificaciones`: Get available discounts
 
 ### 🌍 Catalogs
+
 - `provinciasLista`: List of provinces (Argentina)
 - `departamentosLista`: Departments by province
 - `sucursalesFisicas`: Physical branches
@@ -79,6 +81,7 @@ The node is built to be extensible, making it easy to add new operations for spe
 - `obtenerVendedores`: Get sales representatives
 
 ### ⚙️ Utilities
+
 - `generarProductosWoo`: Transform data to WooCommerce format
 - `procesarImagenes`: Image processing and synchronization
 - `generarToken`: Authentication token generation
@@ -88,36 +91,52 @@ The node is built to be extensible, making it easy to add new operations for spe
 
 ## Prerequisites
 
-To use this node, make sure you have the following installed in your development environment:
+To use or develop this node, you need:
 
-- **n8n**: Version 1.75.2 or higher (latest recommended for compatibility).
-- **Node.js**: Version 20.x or higher.
-- **npm**: Required to install and build the plugin.
-- **Git**: To clone the repository.
-- **Centum API access**: Valid credentials (`centumUrl`, `consumerApiPublicId`, `publicAccessKey`) provided by your Centum provider.
+- **n8n** 1.75.2 or higher.
+- **Node.js** 20.x or higher.
+- **Docker** and **Docker Compose** for local builds in this repository.
+- **Centum API access** with valid credentials: `centumUrl`, `consumerApiPublicId`, and `publicAccessKey`.
 
-Recommended: Follow the n8n guide to [set up your development environment](https://docs.n8n.io/integrations/creating-nodes/build/node-development-environment/).
+## Development
 
-## Using this Starter
+This repository uses a Docker-only build workflow.
 
-Basic steps to work with this starter. For a detailed guide on creating and publishing nodes, see the [documentation](https://docs.n8n.io/integrations/creating-nodes/).
+### Build
 
-1.  [Generate a new repository](https://github.com/n8n-io/n8n-nodes-starter/generate) from this template.
-2.  `git clone https://github.com/<your-username>/<your-repo>.git`
-3.  Run `npm i` to install dependencies.
-4.  Open the project in your editor.
-5.  Explore the examples in `/nodes` and `/credentials`. Modify or replace them with your own nodes.
-6.  Update `package.json` with your details.
-7.  Run `npm run lint` to check for errors or `npm run lintfix` to fix them automatically.
-8.  Test your node locally. See [Running your node locally](https://docs.n8n.io/integrations/creating-nodes/test/run-node-locally/).
-9.  Replace this README with your node documentation. Use the [README TEMPLATE](/broobe/n8n/n8n-nodes-blocky-nodes/-/blob/main/README_TEMPLATE.md) as a base.
-10. Update the LICENSE file with your details.
-11. [Publish](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry) your package to npm.
+```bash
+rm -rf dist
+docker compose run build
+```
+
+### Publish
+
+Create a local `.env` file with your npm token:
+
+```bash
+NPM_TOKEN=npm_your_token_here
+```
+
+Then publish with Docker:
+
+```bash
+rm -rf dist
+docker compose build --no-cache
+docker compose run publish
+```
+
+### Local testing in n8n
+
+1. Build the package with Docker.
+2. Link or copy the package into your n8n community nodes/custom directory.
+3. Restart n8n.
+4. Add the `Centum` node to a workflow and test with valid Centum credentials.
 
 ## Support
 
 For issues or questions:
-- Open an **issue** in the [GitHub repository](https://github.com/your-username/n8n-nodes-centum).
+
+- Open an **issue** in the [GitHub repository](https://github.com/gauchocode/n8n-nodes-centum).
 - Contact your Centum provider for API-related support.
 - Check the [n8n documentation](https://docs.n8n.io/) for help with workflow integration.
 
