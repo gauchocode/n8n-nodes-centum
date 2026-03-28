@@ -10,7 +10,7 @@ const listarMunicipios: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const idProvincia = executeFunctions.getNodeParameter("idProvincia", itemIndex, "") as string;
+	const idProvincia = helperFns.getNodeParameterOrThrow(executeFunctions, "idProvincia", itemIndex, "") as string;
 
 	try {
 		const queryParams: Record<string, string | number | boolean> = {};
@@ -63,7 +63,7 @@ const listarProvincias: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const idPais = executeFunctions.getNodeParameter("idPais", itemIndex, "") as string;
+	const idPais = helperFns.getNodeParameterOrThrow(executeFunctions, "idPais", itemIndex, "") as string;
 
 	try {
 		const queryParams: Record<string, string | number | boolean> = {};

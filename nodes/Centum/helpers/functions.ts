@@ -901,6 +901,33 @@ export function getDebugSettings(this: IExecuteFunctions, itemIndex = 0): DebugS
 	return this.getNodeParameter("debugSettings", itemIndex, {}) as DebugSettings;
 }
 
+export function getNodeParameterOrThrow<T = NodeParameterValueType | object>(executeFunctions: IExecuteFunctions, name: string, itemIndex: number, defaultValue?: T): T {
+	try {
+		if (arguments.length >= 4) {
+			return executeFunctions.getNodeParameter(name, itemIndex, defaultValue as T) as T;
+		}
+
+		return executeFunctions.getNodeParameter(name, itemIndex) as T;
+	} catch (error) {
+		let resource = "";
+		let operation = "";
+
+		try {
+			resource = String(executeFunctions.getNodeParameter("resource", itemIndex, ""));
+		} catch {}
+
+		try {
+			operation = String(executeFunctions.getNodeParameter("operation", itemIndex, ""));
+		} catch {}
+
+		const scope = [resource, operation].filter(Boolean).join("/");
+		const location = scope ? ` en ${scope}` : "";
+		const detail = getErrorMessage(error, "Could not get parameter");
+
+		throw new NodeOperationError(executeFunctions.getNode(), `No se pudo obtener el parámetro "${name}"${location} (item ${itemIndex + 1}). ${detail}`, { itemIndex });
+	}
+}
+
 export interface FetchOptions {
 	method?: "GET" | "POST";
 	headers?: CentumHeaders;

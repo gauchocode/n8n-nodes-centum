@@ -10,12 +10,12 @@ const crearMovimientoStock: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const idSucursalFisica = executeFunctions.getNodeParameter("idSucursalFisica", itemIndex);
-	const articleId = executeFunctions.getNodeParameter("articleId", itemIndex);
-	const fechaImputacion = executeFunctions.getNodeParameter("indictmentDate", itemIndex) as string;
+	const idSucursalFisica = helperFns.getNodeParameterOrThrow(executeFunctions, "idSucursalFisica", itemIndex);
+	const articleId = helperFns.getNodeParameterOrThrow(executeFunctions, "articleId", itemIndex);
+	const fechaImputacion = helperFns.getNodeParameterOrThrow(executeFunctions, "indictmentDate", itemIndex) as string;
 	const fechaImputacionFormateada = fechaImputacion.replace(/\..+/, "");
 
-	// const ubicacionArticle = executeFunctions.getNodeParameter('', itemIndex);
+	// const ubicacionArticle = helperFns.getNodeParameterOrThrow(executeFunctions, '', itemIndex);
 
 	if (!articleId) {
 		throw new NodeOperationError(executeFunctions.getNode(), "El ID del articulo es obligatorio.");

@@ -10,9 +10,9 @@ const registrarCobro: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const ordenCliente = executeFunctions.getNodeParameter("cliente", itemIndex);
-	const ordenArticulo = executeFunctions.getNodeParameter("articulo", itemIndex);
-	const ordenEnvio = executeFunctions.getNodeParameter("envio", itemIndex);
+	const ordenCliente = helperFns.getNodeParameterOrThrow(executeFunctions, "cliente", itemIndex);
+	const ordenArticulo = helperFns.getNodeParameterOrThrow(executeFunctions, "articulo", itemIndex);
+	const ordenEnvio = helperFns.getNodeParameterOrThrow(executeFunctions, "envio", itemIndex);
 	const bodyCharge = helperFns.createChargeJson(ordenCliente as any, ordenArticulo as any[], ordenEnvio as any[]);
 
 	try {
@@ -39,10 +39,10 @@ const listarCobros: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const idCliente = executeFunctions.getNodeParameter("clienteId", itemIndex);
-	const idCobro = executeFunctions.getNodeParameter("idCobro", itemIndex);
-	const fechaDesde = executeFunctions.getNodeParameter("startDate", itemIndex, "") as string;
-	const fechaHasta = executeFunctions.getNodeParameter("endDate", itemIndex, "") as string;
+	const idCliente = helperFns.getNodeParameterOrThrow(executeFunctions, "clienteId", itemIndex);
+	const idCobro = helperFns.getNodeParameterOrThrow(executeFunctions, "idCobro", itemIndex);
+	const fechaDesde = helperFns.getNodeParameterOrThrow(executeFunctions, "startDate", itemIndex, "") as string;
+	const fechaHasta = helperFns.getNodeParameterOrThrow(executeFunctions, "endDate", itemIndex, "") as string;
 	const separarFechaDesde = String(fechaDesde).split("T")[0];
 	const separarFechaHasta = String(fechaHasta).split("T")[0];
 	if (!idCliente && !separarFechaDesde && !separarFechaHasta && !idCobro) {
@@ -79,9 +79,9 @@ const listarFacturasCobros: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const clientIdParam = executeFunctions.getNodeParameter("clienteId", itemIndex);
-	const desdeSaldoFecha = executeFunctions.getNodeParameter("startDate", itemIndex);
-	const hastaSaldoFecha = executeFunctions.getNodeParameter("endDate", itemIndex);
+	const clientIdParam = helperFns.getNodeParameterOrThrow(executeFunctions, "clienteId", itemIndex);
+	const desdeSaldoFecha = helperFns.getNodeParameterOrThrow(executeFunctions, "startDate", itemIndex);
+	const hastaSaldoFecha = helperFns.getNodeParameterOrThrow(executeFunctions, "endDate", itemIndex);
 	const separarFechaDesde = String(desdeSaldoFecha).split("T")[0];
 	const separarFechaHasta = String(hastaSaldoFecha).split("T")[0];
 

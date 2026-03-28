@@ -18,21 +18,21 @@ const crearRemitoCompra: ResourceHandler = async (context) => {
 
 	type NodeErr = any;
 
-	const idCliente = executeFunctions.getNodeParameter("clienteId", itemIndex) ?? "";
-	const letraDocumento = (executeFunctions.getNodeParameter("letraDocumento", itemIndex) as string) ?? "";
-	const puntoDeVenta = (executeFunctions.getNodeParameter("puntoDeVenta", itemIndex) as string) ?? "";
-	const numero = (executeFunctions.getNodeParameter("numeroFactura", itemIndex) as string) ?? "";
-	const articulosRaw = executeFunctions.getNodeParameter("articulo", itemIndex);
-	const fechaDocumento = executeFunctions.getNodeParameter("documentDate", itemIndex) as string;
+	const idCliente = helperFns.getNodeParameterOrThrow(executeFunctions, "clienteId", itemIndex) ?? "";
+	const letraDocumento = (helperFns.getNodeParameterOrThrow(executeFunctions, "letraDocumento", itemIndex) as string) ?? "";
+	const puntoDeVenta = (helperFns.getNodeParameterOrThrow(executeFunctions, "puntoDeVenta", itemIndex) as string) ?? "";
+	const numero = (helperFns.getNodeParameterOrThrow(executeFunctions, "numeroFactura", itemIndex) as string) ?? "";
+	const articulosRaw = helperFns.getNodeParameterOrThrow(executeFunctions, "articulo", itemIndex);
+	const fechaDocumento = helperFns.getNodeParameterOrThrow(executeFunctions, "documentDate", itemIndex) as string;
 	const formattedDocumentDate = String(fechaDocumento).split("T")[0];
-	const fechaDelivery = executeFunctions.getNodeParameter("deliveryDate", itemIndex) as string;
+	const fechaDelivery = helperFns.getNodeParameterOrThrow(executeFunctions, "deliveryDate", itemIndex) as string;
 	const formattedDeliveryDate = String(fechaDelivery).split("T")[0];
-	const fechaVencimiento = executeFunctions.getNodeParameter("dueDate", itemIndex) as string;
+	const fechaVencimiento = helperFns.getNodeParameterOrThrow(executeFunctions, "dueDate", itemIndex) as string;
 	const formattedDueDate = String(fechaVencimiento).split("T")[0];
-	const proveedorIdRaw = executeFunctions.getNodeParameter("proveedorId", itemIndex);
+	const proveedorIdRaw = helperFns.getNodeParameterOrThrow(executeFunctions, "proveedorId", itemIndex);
 	const proveedorId = String(proveedorIdRaw ?? "").trim();
-	const turnoEntregaId = executeFunctions.getNodeParameter("turnoEntrega", itemIndex) as string;
-	const sucursalId = executeFunctions.getNodeParameter("idSucursalFisica", itemIndex);
+	const turnoEntregaId = helperFns.getNodeParameterOrThrow(executeFunctions, "turnoEntrega", itemIndex) as string;
+	const sucursalId = helperFns.getNodeParameterOrThrow(executeFunctions, "idSucursalFisica", itemIndex);
 
 	if (!proveedorId) {
 		throw new NodeOperationError(executeFunctions.getNode(), "Debe especificarse idProveedor.");
@@ -199,22 +199,22 @@ const crearRemitoVenta: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const idSucursalFisica = executeFunctions.getNodeParameter("idSucursalFisica", itemIndex);
-	const puntoDeVenta = executeFunctions.getNodeParameter("puntoDeVenta", itemIndex) as string;
-	const letraDocumento = executeFunctions.getNodeParameter("letraDocumento", itemIndex) as string;
-	const numeroDocumento = executeFunctions.getNodeParameter("numeroFactura", itemIndex);
-	const turnoDeEntrega = executeFunctions.getNodeParameter("turnoEntrega", itemIndex);
-	const fechaDocumento = executeFunctions.getNodeParameter("documentDate", itemIndex) as string;
+	const idSucursalFisica = helperFns.getNodeParameterOrThrow(executeFunctions, "idSucursalFisica", itemIndex);
+	const puntoDeVenta = helperFns.getNodeParameterOrThrow(executeFunctions, "puntoDeVenta", itemIndex) as string;
+	const letraDocumento = helperFns.getNodeParameterOrThrow(executeFunctions, "letraDocumento", itemIndex) as string;
+	const numeroDocumento = helperFns.getNodeParameterOrThrow(executeFunctions, "numeroFactura", itemIndex);
+	const turnoDeEntrega = helperFns.getNodeParameterOrThrow(executeFunctions, "turnoEntrega", itemIndex);
+	const fechaDocumento = helperFns.getNodeParameterOrThrow(executeFunctions, "documentDate", itemIndex) as string;
 	const fechaDocumentoFormateada = fechaDocumento.replace(/\..+/, "");
-	const fechaEmbarque = executeFunctions.getNodeParameter("shipmentDate", itemIndex) as string;
+	const fechaEmbarque = helperFns.getNodeParameterOrThrow(executeFunctions, "shipmentDate", itemIndex) as string;
 	const fechaEmbarqueFormateada = fechaEmbarque.replace(/\..+/, "");
-	const fechaImputacion = executeFunctions.getNodeParameter("indictmentDate", itemIndex) as string;
+	const fechaImputacion = helperFns.getNodeParameterOrThrow(executeFunctions, "indictmentDate", itemIndex) as string;
 	const fechaImputacionFormateada = fechaImputacion.replace(/\..+/, "");
-	const fechaEntrega = executeFunctions.getNodeParameter("deliveryDate", itemIndex) as string;
+	const fechaEntrega = helperFns.getNodeParameterOrThrow(executeFunctions, "deliveryDate", itemIndex) as string;
 	const fechaEntregaFormateada = fechaEntrega.replace(/\..+/, "");
-	const idVendedor = executeFunctions.getNodeParameter("idVendedor", itemIndex);
-	const idCliente = executeFunctions.getNodeParameter("clienteId", itemIndex);
-	const rawArticles = executeFunctions.getNodeParameter("articlesCollection", itemIndex);
+	const idVendedor = helperFns.getNodeParameterOrThrow(executeFunctions, "idVendedor", itemIndex);
+	const idCliente = helperFns.getNodeParameterOrThrow(executeFunctions, "clienteId", itemIndex);
+	const rawArticles = helperFns.getNodeParameterOrThrow(executeFunctions, "articlesCollection", itemIndex);
 
 	let articulosArray: { ID: string; Cantidad: number }[] = [];
 

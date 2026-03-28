@@ -10,8 +10,8 @@ const buscarProductos: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const nombreArticulo = executeFunctions.getNodeParameter("nombreArticulo", itemIndex, "") as string;
-	const codigoArticulo = executeFunctions.getNodeParameter("codigoArticulo", itemIndex, "") as string;
+	const nombreArticulo = helperFns.getNodeParameterOrThrow(executeFunctions, "nombreArticulo", itemIndex, "") as string;
+	const codigoArticulo = helperFns.getNodeParameterOrThrow(executeFunctions, "codigoArticulo", itemIndex, "") as string;
 
 	try {
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
@@ -36,8 +36,8 @@ const buscarProductoPorCodigo: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const codigoRaw = executeFunctions.getNodeParameter("codigoArticulo", itemIndex) as string;
-	const articleIdRaw = executeFunctions.getNodeParameter("articleId", itemIndex) as string;
+	const codigoRaw = helperFns.getNodeParameterOrThrow(executeFunctions, "codigoArticulo", itemIndex) as string;
+	const articleIdRaw = helperFns.getNodeParameterOrThrow(executeFunctions, "articleId", itemIndex) as string;
 
 	const codigo = codigoRaw.trim();
 	const ids = articleIdRaw
@@ -101,7 +101,7 @@ const consultarStock: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const branchOfficeIds = String(executeFunctions.getNodeParameter("branchOfficeIds", itemIndex));
+	const branchOfficeIds = String(helperFns.getNodeParameterOrThrow(executeFunctions, "branchOfficeIds", itemIndex));
 	try {
 		const dataArticulosExistencia = await helperFns.apiRequest<any>(`${centumUrl}/ArticulosExistencias`, {
 			context: executeFunctions,
@@ -127,17 +127,17 @@ const listarProductosDisponibles: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const clientId = executeFunctions.getNodeParameter("clienteId", itemIndex);
-	const documentDate: any = executeFunctions.getNodeParameter("documentDate", itemIndex);
-	const IdsRubro = executeFunctions.getNodeParameter("idsRubros", itemIndex);
-	const completeMigration = executeFunctions.getNodeParameter("migracionCompleta", itemIndex);
-	const IdsSubRubro = executeFunctions.getNodeParameter("idsSubRubros", itemIndex);
+	const clientId = helperFns.getNodeParameterOrThrow(executeFunctions, "clienteId", itemIndex);
+	const documentDate: any = helperFns.getNodeParameterOrThrow(executeFunctions, "documentDate", itemIndex);
+	const IdsRubro = helperFns.getNodeParameterOrThrow(executeFunctions, "rubroId", itemIndex);
+	const completeMigration = helperFns.getNodeParameterOrThrow(executeFunctions, "migracionCompleta", itemIndex);
+	const IdsSubRubro = helperFns.getNodeParameterOrThrow(executeFunctions, "idsSubRubros", itemIndex);
 	const formattedDocumentDate = documentDate.replace(/\..+/, "");
-	const dateModified = executeFunctions.getNodeParameter("dateModified", itemIndex);
-	const dateModifiedImage = executeFunctions.getNodeParameter("dateModifiedImage", itemIndex);
-	const priceDateModified = executeFunctions.getNodeParameter("priceDateModified", itemIndex);
-	const numeroPagina = executeFunctions.getNodeParameter("numeroPagina", itemIndex);
-	const cantidadPorPagina = executeFunctions.getNodeParameter("cantidadPorPagina", itemIndex);
+	const dateModified = helperFns.getNodeParameterOrThrow(executeFunctions, "dateModified", itemIndex);
+	const dateModifiedImage = helperFns.getNodeParameterOrThrow(executeFunctions, "dateModifiedImage", itemIndex);
+	const priceDateModified = helperFns.getNodeParameterOrThrow(executeFunctions, "priceDateModifiedTo", itemIndex);
+	const numeroPagina = helperFns.getNodeParameterOrThrow(executeFunctions, "numeroPagina", itemIndex);
+	const cantidadPorPagina = helperFns.getNodeParameterOrThrow(executeFunctions, "cantidadPorPagina", itemIndex);
 	const bodyToSend = {
 		idCliente: clientId,
 		FechaDocumento: formattedDocumentDate,
@@ -336,26 +336,28 @@ const consultarPrecioProducto: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const idArticulos = executeFunctions.getNodeParameter("articleId", itemIndex);
-	const idLista = executeFunctions.getNodeParameter("idList", itemIndex);
-	const clienteId = executeFunctions.getNodeParameter("clienteId", itemIndex);
-	const fechaDocumento = executeFunctions.getNodeParameter("documentDate", itemIndex);
-	const formattedDocumentDate = String(fechaDocumento).split("T")[0];
+	const idArticulos = helperFns.getNodeParameterOrThrow(executeFunctions, "articleId", itemIndex);
+	const idLista = helperFns.getNodeParameterOrThrow(executeFunctions, "idList", itemIndex);
+	const priceDateModifiedFrom = helperFns.getNodeParameterOrThrow(executeFunctions, "priceDateModifiedFrom", itemIndex);
+	const priceDateModifiedTo = helperFns.getNodeParameterOrThrow(executeFunctions, "priceDateModifiedTo", itemIndex);
+
+
 	const idsNum = String(idArticulos)
 		.split(",")
 		.map((s) => s.trim())
 		.filter(Boolean);
 
-	if (!idLista || !idArticulos) {
-		throw new NodeOperationError(executeFunctions.getNode(), "El id de la lista y el artículo son obligatorios.");
+	if (!idLista) {
+		throw new NodeOperationError(executeFunctions.getNode(), "El id de la lista es obligatorio.");
 	}
+	console.log(idLista);
 	try {
-		const articulo = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
+		const articulo = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/FiltrosPrecios`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
 			method: "POST",
 			headers,
-			body: { IdLista: idLista, IdCliente: clienteId, FechaDocumento: formattedDocumentDate, Ids: idsNum },
+			body: { IdLista: idLista, FechaPrecioActualizadoDesde: priceDateModifiedFrom, FechaPrecioActualizadoHasta: priceDateModifiedTo , IdsArticulos: idsNum },
 		});
 
 		return [executeFunctions.helpers.returnJsonArray(articulo)];
@@ -373,13 +375,13 @@ const listarProductosPorSucursal: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const IdSucursalFisica = executeFunctions.getNodeParameter("idSucursalFisica", itemIndex) as string;
-	const IdArticulo = executeFunctions.getNodeParameter("articleId", itemIndex) as string;
-	const NombreArticulo = executeFunctions.getNodeParameter("nombreArticulo", itemIndex) as string;
-	const IdRubro = executeFunctions.getNodeParameter("rubroId", itemIndex) as string;
-	const IdSubRubro = executeFunctions.getNodeParameter("idsSubRubros", itemIndex) as string;
-	const IdCategoriaArticulo = executeFunctions.getNodeParameter("IdCategoriaArticulo", itemIndex) as string;
-	const IdMarcaArticulo = executeFunctions.getNodeParameter("IdMarcaArticulo", itemIndex) as string;
+	const IdSucursalFisica = helperFns.getNodeParameterOrThrow(executeFunctions, "idSucursalFisica", itemIndex) as string;
+	const IdArticulo = helperFns.getNodeParameterOrThrow(executeFunctions, "articleId", itemIndex) as string;
+	const NombreArticulo = helperFns.getNodeParameterOrThrow(executeFunctions, "nombreArticulo", itemIndex) as string;
+	const IdRubro = helperFns.getNodeParameterOrThrow(executeFunctions, "rubroId", itemIndex) as string;
+	const IdSubRubro = helperFns.getNodeParameterOrThrow(executeFunctions, "idsSubRubros", itemIndex) as string;
+	const IdCategoriaArticulo = helperFns.getNodeParameterOrThrow(executeFunctions, "IdCategoriaArticulo", itemIndex) as string;
+	const IdMarcaArticulo = helperFns.getNodeParameterOrThrow(executeFunctions, "IdMarcaArticulo", itemIndex) as string;
 
 	// Si no filtra por artículo, sucursal + al menos una segmentación son obligatorios
 	if (!IdArticulo) {
@@ -428,8 +430,8 @@ const buscarProductoEnSucursal: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const IdSucursalFisica = executeFunctions.getNodeParameter("idSucursalFisica", itemIndex) as string;
-	const idArticulo = executeFunctions.getNodeParameter("articleId", itemIndex) as string;
+	const IdSucursalFisica = helperFns.getNodeParameterOrThrow(executeFunctions, "idSucursalFisica", itemIndex) as string;
+	const idArticulo = helperFns.getNodeParameterOrThrow(executeFunctions, "articleId", itemIndex) as string;
 	const queryParams: {
 		IdSucursalFisica?: string;
 		idsArticulos: string;
@@ -463,7 +465,7 @@ const listarCategorias: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const subRubro = executeFunctions.getNodeParameter("idsSubRubros", itemIndex);
+	const subRubro = helperFns.getNodeParameterOrThrow(executeFunctions, "idsSubRubros", itemIndex);
 	let url = `${centumUrl}/CategoriasArticulo`;
 
 	if (subRubro) {
@@ -538,7 +540,7 @@ const listarSubRubros: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const idRubro = executeFunctions.getNodeParameter("rubroId", itemIndex) as string;
+	const idRubro = helperFns.getNodeParameterOrThrow(executeFunctions, "rubroId", itemIndex) as string;
 	const queryParams: Record<string, string> = {};
 
 	if (idRubro) queryParams.idRubro = idRubro;
@@ -603,14 +605,14 @@ const sincronizarImagenes: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const dataImages = executeFunctions.getNodeParameter("dataImg", itemIndex) as {
+	const dataImages = helperFns.getNodeParameterOrThrow(executeFunctions, "dataImg", itemIndex) as {
 		json: {
 			idArticulo: number;
 			images: any[];
 			infoImages: { lastModified: string; orderNumber: number }[];
 		};
 	}[];
-	const db = executeFunctions.getNodeParameter("lastModifiedImg", itemIndex) as {
+	const db = helperFns.getNodeParameterOrThrow(executeFunctions, "lastModifiedImg", itemIndex) as {
 		articleId: number;
 		dataImage: { orderNumber: number; lastModified: string }[];
 	}[];

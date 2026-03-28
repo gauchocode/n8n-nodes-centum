@@ -2,80 +2,8 @@ import type { IExecuteFunctions, INodeExecutionData, INodeType, INodeTypeDescrip
 import { NodeConnectionType, NodeOperationError } from "n8n-workflow";
 
 import { CentumFields, CentumOperations, HttpOptions } from "./CentumDescription";
-import { resourceHandlers } from "./resources";
+import { resourceHandlerGroups } from "./resources";
 import type { CentumApiCredentials, CentumHeaders } from "./resources/tipos";
-
-const resourceCategoryMap: Record<string, string> = {
-	generarTokenSeguridad: "extras",
-	buscarProductos: "articulos",
-	buscarProductoPorCodigo: "articulos",
-	consultarStock: "stock",
-	listarProductosDisponibles: "articulos",
-	descargarImagenesProductos: "articulos",
-	listarTodosLosProductos: "articulos",
-	consultarPrecioProducto: "articulos",
-	listarProductosPorSucursal: "articulos",
-	buscarProductoEnSucursal: "articulos",
-	listarBonificaciones: "articulos",
-	listarCategorias: "articulos",
-	listarChoferes: "logistica",
-	actualizarCliente: "clientes",
-	buscarClientes: "clientes",
-	buscarClientePorCuit: "clientes",
-	listarClientes: "clientes",
-	crearCliente: "clientes",
-	verDetalleSaldoCliente: "clientes",
-	listarFacturasCobros: "clientes",
-	listarFacturasVenta: "clientes",
-	listarFacturasVentasPorID: "clientes",
-	listarPromocionesComercialesCliente: "clientes",
-	consultarSaldoCliente: "clientes",
-	buscarContribuyente: "clientes",
-	crearContribuyente: "clientes",
-	registrarCobro: "cobros",
-	listarCobros: "cobros",
-	crearCompra: "compras",
-	listarCompras: "compras",
-	listarComprobantesCompra: "compras",
-	listarComprobantesVenta: "ventas",
-	listarConceptos: "extras",
-	estadisticaVentaRanking: "ventas",
-	frecuenciasCliente: "clientes",
-	listarMarcas: "articulos",
-	listarMunicipios: "geografia",
-	listarOperadoresMoviles: "extras",
-	crearOrdenCompra: "compras",
-	verDetalleOrdenCompra: "compras",
-	crearMovimientoStock: "stock",
-	listarOrdenesCompra: "compras",
-	listarPaises: "geografia",
-	verDetallePedidoVenta: "ventas",
-	crearPedidoVenta: "ventas",
-	listarEstadosPedidosVenta: "ventas",
-	listarPedidosVenta: "ventas",
-	listarPedidosVentaFiltrados: "ventas",
-	listarPrecios: "articulos",
-	sincronizarImagenes: "extras",
-	convertirProductosParaWooCommerce: "extras",
-	listarPromociones: "ventas",
-	buscarProveedor: "proveedores",
-	crearProveedor: "proveedores",
-	listarProveedores: "proveedores",
-	listarProvincias: "geografia",
-	verDetalleRegimenEspecial: "extras",
-	listarRegimenesEspeciales: "extras",
-	crearRemitoCompra: "compras",
-	crearRemitoVenta: "logistica",
-	listarRubros: "articulos",
-	listarSubRubros: "articulos",
-	listarSucursales: "logistica",
-	listarTiposComprobante: "extras",
-	listarTurnosEntrega: "logistica",
-	listarUbicacionArticulos: "stock",
-	listarVendedores: "logistica",
-	crearVenta: "ventas",
-	verificarCredencialesOperador: "extras",
-};
 
 export class Centum implements INodeType {
 	description: INodeTypeDescription = {
@@ -113,18 +41,14 @@ export class Centum implements INodeType {
 			publicAccessKey: String(centumApiCredentials.publicAccessKey),
 		};
 
-		const nodeParameters = this.getNode().parameters as Record<string, unknown>;
-		const hasOperation = typeof nodeParameters.operation !== "undefined";
-
 		for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
 			try {
 				const resource = this.getNodeParameter("resource", itemIndex) as string;
-				const operation = hasOperation ? (this.getNodeParameter("operation", itemIndex) as string) : resource;
-				const resolvedResource = hasOperation && resourceHandlers[resource] && !resourceCategoryMap[resource] ? resource : operation;
-				const handler = resourceHandlers[resolvedResource];
+				const operation = this.getNodeParameter("operation", itemIndex) as string;
+				const handler = resourceHandlerGroups[resource]?.[operation];
 
 				if (!handler) {
-					throw new NodeOperationError(this.getNode(), `Operación no implementada: ${resolvedResource}`, { itemIndex });
+					throw new NodeOperationError(this.getNode(), `Operación no implementada para ${resource}: ${operation}`, { itemIndex });
 				}
 
 				const handlerResult = await handler({

@@ -100,7 +100,7 @@ const verDetalleRegimenEspecial: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const regimenId = executeFunctions.getNodeParameter("id", itemIndex);
+	const regimenId = helperFns.getNodeParameterOrThrow(executeFunctions, "id", itemIndex);
 	if (!regimenId) {
 		throw new NodeOperationError(executeFunctions.getNode(), "El ID del regimen es requerido");
 	}
@@ -172,8 +172,8 @@ const listarOperadoresMoviles: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const username = executeFunctions.getNodeParameter("username", itemIndex) as string;
-	const email = executeFunctions.getNodeParameter("email", itemIndex) as string;
+	const username = helperFns.getNodeParameterOrThrow(executeFunctions, "username", itemIndex) as string;
+	const email = helperFns.getNodeParameterOrThrow(executeFunctions, "email", itemIndex) as string;
 
 	const searchParams = new URLSearchParams();
 	if (username) {
@@ -206,7 +206,7 @@ const verificarCredencialesOperador: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const username = executeFunctions.getNodeParameter("username", itemIndex, "") as string;
+	const username = helperFns.getNodeParameterOrThrow(executeFunctions, "username", itemIndex, "") as string;
 	try {
 		const operadoresActividad = await helperFns.apiRequest<any>(`${centumUrl}/OperadoresMoviles?Usuario=${username}`, {
 			context: executeFunctions,

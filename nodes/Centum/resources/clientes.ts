@@ -10,7 +10,7 @@ const actualizarCliente: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const nuevosDatos = executeFunctions.getNodeParameter("cuerpoHTTP", itemIndex);
+	const nuevosDatos = helperFns.getNodeParameterOrThrow(executeFunctions, "cuerpoHTTP", itemIndex);
 	try {
 		const updateCustomer = await helperFns.apiRequest<any>(`${centumUrl}/Clientes/Actualizar`, {
 			context: executeFunctions,
@@ -34,9 +34,9 @@ const buscarClientes: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const codigo = executeFunctions.getNodeParameter("codigoCliente", itemIndex, "") as string;
-	const cuit = executeFunctions.getNodeParameter("cuit", itemIndex, "") as string;
-	const razonSocial = executeFunctions.getNodeParameter("razonSocial", itemIndex, "") as string;
+	const codigo = helperFns.getNodeParameterOrThrow(executeFunctions, "codigoCliente", itemIndex, "") as string;
+	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, "cuit", itemIndex, "") as string;
+	const razonSocial = helperFns.getNodeParameterOrThrow(executeFunctions, "razonSocial", itemIndex, "") as string;
 
 	if (!codigo && !cuit && !razonSocial) {
 		throw new NodeOperationError(executeFunctions.getNode(), "Debe proporcionar al menos un campo para la búsqueda (CUIT, Codigo o Razón Social).");
@@ -70,7 +70,7 @@ const buscarClientePorCuit: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const cuit = executeFunctions.getNodeParameter("cuit", itemIndex, "") as string;
+	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, "cuit", itemIndex, "") as string;
 
 	if (!cuit) {
 		throw new NodeOperationError(executeFunctions.getNode(), "Debe proporcionar CUIT para buscar clientes.");
@@ -135,14 +135,14 @@ const crearCliente: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const razonSocial = executeFunctions.getNodeParameter("razonSocial", itemIndex);
-	const cuit = executeFunctions.getNodeParameter("cuit", itemIndex);
-	const provincia = executeFunctions.getNodeParameter("idProvincia", itemIndex);
-	const pais = executeFunctions.getNodeParameter("idPais", itemIndex);
-	const zona = executeFunctions.getNodeParameter("idZona", itemIndex);
-	const condicionIVA = executeFunctions.getNodeParameter("condicionIVA", itemIndex);
-	const condicionVentaId = executeFunctions.getNodeParameter("idCondicionVenta", itemIndex);
-	const bonificacionId = executeFunctions.getNodeParameter("idBonificacion", itemIndex);
+	const razonSocial = helperFns.getNodeParameterOrThrow(executeFunctions, "razonSocial", itemIndex);
+	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, "cuit", itemIndex);
+	const provincia = helperFns.getNodeParameterOrThrow(executeFunctions, "idProvincia", itemIndex);
+	const pais = helperFns.getNodeParameterOrThrow(executeFunctions, "idPais", itemIndex);
+	const zona = helperFns.getNodeParameterOrThrow(executeFunctions, "idZona", itemIndex);
+	const condicionIVA = helperFns.getNodeParameterOrThrow(executeFunctions, "condicionIVA", itemIndex);
+	const condicionVentaId = helperFns.getNodeParameterOrThrow(executeFunctions, "idCondicionVenta", itemIndex);
+	const bonificacionId = helperFns.getNodeParameterOrThrow(executeFunctions, "idBonificacion", itemIndex);
 
 	try {
 		const crearCliente = await helperFns.apiRequest<any>(`${centumUrl}/Clientes`, {
@@ -226,8 +226,8 @@ const buscarContribuyente: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const cuit = executeFunctions.getNodeParameter("cuit", itemIndex, "") as string;
-	const razonSocial = executeFunctions.getNodeParameter("razonSocial", itemIndex, "") as string;
+	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, "cuit", itemIndex, "") as string;
+	const razonSocial = helperFns.getNodeParameterOrThrow(executeFunctions, "razonSocial", itemIndex, "") as string;
 
 	if (!cuit && !razonSocial) {
 		throw new NodeOperationError(executeFunctions.getNode(), "Debe proporcionar al menos CUIT o Razón Social para buscar contribuyentes.");
@@ -276,8 +276,8 @@ const crearContribuyente: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const bodyJson = executeFunctions.getNodeParameter("cuerpoHTTP", itemIndex) as any;
-	const cuit = executeFunctions.getNodeParameter("cuit", itemIndex);
+	const bodyJson = helperFns.getNodeParameterOrThrow(executeFunctions, "cuerpoHTTP", itemIndex) as any;
+	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, "cuit", itemIndex);
 
 	if (typeof cuit !== "string" || !/^\d{11}$/.test(cuit)) {
 		throw new NodeOperationError(executeFunctions.getNode(), "El CUIT debe ser una cadena de 11 dígitos numéricos.");
@@ -316,8 +316,8 @@ const consultarSaldoCliente: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const clientIdParam = executeFunctions.getNodeParameter("clienteId", itemIndex);
-	const desdeSaldoFecha = executeFunctions.getNodeParameter("priceDateModified", itemIndex);
+	const clientIdParam = helperFns.getNodeParameterOrThrow(executeFunctions, "clienteId", itemIndex);
+	const desdeSaldoFecha = helperFns.getNodeParameterOrThrow(executeFunctions, "priceDateModifiedTo", itemIndex);
 	const soloFecha = String(desdeSaldoFecha).split("T")[0];
 
 	// Validación de parámetros
@@ -354,8 +354,8 @@ const verDetalleSaldoCliente: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const clientIdParam = executeFunctions.getNodeParameter("clienteId", itemIndex);
-	const hastaSaldoFecha = executeFunctions.getNodeParameter("priceDateModified", itemIndex);
+	const clientIdParam = helperFns.getNodeParameterOrThrow(executeFunctions, "clienteId", itemIndex);
+	const hastaSaldoFecha = helperFns.getNodeParameterOrThrow(executeFunctions, "priceDateModifiedTo", itemIndex);
 	const separarFecha = String(hastaSaldoFecha).split("T")[0];
 
 	// Validación de parámetros
@@ -397,9 +397,9 @@ const listarPromocionesComercialesCliente: ResourceHandler = async (context) => 
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const clientIdParam = executeFunctions.getNodeParameter("clienteId", itemIndex);
-	const documentDate = executeFunctions.getNodeParameter("documentDate", itemIndex) as string;
-	const diaSemana = executeFunctions.getNodeParameter("diaSemana", itemIndex);
+	const clientIdParam = helperFns.getNodeParameterOrThrow(executeFunctions, "clienteId", itemIndex);
+	const documentDate = helperFns.getNodeParameterOrThrow(executeFunctions, "documentDate", itemIndex) as string;
+	const diaSemana = helperFns.getNodeParameterOrThrow(executeFunctions, "diaSemana", itemIndex);
 	const clientId = Number(clientIdParam);
 
 	if (!documentDate) {

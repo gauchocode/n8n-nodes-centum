@@ -10,7 +10,7 @@ const buscarProveedor: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const proveedorId = executeFunctions.getNodeParameter("proveedorId", itemIndex);
+	const proveedorId = helperFns.getNodeParameterOrThrow(executeFunctions, "proveedorId", itemIndex);
 
 	try {
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/Proveedores/${proveedorId}`, {
@@ -34,20 +34,20 @@ const crearProveedor: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const codigo = executeFunctions.getNodeParameter("codigoArticulo", itemIndex, "") as string;
-	const razonSocial = executeFunctions.getNodeParameter("razonSocial", itemIndex, "") as string;
-	const cuit = executeFunctions.getNodeParameter("cuit", itemIndex);
-	const provincia = executeFunctions.getNodeParameter("idProvincia", itemIndex);
-	const pais = executeFunctions.getNodeParameter("idPais", itemIndex);
-	const condicionIVA = executeFunctions.getNodeParameter("condicionIVA", itemIndex, "") as string;
-	const formaPagoProveedor = executeFunctions.getNodeParameter("formaPagoProveedor", itemIndex);
-	const condicionPago = executeFunctions.getNodeParameter("condicionDePago", itemIndex);
-	const categoriaImpuestoGanancias = executeFunctions.getNodeParameter("categoriaImpuestosGanancias", itemIndex);
-	const claseProveedor = executeFunctions.getNodeParameter("claseProveedor", itemIndex);
-	const activo = executeFunctions.getNodeParameter("active", itemIndex);
-	const idOperadorCompra = executeFunctions.getNodeParameter("idOperadorCompra", itemIndex);
-	const idZona = executeFunctions.getNodeParameter("idZona", itemIndex);
-	const idDescuentoProveedor = executeFunctions.getNodeParameter("idDescuentoProveedor", itemIndex);
+	const codigo = helperFns.getNodeParameterOrThrow(executeFunctions, "codigoArticulo", itemIndex, "") as string;
+	const razonSocial = helperFns.getNodeParameterOrThrow(executeFunctions, "razonSocial", itemIndex, "") as string;
+	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, "cuit", itemIndex);
+	const provincia = helperFns.getNodeParameterOrThrow(executeFunctions, "idProvincia", itemIndex);
+	const pais = helperFns.getNodeParameterOrThrow(executeFunctions, "idPais", itemIndex);
+	const condicionIVA = helperFns.getNodeParameterOrThrow(executeFunctions, "condicionIVA", itemIndex, "") as string;
+	const formaPagoProveedor = helperFns.getNodeParameterOrThrow(executeFunctions, "formaPagoProveedor", itemIndex);
+	const condicionPago = helperFns.getNodeParameterOrThrow(executeFunctions, "condicionDePago", itemIndex);
+	const categoriaImpuestoGanancias = helperFns.getNodeParameterOrThrow(executeFunctions, "categoriaImpuestosGanancias", itemIndex);
+	const claseProveedor = helperFns.getNodeParameterOrThrow(executeFunctions, "claseProveedor", itemIndex);
+	const activo = helperFns.getNodeParameterOrThrow(executeFunctions, "active", itemIndex);
+	const idOperadorCompra = helperFns.getNodeParameterOrThrow(executeFunctions, "idOperadorCompra", itemIndex);
+	const idZona = helperFns.getNodeParameterOrThrow(executeFunctions, "idZona", itemIndex);
+	const idDescuentoProveedor = helperFns.getNodeParameterOrThrow(executeFunctions, "idDescuentoProveedor", itemIndex);
 
 	const body = {
 		Codigo: codigo,
@@ -109,10 +109,10 @@ const listarProveedores: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const codigo = executeFunctions.getNodeParameter("codigo", itemIndex) as string | undefined;
-	const razonSocial = executeFunctions.getNodeParameter("razonSocial", itemIndex) as string | undefined;
-	const cuit = executeFunctions.getNodeParameter("cuit", itemIndex) as string | undefined;
-	const activo = executeFunctions.getNodeParameter("active", itemIndex) as boolean | undefined;
+	const codigo = helperFns.getNodeParameterOrThrow(executeFunctions, "codigo", itemIndex) as string | undefined;
+	const razonSocial = helperFns.getNodeParameterOrThrow(executeFunctions, "razonSocial", itemIndex) as string | undefined;
+	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, "cuit", itemIndex) as string | undefined;
+	const activo = helperFns.getNodeParameterOrThrow(executeFunctions, "active", itemIndex) as boolean | undefined;
 
 	// Better filtering function
 	const queryParams = Object.fromEntries(
