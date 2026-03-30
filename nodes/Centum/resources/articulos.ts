@@ -1,90 +1,52 @@
-import { NodeOperationError } from 'n8n-workflow';
-import * as helperFns from '../helpers/functions';
-import type { ResourceHandler, ResourceHandlerMap } from './tipos';
+import { NodeOperationError } from "n8n-workflow";
+import * as helperFns from "../helpers/functions";
+import type { ResourceHandler, ResourceHandlerMap } from "./tipos";
 
 const buscarProductos: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const nombreArticulo = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'nombreArticulo',
-		itemIndex,
-		'',
-	) as string;
-	const codigoArticulo = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'codigoArticulo',
-		itemIndex,
-		'',
-	) as string;
+	const nombreArticulo = helperFns.getNodeParameterOrThrow(executeFunctions, "nombreArticulo", itemIndex, "") as string;
+	const codigoArticulo = helperFns.getNodeParameterOrThrow(executeFunctions, "codigoArticulo", itemIndex, "") as string;
 
 	try {
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: 'POST',
+			method: "POST",
 			headers,
 			body: { Nombre: nombreArticulo, Codigo: codigoArticulo },
 		});
 
 		return [executeFunctions.helpers.returnJsonArray(response as any)];
 	} catch (error) {
-		throw new NodeOperationError(
-			executeFunctions.getNode(),
-			`Hubo un error al buscar el articulo. Error: ${error}`,
-		);
+		throw new NodeOperationError(executeFunctions.getNode(), `Hubo un error al buscar el articulo. Error: ${error}`);
 	}
 };
 
 const buscarProductoPorCodigo: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const codigoRaw = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'codigoArticulo',
-		itemIndex,
-	) as string;
-	const articleIdRaw = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'articleId',
-		itemIndex,
-	) as string;
+	const codigoRaw = helperFns.getNodeParameterOrThrow(executeFunctions, "codigoArticulo", itemIndex) as string;
+	const articleIdRaw = helperFns.getNodeParameterOrThrow(executeFunctions, "articleId", itemIndex) as string;
 
 	const codigo = codigoRaw.trim();
 	const ids = articleIdRaw
-		.split(',')
+		.split(",")
 		.map((s) => s.trim())
 		.filter(Boolean);
 
 	if (!codigo && ids.length === 0) {
-		throw new NodeOperationError(
-			executeFunctions.getNode(),
-			'El id o codigo del articulo es obligatorio',
-		);
+		throw new NodeOperationError(executeFunctions.getNode(), "El id o codigo del articulo es obligatorio");
 	}
 
 	try {
@@ -95,7 +57,7 @@ const buscarProductoPorCodigo: ResourceHandler = async (context) => {
 			articulo = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
 				context: executeFunctions,
 				debugItemIndex: itemIndex,
-				method: 'POST',
+				method: "POST",
 				headers,
 				body: { Ids: ids },
 			});
@@ -107,7 +69,7 @@ const buscarProductoPorCodigo: ResourceHandler = async (context) => {
 				articulo = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
 					context: executeFunctions,
 					debugItemIndex: itemIndex,
-					method: 'POST',
+					method: "POST",
 					headers,
 					body: { CodigoExacto: codigo },
 				});
@@ -117,7 +79,7 @@ const buscarProductoPorCodigo: ResourceHandler = async (context) => {
 			articulo = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
 				context: executeFunctions,
 				debugItemIndex: itemIndex,
-				method: 'POST',
+				method: "POST",
 				headers,
 				body: { CodigoExacto: codigo },
 			});
@@ -125,109 +87,64 @@ const buscarProductoPorCodigo: ResourceHandler = async (context) => {
 
 		return [executeFunctions.helpers.returnJsonArray(articulo)];
 	} catch (error) {
-		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
+		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
 
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
 const consultarStock: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const branchOfficeIds = String(
-		helperFns.getNodeParameterOrThrow(executeFunctions, 'branchOfficeIds', itemIndex),
-	);
+	const branchOfficeIds = String(helperFns.getNodeParameterOrThrow(executeFunctions, "branchOfficeIds", itemIndex));
 	try {
-		const dataArticulosExistencia = await helperFns.apiRequest<any>(
-			`${centumUrl}/ArticulosExistencias`,
-			{
-				context: executeFunctions,
-				debugItemIndex: itemIndex,
-				headers,
-				queryParams: {
-					idsSucursalesFisicas: branchOfficeIds,
-				},
+		const dataArticulosExistencia = await helperFns.apiRequest<any>(`${centumUrl}/ArticulosExistencias`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
+			headers,
+			queryParams: {
+				idsSucursalesFisicas: branchOfficeIds,
 			},
-		);
+		});
 
 		return [executeFunctions.helpers.returnJsonArray(dataArticulosExistencia.Items as any)];
 	} catch (error) {
-		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
+		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
 const listarProductosDisponibles: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const clientId = helperFns.getNodeParameterOrThrow(executeFunctions, 'clienteId', itemIndex);
-	const documentDate: any = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'documentDate',
-		itemIndex,
-	);
-	const IdsRubro = helperFns.getNodeParameterOrThrow(executeFunctions, 'rubroId', itemIndex);
-	const completeMigration = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'migracionCompleta',
-		itemIndex,
-	);
-	const IdsSubRubro = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'idsSubRubros',
-		itemIndex,
-	);
-	const formattedDocumentDate = documentDate.replace(/\..+/, '');
-	const dateModified = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'dateModified',
-		itemIndex,
-	);
-	const dateModifiedImage = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'dateModifiedImage',
-		itemIndex,
-	);
-	const priceDateModified = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'priceDateModifiedTo',
-		itemIndex,
-	);
+	const clientId = helperFns.getNodeParameterOrThrow(executeFunctions, "clienteId", itemIndex);
+	const documentDate: any = helperFns.getNodeParameterOrThrow(executeFunctions, "documentDate", itemIndex);
+	const IdsRubro = helperFns.getNodeParameterOrThrow(executeFunctions, "rubroId", itemIndex);
+	const completeMigration = helperFns.getNodeParameterOrThrow(executeFunctions, "migracionCompleta", itemIndex);
+	const IdsSubRubro = helperFns.getNodeParameterOrThrow(executeFunctions, "idsSubRubros", itemIndex);
+	const formattedDocumentDate = documentDate.replace(/\..+/, "");
+	const dateModified = helperFns.getNodeParameterOrThrow(executeFunctions, "dateModified", itemIndex);
+	const dateModifiedImage = helperFns.getNodeParameterOrThrow(executeFunctions, "dateModifiedImage", itemIndex);
+	const priceDateModified = helperFns.getNodeParameterOrThrow(executeFunctions, "priceDateModifiedTo", itemIndex);
 	const ajustesHTTP = helperFns.getHttpSettings.call(executeFunctions, itemIndex);
 	const bodyToSend = {
 		idCliente: clientId,
 		FechaDocumento: formattedDocumentDate,
 		incluirAtributosArticulos: true,
 		IdsRubro: IdsRubro ? [IdsRubro] : [],
-		IdsSubRubro: IdsSubRubro ? [IdsSubRubro] : [''],
-		fechaModificacionDesde: dateModified ? dateModified : '',
-		fechaModificacionImagenesDesde: dateModifiedImage ? dateModifiedImage : '',
+		IdsSubRubro: IdsSubRubro ? [IdsSubRubro] : [""],
+		fechaModificacionDesde: dateModified ? dateModified : "",
+		fechaModificacionImagenesDesde: dateModifiedImage ? dateModifiedImage : "",
 		fechaPrecioActualizadoDesde: priceDateModified,
 		numeroPagina: ajustesHTTP.numeroPagina,
 		cantidadPorPagina: ajustesHTTP.cantidadItemsPorPagina,
@@ -237,10 +154,10 @@ const listarProductosDisponibles: ResourceHandler = async (context) => {
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: 'POST',
+			method: "POST",
 			body: bodyToSend,
 			headers,
-			queryParams: { tipoOrdenArticulos: 'Codigo' },
+			queryParams: { tipoOrdenArticulos: "Codigo" },
 		});
 
 		if (response.Articulos.Items.length > 0) {
@@ -264,7 +181,7 @@ const listarProductosDisponibles: ResourceHandler = async (context) => {
 						FechaDocumento: formattedDocumentDate,
 						incluirAtributosArticulos: true,
 						IdsRubro: IdsRubro ? [IdsRubro] : [],
-						IdsSubRubro: IdsSubRubro ? [IdsSubRubro] : [''],
+						IdsSubRubro: IdsSubRubro ? [IdsSubRubro] : [""],
 						NombreGrupoArticulo: groupArticle.Nombre,
 						IdGrupoArticulo: groupArticle.IdGrupoArticulo,
 					};
@@ -273,25 +190,22 @@ const listarProductosDisponibles: ResourceHandler = async (context) => {
 						const response = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
 							context: executeFunctions,
 							debugItemIndex: itemIndex,
-							method: 'POST',
+							method: "POST",
 							headers: { ...headers }, // reusar headers de la primera request
 							body,
-							queryParams: { tipoOrdenArticulos: 'Codigo' },
+							queryParams: { tipoOrdenArticulos: "Codigo" },
 						});
 
 						if (response.Articulos.Items.length > 0) {
 							acc.push(...response.Articulos.Items);
 						}
 					} catch (error) {
-						const errorMessage =
-							error?.response?.data?.Message || (error as any).message || 'Error desconocido';
+						const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
 						throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 					}
 				}
 				const combinedArrays = [...acc, ...items];
-				const filteredArray = Array.from(
-					new Map(combinedArrays.map((obj) => [obj.IdArticulo, obj])).values(),
-				);
+				const filteredArray = Array.from(new Map(combinedArrays.map((obj) => [obj.IdArticulo, obj])).values());
 
 				const itemsArray = filteredArray.map((item: any) => ({
 					...item,
@@ -305,21 +219,13 @@ const listarProductosDisponibles: ResourceHandler = async (context) => {
 			return [executeFunctions.helpers.returnJsonArray([{}])];
 		}
 	} catch (error) {
-		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
+		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
 const descargarImagenesProductos: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
@@ -358,7 +264,7 @@ const descargarImagenesProductos: ResourceHandler = async (context) => {
 				const binary: any = {};
 				const dataImage = allArticleImages[j];
 				const buffer = Buffer.from(dataImage.buffer);
-				binary['data'] = await executeFunctions.helpers.prepareBinaryData(buffer);
+				binary["data"] = await executeFunctions.helpers.prepareBinaryData(buffer);
 				binary.data.fileName = `${element.json.Codigo}_${j + 1}.${binary.data.fileExtension}`;
 
 				dataObj.images!.push(binary);
@@ -383,14 +289,7 @@ const descargarImagenesProductos: ResourceHandler = async (context) => {
 };
 
 const listarTodosLosProductos: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
@@ -402,12 +301,12 @@ const listarTodosLosProductos: ResourceHandler = async (context) => {
 		const articulosURL = `${centumUrl}/Articulos/DatosGenerales`;
 
 		const fetchOptions: any = {
-			method: 'POST',
+			method: "POST",
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
 			headers,
 			body: {},
-			queryParams: { tipoOrdenArticulos: 'Nombre' },
+			queryParams: { tipoOrdenArticulos: "Nombre" },
 			pagination: ajustesHTTP.pagination,
 			cantidadItemsPorPagina: ajustesHTTP.cantidadItemsPorPagina,
 			intervaloPagina: ajustesHTTP.intervaloPagina,
@@ -416,7 +315,7 @@ const listarTodosLosProductos: ResourceHandler = async (context) => {
 		const paginated = await helperFns.apiPostRequestPaginated<any>(articulosURL, fetchOptions);
 		return [executeFunctions.helpers.returnJsonArray(paginated as any)];
 	} catch (error) {
-		let errorMessage = 'Error desconocido';
+		let errorMessage = "Error desconocido";
 
 		if ((error as any)?.response?.data?.Message) {
 			errorMessage = (error as any).response.data.Message;
@@ -429,129 +328,90 @@ const listarTodosLosProductos: ResourceHandler = async (context) => {
 };
 
 const consultarPrecioProducto: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const idArticulos = helperFns.getNodeParameterOrThrow(executeFunctions, 'articleId', itemIndex);
-	const idLista = helperFns.getNodeParameterOrThrow(executeFunctions, 'idList', itemIndex);
-	const priceDateModifiedFrom = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'priceDateModifiedFrom',
-		itemIndex,
-	);
-	const priceDateModifiedTo = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'priceDateModifiedTo',
-		itemIndex,
-	);
+	const idArticulos = helperFns.getNodeParameterOrThrow(executeFunctions, "articleId", itemIndex, "");
+	const idLista = helperFns.getNodeParameterOrThrow(executeFunctions, "idList", itemIndex);
+	const priceDateModifiedFrom = helperFns.getNodeParameterOrThrow(executeFunctions, "priceDateModifiedFrom", itemIndex);
+	const priceDateModifiedTo = helperFns.getNodeParameterOrThrow(executeFunctions, "priceDateModifiedTo", itemIndex);
 
-	const idsNum = String(idArticulos)
-		.split(',')
+	const articleIds = String(idArticulos)
+		.split(",")
 		.map((s) => s.trim())
 		.filter(Boolean);
 
-	if (!idLista) {
-		throw new NodeOperationError(executeFunctions.getNode(), 'El id de la lista es obligatorio.');
+	if (articleIds.length > 1) {
+		throw new NodeOperationError(executeFunctions.getNode(), "La consulta de precio por producto admite un unico ID de articulo.");
 	}
+
+	if (!idLista) {
+		throw new NodeOperationError(executeFunctions.getNode(), "El id de la lista es obligatorio.");
+	}
+
+	const requestBody: Record<string, string | number> = {
+		IdLista: Number(idLista),
+	};
+
+	if (articleIds.length === 1) {
+		const articleIdValue = Number(articleIds[0]);
+		requestBody.IdsArticulos = Number.isFinite(articleIdValue) ? articleIdValue : articleIds[0];
+	}
+
+	if (priceDateModifiedFrom) {
+		requestBody.FechaPrecioActualizadoDesde = String(priceDateModifiedFrom);
+	}
+
+	if (priceDateModifiedTo) {
+		requestBody.FechaPrecioActualizadoHasta = String(priceDateModifiedTo);
+	}
+
 	try {
 		const articulo = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/FiltrosPrecios`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: 'POST',
+			method: "POST",
 			headers,
-			body: {
-				IdLista: idLista,
-				FechaPrecioActualizadoDesde: priceDateModifiedFrom,
-				FechaPrecioActualizadoHasta: priceDateModifiedTo,
-				IdsArticulos: idsNum,
-			},
+			body: requestBody,
 		});
-
 		return [executeFunctions.helpers.returnJsonArray(articulo)];
 	} catch (error) {
-		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
+		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
 const listarProductosPorSucursal: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const IdSucursalFisica = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'idSucursalFisica',
-		itemIndex,
-	) as string;
-	const IdArticulo = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'articleId',
-		itemIndex,
-	) as string;
-	const NombreArticulo = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'nombreArticulo',
-		itemIndex,
-	) as string;
-	const IdRubro = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'rubroId',
-		itemIndex,
-	) as string;
-	const IdSubRubro = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'idsSubRubros',
-		itemIndex,
-	) as string;
-	const IdCategoriaArticulo = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'IdCategoriaArticulo',
-		itemIndex,
-	) as string;
-	const IdMarcaArticulo = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'IdMarcaArticulo',
-		itemIndex,
-	) as string;
+	const IdSucursalFisica = helperFns.getNodeParameterOrThrow(executeFunctions, "idSucursalFisica", itemIndex) as string;
+	const IdArticulo = helperFns.getNodeParameterOrThrow(executeFunctions, "articleId", itemIndex) as string;
+	const NombreArticulo = helperFns.getNodeParameterOrThrow(executeFunctions, "nombreArticulo", itemIndex) as string;
+	const IdRubro = helperFns.getNodeParameterOrThrow(executeFunctions, "rubroId", itemIndex) as string;
+	const IdSubRubro = helperFns.getNodeParameterOrThrow(executeFunctions, "idsSubRubros", itemIndex) as string;
+	const IdCategoriaArticulo = helperFns.getNodeParameterOrThrow(executeFunctions, "IdCategoriaArticulo", itemIndex) as string;
+	const IdMarcaArticulo = helperFns.getNodeParameterOrThrow(executeFunctions, "IdMarcaArticulo", itemIndex) as string;
 
 	// Si no filtra por artículo, sucursal + al menos una segmentación son obligatorios
 	if (!IdArticulo) {
 		if (!IdSucursalFisica) {
-			throw new NodeOperationError(
-				executeFunctions.getNode(),
-				'Si no filtra por artículo, el id de la sucursal física es obligatorio',
-			);
+			throw new NodeOperationError(executeFunctions.getNode(), "Si no filtra por artículo, el id de la sucursal física es obligatorio");
 		}
 
-		const tieneSegmentacion =
-			NombreArticulo || IdRubro || IdSubRubro || IdCategoriaArticulo || IdMarcaArticulo;
+		const tieneSegmentacion = NombreArticulo || IdRubro || IdSubRubro || IdCategoriaArticulo || IdMarcaArticulo;
 		if (!tieneSegmentacion) {
 			throw new NodeOperationError(
 				executeFunctions.getNode(),
-				'Si no filtra por artículo, debe especificar al menos una segmentación: Nombre, IdRubro, IdSubRubro, IdCategoriaArticulo o IdMarcaArticulo',
+				"Si no filtra por artículo, debe especificar al menos una segmentación: Nombre, IdRubro, IdSubRubro, IdCategoriaArticulo o IdMarcaArticulo",
 			);
 		}
 	}
@@ -567,48 +427,29 @@ const listarProductosPorSucursal: ResourceHandler = async (context) => {
 	if (IdMarcaArticulo) queryParams.idMarcaArticulo = IdMarcaArticulo;
 
 	try {
-		const dataArticulosExistencias = await helperFns.apiRequest<any>(
-			`${centumUrl}/ArticulosSucursalesFisicas`,
-			{
-				context: executeFunctions,
-				debugItemIndex: itemIndex,
-				headers,
-				queryParams,
-			},
-		);
+		const dataArticulosExistencias = await helperFns.apiRequest<any>(`${centumUrl}/ArticulosSucursalesFisicas`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
+			headers,
+			queryParams,
+		});
 		return [executeFunctions.helpers.returnJsonArray(dataArticulosExistencias.Items as any)];
 	} catch (error) {
-		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
+		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
 const buscarProductoEnSucursal: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const IdSucursalFisica = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'idSucursalFisica',
-		itemIndex,
-	) as string;
-	const idArticulo = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'articleId',
-		itemIndex,
-	) as string;
+	const IdSucursalFisica = helperFns.getNodeParameterOrThrow(executeFunctions, "idSucursalFisica", itemIndex) as string;
+	const idArticulo = helperFns.getNodeParameterOrThrow(executeFunctions, "articleId", itemIndex) as string;
 	const queryParams: {
 		IdSucursalFisica?: string;
 		idsArticulos: string;
@@ -618,45 +459,31 @@ const buscarProductoEnSucursal: ResourceHandler = async (context) => {
 	};
 
 	if (!IdSucursalFisica || !idArticulo) {
-		throw new NodeOperationError(
-			executeFunctions.getNode(),
-			'El id de la sucursal fisica y el id del articulo son obligatorios',
-		);
+		throw new NodeOperationError(executeFunctions.getNode(), "El id de la sucursal fisica y el id del articulo son obligatorios");
 	}
 	try {
-		const dataArticulosExistencias = await helperFns.apiRequest<any>(
-			`${centumUrl}/ArticulosSucursalesFisicas`,
-			{
-				context: executeFunctions,
-				debugItemIndex: itemIndex,
-				headers,
-				queryParams,
-			},
-		);
+		const dataArticulosExistencias = await helperFns.apiRequest<any>(`${centumUrl}/ArticulosSucursalesFisicas`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
+			headers,
+			queryParams,
+		});
 		return [executeFunctions.helpers.returnJsonArray(dataArticulosExistencias.Items as any)];
 	} catch (error) {
-		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
+		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
 const listarCategorias: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const subRubro = helperFns.getNodeParameterOrThrow(executeFunctions, 'idsSubRubros', itemIndex);
+	const subRubro = helperFns.getNodeParameterOrThrow(executeFunctions, "idsSubRubros", itemIndex);
 	let url = `${centumUrl}/CategoriasArticulo`;
 
 	if (subRubro) {
@@ -667,28 +494,18 @@ const listarCategorias: ResourceHandler = async (context) => {
 		const response = await helperFns.apiRequest<any>(url, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: 'GET',
+			method: "GET",
 			headers,
 		});
 
 		return [executeFunctions.helpers.returnJsonArray(response)];
 	} catch (error) {
-		throw new NodeOperationError(
-			executeFunctions.getNode(),
-			`Hubo un error al obtener el listado de categorias. Error: ${error}`,
-		);
+		throw new NodeOperationError(executeFunctions.getNode(), `Hubo un error al obtener el listado de categorias. Error: ${error}`);
 	}
 };
 
 const listarMarcas: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
@@ -699,30 +516,19 @@ const listarMarcas: ResourceHandler = async (context) => {
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/MarcasArticulo`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: 'GET',
+			method: "GET",
 			headers,
 		});
 
 		return [executeFunctions.helpers.returnJsonArray(response)];
 	} catch (error) {
-		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
-		throw new NodeOperationError(
-			executeFunctions.getNode(),
-			`Error en obtener el listado de marcas. \n ${errorMessage}`,
-		);
+		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
+		throw new NodeOperationError(executeFunctions.getNode(), `Error en obtener el listado de marcas. \n ${errorMessage}`);
 	}
 };
 
 const listarRubros: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
@@ -733,38 +539,26 @@ const listarRubros: ResourceHandler = async (context) => {
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/Rubros`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: 'GET',
+			method: "GET",
 			headers,
 		});
 
 		return [executeFunctions.helpers.returnJsonArray(response)];
 	} catch (error) {
-		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
+		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
 const listarSubRubros: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const idRubro = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'rubroId',
-		itemIndex,
-	) as string;
+	const idRubro = helperFns.getNodeParameterOrThrow(executeFunctions, "rubroId", itemIndex) as string;
 	const queryParams: Record<string, string> = {};
 
 	if (idRubro) queryParams.idRubro = idRubro;
@@ -773,27 +567,19 @@ const listarSubRubros: ResourceHandler = async (context) => {
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/SubRubros`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: 'GET',
+			method: "GET",
 			headers,
 			queryParams,
 		});
 		return [executeFunctions.helpers.returnJsonArray(response)];
 	} catch (error) {
-		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
+		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
 const listarUbicacionArticulos: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
@@ -801,35 +587,21 @@ const listarUbicacionArticulos: ResourceHandler = async (context) => {
 	void consumerApiPublicId;
 
 	try {
-		const ubicacionArticulos = await helperFns.apiRequest<any>(
-			`${centumUrl}/UbicacionesArticulos`,
-			{
-				context: executeFunctions,
-				debugItemIndex: itemIndex,
-				method: 'GET',
-				headers,
-			},
-		);
+		const ubicacionArticulos = await helperFns.apiRequest<any>(`${centumUrl}/UbicacionesArticulos`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
+			method: "GET",
+			headers,
+		});
 		return [executeFunctions.helpers.returnJsonArray(ubicacionArticulos)];
 	} catch (error) {
-		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
-		throw new NodeOperationError(
-			executeFunctions.getNode(),
-			`Error obteniendo las ubicaciones de los articulos: ${errorMessage}`,
-		);
+		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
+		throw new NodeOperationError(executeFunctions.getNode(), `Error obteniendo las ubicaciones de los articulos: ${errorMessage}`);
 	}
 };
 
 const convertirProductosParaWooCommerce: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
@@ -844,28 +616,21 @@ const convertirProductosParaWooCommerce: ResourceHandler = async (context) => {
 };
 
 const sincronizarImagenes: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
+	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const dataImages = helperFns.getNodeParameterOrThrow(executeFunctions, 'dataImg', itemIndex) as {
+	const dataImages = helperFns.getNodeParameterOrThrow(executeFunctions, "dataImg", itemIndex) as {
 		json: {
 			idArticulo: number;
 			images: any[];
 			infoImages: { lastModified: string; orderNumber: number }[];
 		};
 	}[];
-	const db = helperFns.getNodeParameterOrThrow(executeFunctions, 'lastModifiedImg', itemIndex) as {
+	const db = helperFns.getNodeParameterOrThrow(executeFunctions, "lastModifiedImg", itemIndex) as {
 		articleId: number;
 		dataImage: { orderNumber: number; lastModified: string }[];
 	}[];
@@ -884,9 +649,7 @@ const sincronizarImagenes: ResourceHandler = async (context) => {
 			if (!articleInDB) {
 				result.push({ json: {}, binary: currentData });
 			} else {
-				const currentImageInDB = articleInDB.dataImage.find(
-					(dataImageDB) => dataImageDB.orderNumber === currentInfoImage.orderNumber,
-				);
+				const currentImageInDB = articleInDB.dataImage.find((dataImageDB) => dataImageDB.orderNumber === currentInfoImage.orderNumber);
 
 				if (currentImageInDB?.lastModified !== currentInfoImage.lastModified) {
 					result.push({ json: {}, binary: currentData });

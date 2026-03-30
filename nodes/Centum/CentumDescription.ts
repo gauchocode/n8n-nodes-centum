@@ -325,8 +325,7 @@ const getArticulo: INodeProperties[] = [
 					'crearCompra',
 					'crearPedidoVenta',
 					'crearOrdenCompra',
-					'listarPromociones',
-					'consultarPrecioProducto',
+					'listarPromociones'
 				],
 			},
 		},

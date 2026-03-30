@@ -18,76 +18,106 @@ The node is built to be extensible, making it easy to add new operations for spe
 
 ## Available Operations
 
-**55 endpoints organized into 5 categories:**
+**69 operations organized into 10 resources:**
 
-### 📦 Articles
+### Articles (`articulos`)
 
-- `articulo`: Search articles with filters (categories, dates, stock)
-- `articuloPorId`: Query by exact ID or code
-- `articuloPorNombre`: Query by article name
-- `articulosDatosGenerales`: Retrieve general article data
-- `articulosExistencia`: Stock availability by branch
-- `articulosImagenes`: Download and process article images
-- `articulosPrecioPorLista`: Prices by price list
-- `articulosSucursalesFisicas`: Articles grouped by branch
-- `articuloSucursalFisica`: Specific article in branch
-- `buscarArticulo`: Search article by name or code
-- `categoriasObtener`: List categories
-- `marcasObtener`: List brands
-- `rubrosObtener`: List product groups
+- `buscarProductos`: Search articles by name and return every match.
+- `buscarProductoPorCodigo`: Get a specific article by its unique ID.
+- `listarProductosDisponibles`: List sellable articles using filters.
+- `descargarImagenesProductos`: Download the binary image for an article.
+- `listarTodosLosProductos`: List article general data.
+- `consultarPrecioProducto`: Get the price of an article for a selected price list.
+- `listarProductosPorSucursal`: List article stock for a physical branch.
+- `buscarProductoEnSucursal`: Get stock for a specific article in a physical branch.
+- `listarBonificaciones`: List available discounts.
+- `listarCategorias`: List article categories.
+- `listarMarcas`: List article brands.
+- `listarPrecios`: List suggested product prices.
+- `listarRubros`: List article groups.
+- `listarSubRubros`: List subgroups or filter them by ID.
 
-### 👤 Customers
+### Customers (`clientes`)
 
-- `clienteNuevo`: Create a new customer
-- `nuevoContribuyente`: Register a taxpayer with CUIT
-- `clientes`: Paginated customer list
-- `clientesActualizar`: Update customer data
-- `clientesBusqueda`: Search by email or DNI
-- `clientesBusquedaPorCuit`: Search by CUIT
-- `buscarContribuyente`: Search taxpayer
-- `composicionSaldoCliente`: Detailed account status
-- `obtenerSaldoCliente`: Current account balance
+- `actualizarCliente`: Update a customer and return the updated resource information.
+- `buscarClientes`: Search customers using filters.
+- `buscarClientePorCuit`: Search customers by CUIT.
+- `listarClientes`: List all registered customers.
+- `crearCliente`: Create a new customer.
+- `verDetalleSaldoCliente`: Get the detailed account balance composition for a customer.
+- `listarFacturasCobros`: Get all payment invoices for a customer.
+- `listarFacturasVenta`: Get all sales invoices for a customer.
+- `listarFacturasVentasPorID`: Get sales invoices for a customer by ID.
+- `listarPromocionesComercialesCliente`: Get commercial promotions applied to a customer from a selected date.
+- `consultarSaldoCliente`: Get the current customer balance.
+- `buscarContribuyente`: Search taxpayer data by CUIT or business name.
+- `crearContribuyente`: Create a new taxpayer customer.
+- `frecuenciasCliente`: List customer frequency options.
 
-### 💳 Orders and Payments
+### Sales (`ventas`)
 
-- `cobros`: Register a payment
-- `obtenerCobros`: Filter payments
-- `obtenerFacturasCobros`: Payment invoice history
-- `crearPedidoVenta`: Create a sales order
-- `obtenerPedidosDeVenta`: List sales orders
-- `obtenerFacturasPedidosVentas`: Sales order invoice history
-- `obtenerFacturasPedidosVentasPorID`: Sales order invoice history by ID
-- `obtenerEstadosPedidosDeVenta`: Available sales order statuses
-- `pedidoVentaActividad`: Check sales order activity
-- `generarVentas`: Generate a sale
-- `generarCompras`: Generate a purchase
-- `obtenerCompras`: Filter purchases
-- `generarOrdenCompra`: Generate a purchase order
-- `obtenerOrdenCompra`: Get purchase order by ID
-- `obtenerOrdenesCompras`: Filter purchase orders
-- `obtenerBonificaciones`: Get available discounts
+- `listarComprobantesVenta`: List sales vouchers using filters.
+- `estadisticaVentaRanking`: Get sales rankings for customers, articles, sellers, or branches.
+- `verDetallePedidoVenta`: Get a sales order by its unique ID.
+- `crearPedidoVenta`: Create a sales order for selected articles.
+- `listarEstadosPedidosVenta`: List available sales order statuses.
+- `listarPedidosVenta`: List sales orders using filters.
+- `listarPedidosVentaFiltrados`: List sales orders with a lighter response body.
+- `listarPromociones`: List available commercial promotions.
+- `crearVenta`: Generate a sale from the provided parameters.
 
-### 🌍 Catalogs
+### Payments (`cobros`)
 
-- `provinciasLista`: List of provinces (Argentina)
-- `departamentosLista`: Departments by province
-- `sucursalesFisicas`: Physical branches
-- `listaPrecios`: Available price lists
-- `promocionesCliente`: Commercial promotions for customers
-- `regimenesEspecialesLista`: Special tax regimes
-- `regimenesEspecialesPorId`: Special regime by ID
-- `tipoComprobante`: Voucher types
-- `obtenerTurnoEntrega`: Get delivery time slots
-- `obtenerVendedores`: Get sales representatives
+- `registrarCobro`: Register a payment voucher.
+- `listarCobros`: List payments using filters.
 
-### ⚙️ Utilities
+### Purchases (`compras`)
 
-- `generarProductosWoo`: Transform data to WooCommerce format
-- `procesarImagenes`: Image processing and synchronization
-- `generarToken`: Authentication token generation
-- `operadoresMoviles`: Retrieve mobile operator data based on credentials
-- `proveedorBuscar`: Search supplier by ID
-- `proveedorCrear`: Create a new supplier
+- `crearCompra`: Generate a purchase.
+- `listarCompras`: List purchases using filters.
+- `listarComprobantesCompra`: List purchase vouchers using filters.
+- `crearOrdenCompra`: Generate a purchase order.
+- `verDetalleOrdenCompra`: Get a purchase order by ID.
+- `listarOrdenesCompra`: List purchase orders using filters.
+- `crearRemitoCompra`: Create a purchase delivery note.
+
+### Suppliers (`proveedores`)
+
+- `buscarProveedor`: Get supplier information by ID.
+- `crearProveedor`: Create a supplier.
+- `listarProveedores`: List all suppliers.
+
+### Logistics (`logistica`)
+
+- `listarChoferes`: List available drivers.
+- `crearRemitoVenta`: Create a sales delivery note.
+- `listarSucursales`: List physical branches.
+- `listarTurnosEntrega`: List available delivery time slots.
+- `listarVendedores`: List available sellers.
+
+### Stock (`stock`)
+
+- `consultarStock`: List article stock using filters.
+- `crearMovimientoStock`: Create a stock movement adjustment.
+- `listarUbicacionArticulos`: List article locations.
+
+### Geography (`geografia`)
+
+- `listarMunicipios`: List municipalities, usually filtered by province.
+- `listarPaises`: List available countries.
+- `listarProvincias`: List provinces, usually filtered by country.
+
+### Extras (`extras`)
+
+- `generarTokenSeguridad`: Generate a token for external tools such as Postman.
+- `listarConceptos`: List concepts.
+- `listarOperadoresMoviles`: List mobile operators.
+- `sincronizarImagenes`: Process binary image data for WooCommerce usage.
+- `convertirProductosParaWooCommerce`: Generate WooCommerce-ready product JSON from Centum articles.
+- `verDetalleRegimenEspecial`: Get a special tax regime by ID.
+- `listarRegimenesEspeciales`: List special tax regimes.
+- `listarTiposComprobante`: List voucher types.
+- `verificarCredencialesOperador`: Get mobile operator data using the configured credentials.
 
 ## Prerequisites
 
