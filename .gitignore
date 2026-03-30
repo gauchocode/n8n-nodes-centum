@@ -6,6 +6,7 @@ tmp
 .vscode
 .prettierrc
 settings.local*
+.env
 
 
 

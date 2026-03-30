@@ -1,5 +1,12 @@
-import { randomUUID, createHash as cryptoCreateHash } from "crypto";
-import { constantProvincias, wooToCentumProvinciaMap, constantsZonas, CondicionesIVA, CondicionesIIBB, CategoriasIIBB } from "../constants";
+import { randomUUID, createHash as cryptoCreateHash } from 'crypto';
+import {
+	constantProvincias,
+	wooToCentumProvinciaMap,
+	constantsZonas,
+	CondicionesIVA,
+	CondicionesIIBB,
+	CategoriasIIBB,
+} from '../constants';
 
 import {
 	IWoo,
@@ -23,18 +30,23 @@ import {
 	CondicionIIBBCodigo,
 	IProvincias,
 	CondicionIVANombre,
-} from "../interfaces";
-import { NodeParameterValue, IExecuteFunctions, NodeOperationError, NodeParameterValueType } from "n8n-workflow";
-import type { CentumHeaders } from "../resources/tipos";
+} from '../interfaces';
+import {
+	NodeParameterValue,
+	IExecuteFunctions,
+	NodeOperationError,
+	NodeParameterValueType,
+} from 'n8n-workflow';
+import type { CentumHeaders } from '../resources/tipos';
 
 export const createHash = (publicAccessKey: string): string => {
-	const uuid = randomUUID().replace(/-/gi, "");
+	const uuid = randomUUID().replace(/-/gi, '');
 	//yyyy-MM-ddTHH:mm:ss
-	const currentDateFormatted = new Date().toISOString().replace(/\..+/, "");
+	const currentDateFormatted = new Date().toISOString().replace(/\..+/, '');
 
-	const hash = cryptoCreateHash("sha1");
+	const hash = cryptoCreateHash('sha1');
 	hash.update(`${currentDateFormatted} ${uuid} ${publicAccessKey}`);
-	const hashedResult = hash.digest("hex");
+	const hashedResult = hash.digest('hex');
 
 	return `${currentDateFormatted} ${uuid} ${hashedResult}`;
 };
@@ -49,71 +61,74 @@ export const createCustomerJson = (respWoo: IWoo, dni: string) => {
 		IdCliente: -1,
 		Localidad: respWoo.billing.city,
 		RazonSocial: `${respWoo.billing.first_name} ${respWoo.billing.last_name}`,
-		Email: respWoo.billing.email || "",
-		Provincia: constantProvincias.find((prov) => prov.Nombre.toLocaleLowerCase() === respWoo.billing.state.toLocaleLowerCase()) || constantProvincias[5],
+		Email: respWoo.billing.email || '',
+		Provincia:
+			constantProvincias.find(
+				(prov) => prov.Nombre.toLocaleLowerCase() === respWoo.billing.state.toLocaleLowerCase(),
+			) || constantProvincias[5],
 		Pais: {
-			Codigo: "ARG",
+			Codigo: 'ARG',
 			IdPais: 4657,
-			Nombre: "Argentina",
+			Nombre: 'Argentina',
 		},
 		Telefono: respWoo.billing.phone,
 		DireccionEntrega: respWoo.shipping.address_1,
 		CigarreraCliente: {
-			Codigo: "MSP",
+			Codigo: 'MSP',
 			IdCigarreraCliente: 6972,
-			Nombre: "Massalin Particulares",
+			Nombre: 'Massalin Particulares',
 		},
 		Bonificacion: {
 			Calculada: 0,
-			Codigo: "01",
+			Codigo: '01',
 			IdBonificacion: 6235,
 		},
 		ClaseCliente: {
 			IdClaseCliente: 6087,
-			Codigo: "ClaseDefecto",
-			Nombre: "Clase Defecto",
+			Codigo: 'ClaseDefecto',
+			Nombre: 'Clase Defecto',
 		},
 		CadenaCliente: {
-			Codigo: "365",
+			Codigo: '365',
 			IdCadenaCliente: 6920,
-			Nombre: "365",
+			Nombre: '365',
 		},
 		CondicionVenta: {
-			Codigo: "VTA1",
+			Codigo: 'VTA1',
 			IdCondicionVenta: 1,
-			Nombre: "Contado",
+			Nombre: 'Contado',
 		},
 		DiasAtencionCliente: {
-			Codigo: "LD",
+			Codigo: 'LD',
 			IdDiasAtencionCliente: 6969,
-			Nombre: "Lunes a Domingo",
+			Nombre: 'Lunes a Domingo',
 		},
 		EdadesPromedioConsumidoresCliente: {
-			Codigo: "111",
+			Codigo: '111',
 			IdEdadesPromedioConsumidoresCliente: 6951,
-			Nombre: "Hay igual cantidad de consumidores",
+			Nombre: 'Hay igual cantidad de consumidores',
 		},
 		FrecuenciaCliente: {
 			IdFrecuenciaCliente: 6891,
-			Nombre: "Frecuencia Defecto",
+			Nombre: 'Frecuencia Defecto',
 		},
 		GeneroPromedioConsumidoresCliente: {
-			Codigo: "11",
+			Codigo: '11',
 			IdGeneroPromedioConsumidoresCliente: 6964,
-			Nombre: "Hay igual cantidad de consumidores",
+			Nombre: 'Hay igual cantidad de consumidores',
 		},
 		HorarioAtencionCliente: {
-			Codigo: "D",
+			Codigo: 'D',
 			IdHorarioAtencionCliente: 6970,
-			Nombre: "Diurno",
+			Nombre: 'Diurno',
 		},
 		LimiteCredito: {
 			IdLimiteCredito: 46002,
-			Nombre: "Límite Credito 1",
+			Nombre: 'Límite Credito 1',
 			Valor: 1000000,
 		},
 		Transporte: {
-			Codigo: "TRA1",
+			Codigo: 'TRA1',
 			CodigoPostal: null,
 			CodigoPostalEntrega: null,
 			Direccion: null,
@@ -122,44 +137,44 @@ export const createCustomerJson = (respWoo: IWoo, dni: string) => {
 			IdTransporte: 1,
 			Localidad: null,
 			LocalidadEntrega: null,
-			NumeroDocumento: "00000000",
+			NumeroDocumento: '00000000',
 			Pais: {
-				Codigo: "ARG",
+				Codigo: 'ARG',
 				IdPais: 4657,
-				Nombre: "Argentina",
+				Nombre: 'Argentina',
 			},
 			PaisEntrega: null,
 			Provincia: {
-				Codigo: "BSAS",
+				Codigo: 'BSAS',
 				IdProvincia: 4876,
-				Nombre: "Buenos Aires",
+				Nombre: 'Buenos Aires',
 			},
 			ProvinciaEntrega: null,
-			RazonSocial: "Transporte Defecto",
-			Telefono: "",
+			RazonSocial: 'Transporte Defecto',
+			Telefono: '',
 			TipoDocumento: {
-				Codigo: "DNI",
+				Codigo: 'DNI',
 				IdTipoDocumento: 6028,
-				Nombre: "Documento Nacional de Identidad",
+				Nombre: 'Documento Nacional de Identidad',
 			},
 			ZonaEntrega: null,
 		},
 		UbicacionCliente: {
-			Codigo: "BAR",
+			Codigo: 'BAR',
 			IdUbicacionCliente: 6942,
-			Nombre: "Zona de Bares y Boliches",
+			Nombre: 'Zona de Bares y Boliches',
 		},
 		CondicionIVA: {
 			IdCondicionIVA: 1892,
-			Codigo: "CF",
-			Nombre: "Consumidor Final",
+			Codigo: 'CF',
+			Nombre: 'Consumidor Final',
 		},
 		CUIT: `${dni}`,
 		Codigo: `web-${dni}`,
 		Vendedor: {
 			IdVendedor: 12,
-			Codigo: "V11",
-			Nombre: "EXITOWEB",
+			Codigo: 'V11',
+			Nombre: 'EXITOWEB',
 			CUIT: null,
 			Direccion: null,
 			Localidad: null,
@@ -168,11 +183,14 @@ export const createCustomerJson = (respWoo: IWoo, dni: string) => {
 			EsSupervisor: false,
 		},
 		CanalCliente: {
-			Codigo: "OTR",
+			Codigo: 'OTR',
 			IdCanalCliente: 6904,
-			Nombre: "Otros",
+			Nombre: 'Otros',
 		},
-		Zona: constantsZonas.find((zone) => zone.Nombre.toLocaleLowerCase() === respWoo.billing.city.toLocaleLowerCase()) || constantsZonas[0],
+		Zona:
+			constantsZonas.find(
+				(zone) => zone.Nombre.toLocaleLowerCase() === respWoo.billing.city.toLocaleLowerCase(),
+			) || constantsZonas[0],
 		ListaPrecio: {
 			Codigo: ListaPrecioCodigo.Exitoweb,
 			Descripcion: Descripcion.TiendaOnLineExito,
@@ -182,10 +200,10 @@ export const createCustomerJson = (respWoo: IWoo, dni: string) => {
 			IdListaPrecio: 3,
 			ListaPrecioAlternativa: null,
 			Moneda: {
-				Codigo: "ARS",
+				Codigo: 'ARS',
 				Cotizacion: 1,
 				IdMoneda: 1,
-				Nombre: "Peso Argentino",
+				Nombre: 'Peso Argentino',
 			},
 			PorcentajePrecioSugerido: 0,
 		},
@@ -200,40 +218,53 @@ function getProvinciaCentumFromWoo(wooCode: string): IProvincias | null {
 
 export const createContribuyenteJson = (body: IContribuyenteBodyInput, cuit: string) => {
 	const provinciaCentum =
-		getProvinciaCentumFromWoo(body.Provincia ?? "") ??
-		constantProvincias.find((prov) => prov.Nombre.toLowerCase() === (body.Provincia ?? "").toLowerCase()) ??
+		getProvinciaCentumFromWoo(body.Provincia ?? '') ??
+		constantProvincias.find(
+			(prov) => prov.Nombre.toLowerCase() === (body.Provincia ?? '').toLowerCase(),
+		) ??
 		constantProvincias[5]; // fallback a Buenos Aires
 
 	const cuitStr = String(cuit);
-	const fullAddress = [body.Direccion || "", body.NroDireccion || "", body.PisoDepartamento || ""].filter(Boolean).join(" ");
+	const fullAddress = [body.Direccion || '', body.NroDireccion || '', body.PisoDepartamento || '']
+		.filter(Boolean)
+		.join(' ');
 
 	return {
 		IdCliente: -1,
 		CUIT: cuit,
 		Codigo: `web-${cuitStr.slice(2, 10)}`,
 		RazonSocial: body.RazonSocial,
-		Email: body.Email || "",
-		Telefono: body.Telefono || "",
+		Email: body.Email || '',
+		Telefono: body.Telefono || '',
 		CodigoPostal: body.CodigoPostal,
 		Localidad: body.Localidad,
 		Direccion: fullAddress,
 		Provincia: provinciaCentum,
 		Zona: constantsZonas[0],
 		Pais: {
-			Codigo: "ARG",
+			Codigo: 'ARG',
 			IdPais: 4657,
-			Nombre: "Argentina",
+			Nombre: 'Argentina',
 		},
-		CondicionIVA: CondicionesIVA.find((condicion) => condicion.Nombre.toLocaleLowerCase() === (body.CondicionIVA ?? "").toLocaleLowerCase()) || {
+		CondicionIVA: CondicionesIVA.find(
+			(condicion) =>
+				condicion.Nombre.toLocaleLowerCase() === (body.CondicionIVA ?? '').toLocaleLowerCase(),
+		) || {
 			IdCondicionIVA: 1895,
-			Codigo: "RI",
-			Nombre: "Responsable Inscripto" as CondicionIVANombre,
+			Codigo: 'RI',
+			Nombre: 'Responsable Inscripto' as CondicionIVANombre,
 		},
-		CondicionIIBB: CondicionesIIBB.find((condicion) => condicion.Codigo.toLocaleLowerCase() === (body.CondicionIIBB ?? "").toLocaleLowerCase()) || {
+		CondicionIIBB: CondicionesIIBB.find(
+			(condicion) =>
+				condicion.Codigo.toLocaleLowerCase() === (body.CondicionIIBB ?? '').toLocaleLowerCase(),
+		) || {
 			IdCondicionIIBB: 6051,
-			Codigo: "Exento" as CondicionIIBBCodigo,
+			Codigo: 'Exento' as CondicionIIBBCodigo,
 		},
-		CategoriaIIBB: CategoriasIIBB.find((categoria) => categoria.Codigo.toLowerCase() === (body.CategoriaIIBB ?? "").toLocaleLowerCase()),
+		CategoriaIIBB: CategoriasIIBB.find(
+			(categoria) =>
+				categoria.Codigo.toLowerCase() === (body.CategoriaIIBB ?? '').toLocaleLowerCase(),
+		),
 		// || {
 		//     IdCondicionIIBB: 6054,
 		//     Codigo: 'Cosas Muebles'
@@ -241,61 +272,61 @@ export const createContribuyenteJson = (body: IContribuyenteBodyInput, cuit: str
 		NumeroIIBB: body.NumeroIIBB,
 		DireccionEntrega: fullAddress,
 		CigarreraCliente: {
-			Codigo: "MSP",
+			Codigo: 'MSP',
 			IdCigarreraCliente: 6972,
-			Nombre: "Massalin Particulares",
+			Nombre: 'Massalin Particulares',
 		},
 		Bonificacion: {
 			Calculada: 0,
-			Codigo: "01",
+			Codigo: '01',
 			IdBonificacion: 6235,
 		},
 		ClaseCliente: {
 			IdClaseCliente: 6087,
-			Codigo: "ClaseDefecto",
-			Nombre: "Clase Defecto",
+			Codigo: 'ClaseDefecto',
+			Nombre: 'Clase Defecto',
 		},
 		CadenaCliente: {
-			Codigo: "365",
+			Codigo: '365',
 			IdCadenaCliente: 6920,
-			Nombre: "365",
+			Nombre: '365',
 		},
 		CondicionVenta: {
-			Codigo: "VTA1",
+			Codigo: 'VTA1',
 			IdCondicionVenta: 1,
-			Nombre: "Contado",
+			Nombre: 'Contado',
 		},
 		DiasAtencionCliente: {
-			Codigo: "LD",
+			Codigo: 'LD',
 			IdDiasAtencionCliente: 6969,
-			Nombre: "Lunes a Domingo",
+			Nombre: 'Lunes a Domingo',
 		},
 		EdadesPromedioConsumidoresCliente: {
-			Codigo: "111",
+			Codigo: '111',
 			IdEdadesPromedioConsumidoresCliente: 6951,
-			Nombre: "Hay igual cantidad de consumidores",
+			Nombre: 'Hay igual cantidad de consumidores',
 		},
 		FrecuenciaCliente: {
 			IdFrecuenciaCliente: 6891,
-			Nombre: "Frecuencia Defecto",
+			Nombre: 'Frecuencia Defecto',
 		},
 		GeneroPromedioConsumidoresCliente: {
-			Codigo: "11",
+			Codigo: '11',
 			IdGeneroPromedioConsumidoresCliente: 6964,
-			Nombre: "Hay igual cantidad de consumidores",
+			Nombre: 'Hay igual cantidad de consumidores',
 		},
 		HorarioAtencionCliente: {
-			Codigo: "D",
+			Codigo: 'D',
 			IdHorarioAtencionCliente: 6970,
-			Nombre: "Diurno",
+			Nombre: 'Diurno',
 		},
 		LimiteCredito: {
 			IdLimiteCredito: 46002,
-			Nombre: "Límite Credito 1",
+			Nombre: 'Límite Credito 1',
 			Valor: 1000000,
 		},
 		Transporte: {
-			Codigo: "TRA1",
+			Codigo: 'TRA1',
 			CodigoPostal: null,
 			CodigoPostalEntrega: null,
 			Direccion: null,
@@ -304,37 +335,37 @@ export const createContribuyenteJson = (body: IContribuyenteBodyInput, cuit: str
 			IdTransporte: 1,
 			Localidad: null,
 			LocalidadEntrega: null,
-			NumeroDocumento: "00000000",
+			NumeroDocumento: '00000000',
 			Pais: {
-				Codigo: "ARG",
+				Codigo: 'ARG',
 				IdPais: 4657,
-				Nombre: "Argentina",
+				Nombre: 'Argentina',
 			},
 			PaisEntrega: null,
 			Provincia: {
-				Codigo: "BSAS",
+				Codigo: 'BSAS',
 				IdProvincia: 4876,
-				Nombre: "Buenos Aires",
+				Nombre: 'Buenos Aires',
 			},
 			ProvinciaEntrega: null,
-			RazonSocial: "Transporte Defecto",
-			Telefono: "",
+			RazonSocial: 'Transporte Defecto',
+			Telefono: '',
 			TipoDocumento: {
-				Codigo: "DNI",
+				Codigo: 'DNI',
 				IdTipoDocumento: 6028,
-				Nombre: "Documento Nacional de Identidad",
+				Nombre: 'Documento Nacional de Identidad',
 			},
 			ZonaEntrega: null,
 		},
 		UbicacionCliente: {
-			Codigo: "BAR",
+			Codigo: 'BAR',
 			IdUbicacionCliente: 6942,
-			Nombre: "Zona de Bares y Boliches",
+			Nombre: 'Zona de Bares y Boliches',
 		},
 		Vendedor: {
 			IdVendedor: 12,
-			Codigo: "V11",
-			Nombre: "EXITOWEB",
+			Codigo: 'V11',
+			Nombre: 'EXITOWEB',
 			CUIT: null,
 			Direccion: null,
 			Localidad: null,
@@ -343,9 +374,9 @@ export const createContribuyenteJson = (body: IContribuyenteBodyInput, cuit: str
 			EsSupervisor: false,
 		},
 		CanalCliente: {
-			Codigo: "OTR",
+			Codigo: 'OTR',
 			IdCanalCliente: 6904,
-			Nombre: "Otros",
+			Nombre: 'Otros',
 		},
 		ListaPrecio: {
 			Codigo: ListaPrecioCodigo.Exitoweb,
@@ -356,17 +387,23 @@ export const createContribuyenteJson = (body: IContribuyenteBodyInput, cuit: str
 			IdListaPrecio: 3,
 			ListaPrecioAlternativa: null,
 			Moneda: {
-				Codigo: "ARS",
+				Codigo: 'ARS',
 				Cotizacion: 1,
 				IdMoneda: 1,
-				Nombre: "Peso Argentino",
+				Nombre: 'Peso Argentino',
 			},
 			PorcentajePrecioSugerido: 0,
 		},
 	};
 };
 
-export const createOrderSaleJson = (articles: Item[], client: INewCustomer, articlesOrder: LineItem[], shippingSalesOrder: ShippingLine[], idCobro: CobroId) => {
+export const createOrderSaleJson = (
+	articles: Item[],
+	client: INewCustomer,
+	articlesOrder: LineItem[],
+	shippingSalesOrder: ShippingLine[],
+	idCobro: CobroId,
+) => {
 	let dbArticle: Item | undefined;
 	const saleOrderObj: INewPedidoVenta = {
 		Cliente: client,
@@ -380,17 +417,19 @@ export const createOrderSaleJson = (articles: Item[], client: INewCustomer, arti
 			const metaData = product.meta_data;
 			const quantity = product.quantity;
 
-			const isProductQuoter = metaData.some((meta) => meta.key === "blocky_woo_product_quoter");
-			const price = isProductQuoter ? Number(product.total || 0) / quantity : Number(product.price || 0);
+			const isProductQuoter = metaData.some((meta) => meta.key === 'blocky_woo_product_quoter');
+			const price = isProductQuoter
+				? Number(product.total || 0) / quantity
+				: Number(product.price || 0);
 
 			const obj: IArticuloPedidoVenta = {
 				Nombre: product.name,
 				Codigo: product.sku,
 				Cantidad: quantity,
 				CategoriaImpuestoIVA: {
-					Codigo: "5",
+					Codigo: '5',
 					IdCategoriaImpuestoIVA: 4,
-					Nombre: "IVA 21.00",
+					Nombre: 'IVA 21.00',
 					Tasa: 21,
 				},
 				IdArticulo: dbArticle?.IdArticulo || product.product_id,
@@ -402,10 +441,10 @@ export const createOrderSaleJson = (articles: Item[], client: INewCustomer, arti
 				//Precio: isProductQuoter ? Number(product.total) / quantity : product.price,
 				Precio: price,
 				SegundoControlStock: dbArticle?.SegundoControlStock || 0,
-				NumeroTropa: "",
-				NumeroSerie: "",
+				NumeroTropa: '',
+				NumeroSerie: '',
 				ImpuestoInterno: dbArticle?.ImpuestoInterno || 0,
-				Observaciones: dbArticle?.Observaciones || "",
+				Observaciones: dbArticle?.Observaciones || '',
 				ClaseDescuento: {
 					IdClaseDescuento: 0,
 				},
@@ -419,30 +458,30 @@ export const createOrderSaleJson = (articles: Item[], client: INewCustomer, arti
 			RazonSocialEmpresaGrupoEconomico: null,
 		},
 		TiendaOnline: null,
-		Observaciones: dbArticle?.Observaciones || "",
+		Observaciones: dbArticle?.Observaciones || '',
 		ContieneConjunto: false,
 		PorcentajeDescuento: dbArticle?.PorcentajeDescuento || 0,
 		TurnoEntrega: {
 			IdTurnoEntrega: 6083,
-			Nombre: "Maniana",
+			Nombre: 'Maniana',
 		},
 	};
 
 	//Verificar si el envío ya existe en el pedido. Si existe, ignora, si no, agrega.
-	const isShippingAlreadyIncluded = articlesOrder.some((item) => item.sku === "R06SR0601P00010007");
+	const isShippingAlreadyIncluded = articlesOrder.some((item) => item.sku === 'R06SR0601P00010007');
 	// Agregar costo de envío como artículo extra si existe & tiene precio
 	if (shippingSalesOrder.length > 0 && !isShippingAlreadyIncluded) {
 		const shipping = shippingSalesOrder[0]; // WooCommerce generalmente solo tiene uno
 		const shippingCost = Number(shipping.total || 0);
 		if (shippingCost > 0) {
 			const shippingItem: IArticuloPedidoVenta = {
-				Nombre: shipping.method_title || "Costo de Envío",
-				Codigo: "R06SR0601P00010007",
+				Nombre: shipping.method_title || 'Costo de Envío',
+				Codigo: 'R06SR0601P00010007',
 				Cantidad: 1,
 				CategoriaImpuestoIVA: {
-					Codigo: "5",
+					Codigo: '5',
 					IdCategoriaImpuestoIVA: 4,
-					Nombre: "IVA 21.00",
+					Nombre: 'IVA 21.00',
 					Tasa: 21,
 				},
 				IdArticulo: 2126,
@@ -453,8 +492,8 @@ export const createOrderSaleJson = (articles: Item[], client: INewCustomer, arti
 				PorcentajeDescuentoMaximo: 0,
 				Precio: shippingCost,
 				SegundoControlStock: 0,
-				NumeroTropa: "",
-				NumeroSerie: "",
+				NumeroTropa: '',
+				NumeroSerie: '',
 				ImpuestoInterno: 0,
 				Observaciones: ``,
 				ClaseDescuento: {
@@ -468,31 +507,35 @@ export const createOrderSaleJson = (articles: Item[], client: INewCustomer, arti
 	return saleOrderObj;
 };
 
-export const createChargeJson = (customer: Cliente, articlesOrder: LineItem[], shippingChargeOrder: ShippingLine[]) => {
+export const createChargeJson = (
+	customer: Cliente,
+	articlesOrder: LineItem[],
+	shippingChargeOrder: ShippingLine[],
+) => {
 	if (shippingChargeOrder.length > 0) {
 		const shipping = shippingChargeOrder[0]; // WooCommerce generalmente solo tiene uno
 		const shippingCost = Number(shipping.total || 0);
 		if (shippingCost > 0) {
 			const shippingChargeItem: LineItem = {
 				id: shipping.id,
-				name: shipping.method_title || "Costo de Envío",
+				name: shipping.method_title || 'Costo de Envío',
 				total: shipping.total,
 				meta_data: shipping.meta_data,
 				product_id: 2126, // Tob Note: ID Del articulo extraido de dataArticulosExistencias
 				variation_id: 0,
 				quantity: 1,
-				tax_class: "",
-				subtotal: "",
-				subtotal_tax: "",
-				total_tax: "",
+				tax_class: '',
+				subtotal: '',
+				subtotal_tax: '',
+				total_tax: '',
 				taxes: [],
-				sku: "R06SR0601P00010007", // Tob Note: SKU del envio extraido de centum
+				sku: 'R06SR0601P00010007', // Tob Note: SKU del envio extraido de centum
 				price: shippingCost,
 				image: {
 					id: 0,
-					src: "",
+					src: '',
 				},
-				parent_name: "",
+				parent_name: '',
 			};
 			articlesOrder.push(shippingChargeItem);
 		}
@@ -500,13 +543,15 @@ export const createChargeJson = (customer: Cliente, articlesOrder: LineItem[], s
 	const chargeJson: INewCobro = {
 		Cliente: customer,
 		ClienteCuentaCorriente: customer,
-		Observacion: "",
+		Observacion: '',
 		CobroAnticipos: articlesOrder.map((product) => {
 			const metaData = product.meta_data;
 			const quantity = product.quantity;
 
-			const isProductQuoter = metaData.some((meta) => meta.key === "blocky_woo_product_quoter");
-			const price = isProductQuoter ? Number(product.total || 0) : Number(product.price || 0) * quantity;
+			const isProductQuoter = metaData.some((meta) => meta.key === 'blocky_woo_product_quoter');
+			const price = isProductQuoter
+				? Number(product.total || 0)
+				: Number(product.price || 0) * quantity;
 
 			const obj: CobrosAnticipos = {
 				ConceptoVarios: {
@@ -517,7 +562,7 @@ export const createChargeJson = (customer: Cliente, articlesOrder: LineItem[], s
 					ResumenFondo: null,
 				},
 				Cotizacion: 1,
-				Detalle: "",
+				Detalle: '',
 				Importe: price,
 			};
 			return obj;
@@ -526,7 +571,7 @@ export const createChargeJson = (customer: Cliente, articlesOrder: LineItem[], s
 			const metaData = p.meta_data;
 			const quantity = p.quantity;
 
-			const isProductQuoter = metaData.some((meta) => meta.key === "blocky_woo_product_quoter");
+			const isProductQuoter = metaData.some((meta) => meta.key === 'blocky_woo_product_quoter');
 			const price = isProductQuoter ? Number(p.total || 0) : Number(p.price || 0) * quantity;
 			const object: CobroEfectivos = {
 				Valor: {
@@ -546,7 +591,7 @@ export const createChargeJson = (customer: Cliente, articlesOrder: LineItem[], s
 					CantidadMaximaCuotas: 0,
 					Cuotas: null,
 				},
-				Detalle: "Compra mediante web",
+				Detalle: 'Compra mediante web',
 				Importe: price,
 				Cotizacion: 1,
 				CotizacionMonedaRespectoMonedaCliente: 1,
@@ -555,26 +600,26 @@ export const createChargeJson = (customer: Cliente, articlesOrder: LineItem[], s
 				PorcentajeCostoFinanciacion: 0,
 				PorcentajeCostoImpositivo: 0,
 				FechaAcreditacion: new Date().toISOString(),
-				NumeroCupon: "",
-				DNI: "",
-				NombreApellido: "",
+				NumeroCupon: '',
+				DNI: '',
+				NombreApellido: '',
 			};
 
 			return object;
 		}),
 		SucursalFisica: {
 			IdSucursalFisica: 7341,
-			Codigo: "Moron",
-			Nombre: "Moron",
+			Codigo: 'Moron',
+			Nombre: 'Moron',
 		},
 		FechaDocumento: new Date().toISOString(),
 		FechaImputacion: new Date().toISOString(),
 		Anulado: false,
-		Nota: "",
+		Nota: '',
 		Moneda: {
 			IdMoneda: 1,
-			Codigo: "ARS",
-			Nombre: "Peso Argentino",
+			Codigo: 'ARS',
+			Nombre: 'Peso Argentino',
 			Cotizacion: 1,
 		},
 		Cotizacion: 1,
@@ -649,7 +694,8 @@ function centumGetArticleAttributes(article: { json: { AtributosArticulo: any[] 
 function centumGetArticleVariations(groupId: number, arrArticles: any) {
 	const allAttributes: any = [];
 	const articlesWithSameGroupId = arrArticles.filter(
-		(article: { json: { GrupoArticulo: { IdGrupoArticulo: number } | null } }) => article.json.GrupoArticulo !== null && article.json.GrupoArticulo.IdGrupoArticulo === groupId,
+		(article: { json: { GrupoArticulo: { IdGrupoArticulo: number } | null } }) =>
+			article.json.GrupoArticulo !== null && article.json.GrupoArticulo.IdGrupoArticulo === groupId,
 	);
 
 	articlesWithSameGroupId.forEach((article: { json: { AtributosArticulo: any[] } }) => {
@@ -671,7 +717,7 @@ function centumGetArticleVariations(groupId: number, arrArticles: any) {
 				weight: article.json.Masa,
 			},
 			images: article.json.images?.map((image: any) => image.data.fileName) || [],
-			description: article.json.Detalle ?? "",
+			description: article.json.Detalle ?? '',
 		};
 
 		// ⬇️ Solo setear sale_price si existe la propiedad y es válido (< regular)
@@ -686,7 +732,7 @@ function centumGetArticleVariations(groupId: number, arrArticles: any) {
 		return variation;
 	});
 
-	const allUniqueAttributes = getUniqueValues(allAttributes, "value");
+	const allUniqueAttributes = getUniqueValues(allAttributes, 'value');
 
 	return [variations, allUniqueAttributes];
 }
@@ -718,15 +764,15 @@ export const createJsonProducts = (arrArticles: IMergeArticulos[]) => {
 		obj.regular_price = article.json.Precio;
 
 		// Actualización de description para no hacer match sobre undefined
-		const description = article?.json?.Detalle || "";
+		const description = article?.json?.Detalle || '';
 
 		const pattern = /\/{2,}/g;
 		const matches = (description.match(pattern) || []).length;
 
 		if (matches > 0) {
 			const parts = description.split(pattern);
-			obj.short_description = parts[0].replace(/<[^>]+>/g, "");
-			obj.description = parts[1].replace(/^<\/\w+>/, "");
+			obj.short_description = parts[0].replace(/<[^>]+>/g, '');
+			obj.description = parts[1].replace(/^<\/\w+>/, '');
 		} else {
 			obj.description = description;
 		}
@@ -777,14 +823,18 @@ export const createJsonProducts = (arrArticles: IMergeArticulos[]) => {
 			if (articleGroupIds.includes(article.json.GrupoArticulo.IdGrupoArticulo)) {
 				continue;
 			}
-			const [variations, allAttributes] = centumGetArticleVariations(article.json.GrupoArticulo.IdGrupoArticulo, arrArticles);
+			const [variations, allAttributes] = centumGetArticleVariations(
+				article.json.GrupoArticulo.IdGrupoArticulo,
+				arrArticles,
+			);
 
 			obj.name = article.json.GrupoArticulo.Nombre;
-			obj.type = "variable";
+			obj.type = 'variable';
 			obj.variations = variations;
 			obj.attributes = allAttributes;
 			obj.sku = article.json.GrupoArticulo.IdGrupoArticulo.toString();
-			obj.short_description = article.json.GrupoArticulo.Detalle; /* [MRF 2024-09-11] - adding short description based on GrupoArticulo.Detalle */
+			obj.short_description =
+				article.json.GrupoArticulo.Detalle; /* [MRF 2024-09-11] - adding short description based on GrupoArticulo.Detalle */
 			// obj.description = article.json.GrupoArticulo.Detalle; /* [MRF 2024-09-11] - long description was assigned in a previous step */
 
 			wooProducts.products.push(obj);
@@ -793,8 +843,9 @@ export const createJsonProducts = (arrArticles: IMergeArticulos[]) => {
 		} else {
 			obj.sku = article.json.Codigo;
 			obj.enabled = article.json.Habilitado === true && article.json.ActivoWeb === true;
-			obj.name = article.json.NombreFantasia.length > 0 ? article.json.NombreFantasia : article.json.Nombre;
-			obj.type = "simple";
+			obj.name =
+				article.json.NombreFantasia.length > 0 ? article.json.NombreFantasia : article.json.Nombre;
+			obj.type = 'simple';
 			obj.attributes = centumGetArticleAttributes(article);
 			obj.stock = article.json.ExistenciasTotal;
 			obj.images = article.json.images?.map((image) => image.data.fileName);
@@ -802,7 +853,7 @@ export const createJsonProducts = (arrArticles: IMergeArticulos[]) => {
 			wooProducts.products.push(obj);
 		}
 	}
-	const uniqueArticles = getUniqueValues(wooProducts.products, "name");
+	const uniqueArticles = getUniqueValues(wooProducts.products, 'name');
 
 	wooProducts.products = uniqueArticles;
 	return wooProducts;
@@ -824,10 +875,10 @@ export async function centumGetArticleImages(
 ): Promise<ObjImageData[] | Error> {
 	try {
 		const url = new URL(`${requestUrl}/${articleId}`);
-		url.searchParams.append("numeroOrden", orderNumber.toString());
+		url.searchParams.append('numeroOrden', orderNumber.toString());
 
 		const response = await fetch(url.toString(), {
-			method: "GET",
+			method: 'GET',
 			headers: {
 				CentumSuiteConsumidorApiPublicaId: requestHeaders.consumerApiPublicId,
 				CentumSuiteAccessToken: createHash(requestHeaders.publicAccessKey),
@@ -843,7 +894,7 @@ export async function centumGetArticleImages(
 		}
 
 		const buffer = await response.arrayBuffer();
-		const lastModified = response.headers.get("last-modified") ?? undefined;
+		const lastModified = response.headers.get('last-modified') ?? undefined;
 
 		allImages.push({
 			orderNumber,
@@ -852,56 +903,70 @@ export async function centumGetArticleImages(
 			lastModified,
 		});
 
-		return await centumGetArticleImages(orderNumber + 1, articleId, requestHeaders, requestUrl, allImages);
+		return await centumGetArticleImages(
+			orderNumber + 1,
+			articleId,
+			requestHeaders,
+			requestUrl,
+			allImages,
+		);
 	} catch (e: any) {
 		return e;
 	}
 }
 
-export const centumImageName = (name: string, size: string, numberImage: number, fileExtension: string) => {
-	return `${name.split(" ").join("").replace(".", "").toLocaleLowerCase()}${numberImage}_${size.split(" ").join("").replace(".", "_").toLocaleLowerCase()}.${fileExtension}`;
+export const centumImageName = (
+	name: string,
+	size: string,
+	numberImage: number,
+	fileExtension: string,
+) => {
+	return `${name.split(' ').join('').replace('.', '').toLocaleLowerCase()}${numberImage}_${size.split(' ').join('').replace('.', '_').toLocaleLowerCase()}.${fileExtension}`;
 };
 
-export function getEndpoint(this: IExecuteFunctions): string {
-	const endpoint = this.getNodeParameter("endpoint", 0) as string;
-
-	if (!endpoint?.trim()) {
-		throw new NodeOperationError(this.getNode(), 'El campo "Endpoint" es obligatorio.');
-	}
-
-	return endpoint;
-}
-
 export interface HttpSettings {
-	method?: "GET" | "POST";
-	pagination: "all" | "default" | "custom";
+	method?: 'GET' | 'POST';
+	pagination: 'all' | 'default' | 'custom';
 	cantidadItemsPorPagina?: number;
 }
 
 interface DebugSettings {
 	enableDebugLogging?: boolean;
 	debugEndpointContains?: string;
-	debugMaxBodyLength?: number;
 }
 
-export function buildCentumHeaders(consumerId: string | number, publicKey: string): Record<string, string> {
+export function buildCentumHeaders(
+	consumerId: string | number,
+	publicKey: string,
+): Record<string, string> {
 	return {
 		CentumSuiteConsumidorApiPublicaId: String(consumerId),
 		CentumSuiteAccessToken: createHash(publicKey),
 	};
 }
 
-export function getHttpSettings(this: IExecuteFunctions): HttpSettings & { intervaloPagina?: number; numeroPagina?: number } {
-	const httpSettings = this.getNodeParameter("httpSettings", 0, {}) as HttpSettings & { intervaloPagina?: number; numeroPagina?: number };
+export function getHttpSettings(
+	this: IExecuteFunctions,
+	itemIndex = 0,
+): HttpSettings & { intervaloPagina?: number; numeroPagina?: number } {
+	const httpSettings = this.getNodeParameter('httpSettings', itemIndex, {}) as HttpSettings & {
+		intervaloPagina?: number;
+		numeroPagina?: number;
+	};
 
 	return httpSettings;
 }
 
 export function getDebugSettings(this: IExecuteFunctions, itemIndex = 0): DebugSettings {
-	return this.getNodeParameter("debugSettings", itemIndex, {}) as DebugSettings;
+	return this.getNodeParameter('debugSettings', itemIndex, {}) as DebugSettings;
 }
 
-export function getNodeParameterOrThrow<T = NodeParameterValueType | object>(executeFunctions: IExecuteFunctions, name: string, itemIndex: number, defaultValue?: T): T {
+export function getNodeParameterOrThrow<T = NodeParameterValueType | object>(
+	executeFunctions: IExecuteFunctions,
+	name: string,
+	itemIndex: number,
+	defaultValue?: T,
+): T {
 	try {
 		if (arguments.length >= 4) {
 			return executeFunctions.getNodeParameter(name, itemIndex, defaultValue as T) as T;
@@ -909,27 +974,31 @@ export function getNodeParameterOrThrow<T = NodeParameterValueType | object>(exe
 
 		return executeFunctions.getNodeParameter(name, itemIndex) as T;
 	} catch (error) {
-		let resource = "";
-		let operation = "";
+		let resource = '';
+		let operation = '';
 
 		try {
-			resource = String(executeFunctions.getNodeParameter("resource", itemIndex, ""));
+			resource = String(executeFunctions.getNodeParameter('resource', itemIndex, ''));
 		} catch {}
 
 		try {
-			operation = String(executeFunctions.getNodeParameter("operation", itemIndex, ""));
+			operation = String(executeFunctions.getNodeParameter('operation', itemIndex, ''));
 		} catch {}
 
-		const scope = [resource, operation].filter(Boolean).join("/");
-		const location = scope ? ` en ${scope}` : "";
-		const detail = getErrorMessage(error, "Could not get parameter");
+		const scope = [resource, operation].filter(Boolean).join('/');
+		const location = scope ? ` en ${scope}` : '';
+		const detail = getErrorMessage(error, 'Could not get parameter');
 
-		throw new NodeOperationError(executeFunctions.getNode(), `No se pudo obtener el parámetro "${name}"${location} (item ${itemIndex + 1}). ${detail}`, { itemIndex });
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			`No se pudo obtener el parámetro "${name}"${location} (item ${itemIndex + 1}). ${detail}`,
+			{ itemIndex },
+		);
 	}
 }
 
 export interface FetchOptions {
-	method?: "GET" | "POST";
+	method?: 'GET' | 'POST';
 	headers?: CentumHeaders;
 	queryParams?: Record<string, object | NodeParameterValueType>;
 	body?: object | NodeParameterValueType;
@@ -939,8 +1008,8 @@ export interface FetchOptions {
 	numeroPagina?: number;
 	context?: IExecuteFunctions;
 	debugItemIndex?: number;
-	pagination?: "all" | "default" | "custom";
-	responseType?: "json" | "arraybuffer";
+	pagination?: 'all' | 'default' | 'custom';
+	responseType?: 'json' | 'arraybuffer';
 }
 
 interface ApiErrorBody {
@@ -954,37 +1023,37 @@ function redactHeaders(headers: Record<string, unknown>): Record<string, unknown
 	const redacted = { ...headers };
 	for (const key of Object.keys(redacted)) {
 		const normalizedKey = key.toLowerCase();
-		if (normalizedKey.includes("token") || normalizedKey.includes("key") || normalizedKey.includes("authorization")) {
-			redacted[key] = "[redacted]";
+		if (
+			normalizedKey.includes('token') ||
+			normalizedKey.includes('key') ||
+			normalizedKey.includes('authorization')
+		) {
+			redacted[key] = '[redacted]';
 		}
 	}
 	return redacted;
 }
 
-function truncateLoggedValue(value: string, maxLength: number): string {
-	if (value.length <= maxLength) {
-		return value;
-	}
-
-	return `${value.slice(0, maxLength)}... [truncated ${value.length - maxLength} chars]`;
+function logDebugMessage(
+	context: IExecuteFunctions | undefined,
+	message: string,
+	data: unknown,
+): void {
+	context?.logger?.info?.(message, data as Record<string, unknown>);
 }
 
-function logDebugMessage(context: IExecuteFunctions | undefined, message: string, data: unknown): void {
-	if (context?.logger?.info) {
-		context.logger.info(message, data as Record<string, unknown>);
-		return;
-	}
-
-	console.log(message, data);
-}
-
-function getDebugConfig(context: IExecuteFunctions | undefined, finalUrl: string, itemIndex = 0): { shouldDebug: boolean; maxBodyLength: number } {
+function getDebugConfig(
+	context: IExecuteFunctions | undefined,
+	finalUrl: string,
+	itemIndex = 0,
+): { shouldDebug: boolean } {
 	const debugSettings = context ? getDebugSettings.call(context, itemIndex) : {};
-	const debugEndpointFilter = debugSettings.debugEndpointContains?.trim() ?? "";
-	const maxBodyLength = debugSettings.debugMaxBodyLength ?? 5000;
-	const shouldDebug = debugSettings.enableDebugLogging === true && (!debugEndpointFilter || finalUrl.includes(debugEndpointFilter));
+	const debugEndpointFilter = debugSettings.debugEndpointContains?.trim() ?? '';
+	const shouldDebug =
+		debugSettings.enableDebugLogging === true &&
+		(!debugEndpointFilter || finalUrl.includes(debugEndpointFilter));
 
-	return { shouldDebug, maxBodyLength };
+	return { shouldDebug };
 }
 
 export function safeThrow(context: IExecuteFunctions | undefined, mensaje: string): never {
@@ -995,17 +1064,22 @@ export function safeThrow(context: IExecuteFunctions | undefined, mensaje: strin
 	}
 }
 
-export function getErrorMessage(error: unknown, fallback = "Error desconocido"): string {
+export function getErrorMessage(error: unknown, fallback = 'Error desconocido'): string {
 	if (error instanceof Error && error.message) {
 		return error.message;
 	}
 
-	if (typeof error === "object" && error !== null) {
+	if (typeof error === 'object' && error !== null) {
 		const maybeError = error as {
 			message?: string;
 			response?: { data?: ApiErrorBody };
 		};
-		return maybeError.response?.data?.Message ?? maybeError.response?.data?.message ?? maybeError.message ?? fallback;
+		return (
+			maybeError.response?.data?.Message ??
+			maybeError.response?.data?.message ??
+			maybeError.message ??
+			fallback
+		);
 	}
 
 	return fallback;
@@ -1023,7 +1097,7 @@ function buildUrl(baseUrl: string, queryParams: Record<string, any> = {}): strin
 
 function extractItems<T>(data: any, itemsField?: string): T[] {
 	if (data == null) {
-		safeThrow(undefined, "Respuesta inválida: no se encontraron items.");
+		safeThrow(undefined, 'Respuesta inválida: no se encontraron items.');
 	}
 
 	if (itemsField && data[itemsField] && Array.isArray(data[itemsField])) {
@@ -1032,40 +1106,50 @@ function extractItems<T>(data: any, itemsField?: string): T[] {
 	if (Array.isArray(data)) {
 		return data;
 	}
-	if (typeof data === "object") {
+	if (typeof data === 'object') {
 		const arrayField = Object.values(data).find(Array.isArray);
 		return arrayField || [data];
 	}
-	safeThrow(undefined, "Respuesta inválida: no se encontraron items.");
+	safeThrow(undefined, 'Respuesta inválida: no se encontraron items.');
 }
 
-export async function apiGetRequest<T = any>(url: string, options: FetchOptions = {}): Promise<T[]> {
+export async function apiGetRequest<T = any>(
+	url: string,
+	options: FetchOptions = {},
+): Promise<T[]> {
 	const {
 		headers = {} as CentumHeaders,
-		method = "GET",
+		method = 'GET',
 		queryParams = {},
 		cantidadItemsPorPagina,
-		itemsField = "Items",
+		itemsField = 'Items',
 		numeroPagina,
 		context,
-		pagination = "all",
+		pagination = 'all',
 		// intervaloPagina,
 	} = options;
 
-	if (!url.trim()) safeThrow(context, "El Endpoint es obligatorio.");
+	if (!url.trim()) safeThrow(context, 'El Endpoint es obligatorio.');
 
-	if (method === "POST") safeThrow(context, "Se está intentando hacer una solicitud GET sin un metodo asignado o se asignó el metodo equivocado.");
+	if (method === 'POST')
+		safeThrow(
+			context,
+			'Se está intentando hacer una solicitud GET sin un metodo asignado o se asignó el metodo equivocado.',
+		);
 
 	const finalUrl = buildUrl(url, queryParams); // Sin parámetros de paginación
-	const requestHeaders = buildCentumHeaders(headers.CentumSuiteConsumidorApiPublicaId, headers.publicAccessKey);
-	const { shouldDebug, maxBodyLength } = getDebugConfig(context, finalUrl, options.debugItemIndex ?? 0);
+	const requestHeaders = buildCentumHeaders(
+		headers.CentumSuiteConsumidorApiPublicaId,
+		headers.publicAccessKey,
+	);
+	const { shouldDebug } = getDebugConfig(context, finalUrl, options.debugItemIndex ?? 0);
 
 	if (shouldDebug) {
-		logDebugMessage(context, "[Centum debug] Request", {
+		logDebugMessage(context, '[Centum debug] Request', {
 			url: finalUrl,
 			method,
 			headers: redactHeaders(requestHeaders),
-			body: null,
+			hasBody: false,
 		});
 	}
 
@@ -1077,11 +1161,12 @@ export async function apiGetRequest<T = any>(url: string, options: FetchOptions 
 	const responseText = await response.text();
 
 	if (shouldDebug) {
-		logDebugMessage(context, "[Centum debug] Response", {
+		logDebugMessage(context, '[Centum debug] Response', {
 			url: finalUrl,
 			status: response.status,
 			statusText: response.statusText,
-			body: truncateLoggedValue(responseText, maxBodyLength),
+			contentType: response.headers.get('content-type') || '',
+			bodyLength: responseText.length,
 		});
 	}
 
@@ -1093,7 +1178,7 @@ export async function apiGetRequest<T = any>(url: string, options: FetchOptions 
 	const allItems = extractItems<T>(data, itemsField);
 
 	// Si no hay paginación configurada o es 'all', devolver todo
-	if (pagination === "all" || !cantidadItemsPorPagina) {
+	if (pagination === 'all' || !cantidadItemsPorPagina) {
 		return allItems;
 	}
 
@@ -1106,36 +1191,52 @@ export async function apiGetRequest<T = any>(url: string, options: FetchOptions 
 }
 
 // POST sin paginación (con validación explícita)
-export async function apiPostRequest<T = any>(url: string, options: FetchOptions = {}): Promise<T[]> {
-	const { headers = {} as CentumHeaders, body, queryParams = {}, context, method = "POST" } = options;
+export async function apiPostRequest<T = any>(
+	url: string,
+	options: FetchOptions = {},
+): Promise<T[]> {
+	const {
+		headers = {} as CentumHeaders,
+		body,
+		queryParams = {},
+		context,
+		method = 'POST',
+	} = options;
 
-	if (!url || url.trim() === "") {
+	if (!url || url.trim() === '') {
 		safeThrow(context, 'El campo "Endpoint" es obligatorio.');
 	}
 
-	if (method === "GET") {
-		safeThrow(context, "Se está intentando hacer una solicitud POST sin un metodo asignado o se asignó el metodo equivocado.");
+	if (method === 'GET') {
+		safeThrow(
+			context,
+			'Se está intentando hacer una solicitud POST sin un metodo asignado o se asignó el metodo equivocado.',
+		);
 	}
 
 	if (!body) {
-		safeThrow(context, "El cuerpo (body) de la solicitud POST es obligatorio.");
+		safeThrow(context, 'El cuerpo (body) de la solicitud POST es obligatorio.');
 	}
-	const requestHeaders = buildCentumHeaders(headers.CentumSuiteConsumidorApiPublicaId, headers.publicAccessKey);
+	const requestHeaders = buildCentumHeaders(
+		headers.CentumSuiteConsumidorApiPublicaId,
+		headers.publicAccessKey,
+	);
 
 	const finalUrl = buildUrl(url, queryParams);
-	const { shouldDebug, maxBodyLength } = getDebugConfig(context, finalUrl, options.debugItemIndex ?? 0);
+	const { shouldDebug } = getDebugConfig(context, finalUrl, options.debugItemIndex ?? 0);
 	const fetchOptions: RequestInit = {
-		method: "POST",
-		headers: { "Content-Type": "application/json", ...requestHeaders },
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json', ...requestHeaders },
 		body: JSON.stringify(body),
 	};
 
 	if (shouldDebug) {
-		logDebugMessage(context, "[Centum debug] Request", {
+		logDebugMessage(context, '[Centum debug] Request', {
 			url: finalUrl,
-			method: "POST",
+			method: 'POST',
 			headers: redactHeaders(fetchOptions.headers as Record<string, unknown>),
-			body: truncateLoggedValue(String(fetchOptions.body), maxBodyLength),
+			hasBody: true,
+			bodyLength: String(fetchOptions.body).length,
 		});
 	}
 
@@ -1143,11 +1244,12 @@ export async function apiPostRequest<T = any>(url: string, options: FetchOptions
 	const responseText = await response.text();
 
 	if (shouldDebug) {
-		logDebugMessage(context, "[Centum debug] Response", {
+		logDebugMessage(context, '[Centum debug] Response', {
 			url: finalUrl,
 			status: response.status,
 			statusText: response.statusText,
-			body: truncateLoggedValue(responseText, maxBodyLength),
+			contentType: response.headers.get('content-type') || '',
+			bodyLength: responseText.length,
 		});
 	}
 
@@ -1160,35 +1262,44 @@ export async function apiPostRequest<T = any>(url: string, options: FetchOptions
 }
 
 // POST paginado (igual que GET pero usando body)
-export async function apiPostRequestPaginated<T = any>(url: string, options: FetchOptions = {}): Promise<T[]> {
+export async function apiPostRequestPaginated<T = any>(
+	url: string,
+	options: FetchOptions = {},
+): Promise<T[]> {
 	const {
 		headers = {} as CentumHeaders,
-		method = "POST",
+		method = 'POST',
 		body,
 		queryParams = {},
 		cantidadItemsPorPagina,
-		itemsField = "Items",
+		itemsField = 'Items',
 		numeroPagina,
 		context,
-		pagination = "all",
+		pagination = 'all',
 		intervaloPagina,
 	} = options;
 
-	if (!url || url.trim() === "") {
+	if (!url || url.trim() === '') {
 		safeThrow(context, 'El campo "Endpoint" es obligatorio.');
 	}
-	if (method === "GET") {
-		safeThrow(context, "Se está intentando hacer una solicitud POST sin un metodo asignado o se asignó el metodo equivocado.");
+	if (method === 'GET') {
+		safeThrow(
+			context,
+			'Se está intentando hacer una solicitud POST sin un metodo asignado o se asignó el metodo equivocado.',
+		);
 	}
 	if (!body) {
-		safeThrow(context, "El cuerpo (body) de la solicitud POST es obligatorio.");
+		safeThrow(context, 'El cuerpo (body) de la solicitud POST es obligatorio.');
 	}
 
-	const requestHeaders = buildCentumHeaders(headers.CentumSuiteConsumidorApiPublicaId, headers.publicAccessKey);
+	const requestHeaders = buildCentumHeaders(
+		headers.CentumSuiteConsumidorApiPublicaId,
+		headers.publicAccessKey,
+	);
 	const allItems: T[] = [];
 	let currentPage = numeroPagina || 1;
-	const itemsPerPage = pagination === "all" ? 1000 : cantidadItemsPorPagina || 100;
-	const intervaloMs = pagination === "all" ? 1000 : (intervaloPagina ?? 1000);
+	const itemsPerPage = pagination === 'all' ? 1000 : cantidadItemsPorPagina || 100;
+	const intervaloMs = pagination === 'all' ? 1000 : (intervaloPagina ?? 1000);
 
 	while (true) {
 		const totalStart = Date.now();
@@ -1198,28 +1309,30 @@ export async function apiPostRequestPaginated<T = any>(url: string, options: Fet
 			cantidadItemsPorPagina: itemsPerPage,
 		};
 		const finalUrl = buildUrl(url, paginatedParams);
-		const { shouldDebug, maxBodyLength } = getDebugConfig(context, finalUrl, options.debugItemIndex ?? 0);
+		const { shouldDebug } = getDebugConfig(context, finalUrl, options.debugItemIndex ?? 0);
 		const fetchOptions: RequestInit = {
-			method: "POST",
-			headers: { "Content-Type": "application/json", ...requestHeaders },
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json', ...requestHeaders },
 			body: JSON.stringify(body),
 		};
 		if (shouldDebug) {
-			logDebugMessage(context, "[Centum debug] Request", {
+			logDebugMessage(context, '[Centum debug] Request', {
 				url: finalUrl,
-				method: "POST",
+				method: 'POST',
 				headers: redactHeaders(fetchOptions.headers as Record<string, unknown>),
-				body: truncateLoggedValue(String(fetchOptions.body), maxBodyLength),
+				hasBody: true,
+				bodyLength: String(fetchOptions.body).length,
 			});
 		}
 		const response = await fetch(finalUrl, fetchOptions);
 		const responseText = await response.text();
 		if (shouldDebug) {
-			logDebugMessage(context, "[Centum debug] Response", {
+			logDebugMessage(context, '[Centum debug] Response', {
 				url: finalUrl,
 				status: response.status,
 				statusText: response.statusText,
-				body: truncateLoggedValue(responseText, maxBodyLength),
+				contentType: response.headers.get('content-type') || '',
+				bodyLength: responseText.length,
 			});
 		}
 		if (!response.ok) {
@@ -1296,42 +1409,56 @@ export async function apiPostRequestPaginated<T = any>(url: string, options: Fet
 // 	}
 // }
 
-export async function apiRequest<T>(url: string, options: FetchOptions = {}, context?: IExecuteFunctions): Promise<T> {
+export async function apiRequest<T>(
+	url: string,
+	options: FetchOptions = {},
+	context?: IExecuteFunctions,
+): Promise<T> {
 	const effectiveContext = options.context ?? context;
-	const { method = "GET", headers = {} as CentumHeaders, body, queryParams, responseType } = options;
+	const {
+		method = 'GET',
+		headers = {} as CentumHeaders,
+		body,
+		queryParams,
+		responseType,
+	} = options;
 
 	const finalUrl = buildUrl(url, queryParams);
-	const requestHeaders = buildCentumHeaders(headers.CentumSuiteConsumidorApiPublicaId, headers.publicAccessKey);
-	const { shouldDebug, maxBodyLength: debugMaxBodyLength } = getDebugConfig(effectiveContext, finalUrl, options.debugItemIndex ?? 0);
+	const requestHeaders = buildCentumHeaders(
+		headers.CentumSuiteConsumidorApiPublicaId,
+		headers.publicAccessKey,
+	);
+	const { shouldDebug } = getDebugConfig(effectiveContext, finalUrl, options.debugItemIndex ?? 0);
 
 	const fetchOptions: RequestInit = {
 		method,
 		headers: {
-			"Content-Type": "application/json",
+			'Content-Type': 'application/json',
 			...requestHeaders,
 		},
 	};
 
 	if (body) {
-		if (typeof body !== "object") {
-			safeThrow(effectiveContext, "El body debe ser un objeto válido (no una cadena u otro tipo)");
+		if (typeof body !== 'object') {
+			safeThrow(effectiveContext, 'El body debe ser un objeto válido (no una cadena u otro tipo)');
 		}
 		fetchOptions.body = JSON.stringify(body);
 	}
 
 	if (shouldDebug) {
-		logDebugMessage(effectiveContext, "[Centum debug] Request", {
+		logDebugMessage(effectiveContext, '[Centum debug] Request', {
 			url: finalUrl,
 			method,
 			headers: redactHeaders((fetchOptions.headers ?? {}) as Record<string, unknown>),
-			body: fetchOptions.body ? truncateLoggedValue(String(fetchOptions.body), debugMaxBodyLength) : null,
+			hasBody: Boolean(fetchOptions.body),
+			bodyLength: fetchOptions.body ? String(fetchOptions.body).length : 0,
 		});
 	}
 
 	try {
 		const response = await fetch(finalUrl, fetchOptions);
 
-		if (responseType === "arraybuffer") {
+		if (responseType === 'arraybuffer') {
 			if (!response.ok) {
 				const errorText = await response.text();
 				safeThrow(effectiveContext, `Error ${response.status} - ${errorText}`);
@@ -1343,20 +1470,21 @@ export async function apiRequest<T>(url: string, options: FetchOptions = {}, con
 		const rawText = await response.text();
 
 		if (shouldDebug) {
-			logDebugMessage(effectiveContext, "[Centum debug] Response", {
+			logDebugMessage(effectiveContext, '[Centum debug] Response', {
 				url: finalUrl,
 				status: response.status,
 				statusText: response.statusText,
-				body: truncateLoggedValue(rawText, debugMaxBodyLength),
+				contentType: response.headers.get('content-type') || '',
+				bodyLength: rawText.length,
 			});
 		}
 
 		if (!response.ok) {
-			const contentType = response.headers.get("content-type") || "";
+			const contentType = response.headers.get('content-type') || '';
 			const status = response.status;
 
 			let errorData: ApiErrorBody | string = rawText;
-			if (contentType.includes("application/json")) {
+			if (contentType.includes('application/json')) {
 				try {
 					errorData = JSON.parse(rawText) as ApiErrorBody;
 				} catch {
@@ -1364,9 +1492,15 @@ export async function apiRequest<T>(url: string, options: FetchOptions = {}, con
 				}
 			}
 
-			const mensaje = typeof errorData === "object" ? errorData.message || errorData.Message || "Sin mensaje en body" : rawText || "Sin cuerpo de respuesta";
+			const mensaje =
+				typeof errorData === 'object'
+					? errorData.message || errorData.Message || 'Sin mensaje en body'
+					: rawText || 'Sin cuerpo de respuesta';
 
-			const descripcion = typeof errorData === "object" ? errorData.detail || errorData.Detail || "Sin detalles adicionales" : "Texto plano sin JSON";
+			const descripcion =
+				typeof errorData === 'object'
+					? errorData.detail || errorData.Detail || 'Sin detalles adicionales'
+					: 'Texto plano sin JSON';
 
 			const errorMessage = `Error ${status} - ${mensaje}\n${descripcion}`;
 			safeThrow(effectiveContext, errorMessage);
@@ -1379,9 +1513,9 @@ export async function apiRequest<T>(url: string, options: FetchOptions = {}, con
 		return JSON.parse(rawText) as T;
 	} catch (error) {
 		if (effectiveContext) {
-			effectiveContext.logger?.error?.("API request failed", { error });
+			effectiveContext.logger?.error?.('API request failed', { error });
 		}
 
-		safeThrow(effectiveContext, getErrorMessage(error, "Error desconocido en fetch"));
+		safeThrow(effectiveContext, getErrorMessage(error, 'Error desconocido en fetch'));
 	}
 }

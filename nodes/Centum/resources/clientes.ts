@@ -1,45 +1,75 @@
-import { NodeOperationError } from "n8n-workflow";
-import * as helperFns from "../helpers/functions";
-import type { ResourceHandler, ResourceHandlerMap } from "./tipos";
+import { NodeOperationError } from 'n8n-workflow';
+import * as helperFns from '../helpers/functions';
+import type { ResourceHandler, ResourceHandlerMap } from './tipos';
 
 const actualizarCliente: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const nuevosDatos = helperFns.getNodeParameterOrThrow(executeFunctions, "cuerpoHTTP", itemIndex);
+	const nuevosDatos = helperFns.getNodeParameterOrThrow(executeFunctions, 'cuerpoHTTP', itemIndex);
 	try {
 		const updateCustomer = await helperFns.apiRequest<any>(`${centumUrl}/Clientes/Actualizar`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: "POST",
+			method: 'POST',
 			body: nuevosDatos,
 			headers,
 		});
 
 		return [executeFunctions.helpers.returnJsonArray(updateCustomer)];
 	} catch (error) {
-		throw new NodeOperationError(executeFunctions.getNode(), helperFns.getErrorMessage(error, "Error actualizando cliente"));
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			helperFns.getErrorMessage(error, 'Error actualizando cliente'),
+		);
 	}
 };
 
 const buscarClientes: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const codigo = helperFns.getNodeParameterOrThrow(executeFunctions, "codigoCliente", itemIndex, "") as string;
-	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, "cuit", itemIndex, "") as string;
-	const razonSocial = helperFns.getNodeParameterOrThrow(executeFunctions, "razonSocial", itemIndex, "") as string;
+	const codigo = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'codigoCliente',
+		itemIndex,
+		'',
+	) as string;
+	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, 'cuit', itemIndex, '') as string;
+	const razonSocial = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'razonSocial',
+		itemIndex,
+		'',
+	) as string;
 
 	if (!codigo && !cuit && !razonSocial) {
-		throw new NodeOperationError(executeFunctions.getNode(), "Debe proporcionar al menos un campo para la búsqueda (CUIT, Codigo o Razón Social).");
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'Debe proporcionar al menos un campo para la búsqueda (CUIT, Codigo o Razón Social).',
+		);
 	}
 
 	const queryParams: Record<string, string> = {};
@@ -51,29 +81,40 @@ const buscarClientes: ResourceHandler = async (context) => {
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/Clientes`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: "GET",
+			method: 'GET',
 			headers,
 			queryParams,
 		});
 		return [executeFunctions.helpers.returnJsonArray(response.Items as any)];
 	} catch (error) {
-		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
 const buscarClientePorCuit: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, "cuit", itemIndex, "") as string;
+	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, 'cuit', itemIndex, '') as string;
 
 	if (!cuit) {
-		throw new NodeOperationError(executeFunctions.getNode(), "Debe proporcionar CUIT para buscar clientes.");
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'Debe proporcionar CUIT para buscar clientes.',
+		);
 	}
 
 	const queryParams: Record<string, string> = { Cuit: cuit };
@@ -82,35 +123,43 @@ const buscarClientePorCuit: ResourceHandler = async (context) => {
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/Clientes`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: "GET",
+			method: 'GET',
 			headers,
 			queryParams,
 		});
 
 		return [executeFunctions.helpers.returnJsonArray(response.Items as any)];
 	} catch (error) {
-		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
 const listarClientes: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
 	try {
-		const ajustesHTTP = helperFns.getHttpSettings.call(executeFunctions);
+		const ajustesHTTP = helperFns.getHttpSettings.call(executeFunctions, itemIndex);
 		const clientesURL = `${centumUrl}/Clientes`;
 
 		const fetchOptions: any = {
-			method: "GET",
+			method: 'GET',
 			pagination: ajustesHTTP.pagination,
 			cantidadItemsPorPagina: ajustesHTTP.cantidadItemsPorPagina,
 			intervaloPagina: ajustesHTTP.intervaloPagina,
-			itemsField: "Items",
+			itemsField: 'Items',
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
 			headers,
@@ -122,33 +171,53 @@ const listarClientes: ResourceHandler = async (context) => {
 
 		return [executeFunctions.helpers.returnJsonArray(clientes as any)];
 	} catch (error) {
-		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
 const crearCliente: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const razonSocial = helperFns.getNodeParameterOrThrow(executeFunctions, "razonSocial", itemIndex);
-	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, "cuit", itemIndex);
-	const provincia = helperFns.getNodeParameterOrThrow(executeFunctions, "idProvincia", itemIndex);
-	const pais = helperFns.getNodeParameterOrThrow(executeFunctions, "idPais", itemIndex);
-	const zona = helperFns.getNodeParameterOrThrow(executeFunctions, "idZona", itemIndex);
-	const condicionIVA = helperFns.getNodeParameterOrThrow(executeFunctions, "condicionIVA", itemIndex);
-	const condicionVentaId = helperFns.getNodeParameterOrThrow(executeFunctions, "idCondicionVenta", itemIndex);
-	const bonificacionId = helperFns.getNodeParameterOrThrow(executeFunctions, "idBonificacion", itemIndex);
+	const razonSocial = helperFns.getNodeParameterOrThrow(executeFunctions, 'razonSocial', itemIndex);
+	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, 'cuit', itemIndex);
+	const provincia = helperFns.getNodeParameterOrThrow(executeFunctions, 'idProvincia', itemIndex);
+	const pais = helperFns.getNodeParameterOrThrow(executeFunctions, 'idPais', itemIndex);
+	const zona = helperFns.getNodeParameterOrThrow(executeFunctions, 'idZona', itemIndex);
+	const condicionIVA = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'condicionIVA',
+		itemIndex,
+	);
+	const condicionVentaId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'idCondicionVenta',
+		itemIndex,
+	);
+	const bonificacionId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'idBonificacion',
+		itemIndex,
+	);
 
 	try {
 		const crearCliente = await helperFns.apiRequest<any>(`${centumUrl}/Clientes`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: "POST",
+			method: 'POST',
 			headers,
 			body: {
 				RazonSocial: razonSocial,
@@ -214,23 +283,41 @@ const crearCliente: ResourceHandler = async (context) => {
 		});
 		return [executeFunctions.helpers.returnJsonArray(crearCliente)];
 	} catch (error) {
-		throw new NodeOperationError(executeFunctions.getNode(), `Error al obtener la informacion de los articulos ${error}`);
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			`Error al obtener la informacion de los articulos ${error}`,
+		);
 	}
 };
 
 const buscarContribuyente: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, "cuit", itemIndex, "") as string;
-	const razonSocial = helperFns.getNodeParameterOrThrow(executeFunctions, "razonSocial", itemIndex, "") as string;
+	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, 'cuit', itemIndex, '') as string;
+	const razonSocial = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'razonSocial',
+		itemIndex,
+		'',
+	) as string;
 
 	if (!cuit && !razonSocial) {
-		throw new NodeOperationError(executeFunctions.getNode(), "Debe proporcionar al menos CUIT o Razón Social para buscar contribuyentes.");
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'Debe proporcionar al menos CUIT o Razón Social para buscar contribuyentes.',
+		);
 	}
 
 	let url = `${centumUrl}/Clientes/BuscarContribuyente`;
@@ -253,7 +340,7 @@ const buscarContribuyente: ResourceHandler = async (context) => {
 		const response = await helperFns.apiRequest<any>(requestDetails.url, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: "GET",
+			method: 'GET',
 			headers: requestDetails.headers,
 			queryParams: requestDetails.queryParams,
 		});
@@ -263,24 +350,39 @@ const buscarContribuyente: ResourceHandler = async (context) => {
 
 		return [executeFunctions.helpers.returnJsonArray(response as any)];
 	} catch (error) {
-		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
 const crearContribuyente: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const bodyJson = helperFns.getNodeParameterOrThrow(executeFunctions, "cuerpoHTTP", itemIndex) as any;
-	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, "cuit", itemIndex);
+	const bodyJson = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'cuerpoHTTP',
+		itemIndex,
+	) as any;
+	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, 'cuit', itemIndex);
 
-	if (typeof cuit !== "string" || !/^\d{11}$/.test(cuit)) {
-		throw new NodeOperationError(executeFunctions.getNode(), "El CUIT debe ser una cadena de 11 dígitos numéricos.");
+	if (typeof cuit !== 'string' || !/^\d{11}$/.test(cuit)) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'El CUIT debe ser una cadena de 11 dígitos numéricos.',
+		);
 	}
 
 	const contribuyenteJSON = helperFns.createContribuyenteJson(bodyJson, cuit);
@@ -289,7 +391,7 @@ const crearContribuyente: ResourceHandler = async (context) => {
 		const crearCliente = await helperFns.apiRequest(`${centumUrl}/Clientes`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: "POST",
+			method: 'POST',
 			body: contribuyenteJSON,
 			headers,
 		});
@@ -298,32 +400,51 @@ const crearContribuyente: ResourceHandler = async (context) => {
 	} catch (error: any) {
 		const statusCode = error?.response?.status;
 		const responseData = error?.response?.data;
-		const errorMessage = responseData?.Message || responseData?.message || (error as any)?.message || "Error desconocido al crear el contribuyente.";
+		const errorMessage =
+			responseData?.Message ||
+			responseData?.message ||
+			(error as any)?.message ||
+			'Error desconocido al crear el contribuyente.';
 
 		const fullMessage = statusCode ? `Error ${statusCode}: ${errorMessage}` : errorMessage;
 
 		throw new NodeOperationError(executeFunctions.getNode(), fullMessage, {
-			description: responseData?.Detail || "Ocurrió un error inesperado al llamar a la API de Centum.",
+			description:
+				responseData?.Detail || 'Ocurrió un error inesperado al llamar a la API de Centum.',
 		});
 	}
 };
 
 const consultarSaldoCliente: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const clientIdParam = helperFns.getNodeParameterOrThrow(executeFunctions, "clienteId", itemIndex);
-	const desdeSaldoFecha = helperFns.getNodeParameterOrThrow(executeFunctions, "priceDateModifiedTo", itemIndex);
-	const soloFecha = String(desdeSaldoFecha).split("T")[0];
+	const clientIdParam = helperFns.getNodeParameterOrThrow(executeFunctions, 'clienteId', itemIndex);
+	const desdeSaldoFecha = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'priceDateModifiedTo',
+		itemIndex,
+	);
+	const soloFecha = String(desdeSaldoFecha).split('T')[0];
 
 	// Validación de parámetros
 	const clientId = Number(clientIdParam);
 	if (isNaN(clientId) || clientId <= 0) {
-		throw new NodeOperationError(executeFunctions.getNode(), "clienteId debe ser un número positivo");
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'clienteId debe ser un número positivo',
+		);
 	}
 
 	try {
@@ -335,33 +456,51 @@ const consultarSaldoCliente: ResourceHandler = async (context) => {
 		const response = await helperFns.apiRequest<any>(url, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: "GET",
+			method: 'GET',
 			headers,
 		});
 
 		return [executeFunctions.helpers.returnJsonArray(response)];
 	} catch (error) {
-		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
-		throw new NodeOperationError(executeFunctions.getNode(), `Error obteniendo saldo para cliente ${clientId}: ${errorMessage}`);
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			`Error obteniendo saldo para cliente ${clientId}: ${errorMessage}`,
+		);
 	}
 };
 
 const verDetalleSaldoCliente: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const clientIdParam = helperFns.getNodeParameterOrThrow(executeFunctions, "clienteId", itemIndex);
-	const hastaSaldoFecha = helperFns.getNodeParameterOrThrow(executeFunctions, "priceDateModifiedTo", itemIndex);
-	const separarFecha = String(hastaSaldoFecha).split("T")[0];
+	const clientIdParam = helperFns.getNodeParameterOrThrow(executeFunctions, 'clienteId', itemIndex);
+	const hastaSaldoFecha = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'priceDateModifiedTo',
+		itemIndex,
+	);
+	const separarFecha = String(hastaSaldoFecha).split('T')[0];
 
 	// Validación de parámetros
 	const clientId = Number(clientIdParam);
 	if (isNaN(clientId) || clientId <= 0) {
-		throw new NodeOperationError(executeFunctions.getNode(), "clienteId debe ser un número positivo");
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'clienteId debe ser un número positivo',
+		);
 	}
 
 	try {
@@ -373,58 +512,76 @@ const verDetalleSaldoCliente: ResourceHandler = async (context) => {
 		const response = await helperFns.apiRequest<any>(url, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: "GET",
+			method: 'GET',
 			headers,
 		});
 
 		// Validación de la respuesta
-		if (!response || typeof response !== "object") {
-			throw new NodeOperationError(executeFunctions.getNode(), "Respuesta inválida del servidor");
+		if (!response || typeof response !== 'object') {
+			throw new NodeOperationError(executeFunctions.getNode(), 'Respuesta inválida del servidor');
 		}
 
 		return [executeFunctions.helpers.returnJsonArray(response)];
 	} catch (error) {
-		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
-		throw new NodeOperationError(executeFunctions.getNode(), `Error obteniendo composición de saldo para cliente ${clientId}: ${errorMessage}`);
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			`Error obteniendo composición de saldo para cliente ${clientId}: ${errorMessage}`,
+		);
 	}
 };
 
 const listarPromocionesComercialesCliente: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const clientIdParam = helperFns.getNodeParameterOrThrow(executeFunctions, "clienteId", itemIndex);
-	const documentDate = helperFns.getNodeParameterOrThrow(executeFunctions, "documentDate", itemIndex) as string;
-	const diaSemana = helperFns.getNodeParameterOrThrow(executeFunctions, "diaSemana", itemIndex);
+	const clientIdParam = helperFns.getNodeParameterOrThrow(executeFunctions, 'clienteId', itemIndex);
+	const documentDate = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'documentDate',
+		itemIndex,
+	) as string;
+	const diaSemana = helperFns.getNodeParameterOrThrow(executeFunctions, 'diaSemana', itemIndex);
 	const clientId = Number(clientIdParam);
 
 	if (!documentDate) {
-		throw new NodeOperationError(executeFunctions.getNode(), "documentDate es requerido");
+		throw new NodeOperationError(executeFunctions.getNode(), 'documentDate es requerido');
 	}
 
-	const formattedDocumentDate = String(documentDate).split("T")[0];
+	const formattedDocumentDate = String(documentDate).split('T')[0];
 
 	try {
 		const body = {
 			FechaDocumento: formattedDocumentDate,
 			IdsCliente: clientId,
-			DiaSemana: diaSemana || "",
+			DiaSemana: diaSemana || '',
 		};
 
-		const response = await helperFns.apiRequest<any>(`${centumUrl}/PromocionesComerciales/FiltrosPromocionComercial`, {
-			context: executeFunctions,
-			debugItemIndex: itemIndex,
-			method: "POST",
-			headers,
-			body,
-		});
+		const response = await helperFns.apiRequest<any>(
+			`${centumUrl}/PromocionesComerciales/FiltrosPromocionComercial`,
+			{
+				context: executeFunctions,
+				debugItemIndex: itemIndex,
+				method: 'POST',
+				headers,
+				body,
+			},
+		);
 
-		if (!response || typeof response !== "object") {
-			throw new NodeOperationError(executeFunctions.getNode(), "Respuesta inválida del servidor");
+		if (!response || typeof response !== 'object') {
+			throw new NodeOperationError(executeFunctions.getNode(), 'Respuesta inválida del servidor');
 		}
 
 		if (response.Items && Array.isArray(response.Items)) {
@@ -433,13 +590,24 @@ const listarPromocionesComercialesCliente: ResourceHandler = async (context) => 
 
 		return [executeFunctions.helpers.returnJsonArray(response)];
 	} catch (error) {
-		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
-		throw new NodeOperationError(executeFunctions.getNode(), `Error obteniendo promociones para el cliente ${clientId}: \n ${errorMessage}`);
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			`Error obteniendo promociones para el cliente ${clientId}: \n ${errorMessage}`,
+		);
 	}
 };
 
 const frecuenciasCliente: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
@@ -454,7 +622,8 @@ const frecuenciasCliente: ResourceHandler = async (context) => {
 
 		return [executeFunctions.helpers.returnJsonArray(frecuenciasCliente)];
 	} catch (error) {
-		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
