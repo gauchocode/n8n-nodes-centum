@@ -8,44 +8,44 @@ export const CentumOperations: INodeProperties[] = [
 		noDataExpression: true,
 		options: [
 			{
-				name: "Artículos",
+				name: "Artículo",
 				value: "articulos",
 			},
 			{
-				name: "Clientes",
+				name: "Cliente",
 				value: "clientes",
 			},
 			{
-				name: "Ventas",
-				value: "ventas",
-			},
-			{
-				name: "Cobros",
+				name: "Cobro",
 				value: "cobros",
 			},
 			{
-				name: "Compras",
+				name: "Compra",
 				value: "compras",
 			},
 			{
-				name: "Proveedores",
-				value: "proveedores",
-			},
-			{
-				name: "Logística",
-				value: "logistica",
-			},
-			{
-				name: "Stock",
-				value: "stock",
+				name: "Extra",
+				value: "extras",
 			},
 			{
 				name: "Geografía",
 				value: "geografia",
 			},
 			{
-				name: "Extras",
-				value: "extras",
+				name: "Logística",
+				value: "logistica",
+			},
+			{
+				name: "Proveedor",
+				value: "proveedores",
+			},
+			{
+				name: "Stock",
+				value: "stock",
+			},
+			{
+				name: "Venta",
+				value: "ventas",
 			},
 		],
 		default: "ventas",
@@ -64,31 +64,31 @@ export const CentumOperations: INodeProperties[] = [
 			{
 				name: "Artículo - Buscar",
 				value: "buscarProductos",
-				action: "Busca artículos por nombre",
+				action: "Busca articulos por nombre",
 				description: "Busca un artículo por nombre y retorna todas las ocurrencias",
 			},
 			{
 				name: "Artículo - Por ID",
 				value: "buscarProductoPorCodigo",
-				action: "Busca artículo por ID",
+				action: "Busca articulo por id",
 				description: "Retorna un artículo específico basado en su ID único",
 			},
 			{
 				name: "Artículos - Filtrado",
 				value: "listarProductosDisponibles",
-				action: "Lista artículos con filtros",
+				action: "Lista articulos con filtros",
 				description: "Retorna un listado de artículos para vender en base a ciertos filtros",
 			},
 			{
 				name: "Artículos - Imagen",
 				value: "descargarImagenesProductos",
-				action: "Obtiene imagen de artículo",
+				action: "Obtiene imagen de articulo",
 				description: "Retorna la imagen binaria de un artículo",
 			},
 			{
 				name: "Artículos - Listado",
 				value: "listarTodosLosProductos",
-				action: "Lista datos generales de artículos",
+				action: "Lista datos generales de articulos",
 				description: "Retorna un listado de los artículos y sus datos generales",
 			},
 			{
@@ -100,13 +100,13 @@ export const CentumOperations: INodeProperties[] = [
 			{
 				name: "Artículos - Stock Sucursal Física",
 				value: "listarProductosPorSucursal",
-				action: "Lista stock por sucursal física",
+				action: "Lista stock por sucursal fisica",
 				description: "Retorna el stock de artículos en una sucursal física específica",
 			},
 			{
 				name: "Artículos - Stock Sucursal Física Por ID Artículo",
 				value: "buscarProductoEnSucursal",
-				action: "Obtiene stock por artículo en sucursal",
+				action: "Obtiene stock por articulo en sucursal",
 				description: "Retorna el stock de un artículo específico en una sucursal física",
 			},
 			{
@@ -118,7 +118,7 @@ export const CentumOperations: INodeProperties[] = [
 			{
 				name: "Categorías - Obtener",
 				value: "listarCategorias",
-				action: "Lista categorías",
+				action: "Lista categorias",
 				description: "Obtiene el listado completo de todas las categorías de los artículos",
 			},
 			{
@@ -192,7 +192,7 @@ export const CentumOperations: INodeProperties[] = [
 			{
 				name: "Cliente - Obtener Composición Del Saldo",
 				value: "verDetalleSaldoCliente",
-				action: "Obtiene composición del saldo",
+				action: "Obtiene composicion del saldo",
 				description: "Obtiene la composición del saldo de la cuenta corriente del cliente especificado",
 			},
 			{
@@ -384,7 +384,7 @@ export const CentumOperations: INodeProperties[] = [
 			{
 				name: "Órdenes De Compra - Obtener",
 				value: "listarOrdenesCompra",
-				action: "Lista órdenes de compra",
+				action: "Lista ordenes de compra",
 				description: "Obtiene todas las órdenes de compra en base a ciertos filtros",
 			},
 			{
@@ -454,7 +454,7 @@ export const CentumOperations: INodeProperties[] = [
 			{
 				name: "Sucursales Físicas - Lista",
 				value: "listarSucursales",
-				action: "Lista sucursales físicas",
+				action: "Lista sucursales fisicas",
 				description: "Obtiene un listado de las sucursales físicas disponibles",
 			},
 			{
@@ -486,7 +486,7 @@ export const CentumOperations: INodeProperties[] = [
 			{
 				name: "Artículos - Existencia",
 				value: "consultarStock",
-				action: "Consulta existencias de artículos",
+				action: "Consulta existencias de articulos",
 				description: "Retorna un listado de las existencias de los artículos en base a ciertos filtros",
 			},
 			{
@@ -498,7 +498,7 @@ export const CentumOperations: INodeProperties[] = [
 			{
 				name: "Ubicaciones De Artículos - Listar",
 				value: "listarUbicacionArticulos",
-				action: "Lista ubicaciones de artículos",
+				action: "Lista ubicaciones de articulos",
 				description: "Obtiene un listado total de las ubicaciones de los artículos",
 			},
 		],
@@ -524,7 +524,7 @@ export const CentumOperations: INodeProperties[] = [
 			{
 				name: "País - Obtener Listado",
 				value: "listarPaises",
-				action: "Lista países",
+				action: "Lista paises",
 				description: "Obtiene el listado de países disponibles",
 			},
 			{
@@ -562,31 +562,31 @@ export const CentumOperations: INodeProperties[] = [
 			{
 				name: "Obtener Operador Móvil",
 				value: "listarOperadoresMoviles",
-				action: "Lista operadores móviles",
+				action: "Lista operadores moviles",
 				description: "Obtiene el listado de todos los operadores móviles",
 			},
 			{
 				name: "Proceso Binario a Imagen",
 				value: "sincronizarImagenes",
-				action: "Procesa imágenes binarias",
+				action: "Procesa imagenes binarias",
 				description: "Procesa datos binarios de imágenes para su uso en WooCommerce",
 			},
 			{
 				name: "Productos WooCommerce - Generar (JSON Producto)",
 				value: "convertirProductosParaWooCommerce",
-				action: "Convierte productos para WooCommerce",
+				action: "Convierte productos para woocommerce",
 				description: "Genera un JSON estructurado para productos WooCommerce a partir de artículos Centum",
 			},
 			{
 				name: "Regímenes Especiales - ID",
 				value: "verDetalleRegimenEspecial",
-				action: "Obtiene régimen especial por ID",
+				action: "Obtiene regimen especial por id",
 				description: "Trae un régimen especial por ID",
 			},
 			{
 				name: "Regímenes Especiales - Lista",
 				value: "listarRegimenesEspeciales",
-				action: "Lista regímenes especiales",
+				action: "Lista regimenes especiales",
 				description: "Trae un listado completo de los regímenes especiales",
 			},
 			{
@@ -598,7 +598,7 @@ export const CentumOperations: INodeProperties[] = [
 			{
 				name: "Verificar Operador Móvil",
 				value: "verificarCredencialesOperador",
-				action: "Verifica operador móvil",
+				action: "Verifica operador movil",
 				description: "Obtiene todos los datos de un operador móvil en base a las credenciales",
 			},
 		],
