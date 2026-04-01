@@ -1,38 +1,102 @@
 ---
 name: n8n-community-node
-description: Use when creating custom n8n community nodes for APIs, especially with many endpoints, verbose responses, or when the node should work as an AI Agent tool
+description: Use when creating custom n8n community nodes for APIs, especially with many endpoints, verbose responses, or when the node should work as an AI Agent tool. Includes standards for verified community nodes and code architecture patterns.
 ---
 
 # n8n Community Node Development
 
 ## Overview
 
-Pattern for creating n8n community nodes with clean UX, simplified output, AI Agent compatibility, and npm publishing.
+Pattern for creating n8n community nodes with clean UX, simplified output, AI Agent compatibility, and npm publishing. Covers both personal nodes and **verified community nodes** (published to npm registry).
+
+**Important distinction:**
+- **Personal/Local nodes**: For internal use, can use runtime dependencies
+- **Verified Community nodes**: Published to npm, must follow strict technical constraints (no runtime dependencies, security requirements)
+
+## Prerequisites
+
+- **Node.js**: v18.17.0 or higher (v20+ recommended)
+- **npm**: v9+ or pnpm
+- **git**: For version control
+- **n8n-node CLI**: Official scaffolding tool
+
+## Project Setup (Official Method)
+
+Use the official n8n CLI to ensure compliance with verification standards:
+
+```bash
+npx n8n-node create
+# Follow interactive prompts:
+# - Package name: n8n-nodes-myapi
+# - Description: Your description
+# - Author: Your name
+# - License: MIT (required for verification)
+```
+
+This generates:
+- TypeScript configuration
+- ESLint setup with n8n rules
+- Testing environment
+- Correct folder structure
+
+**Legacy method** (only if you need custom setup):
+```bash
+git clone https://github.com/n8n-io/n8n-nodes-starter.git n8n-nodes-myapi
+cd n8n-nodes-myapi
+rm -rf .git && git init  # Clean history
+```
 
 ## Project Structure
 
 ```
 n8n-nodes-myapi/
-├── package.json           # Package config with n8n metadata
-├── tsconfig.json          # TypeScript config
-├── .npmignore             # Files to exclude from npm package
-├── .env                   # NPM_TOKEN (gitignored)
+├── package.json                    # Package config with n8n metadata
+├── tsconfig.json                   # TypeScript config
+├── .eslintrc.js                    # Linting rules (auto-generated)
+├── .npmignore                      # Files to exclude from npm package
 ├── .gitignore
 ├── nodes/
 │   └── MyApi/
-│       ├── MyApi.node.ts  # Main node implementation
-│       └── myapi.svg      # Node icon
+│       ├── MyApi.node.ts           # Main node implementation
+│       ├── MyApi.node.json         # Metadata (codex) - REQUIRED for verification
+│       └── myapi.svg               # Node icon
 ├── credentials/
-│   └── MyApi.credentials.ts
-└── dist/                  # Compiled output (gitignored)
+│   └── MyApiApi.credentials.ts     # Auth configuration
+└── dist/                           # Compiled output (gitignored)
 ```
 
-**Optional Docker setup (recommended for CI/CD):**
-```
-├── Dockerfile
-├── docker-compose.yml
-├── pnpm-lock.yaml
-```
+## ⚠️ CRITICAL: Verification Standards
+
+To publish as a **verified community node** (appears in n8n's community node repository), you **MUST** follow these constraints:
+
+### Node Eligibility
+- **Must NOT duplicate existing nodes**: If your node is an iteration on an existing n8n node, submit a pull request to the n8n repo instead.
+- **No Logic/Flow control nodes**: n8n is not accepting Logic or Flow control community nodes for verification at this time.
+
+### Technical Constraints
+- **NO runtime dependencies**: Only `devDependencies` allowed in package.json. All code must be bundled or use n8n's internal libraries.
+- **NO file system access**: Do not use `fs`, `path`, or `os` modules.
+- **NO environment variables**: Do not access `process.env`.
+- **NO child processes**: Do not spawn subprocesses.
+- **NO network servers**: Do not create HTTP servers or listen on ports.
+
+### Package Requirements
+- Name must start with `n8n-nodes-` or `@scope/n8n-nodes-`
+- **MUST include keyword**: `"n8n-community-node-package"` (CRITICAL: Without this, your node will not appear in the community registry)
+- Must include `n8n` object in package.json linking to compiled files
+- Must pass official linter: `npx @n8n/scan-community-package n8n-nodes-myapi`
+- **License must be MIT** (not just recommended - required for verification)
+
+### Source Verification
+- npm package `repository.url` must match the actual GitHub repository
+- Package author/maintainer must match between npm and GitHub
+- Git link in npm must work and the repository must be **public**
+- **Must be published from a GitHub Action with provenance** (mandatory from May 1st 2026)
+
+### English Only
+- Both the node interface and all documentation must be in **English only**
+- This includes: parameter names, descriptions, help text, error messages, and README content
+- Do not use any other language in any user-facing text
 
 ## package.json Configuration
 
@@ -41,24 +105,37 @@ n8n-nodes-myapi/
   "name": "n8n-nodes-myapi",
   "version": "1.0.0",
   "description": "n8n community node for MyApi",
-  "keywords": ["n8n", "n8n-community-node-package", "myapi"],
+  "keywords": ["n8n", "n8n-community-node-package", "myapi", "integration"],
   "license": "MIT",
-  "main": "dist/nodes/MyApi/MyApi.node.js",
+  "homepage": "https://github.com/yourusername/n8n-nodes-myapi",
+  "author": {
+    "name": "Your Name",
+    "email": "you@example.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/n8n-nodes-myapi.git"
+  },
+  "main": "index.js",
   "scripts": {
     "build": "tsc && cp nodes/MyApi/myapi.svg dist/nodes/MyApi/",
     "dev": "tsc --watch",
+    "lint": "eslint nodes/ credentials/ --quiet",
     "clean": "rm -rf dist"
   },
   "files": ["dist"],
   "n8n": {
     "n8nNodesApiVersion": 1,
-    "credentials": ["dist/credentials/MyApi.credentials.js"],
+    "credentials": ["dist/credentials/MyApiApi.credentials.js"],
     "nodes": ["dist/nodes/MyApi/MyApi.node.js"]
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "n8n-workflow": "^1.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0"
   },
   "peerDependencies": {
     "n8n-workflow": ">=1.0.0"
@@ -66,122 +143,46 @@ n8n-nodes-myapi/
 }
 ```
 
-## Publishing to npm (Required for Community Nodes)
+**Note**: `dependencies` section is intentionally omitted for verified nodes. The keyword `"n8n-community-node-package"` is **mandatory** for the node to appear in n8n's community node registry.
 
-### Step 1: Create npm Account & Token
+## Node Metadata (Codex File)
 
-1. Create account at https://www.npmjs.com
-2. Generate Access Token: Profile → Access Tokens → Generate New Token (Classic)
-3. Copy token (starts with `npm_`)
+**File**: `nodes/MyApi/MyApi.node.json`
 
-### Step 2: Configure Authentication
+Required for verification. Defines categories and documentation links.
 
-**Option A: Local .npmrc (simple)**
-```bash
-# Create .npmrc in project root
-echo "//registry.npmjs.org/:_authToken=npm_YOUR_TOKEN_HERE" > .npmrc
-echo ".npmrc" >> .gitignore
+```json
+{
+  "node": "n8n-nodes-myapi.MyApi",
+  "nodeVersion": "1.0",
+  "codexVersion": "1.0",
+  "categories": ["Communication", "Productivity", "Development"],
+  "resources": {
+    "credentialDocumentation": [
+      {
+        "url": "https://docs.myapi.com/authentication"
+      }
+    ],
+    "primaryDocumentation": [
+      {
+        "url": "https://github.com/yourusername/n8n-nodes-myapi/blob/main/README.md"
+      }
+    ]
+  }
+}
 ```
 
-**Option B: .env file (recommended for Docker)**
-```bash
-# Create .env (gitignored)
-echo "NPM_TOKEN=npm_YOUR_TOKEN_HERE" > .env
-echo ".env" >> .gitignore
-```
-
-### Step 3: Build & Publish
-
-**Without Docker:**
-```bash
-# Install dependencies
-pnpm install
-
-# Clean and build
-rm -rf dist && pnpm build
-
-# Publish
-npm publish --access public
-```
-
-**With Docker (recommended for consistency):**
-
-Create `Dockerfile`:
-```dockerfile
-FROM node:20-alpine
-
-WORKDIR /app
-
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@9.1.4 --activate
-
-# Copy package files
-COPY package.json pnpm-lock.yaml* ./
-
-# Install dependencies
-RUN pnpm install
-
-# Copy source
-COPY . .
-
-# Clean dist and build (ensures fresh compilation)
-RUN rm -rf dist && pnpm build
-
-# Default command
-CMD ["sh"]
-```
-
-Create `docker-compose.yml`:
-```yaml
-services:
-  build:
-    build: .
-    volumes:
-      - ./dist:/app/dist
-    command: pnpm build
-
-  publish:
-    build: .
-    env_file:
-      - .env
-    command: sh -c "echo '//registry.npmjs.org/:_authToken=$${NPM_TOKEN}' > ~/.npmrc && npm publish --access public"
-```
-
-Publish:
-```bash
-docker compose build --no-cache
-docker compose run publish
-```
-
-### Step 4: Verify Publication
-
-```bash
-# Check package exists
-curl -s https://registry.npmjs.org/n8n-nodes-myapi | jq '.name, ."dist-tags".latest'
-
-# Verify tarball contents
-curl -s https://registry.npmjs.org/n8n-nodes-myapi/1.0.0 | jq '.dist.tarball' -r | xargs curl -s | tar -tzf -
-```
-
-### Step 5: Install in n8n
-
-1. Go to n8n → Settings → Community Nodes
-2. Click "Install a community node"
-3. Enter: `n8n-nodes-myapi`
-4. Click Install
-
-**Or via CLI:**
-```bash
-n8n-cli community-package:install n8n-nodes-myapi
-```
+**Categories must be from n8n's allowed list**:
+- Communication, Data & Storage, Development, Finance, HR, Marketing, Operations, Productivity, Sales, Security, Utility
 
 ## Icon Configuration (SVG)
 
 **Requirements:**
 - Format: SVG (vector, scales well)
-- Size: 60x60 pixels recommended
+- Size: 60x60 pixels viewBox
+- Style: Simple, recognizable at small size
 - Colors: Use brand colors, avoid gradients
-- Keep it simple - displayed small
+- Background: Transparent or solid
 
 **Location:**
 ```
@@ -199,16 +200,7 @@ nodes/MyApi/myapi.svg
 
 **Icon property in node description:**
 ```typescript
-export class MyApi implements INodeType {
-  description: INodeTypeDescription = {
-    displayName: 'MyApi',
-    name: 'myApi',
-    icon: 'file:myapi.svg',  // Relative to node file
-    group: ['transform'],
-    version: 1,
-    // ...
-  };
-}
+icon: 'file:myapi.svg',  // Relative to node file location
 ```
 
 **Creating a simple SVG:**
@@ -217,6 +209,527 @@ export class MyApi implements INodeType {
   <rect width="60" height="60" rx="8" fill="#3B82F6"/>
   <text x="30" y="40" text-anchor="middle" fill="white" font-size="24" font-weight="bold">MA</text>
 </svg>
+```
+
+## Code Organization & Architecture
+
+The file structure depends on node complexity. n8n recommends: **"Unless your node is very simple, it's a best practice to split it out."**
+
+### Decision Matrix
+
+| Complexity | Structure | When to Use |
+|------------|-----------|-------------|
+| **Simple** | **Monolithic** - Single file | 1-2 resources, <5 operations, no complex logic |
+| **Medium** | **Semi-Modular** - Base file + helpers | 3-5 resources, CRUD operations, some shared logic |
+| **Complex** | **Full Modular** - Directory structure | 5+ resources, multiple versions, complex API |
+
+### Pattern 1: Monolithic (Simple Nodes)
+
+**Best for**: Webhooks, simple APIs with 1-2 resources, prototyping
+
+**Structure:**
+```
+nodes/MyApi/
+├── MyApi.node.ts       # Everything in one file
+├── MyApi.node.json
+└── myapi.svg
+```
+
+**Example:**
+```typescript
+import { IExecuteFunctions, INodeExecutionData, INodeParameterResourceLocator, INodeType, INodeTypeDescription } from 'n8n-workflow';
+
+export class MyApi implements INodeType {
+  description: INodeTypeDescription = {
+    displayName: 'MyApi',
+    name: 'myApi',
+    icon: 'file:myapi.svg',
+    group: ['transform'],
+    version: 1,
+    usableAsTool: true,
+    inputs: ['main'],
+    outputs: ['main'],
+    credentials: [{ name: 'myApiApi', required: true }],
+    properties: [
+      // Resources and operations defined inline
+      {
+        displayName: 'Operation',
+        name: 'operation',
+        type: 'options',
+        options: [
+          { name: 'List', value: 'list', action: 'List items' },
+          { name: 'Create', value: 'create', action: 'Create item' },
+        ],
+        default: 'list',
+      },
+    ],
+  };
+
+  async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
+    const items = this.getInputData();
+    const returnData: INodeExecutionData[] = [];
+    const operation = this.getNodeParameter('operation', 0) as string;
+
+    for (let i = 0; i < items.length; i++) {
+      try {
+        let response;
+
+        // Inline operation logic
+        if (operation === 'list') {
+          response = await this.helpers.httpRequestWithAuthentication.call(
+            this, 'myApiApi', { method: 'GET', url: 'https://api.myapi.com/items', json: true }
+          );
+        } else if (operation === 'create') {
+          const name = this.getNodeParameter('name', i) as string;
+          response = await this.helpers.httpRequestWithAuthentication.call(
+            this, 'myApiApi', { method: 'POST', url: 'https://api.myapi.com/items', body: { name }, json: true }
+          );
+        }
+
+        const executionData = this.helpers.constructExecutionMetaData(
+          this.helpers.returnJsonArray(response),
+          { itemData: { item: i } }
+        );
+        returnData.push(...executionData);
+
+      } catch (error) {
+        if (this.continueOnFail()) {
+          returnData.push({ json: { error: error.message } });
+          continue;
+        }
+        throw error;
+      }
+    }
+
+    return [returnData];
+  }
+}
+```
+
+### Pattern 2: Semi-Modular (Medium Complexity)
+
+**Best for**: 3-5 resources, shared logic between operations, need for helper functions
+
+**Structure:**
+```
+nodes/MyApi/
+├── MyApi.node.ts              # Entry point, description, routing
+├── operations/                # Operation implementations
+│   ├── index.ts              # Export all
+│   ├── list.operation.ts     # List operation
+│   ├── create.operation.ts   # Create operation
+│   └── utils.ts              # Shared helpers
+├── methods/
+│   └── loadOptions.ts        # Dynamic dropdowns
+├── MyApi.node.json
+└── myapi.svg
+```
+
+**Example:**
+
+```typescript
+// operations/list.operation.ts
+import { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
+
+export const listDescription = {
+  displayName: 'List',
+  name: 'list',
+  type: 'options',
+  action: 'List conversations',
+  // ... other properties
+};
+
+export async function executeList(
+  this: IExecuteFunctions,
+  itemIndex: number
+): Promise<INodeExecutionData[]> {
+  const qs: Record<string, any> = {};
+  const filters = this.getNodeParameter('filters', itemIndex, {}) as IDataObject;
+
+  if (filters.status) qs.status = filters.status;
+  if (filters.limit) qs.limit = filters.limit;
+
+  const response = await this.helpers.httpRequestWithAuthentication.call(
+    this,
+    'myApiApi',
+    {
+      method: 'GET',
+      url: 'https://api.myapi.com/conversations',
+      qs,
+      json: true,
+    }
+  );
+
+  return this.helpers.returnJsonArray(response.data || response);
+}
+
+// MyApi.node.ts
+import { executeList, listDescription } from './operations/list.operation';
+import { executeCreate, createDescription } from './operations/create.operation';
+
+export class MyApi implements INodeType {
+  description: INodeTypeDescription = {
+    displayName: 'MyApi',
+    name: 'myApi',
+    icon: 'file:myapi.svg',
+    usableAsTool: true,
+    inputs: ['main'],
+    outputs: ['main'],
+    credentials: [{ name: 'myApiApi', required: true }],
+    properties: [
+      {
+        displayName: 'Resource',
+        name: 'resource',
+        type: 'options',
+        options: [
+          { name: 'Conversation', value: 'conversation' },
+        ],
+        default: 'conversation',
+      },
+      {
+        displayName: 'Operation',
+        name: 'operation',
+        type: 'options',
+        displayOptions: { show: { resource: ['conversation'] } },
+        options: [listDescription, createDescription],
+        default: 'list',
+      },
+    ],
+  };
+
+  async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
+    const items = this.getInputData();
+    const returnData: INodeExecutionData[] = [];
+    const operation = this.getNodeParameter('operation', 0) as string;
+
+    for (let i = 0; i < items.length; i++) {
+      try {
+        let results: INodeExecutionData[];
+
+        // Route to specific operation
+        switch(operation) {
+          case 'list':
+            results = await executeList.call(this, i);
+            break;
+          case 'create':
+            results = await executeCreate.call(this, i);
+            break;
+          default:
+            throw new NodeOperationError(this.getNode(), `Operation ${operation} not supported`);
+        }
+
+        const executionData = this.helpers.constructExecutionMetaData(
+          results,
+          { itemData: { item: i } }
+        );
+        returnData.push(...executionData);
+
+      } catch (error) {
+        if (this.continueOnFail()) {
+          returnData.push({ json: { error: error.message } });
+          continue;
+        }
+        throw error;
+      }
+    }
+
+    return [returnData];
+  }
+}
+```
+
+### Pattern 3: Full Modular (Complex Nodes)
+
+**Best for**: 5+ resources, multiple node versions, complex APIs (like Airtable, Microsoft Outlook)
+
+**Structure:**
+```
+nodes/MyApi/
+├── MyApi.node.ts              # Entry point only
+├── V1/                        # Version 1 (optional)
+│   └── MyApiV1.node.ts
+├── actions/                   # Resources directory
+│   ├── conversation/
+│   │   ├── index.ts          # Resource index
+│   │   ├── list.operation.ts
+│   │   ├── create.operation.ts
+│   │   └── types.ts          # Resource-specific types
+│   ├── contact/
+│   │   ├── index.ts
+│   │   └── ...
+│   └── index.ts              # Export all resources
+├── methods/
+│   ├── loadOptions.ts
+│   └── searchFilters.ts
+├── transport/                 # HTTP client abstraction
+│   ├── index.ts
+│   ├── types.ts
+│   └── utils.ts
+├── utils/                     # Shared utilities
+│   ├── extractItems.ts
+│   └── simplifyOutput.ts
+├── MyApi.node.json
+└── myapi.svg
+```
+
+**Example:**
+
+```typescript
+// actions/conversation/index.ts
+import { listOperation, listDescription } from './list.operation';
+import { createOperation, createDescription } from './create.operation';
+
+export const conversationResource = {
+  name: 'conversation',
+  value: 'conversation',
+  operations: [listDescription, createDescription],
+};
+
+export const conversationHandlers: Record<string, Function> = {
+  list: listOperation,
+  create: createOperation,
+};
+
+// actions/conversation/list.operation.ts
+import { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
+
+export const listDescription = {
+  displayName: 'List',
+  name: 'list',
+  action: 'List conversations',
+  // ... full description
+};
+
+export async function listOperation(
+  this: IExecuteFunctions,
+  itemIndex: number
+): Promise<INodeExecutionData[]> {
+  // Implementation using transport layer
+  const client = await getClient.call(this);
+  const filters = this.getNodeParameter('filters', itemIndex, {}) as IDataObject;
+
+  const response = await client.get('/conversations', { params: filters });
+  return this.helpers.returnJsonArray(response.data);
+}
+
+// transport/index.ts
+import { IExecuteFunctions } from 'n8n-workflow';
+
+export class MyApiClient {
+  private baseURL: string;
+  private credentials: ICredentialDataDecryptedObject;
+
+  constructor(private executeFunctions: IExecuteFunctions) {}
+
+  async init() {
+    this.credentials = await this.executeFunctions.getCredentials('myApiApi');
+    this.baseURL = (this.credentials.baseUrl as string) || 'https://api.myapi.com';
+  }
+
+  async get(path: string, options?: any) {
+    return this.executeFunctions.helpers.httpRequestWithAuthentication.call(
+      this.executeFunctions,
+      'myApiApi',
+      {
+        method: 'GET',
+        url: `${this.baseURL}${path}`,
+        ...options,
+      }
+    );
+  }
+
+  async post(path: string, body: any) {
+    // Similar implementation
+  }
+}
+
+export async function getClient(
+  this: IExecuteFunctions
+): Promise<MyApiClient> {
+  const client = new MyApiClient(this);
+  await client.init();
+  return client;
+}
+
+// MyApi.node.ts - Clean entry point
+import { conversationResource, conversationHandlers } from './actions/conversation';
+import { contactResource, contactHandlers } from './actions/contact';
+
+const RESOURCES = [conversationResource, contactResource];
+const HANDLERS: Record<string, Record<string, Function>> = {
+  conversation: conversationHandlers,
+  contact: contactHandlers,
+};
+
+export class MyApi implements INodeType {
+  description: INodeTypeDescription = {
+    displayName: 'MyApi',
+    name: 'myApi',
+    icon: 'file:myapi.svg',
+    usableAsTool: true,
+    inputs: ['main'],
+    outputs: ['main'],
+    credentials: [{ name: 'myApiApi', required: true }],
+    properties: [
+      {
+        displayName: 'Resource',
+        name: 'resource',
+        type: 'options',
+        noDataExpression: true,
+        options: RESOURCES.map(r => ({ name: r.name, value: r.value })),
+        default: 'conversation',
+      },
+      {
+        displayName: 'Operation',
+        name: 'operation',
+        type: 'options',
+        noDataExpression: true,
+        displayOptions: {
+          show: { resource: RESOURCES.map(r => r.value) },
+        },
+        options: RESOURCES.flatMap(r => r.operations),
+        default: 'list',
+      },
+      // ... other shared properties
+    ],
+  };
+
+  async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
+    const items = this.getInputData();
+    const returnData: INodeExecutionData[] = [];
+
+    const resource = this.getNodeParameter('resource', 0) as string;
+    const operation = this.getNodeParameter('operation', 0) as string;
+
+    const handler = HANDLERS[resource]?.[operation];
+    if (!handler) {
+      throw new NodeOperationError(this.getNode(), `Unknown operation: ${resource}.${operation}`);
+    }
+
+    for (let i = 0; i < items.length; i++) {
+      try {
+        const results = await handler.call(this, i);
+        const executionData = this.helpers.constructExecutionMetaData(
+          results,
+          { itemData: { item: i } }
+        );
+        returnData.push(...executionData);
+      } catch (error) {
+        if (this.continueOnFail()) {
+          returnData.push({ json: { error: error.message } });
+          continue;
+        }
+        throw error;
+      }
+    }
+
+    return [returnData];
+  }
+}
+```
+
+## Architectural Best Practices
+
+### 1. Keep `execute` as an Orchestrator
+
+The `execute` method should route to operations, not contain business logic:
+
+```typescript
+// ❌ Bad: Business logic in execute
+async execute() {
+  const response = await this.helpers.httpRequest(...);
+  const transformed = response.map(item => {
+    // 20 lines of transformation logic
+  });
+  const validated = transformed.filter(item => {
+    // 10 lines of validation
+  });
+  return [validated];
+}
+
+// ✅ Good: Execute orchestrates, operations implement
+async execute() {
+  const handler = getHandler(resource, operation);
+  const raw = await handler.fetch.call(this, itemIndex);
+  const transformed = transformResponse(raw, resource);
+  return [formatOutput(transformed)];
+}
+```
+
+### 2. Handle Response Wrappers Consistently
+
+Create a utility for extracting items from various API response formats:
+
+```typescript
+// utils/extractItems.ts
+export function extractItems(response: any, resource: string): any[] {
+  const wrappers: Record<string, string> = {
+    conversation: 'data',
+    contact: 'contacts',
+    team: 'teams',
+  };
+
+  const key = wrappers[resource];
+  if (key && response?.[key]) {
+    return Array.isArray(response[key]) ? response[key] : [response[key]];
+  }
+  if (Array.isArray(response)) return response;
+  return [response];
+}
+```
+
+### 3. Use TypeScript Types
+
+Define interfaces for API responses:
+
+```typescript
+// types.ts
+export interface IConversation {
+  id: string;
+  title: string;
+  status: 'open' | 'closed' | 'pending';
+  team_id: string;
+  created_at: string;
+}
+
+export interface IApiResponse<T> {
+  data: T;
+  meta?: {
+    total: number;
+    page: number;
+  };
+}
+```
+
+### 4. Error Handling Strategy
+
+Centralize error handling:
+
+```typescript
+// utils/handleErrors.ts
+import { NodeApiError, NodeOperationError, IExecuteFunctions } from 'n8n-workflow';
+
+export function handleApiError(
+  error: any,
+  executeFunctions: IExecuteFunctions,
+  itemIndex: number
+): never {
+  if (error.statusCode === 429) {
+    throw new NodeApiError(executeFunctions.getNode(), error, {
+      message: 'Rate limit exceeded',
+      description: 'Please wait before retrying',
+      itemIndex,
+    });
+  }
+  if (error.statusCode === 401) {
+    throw new NodeApiError(executeFunctions.getNode(), error, {
+      message: 'Authentication failed',
+      description: 'Check your API credentials',
+      itemIndex,
+    });
+  }
+  throw new NodeApiError(executeFunctions.getNode(), error, { itemIndex });
+}
 ```
 
 ## Credential Definition
@@ -228,7 +741,6 @@ import {
 	IAuthenticateGeneric,
 	ICredentialTestRequest,
 	ICredentialType,
-	IHttpRequestOptions,
 	INodeProperties,
 } from 'n8n-workflow';
 
@@ -236,31 +748,38 @@ export class MyApiApi implements ICredentialType {
 	name = 'myApiApi';
 	displayName = 'MyApi API';
 	documentationUrl = 'https://docs.myapi.com/authentication';
+
 	properties: INodeProperties[] = [
 		{
 			displayName: 'API Key',
 			name: 'apiKey',
 			type: 'string',
 			typeOptions: {
-				password: true,
+				password: true,  // Masks input
 			},
 			default: '',
 			required: true,
-			description: 'Your MyApi API key',
+			description: 'Your MyApi API key from the dashboard',
+		},
+		{
+			displayName: 'Base URL',
+			name: 'baseUrl',
+			type: 'string',
+			default: 'https://api.myapi.com',
+			description: 'Override the default API URL (optional)',
 		},
 	];
 
-	// Optional: Test credential button
+	// Test button configuration - validates credentials work
 	test: ICredentialTestRequest = {
 		request: {
-			baseURL: 'https://api.myapi.com',
-			url: '/me',  // Lightweight endpoint to verify auth
+			baseURL: '= {{ $credentials.baseUrl }}',
+			url: '/me',  // Lightweight endpoint that requires auth
 			method: 'GET',
-			authentication: 'genericCredentialType',
 		},
 	};
 
-	// Authentication configuration
+	// Automatic authentication injection
 	authenticate: IAuthenticateGeneric = {
 		type: 'generic',
 		properties: {
@@ -272,667 +791,451 @@ export class MyApiApi implements ICredentialType {
 }
 ```
 
-**Using credentials in node:**
-```typescript
-async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
-  const credentials = await this.getCredentials('myApiApi');
-  const apiKey = credentials.apiKey as string;
-
-  const response = await this.helpers.request({
-    method: 'GET',
-    url: 'https://api.myapi.com/endpoint',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    json: true,
-  });
-  // ...
-}
-```
-
 **Common authentication patterns:**
 
 | Auth Type | Header Format |
 |-----------|---------------|
 | Bearer token | `Authorization: Bearer <token>` |
-| API key header | `X-API-Key: <key>` |
-| Basic auth | `Authorization: Basic base64(user:pass)` |
-| Custom header | `X-Custom-Auth: <value>` |
+| API key header | `X-API-Key: {{$credentials.apiKey}}` |
+| Basic auth | `Authorization: Basic {{ Buffer.from($credentials.user + ':' + $credentials.pass).toString('base64') }}` |
+| Query parameter | `?api_key={{$credentials.apiKey}}` |
 
-**Register in package.json:**
-```json
-{
-  "n8n": {
-    "credentials": ["dist/credentials/MyApi.credentials.js"]
-  }
-}
+## UX Guidelines & Text Conventions
+
+### Text Casing
+- **Title Case** (Every Word Capitalized): Use for parameter `displayName`, dropdown options, button labels, section headers
+  - Examples: "API Key", "First Name", "Additional Options", "Create Conversation"
+
+- **Sentence case** (First word capitalized): Use for descriptions, tooltips, placeholder text, error messages
+  - Examples: "The email address to use", "Maximum number of results to return", "Select the team to assign"
+
+### AI Agent Tool Support
+
+Two properties work together for AI Agent compatibility:
+
+1. **`usableAsTool: true`** (Node level) - **REQUIRED**
+   - Enables the node to be used as a tool by AI Agents
+   - Must be set in the node description
+
+2. **`action` property** (Operation level) - **Recommended**
+   - Provides a human-readable description of what the operation does
+   - Appears in the UI and helps AI Agents understand the operation's purpose
+   - Not strictly required technically, but improves UX significantly
+
+```typescript
+description: INodeTypeDescription = {
+  displayName: 'MyApi',
+  usableAsTool: true,  // REQUIRED for AI Agent support
+  // ...
+  properties: [{
+    displayName: 'Operation',
+    name: 'operation',
+    type: 'options',
+    options: [
+      {
+        name: 'List',
+        value: 'list',
+        action: 'List conversations',  // UX description
+        description: 'Retrieve a list of conversations'  // Tooltip
+      },
+    ],
+  }],
+};
 ```
 
-## Complete Node Template
+### ResourceLocator Fields (AI Agent Compatible Dropdowns)
 
-**File:** `nodes/MyApi/MyApi.node.ts`
+**For AI Agent compatibility, use `resourceLocator` type instead of `options` for filter/reference fields.** This provides a mode selector ("From List" / "By ID") that enables "Let the model define this parameter" for AI Agents.
 
+**Why use resourceLocator:**
+- Standard `type: 'options'` does NOT support "Let the model define" for AI Agents
+- `resourceLocator` provides native n8n UI with mode selector (same pattern as Apify node)
+- Allows AI Agents to pass IDs/keys directly without needing the dropdown
+
+**Property definition:**
 ```typescript
 import {
-	IExecuteFunctions,
-	ILoadOptionsFunctions,
-	INodeExecutionData,
-	INodePropertyOptions,
-	INodeType,
-	INodeTypeDescription,
-	NodeOperationError,
+	INodeParameterResourceLocator,  // Add this import
 } from 'n8n-workflow';
 
-// ==================== CONSTANTS ====================
-const BASE_URL = 'https://api.myapi.com';
-
-const RESOURCES = {
-	CONVERSATION: 'conversation',
-	CONTACT: 'contact',
-	TEAM: 'team',
-};
-
-const OPERATIONS = {
-	LIST: 'list',
-	GET: 'get',
-	CREATE: 'create',
-	UPDATE: 'update',
-	DELETE: 'delete',
-};
-
-// ==================== SIMPLIFIED FIELDS ====================
-const SIMPLIFIED_FIELDS: Record<string, string[]> = {
-	conversation: ['id', 'title', 'date_time', 'team_id', 'status'],
-	contact: ['id', 'first_name', 'last_name', 'email', 'company_name'],
-};
-
-// ==================== RESPONSE WRAPPERS ====================
-const RESPONSE_WRAPPERS: Record<string, string> = {
-	conversation: 'data',
-	contact: 'contacts',
-	team: 'teams',
-};
-
-function extractItems(response: any, resource: string): any[] {
-	const wrapperKey = RESPONSE_WRAPPERS[resource];
-	if (wrapperKey && response?.[wrapperKey]) {
-		return response[wrapperKey];
-	}
-	if (response?.data) return Array.isArray(response.data) ? response.data : [response.data];
-	if (Array.isArray(response)) return response;
-	return [response];
-}
-
-// ==================== MAIN CLASS ====================
-export class MyApi implements INodeType {
-	description: INodeTypeDescription = {
-		displayName: 'MyApi',
-		name: 'myApi',
-		icon: 'file:myapi.svg',
-		group: ['transform'],
-		version: 1,
-		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-		description: 'Interact with MyApi',
-		defaults: {
-			name: 'MyApi',
-		},
-		usableAsTool: true,
-		inputs: ['main'],
-		outputs: ['main'],
-		credentials: [
-			{
-				name: 'myApiApi',
-				required: true,
-			},
-		],
-		requestDefaults: {
-			baseURL: BASE_URL,
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json',
-			},
-		},
-		properties: [
-			// ==================== RESOURCE SELECTOR ====================
-			{
-				displayName: 'Resource',
-				name: 'resource',
-				type: 'options',
-				noDataExpression: true,
-				options: [
-					{ name: 'Conversation', value: RESOURCES.CONVERSATION },
-					{ name: 'Contact', value: RESOURCES.CONTACT },
-					{ name: 'Team', value: RESOURCES.TEAM },
-				],
-				default: RESOURCES.CONVERSATION,
-			},
-
-			// ==================== CONVERSATION OPERATIONS ====================
-			{
-				displayName: 'Operation',
-				name: 'operation',
-				type: 'options',
-				noDataExpression: true,
-				displayOptions: {
-					show: { resource: [RESOURCES.CONVERSATION] },
-				},
-				options: [
-					{ name: 'List', value: OPERATIONS.LIST, action: 'List conversations' },
-					{ name: 'Get', value: OPERATIONS.GET, action: 'Get a conversation' },
-					{ name: 'Create', value: OPERATIONS.CREATE, action: 'Create a conversation' },
-				],
-				default: OPERATIONS.LIST,
-			},
-
-			// ==================== CONVERSATION: LIST OPTIONS ====================
-			{
-				displayName: 'Additional Options',
-				name: 'additionalOptions',
-				type: 'collection',
-				placeholder: 'Add Option',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONVERSATION],
-						operation: [OPERATIONS.LIST],
-					},
-				},
-				default: {},
-				options: [
-					{
-						displayName: 'Team',
-						name: 'teamId',
-						type: 'options',
-						typeOptions: { loadOptionsMethod: 'getTeams' },
-						default: '',
-						description: 'Filter by team',
-					},
-					{
-						displayName: 'Limit',
-						name: 'limit',
-						type: 'number',
-						default: 100,
-						description: 'Max results',
-					},
-				],
-			},
-
-			// ==================== CONVERSATION: CREATE FIELDS ====================
-			{
-				displayName: 'Title',
-				name: 'title',
-				type: 'string',
-				required: true,
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONVERSATION],
-						operation: [OPERATIONS.CREATE],
-					},
-				},
-				default: '',
-				description: 'Conversation title',
-			},
-
-			// ==================== SIMPLIFIED OUTPUT ====================
-			{
-				displayName: 'Simplified Output',
-				name: 'simplifiedOutput',
-				type: 'boolean',
-				displayOptions: {
-					show: {
-						resource: [RESOURCES.CONVERSATION],
-						operation: [OPERATIONS.LIST, OPERATIONS.GET],
-					},
-				},
-				default: true,
-				description: 'Return only key fields',
-			},
-
-			// ... Add more resources following the same pattern
-		],
-	};
-
-	// ==================== LOAD OPTIONS METHODS ====================
-	methods = {
-		loadOptions: {
-			async getTeams(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-				const credentials = await this.getCredentials('myApiApi');
-				const response = await this.helpers.request({
-					method: 'GET',
-					url: `${BASE_URL}/teams`,
-					headers: { 'Authorization': `Bearer ${credentials.apiKey}` },
-					json: true,
-				});
-
-				const teams = extractItems(response, 'team');
-				return teams.map((team: any) => ({
-					name: team.name,
-					value: team.id,
-				}));
-			},
-		},
-	};
-
-	// ==================== EXECUTE METHOD ====================
-	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
-		const items = this.getInputData();
-		const returnData: INodeExecutionData[] = [];
-		const credentials = await this.getCredentials('myApiApi');
-		const apiKey = credentials.apiKey as string;
-
-		const resource = this.getNodeParameter('resource', 0) as string;
-
-		for (let i = 0; i < items.length; i++) {
-			try {
-				const operation = this.getNodeParameter('operation', i) as string;
-				let response: any;
-
-				// ==================== CONVERSATION ====================
-				if (resource === RESOURCES.CONVERSATION) {
-					if (operation === OPERATIONS.LIST) {
-						const additionalOptions = this.getNodeParameter('additionalOptions', i, {}) as {
-							teamId?: string;
-							limit?: number;
-						};
-
-						const qs: Record<string, any> = {};
-						if (additionalOptions.teamId) qs.team = additionalOptions.teamId;
-						if (additionalOptions.limit) qs.limit = additionalOptions.limit;
-
-						response = await this.helpers.request({
-							method: 'GET',
-							url: `${BASE_URL}/conversations`,
-							headers: { 'Authorization': `Bearer ${apiKey}` },
-							qs,
-							json: true,
-						});
-
-						const simplifiedOutput = this.getNodeParameter('simplifiedOutput', i, true) as boolean;
-						let items = extractItems(response, resource);
-
-						if (simplifiedOutput) {
-							const allowed = SIMPLIFIED_FIELDS[resource] || [];
-							items = items.map(item => {
-								const filtered: any = {};
-								for (const field of allowed) {
-									if (item[field] !== undefined) filtered[field] = item[field];
-								}
-								return filtered;
-							});
-						}
-
-						for (const item of items) {
-							returnData.push({ json: item });
-						}
-					}
-					else if (operation === OPERATIONS.GET) {
-						const id = this.getNodeParameter('id', i) as string;
-						response = await this.helpers.request({
-							method: 'GET',
-							url: `${BASE_URL}/conversations/${id}`,
-							headers: { 'Authorization': `Bearer ${apiKey}` },
-							json: true,
-						});
-						returnData.push({ json: response });
-					}
-					else if (operation === OPERATIONS.CREATE) {
-						const title = this.getNodeParameter('title', i) as string;
-						response = await this.helpers.request({
-							method: 'POST',
-							url: `${BASE_URL}/conversations`,
-							headers: { 'Authorization': `Bearer ${apiKey}` },
-							body: { title },
-							json: true,
-						});
-						returnData.push({ json: response });
-					}
-				}
-
-				// ==================== ADD MORE RESOURCES HERE ====================
-				// else if (resource === RESOURCES.CONTACT) { ... }
-
-			} catch (error: any) {
-				if (this.continueOnFail()) {
-					returnData.push({ json: { error: error.message } });
-					continue;
-				}
-				throw new NodeOperationError(this.getNode(), error.message, { itemIndex: i });
-			}
-		}
-
-		return [returnData];
-	}
-}
-```
-
-## Class Structure Breakdown
-
-### Imports
-```typescript
-import {
-	IExecuteFunctions,      // For execute() method
-	ILoadOptionsFunctions,  // For loadOptions methods
-	INodeExecutionData,     // Return type for items
-	INodePropertyOptions,   // For dropdown options
-	INodeType,              // Interface for node class
-	INodeTypeDescription,   // Interface for description
-	NodeOperationError,     // For throwing errors
-} from 'n8n-workflow';
-```
-
-### INodeTypeDescription Properties
-
-| Property | Required | Description |
-|----------|----------|-------------|
-| `displayName` | ✅ | Name shown in n8n UI |
-| `name` | ✅ | Internal identifier (camelCase) |
-| `icon` | ✅ | Path to SVG: `file:icon.svg` |
-| `group` | ✅ | Category: `['transform']` |
-| `version` | ✅ | Node version (number) |
-| `description` | ✅ | Brief description |
-| `defaults` | ✅ | `{ name: 'NodeName' }` |
-| `usableAsTool` | ⚪ | `true` for AI Agent support |
-| `inputs` | ✅ | `['main']` |
-| `outputs` | ✅ | `['main']` |
-| `credentials` | ✅ | Array of credential references |
-| `properties` | ✅ | Array of UI fields |
-
-### Execute Method Pattern
-
-```typescript
-async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
-	const items = this.getInputData();           // Get input items
-	const returnData: INodeExecutionData[] = []; // Output accumulator
-	const credentials = await this.getCredentials('credName');
-	const resource = this.getNodeParameter('resource', 0) as string;
-
-	for (let i = 0; i < items.length; i++) {
-		try {
-			const operation = this.getNodeParameter('operation', i) as string;
-
-			if (resource === 'x') {
-				if (operation === 'list') {
-					// Handle list
-				} else if (operation === 'get') {
-					// Handle get
-				}
-			}
-			// More resources...
-
-		} catch (error: any) {
-			if (this.continueOnFail()) {
-				returnData.push({ json: { error: error.message } });
-				continue;
-			}
-			throw new NodeOperationError(this.getNode(), error.message, { itemIndex: i });
-		}
-	}
-
-	return [returnData];
-}
-```
-
-### Load Options Registration
-
-```typescript
-methods = {
-	loadOptions: {
-		async getTeams(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-			// Fetch and return options
-		},
-		async getProjects(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-			// Fetch and return options
-		},
-	},
-};
-```
-
-**Use in property:**
-```typescript
+// Property with resourceLocator type
 {
 	displayName: 'Team',
 	name: 'teamId',
-	type: 'options',
-	typeOptions: { loadOptionsMethod: 'getTeams' },  // <-- Method name
-	default: '',
+	type: 'resourceLocator',
+	default: { mode: 'list', value: '' },
+	modes: [
+		{
+			displayName: 'From List',
+			name: 'list',
+			type: 'list',
+			typeOptions: {
+				searchListMethod: 'getTeams',  // Uses same loadOptions method
+			},
+		},
+		{
+			displayName: 'By ID',
+			name: 'id',
+			type: 'string',
+			placeholder: 'Enter team ID',
+		},
+	],
+	description: 'Filter by team',
 }
 ```
 
-## Core Node Patterns
-
-### 1. Parameter Organization
-
-**Rule: Show only required fields by default. Optional filters go in "Additional Options" collection.**
-
+**Helper function to extract value:**
 ```typescript
-// Required field - always visible
-{
-  displayName: 'Title',
-  name: 'title',
-  type: 'string',
-  required: true,
-  displayOptions: {
-    show: { resource: ['conversation'], operation: ['create'] },
-  },
-  default: '',
-  description: 'The conversation title',
-}
-
-// Additional Options - collapsible, contains optional filters
-{
-  displayName: 'Additional Options',
-  name: 'additionalOptions',
-  type: 'collection',
-  placeholder: 'Add Option',
-  displayOptions: {
-    show: { resource: ['conversation'], operation: ['list'] },
-  },
-  default: {},
-  options: [
-    {
-      displayName: 'Team',
-      name: 'teamId',
-      type: 'options',
-      typeOptions: { loadOptionsMethod: 'getTeams' },
-      default: '',
-      description: 'Filter by team',
-    },
-    {
-      displayName: 'Limit',
-      name: 'limit',
-      type: 'number',
-      default: 10,
-      description: 'Max results to return',
-    },
-  ],
+// Add at top of file after imports
+function getResourceLocatorValue(param: INodeParameterResourceLocator | string | undefined): string {
+	if (!param) return '';
+	if (typeof param === 'string') return param;
+	return param.value as string || '';
 }
 ```
 
-### 2. Simplified Output
-
-For APIs with 30+ fields, add simplified output. Include 8-12 key fields.
-
-**How to choose fields:**
-1. Call API, examine response
-2. Keep: id, name, title, date, status, foreign keys
-3. Exclude: verbose content (transcripts, metadata, raw data)
-
+**Usage in execute method:**
 ```typescript
-// Property
-{
-  displayName: 'Simplified Output',
-  name: 'simplifiedOutput',
-  type: 'boolean',
-  displayOptions: {
-    show: { resource: ['conversation'], operation: ['list', 'get'] },
-  },
-  default: true,
-  description: 'Return only key fields instead of full response',
-}
-
-// Field whitelist at top of file
-const SIMPLIFIED_FIELDS: Record<string, string[]> = {
-  conversation: ['id', 'title', 'date_time', 'team_id', 'project_id', 'status'],
-  contact: ['id', 'first_name', 'last_name', 'email', 'company_name'],
+// For fields inside additionalOptions collection
+const additionalOptions = this.getNodeParameter('additionalOptions', i, {}) as {
+	teamId?: INodeParameterResourceLocator;
+	clientId?: INodeParameterResourceLocator;
+	limit?: number;
 };
 
-// In execute()
-if (simplifiedOutput && response) {
-  const allowed = SIMPLIFIED_FIELDS[resource] || [];
-  return items.map(item => {
-    const filtered: any = {};
-    for (const field of allowed) {
-      if (item[field] !== undefined) filtered[field] = item[field];
-    }
-    return filtered;
-  });
-}
+const teamIdValue = getResourceLocatorValue(additionalOptions.teamId);
+if (teamIdValue) query.team = teamIdValue;
+
+// For direct fields (not in collection)
+const teamIdParam = this.getNodeParameter('teamId', i, { mode: 'list', value: '' }) as INodeParameterResourceLocator;
+const teamId = getResourceLocatorValue(teamIdParam);
 ```
 
-### 3. AI Agent Tool Support (CRITICAL)
+**When to use resourceLocator vs options:**
 
-**Two properties are needed for AI Agent compatibility:**
+| Field Type | Use When |
+|------------|----------|
+| `resourceLocator` | Filter/reference fields that AI Agents might need to populate |
+| `options` | Static options (status, type enums) that don't need AI Agent input |
 
-#### 1. `usableAsTool: true` (Node Level)
+### Standard Operations
+For each resource, try to implement standard CRUD operations:
+- **List** (with pagination/filters in Additional Options)
+- **Get** (by ID)
+- **Create**
+- **Update** (by ID)
+- **Delete** (by ID)
 
-Add this to the node description to enable the node as an AI Agent tool:
+### Field Organization
+1. **Required fields**: Always visible at the top
+2. **Resource/Operation selectors**: Always first properties
+3. **Additional Options**: Use `type: 'collection'` for optional filters
+4. **ID fields**: Show only for Get/Update/Delete operations using `displayOptions`
 
+## Security Best Practices
+
+1. **Never log credentials**:
 ```typescript
-export class MyApi implements INodeType {
-  description: INodeTypeDescription = {
-    displayName: 'MyApi',
-    name: 'myApi',
-    icon: 'file:myapi.svg',
-    usableAsTool: true,  // <-- Enable as AI Agent tool
-    inputs: ['main'],
-    outputs: ['main'],
-    // ...
-  };
-}
+// BAD
+console.log('Using API key:', credentials.apiKey);
+
+// GOOD
+console.log('Making request to:', url); // Only log non-sensitive data
 ```
 
-#### 2. `action` Property (Operation Level)
-
-Add `action` to each operation option for AI Agent descriptions:
-
+2. **Validate and sanitize inputs**:
 ```typescript
-{
-  displayName: 'Operation',
-  name: 'operation',
-  type: 'options',
-  options: [
-    { name: 'List', value: 'list', action: 'List conversations' },
-    { name: 'Get', value: 'get', action: 'Get a conversation' },
-    { name: 'Create', value: 'create', action: 'Create a conversation' },
-  ],
-  default: 'list',
+// Validate IDs
+const id = this.getNodeParameter('id', i) as string;
+if (!id.match(/^[a-zA-Z0-9-_]+$/)) {
+  throw new NodeOperationError(this.getNode(), 'Invalid ID format', { itemIndex: i });
 }
 ```
 
-**Red Flags - These are WRONG:**
-- `routing` for AI tools - This is only for declarative HTTP request routing, not AI Agent compatibility
-- `tool` - Not a valid property
+3. **Use parameterized queries** (if your API supports SQL-like queries):
+Never concatenate user input directly into query strings.
 
-**Both `usableAsTool: true` AND `action` are needed for full AI Agent compatibility.**
+4. **Handle sensitive data**:
+Mark sensitive fields with `typeOptions: { password: true }` in credentials.
 
-### 4. Load Options (Dynamic Dropdowns)
+5. **Rate limiting awareness**:
+Implement exponential backoff if API returns 429 errors.
 
-```typescript
-// Property with loadOptionsMethod
-{
-  displayName: 'Team',
-  name: 'teamId',
-  type: 'options',
-  typeOptions: { loadOptionsMethod: 'getTeams' },
-  default: '',
-  description: 'Filter by team',
-}
+## Local Testing
 
-// Helper function
-async function getTeamOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-  const credentials = await this.getCredentials('myApi');
-  const response = await this.helpers.request({
-    method: 'GET',
-    url: `${BASE_URL}/teams`,
-    headers: { 'Authorization': `Bearer ${credentials.apiKey}` },
-    json: true,
-  });
+### Method 1: npm link (Recommended for development)
+```bash
+# In your node directory
+npm run build
+npm link
 
-  // Handle response wrapper - CRITICAL
-  const teams = Array.isArray(response)
-    ? response
-    : (response?.teams || response?.data || []);
+# In n8n installation directory
+cd ~/.n8n/custom
+npm link n8n-nodes-myapi
 
-  return teams.map((team: any) => ({
-    name: team.name,
-    value: team.id,
-  }));
-}
+# Restart n8n
+n8n start
 ```
 
-### 5. Response Wrappers
-
-APIs nest data differently. Always handle wrapper keys:
-
-```typescript
-const RESPONSE_WRAPPERS: Record<string, string> = {
-  conversation: 'data',      // { "data": [...] }
-  contact: 'contacts',       // { "contacts": [...] }
-  project: 'projects',       // { "projects": [...] }
-};
-
-function extractItems(response: any, resource: string): any[] {
-  const wrapperKey = RESPONSE_WRAPPERS[resource];
-
-  if (wrapperKey && response?.[wrapperKey]) {
-    return response[wrapperKey];
-  }
-  if (response?.data) return Array.isArray(response.data) ? response.data : [response.data];
-  if (Array.isArray(response)) return response;
-  return [response];
-}
+### Method 2: Dev mode (Hot reload)
+```bash
+npm run dev
+# Keeps TypeScript compiler watching for changes
 ```
 
-## Quick Reference
+### Method 3: Docker (Isolated)
+Create `docker-compose.yml`:
+```yaml
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    ports:
+      - "5678:5678"
+    volumes:
+      - ~/.n8n:/home/node/.n8n
+      - ./dist:/home/node/.n8n/custom/n8n-nodes-myapi
+```
 
-| Pattern | Implementation |
-|---------|----------------|
-| Required fields | Direct properties with `required: true` |
-| Optional filters | Collection named `additionalOptions` |
-| Simplified output | Boolean option (default: true) + 8-12 field whitelist |
-| **AI Agent tool** | **`usableAsTool: true` in description + `action` in operations** |
-| Dynamic dropdowns | `loadOptionsMethod` + helper with wrapper handling |
-| Response extraction | Check wrapper key, then `data`, then array |
-| Publish to npm | `npm publish --access public` |
-| Docker build | `docker compose run build` |
-| Docker publish | `docker compose run publish` (requires .env with NPM_TOKEN) |
+## Pre-Publication Verification
+
+Before publishing, you **MUST** run the official n8n scanner:
+
+```bash
+# Install scanner globally (one time)
+npm install -g @n8n/scan-community-package
+
+# Run check on your built package
+npx @n8n/scan-community-package ./dist
+
+# Or scan by package name
+npx @n8n/scan-community-package n8n-nodes-myapi
+```
+
+**What it checks:**
+- No runtime dependencies in package.json
+- No forbidden imports (fs, path, os, child_process)
+- Correct file structure
+- Valid credential and node definitions
+- Security violations
+
+**Fix all errors before submitting for verification.**
+
+## Publishing to npm
+
+### ⚠️ GitHub Actions with Provenance (Required from May 1st 2026)
+
+n8n requires ALL community nodes to be published via a **GitHub Action with provenance**. This ensures supply chain security.
+
+**GitHub Actions workflow** (`.github/workflows/publish.yml`):
+```yaml
+name: Publish to npm
+on:
+  release:
+    types: [created]
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # Required for provenance
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
+      - run: npm run build
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+```
+
+**Setup:**
+1. Add `NPM_TOKEN` as a GitHub secret (Settings → Secrets → Actions)
+2. Create a GitHub Release to trigger the workflow
+3. The `--provenance` flag generates a signed attestation linking the package to the source
+
+### Step 1: Create npm Account
+1. Create account at https://www.npmjs.com
+2. Generate Access Token: Profile → Access Tokens → Generate New Token (Classic)
+3. Copy token (starts with `npm_`)
+
+### Step 2: Configure Authentication
+
+**Local .npmrc (simple):**
+```bash
+echo "//registry.npmjs.org/:_authToken=npm_YOUR_TOKEN_HERE" > .npmrc
+echo ".npmrc" >> .gitignore
+```
+
+### Step 3: Build & Publish
+
+```bash
+# Clean previous builds
+rm -rf dist
+
+# Install dependencies
+pnpm install
+
+# Build
+pnpm build
+
+# Verify package contents
+npm pack --dry-run
+
+# Publish (public access required for scoped packages)
+npm publish --access public
+```
+
+### Step 4: Verify Installation
+
+```bash
+# Check package exists
+npm view n8n-nodes-myapi
+
+# Install in n8n via UI:
+# Go to n8n → Settings → Community Nodes → Install
+# Enter: n8n-nodes-myapi
+```
+
+## Version Management
+
+Follow semantic versioning:
+- **Patch** (1.0.0 → 1.0.1): Bug fixes
+- **Minor** (1.0.0 → 1.1.0): New features (backward compatible)
+- **Major** (1.0.0 → 2.0.0): Breaking changes
+
+```bash
+npm version patch  # or minor/major
+npm publish
+```
+
+## Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| Node not appearing in n8n | Check `package.json` `n8n.nodes` path matches compiled file location |
+| Icon not showing | Ensure SVG is copied to `dist/` during build; check `icon: 'file:myapi.svg'` path |
+| Dropdown empty | API wraps response: check `response.data`, `response.items`, etc. |
+| Auth not working | Verify `authenticate` block in credentials; check header format |
+| Linting fails | Run `npm run lint` and fix all errors; ensure no `any` types |
+| "Module not found" | Delete `node_modules` and `pnpm install`; check imports use `n8n-workflow` |
+| Continue on fail not working | Wrap only the API call in try-catch, not the entire iteration |
+| Item linking broken | Use `constructExecutionMetaData` with correct `itemData: { item: i }` |
+| Scanner fails | Ensure no `dependencies` in package.json (only `devDependencies`) |
+
+## Complete File Structure Examples
+
+### Simple Node (Monolithic)
+```
+n8n-nodes-myapi/
+├── package.json
+├── tsconfig.json
+├── nodes/
+│   └── MyApi/
+│       ├── MyApi.node.ts       # Everything here
+│       ├── MyApi.node.json
+│       └── myapi.svg
+└── credentials/
+    └── MyApiApi.credentials.ts
+```
+
+### Medium Node (Semi-Modular)
+```
+n8n-nodes-myapi/
+├── package.json
+├── tsconfig.json
+├── nodes/
+│   └── MyApi/
+│       ├── MyApi.node.ts
+│       ├── MyApi.node.json
+│       ├── myapi.svg
+│       ├── operations/
+│       │   ├── index.ts
+│       │   ├── list.operation.ts
+│       │   └── create.operation.ts
+│       └── methods/
+│           └── loadOptions.ts
+└── credentials/
+    └── MyApiApi.credentials.ts
+```
+
+### Complex Node (Full Modular)
+```
+n8n-nodes-myapi/
+├── package.json
+├── tsconfig.json
+├── nodes/
+│   └── MyApi/
+│       ├── MyApi.node.ts
+│       ├── MyApi.node.json
+│       ├── myapi.svg
+│       ├── actions/
+│       │   ├── index.ts
+│       │   ├── conversation/
+│       │   │   ├── index.ts
+│       │   │   ├── list.operation.ts
+│       │   │   └── types.ts
+│       │   └── contact/
+│       │       └── ...
+│       ├── methods/
+│       │   └── loadOptions.ts
+│       ├── transport/
+│       │   ├── index.ts
+│       │   └── types.ts
+│       └── utils/
+│           ├── extractItems.ts
+│           └── simplifyOutput.ts
+└── credentials/
+    └── MyApiApi.credentials.ts
+```
+
+## Quick Reference Checklist
+
+Before publishing:
+- [ ] `n8n-node create` used or structure matches official template
+- [ ] Node does NOT duplicate an existing n8n node (use PRs for iterations)
+- [ ] Node is NOT a Logic/Flow control node (not accepted for verification)
+- [ ] `MyApi.node.json` codex file exists with categories
+- [ ] `usableAsTool: true` set for AI Agent support
+- [ ] `action` property added to operation options (UX improvement)
+- [ ] `resourceLocator` type used for filter fields (AI Agent compatible dropdowns)
+- [ ] No runtime dependencies in package.json (only devDependencies)
+- [ ] Keyword `"n8n-community-node-package"` included in package.json
+- [ ] License is `"MIT"` (required, not optional)
+- [ ] Repository is public and npm `repository.url` matches
+- [ ] Author/maintainer matches between npm and GitHub
+- [ ] Published via GitHub Action with provenance (mandatory from May 1st 2026)
+- [ ] All text is English only (parameters, descriptions, errors, README)
+- [ ] `httpRequestWithAuthentication` used instead of manual header injection
+- [ ] Error handling uses `NodeApiError` for HTTP errors, `NodeOperationError` for user errors
+- [ ] Item linking implemented with `constructExecutionMetaData`
+- [ ] Simplified output option for resources with many fields
+- [ ] Load options methods handle API wrappers correctly
+- [ ] Credentials include `test` configuration
+- [ ] ESLint passes with no errors
+- [ ] `@n8n/scan-community-package` passes without errors
+- [ ] README.md with installation, usage instructions, and auth details
+- [ ] Code organized appropriately (monolithic vs modular based on complexity)
 
 ## Common Mistakes
 
 | Mistake | Fix |
 |---------|-----|
-| All fields visible | Move optional fields to Additional Options collection |
-| No simplified output | Add for APIs with 30+ fields |
-| Missing `action` property | **REQUIRED** - add `action: 'Description'` to each operation |
-| Missing `usableAsTool` | Add `usableAsTool: true` to node description for AI Agent compatibility |
-| Dropdown empty | API wraps data: check `response.teams`, `response.data`, etc. |
-| Publishing without building | Always `rm -rf dist && pnpm build` before publish |
-| Docker volume overwrites fresh build | Don't mount `./dist:/app/dist` in publish service |
-| Token in git | Use `.env` (gitignored) with `NPM_TOKEN` |
-
-## Version Bumping
-
-```bash
-# Patch (1.0.0 → 1.0.1) - bug fixes
-npm version patch
-
-# Minor (1.0.0 → 1.1.0) - new features
-npm version minor
-
-# Major (1.0.0 → 2.0.0) - breaking changes
-npm version major
-```
-
-After version bump, rebuild and publish:
-```bash
-rm -rf dist && pnpm build && npm publish --access public
-```
+| Duplicating an existing n8n node | Submit a PR to n8n instead of creating a new community node |
+| Creating a Logic/Flow control node | n8n doesn't accept these for verification |
+| Missing `n8n-community-node-package` keyword | Add to package.json keywords - **CRITICAL** for registry visibility |
+| Non-MIT license | Must be `"MIT"` for verification |
+| Non-English text in node | All UI text, descriptions, errors, and docs must be English only |
+| Missing provenance in publish | Use GitHub Action with provenance (mandatory from May 1st 2026) |
+| Runtime dependencies in package.json | Remove from `dependencies`, only use `devDependencies` |
+| Missing `usableAsTool: true` | Add to node description for AI Agent support |
+| Missing `action` property on operations | Add `action: 'List items'` to each operation option |
+| **AI Agent can't set filter fields** | **Use `resourceLocator` type instead of `options` for filter/reference fields** |
+| Dropdown options empty | Check API wrapper: `response.data`, `response.items`, etc. |
+| No simplified output | Add for APIs with 30+ fields in responses |
+| Publishing without building | Always `pnpm build` before `npm publish` |
+| Using `fs`, `path`, `process.env` | NOT ALLOWED in verified community nodes |
+| Missing codex file | Create `MyApi.node.json` with categories |
+| Private repository | Repository must be public for verification |
