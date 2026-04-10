@@ -1,4 +1,4 @@
-# n8n-nodes-centum-v2
+# n8n-nodes-centum
 
 ![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
 
@@ -6,6 +6,8 @@ This is a custom node for [n8n](https://n8n.io/), an open-source workflow automa
 The `Centum` node simplifies interaction with the Centum API endpoints, allowing operations such as customer search, payment creation, and more directly inside your n8n workflows.
 
 The node is built to be extensible, making it easy to add new operations for specific integration needs with Centum.
+
+> Breaking change: workflow parameter keys are now English-only. Existing workflows created against older Spanish parameter keys must be updated before reuse.
 
 ## Requires 3 parameters in the **Centum API** credential:
 
@@ -20,104 +22,106 @@ The node is built to be extensible, making it easy to add new operations for spe
 
 **69 operations organized into 10 resources:**
 
-### Articles (`articulos`)
+The node interface is in English and the operation IDs below match the actual values exposed by the node. Some Centum request and response fields remain in Spanish because they mirror the upstream API contract.
 
-- `buscarProductos`: Search articles by name and return every match.
-- `buscarProductoPorCodigo`: Get a specific article by its unique ID.
-- `listarProductosDisponibles`: List sellable articles using filters.
-- `descargarImagenesProductos`: Download the binary image for an article.
-- `listarTodosLosProductos`: List article general data.
-- `consultarPrecioProducto`: Get the price of an article for a selected price list.
-- `listarProductosPorSucursal`: List article stock for a physical branch.
-- `buscarProductoEnSucursal`: Get stock for a specific article in a physical branch.
-- `listarBonificaciones`: List available discounts.
-- `listarCategorias`: List article categories.
-- `listarMarcas`: List article brands.
-- `listarPrecios`: List suggested product prices.
-- `listarRubros`: List article groups.
-- `listarSubRubros`: List subgroups or filter them by ID.
+### Articles (`articles`)
 
-### Customers (`clientes`)
+- `getProductByCode`: Get a specific article by its unique ID.
+- `searchProducts`: Search articles by name and return every match.
+- `listAvailableProducts`: List sellable articles using filters.
+- `downloadProductImages`: Download the binary image for an article.
+- `listAllProducts`: List article general data.
+- `getProductPrice`: Get the price of an article for a selected price list.
+- `getProductInBranch`: Get stock for a specific article in a physical branch.
+- `listProductsByBranch`: List article stock for a physical branch.
+- `listBrands`: List article brands.
+- `listCategories`: List article categories.
+- `listDiscounts`: List available discounts.
+- `listGroups`: List article groups.
+- `listPrices`: List suggested product prices.
+- `listSubgroups`: List subgroups or filter them by ID.
 
-- `actualizarCliente`: Update a customer and return the updated resource information.
-- `buscarClientes`: Search customers using filters.
-- `buscarClientePorCuit`: Search customers by CUIT.
-- `listarClientes`: List all registered customers.
-- `crearCliente`: Create a new customer.
-- `verDetalleSaldoCliente`: Get the detailed account balance composition for a customer.
-- `listarFacturasCobros`: Get all payment invoices for a customer.
-- `listarFacturasVenta`: Get all sales invoices for a customer.
-- `listarFacturasVentasPorID`: Get sales invoices for a customer by ID.
-- `listarPromocionesComercialesCliente`: Get commercial promotions applied to a customer from a selected date.
-- `consultarSaldoCliente`: Get the current customer balance.
-- `buscarContribuyente`: Search taxpayer data by CUIT or business name.
-- `crearContribuyente`: Create a new taxpayer customer.
-- `frecuenciasCliente`: List customer frequency options.
+### Customers (`customers`)
 
-### Sales (`ventas`)
+- `createCustomer`: Create a new customer.
+- `getCustomerBalance`: Get the current customer balance.
+- `getCustomerBalanceDetails`: Get the detailed account balance composition for a customer.
+- `listCustomerCommercialPromotions`: Get commercial promotions applied to a customer from a selected date.
+- `listPaymentInvoices`: Get all payment invoices for a customer.
+- `listSalesInvoices`: Get all sales invoices for a customer.
+- `listSalesInvoicesById`: Get sales invoices for a customer by ID.
+- `listCustomers`: List all registered customers.
+- `searchCustomers`: Search customers using filters.
+- `searchCustomerByCuit`: Search customers by CUIT.
+- `updateCustomer`: Update a customer and return the updated resource information.
+- `listCustomerFrequencies`: List customer frequency options.
+- `createTaxpayerCustomer`: Create a new taxpayer customer.
+- `searchTaxpayerCustomer`: Search taxpayer data by CUIT or business name.
 
-- `listarComprobantesVenta`: List sales vouchers using filters.
-- `estadisticaVentaRanking`: Get sales rankings for customers, articles, sellers, or branches.
-- `verDetallePedidoVenta`: Get a sales order by its unique ID.
-- `crearPedidoVenta`: Create a sales order for selected articles.
-- `listarEstadosPedidosVenta`: List available sales order statuses.
-- `listarPedidosVenta`: List sales orders using filters.
-- `listarPedidosVentaFiltrados`: List sales orders with a lighter response body.
-- `listarPromociones`: List available commercial promotions.
-- `crearVenta`: Generate a sale from the provided parameters.
+### Sales (`sales`)
 
-### Payments (`cobros`)
+- `listPromotions`: List available commercial promotions.
+- `createSale`: Generate a sale from the provided parameters.
+- `createSalesOrder`: Create a sales order for selected articles.
+- `getSalesOrderDetails`: Get a sales order by its unique ID.
+- `listSalesOrderStatuses`: List available sales order statuses.
+- `listSalesOrders`: List sales orders using filters.
+- `listFilteredSalesOrders`: List sales orders with a lighter response body.
+- `getSalesRanking`: Get sales rankings for customers, articles, sellers, or branches.
+- `listSalesVouchers`: List sales vouchers using filters.
 
-- `registrarCobro`: Register a payment voucher.
-- `listarCobros`: List payments using filters.
+### Payments (`payments`)
 
-### Purchases (`compras`)
+- `registerPayment`: Register a payment voucher.
+- `listPayments`: List payments using filters.
 
-- `crearCompra`: Generate a purchase.
-- `listarCompras`: List purchases using filters.
-- `listarComprobantesCompra`: List purchase vouchers using filters.
-- `crearOrdenCompra`: Generate a purchase order.
-- `verDetalleOrdenCompra`: Get a purchase order by ID.
-- `listarOrdenesCompra`: List purchase orders using filters.
-- `crearRemitoCompra`: Create a purchase delivery note.
+### Purchases (`purchases`)
 
-### Suppliers (`proveedores`)
+- `createPurchaseDeliveryNote`: Create a purchase delivery note.
+- `createPurchaseOrder`: Generate a purchase order.
+- `getPurchaseOrderDetails`: Get a purchase order by ID.
+- `listPurchaseOrders`: List purchase orders using filters.
+- `listPurchaseVouchers`: List purchase vouchers using filters.
+- `createPurchase`: Generate a purchase.
+- `listPurchases`: List purchases using filters.
 
-- `buscarProveedor`: Get supplier information by ID.
-- `crearProveedor`: Create a supplier.
-- `listarProveedores`: List all suppliers.
+### Suppliers (`suppliers`)
 
-### Logistics (`logistica`)
+- `searchSupplier`: Get supplier information by ID.
+- `createSupplier`: Create a supplier.
+- `listSuppliers`: List all suppliers.
 
-- `listarChoferes`: List available drivers.
-- `crearRemitoVenta`: Create a sales delivery note.
-- `listarSucursales`: List physical branches.
-- `listarTurnosEntrega`: List available delivery time slots.
-- `listarVendedores`: List available sellers.
+### Logistics (`logistics`)
+
+- `listDeliveryTimeSlots`: List available delivery time slots.
+- `listDrivers`: List available drivers.
+- `listPhysicalBranches`: List physical branches.
+- `createSalesDeliveryNote`: Create a sales delivery note.
+- `listSellers`: List available sellers.
 
 ### Stock (`stock`)
 
-- `consultarStock`: List article stock using filters.
-- `crearMovimientoStock`: Create a stock movement adjustment.
-- `listarUbicacionArticulos`: List article locations.
+- `listArticleLocations`: List article locations.
+- `getStock`: List article stock using filters.
+- `createStockMovement`: Create a stock movement adjustment.
 
-### Geography (`geografia`)
+### Geography (`geography`)
 
-- `listarMunicipios`: List municipalities, usually filtered by province.
-- `listarPaises`: List available countries.
-- `listarProvincias`: List provinces, usually filtered by country.
+- `listCountries`: List available countries.
+- `listMunicipalities`: List municipalities, usually filtered by province.
+- `listProvinces`: List provinces, usually filtered by country.
 
 ### Extras (`extras`)
 
-- `generarTokenSeguridad`: Generate a token for external tools such as Postman.
-- `listarConceptos`: List concepts.
-- `listarOperadoresMoviles`: List mobile operators.
-- `sincronizarImagenes`: Process binary image data for WooCommerce usage.
-- `convertirProductosParaWooCommerce`: Generate WooCommerce-ready product JSON from Centum articles.
-- `verDetalleRegimenEspecial`: Get a special tax regime by ID.
-- `listarRegimenesEspeciales`: List special tax regimes.
-- `listarTiposComprobante`: List voucher types.
-- `verificarCredencialesOperador`: Get mobile operator data using the configured credentials.
+- `generateSecurityToken`: Generate a token for external tools such as Postman.
+- `syncImages`: Process binary image data for WooCommerce usage.
+- `listConcepts`: List concepts.
+- `verifyOperatorCredentials`: Get mobile operator data using the configured credentials.
+- `listMobileOperators`: List mobile operators.
+- `getSpecialTaxRegimeDetails`: Get a special tax regime by ID.
+- `listSpecialTaxRegimes`: List special tax regimes.
+- `listVoucherTypes`: List voucher types.
+- `convertProductsForWooCommerce`: Generate WooCommerce-ready product JSON from Centum articles.
 
 ## Prerequisites
 
@@ -141,7 +145,9 @@ docker compose run build
 
 ### Publish
 
-Create a local `.env` file with your npm token:
+For verified community-node publication, use the GitHub release workflow in `.github/workflows/publish.yml` with the `NPM_TOKEN` GitHub secret.
+
+For local publishing, create a local `.env` file with your npm token:
 
 ```bash
 NPM_TOKEN=npm_your_token_here

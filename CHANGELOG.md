@@ -1,8 +1,10 @@
 ## [0.2.2] - 2025-07-23
+
 ### Added
-- Nueva interface para provincias
-- Modificación en el nombre del campo "Activity" -> "Pedido Venta - Actividad" y se agregó nuevo campo Id al recurso
-- Nuevo case agregado para realizar la petición HTTP GET
-- Soporte para peticiones HTTP en batches a la API de Centum.
-- Nuevos campos "Paginación All y Personalizada" para "Ajustes HTTP" en clientes
-- Nuevo recurso "Provincias - Lista" con un campo opcional para traer provincias por "idPais"
+
+- New interface for provinces
+- Renamed the "Activity" field to "Sales Order - Activity" and added a new ID field to the resource
+- Added a new case to perform the HTTP GET request
+- Added support for batched HTTP requests to the Centum API
+- Added new "All" and "Custom" pagination fields under "HTTP Settings" for customers
+- Added a new "Provinces - List" resource with an optional `idPais` filter field
