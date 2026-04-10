@@ -1,56 +1,86 @@
-import { NodeOperationError } from "n8n-workflow";
-import * as helperFns from "../helpers/functions";
-import type { ResourceHandler, ResourceHandlerMap } from "./tipos";
+import { NodeApiError, NodeOperationError } from 'n8n-workflow';
+import * as helperFns from '../helpers/functions';
+import type { ResourceHandler, ResourceHandlerMap } from './types';
 
-const crearMovimientoStock: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+const createStockMovement: ResourceHandler = async (context) => {
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const idSucursalFisica = helperFns.getNodeParameterOrThrow(executeFunctions, "idSucursalFisica", itemIndex);
-	const articleId = helperFns.getNodeParameterOrThrow(executeFunctions, "articleId", itemIndex);
-	const fechaImputacion = helperFns.getNodeParameterOrThrow(executeFunctions, "indictmentDate", itemIndex) as string;
-	const fechaImputacionFormateada = fechaImputacion.replace(/\..+/, "");
-
-	// const ubicacionArticle = helperFns.getNodeParameterOrThrow(executeFunctions, '', itemIndex);
+	const physicalBranchId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'physicalBranchId',
+		itemIndex,
+	);
+	const articleId = helperFns.getNodeParameterOrThrow(executeFunctions, 'articleId', itemIndex);
+	const articleLocationId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'articleLocationId',
+		itemIndex,
+	);
+	const indictmentDate = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'indictmentDate',
+		itemIndex,
+	) as string;
+	const formattedIndictmentDate = indictmentDate.replace(/\..+/, '');
 
 	if (!articleId) {
-		throw new NodeOperationError(executeFunctions.getNode(), "El ID del articulo es obligatorio.");
+		throw new NodeOperationError(executeFunctions.getNode(), 'Article ID is required.');
 	}
 
 	try {
-		const response = await helperFns.apiRequest<any>(`${centumUrl}/AjustesMovimientoStock?bAjustePrevioACero=false`, {
-			context: executeFunctions,
-			debugItemIndex: itemIndex,
-			method: "POST",
-			headers,
-			body: {
-				AjusteMovimientoStockItems: [
-					{
-						Articulo: {
-							IdArticulo: articleId,
+		const response = await helperFns.apiRequest<any>(
+			`${centumUrl}/AjustesMovimientoStock?bAjustePrevioACero=false`,
+			{
+				context: executeFunctions,
+				debugItemIndex: itemIndex,
+				method: 'POST',
+				headers,
+				body: {
+					AjusteMovimientoStockItems: [
+						{
+							Articulo: {
+								IdArticulo: articleId,
+							},
+							UbicacionArticulo: {
+								IdUbicacionArticulo: articleLocationId,
+							},
 						},
+					],
+					SucursalFisica: {
+						IdSucursalFisica: physicalBranchId,
 					},
-				],
-				SucursalFisica: {
-					IdSucursalFisica: idSucursalFisica,
+					ConceptoVarios: {
+						IdConceptoVarios: 1,
+					},
+					FechaImputacion: formattedIndictmentDate,
 				},
-				ConceptoVarios: {
-					IdConceptoVarios: 1,
-				},
-				FechaImputacion: fechaImputacionFormateada,
 			},
-		});
+		);
 		return [executeFunctions.helpers.returnJsonArray(response)];
 	} catch (error) {
-		const msg = error?.response?.data?.Message || (error as any)?.message || "Error creando el ajuste de stock";
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
+		const msg =
+			error?.response?.data?.Message ||
+			(error as any)?.message ||
+			'Error creating stock adjustment';
 		throw new NodeOperationError(executeFunctions.getNode(), msg);
 	}
 };
 
 export const stockHandlers: ResourceHandlerMap = {
-	crearMovimientoStock,
+	createStockMovement: createStockMovement,
 };
