@@ -1,8 +1,8 @@
-import { NodeOperationError } from 'n8n-workflow';
+import { NodeApiError, NodeOperationError } from 'n8n-workflow';
 import * as helperFns from '../helpers/functions';
-import type { ResourceHandler, ResourceHandlerMap } from './tipos';
+import type { ResourceHandler, ResourceHandlerMap } from './types';
 
-const actualizarCliente: ResourceHandler = async (context) => {
+const updateCustomer: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
 		centumUrl,
@@ -17,26 +17,29 @@ const actualizarCliente: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const nuevosDatos = helperFns.getNodeParameterOrThrow(executeFunctions, 'cuerpoHTTP', itemIndex);
+	const newData = helperFns.getNodeParameterOrThrow(executeFunctions, 'jsonBody', itemIndex);
 	try {
 		const updateCustomer = await helperFns.apiRequest<any>(`${centumUrl}/Clientes/Actualizar`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
 			method: 'POST',
-			body: nuevosDatos,
+			body: newData,
 			headers,
 		});
 
 		return [executeFunctions.helpers.returnJsonArray(updateCustomer)];
 	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			helperFns.getErrorMessage(error, 'Error actualizando cliente'),
+			helperFns.getErrorMessage(error, 'Error updating customer'),
 		);
 	}
 };
 
-const buscarClientes: ResourceHandler = async (context) => {
+const searchCustomers: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
 		centumUrl,
@@ -51,31 +54,31 @@ const buscarClientes: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const codigo = helperFns.getNodeParameterOrThrow(
+	const customerCode = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
-		'codigoCliente',
+		'customerCode',
 		itemIndex,
 		'',
 	) as string;
 	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, 'cuit', itemIndex, '') as string;
-	const razonSocial = helperFns.getNodeParameterOrThrow(
+	const businessName = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
-		'razonSocial',
+		'businessName',
 		itemIndex,
 		'',
 	) as string;
 
-	if (!codigo && !cuit && !razonSocial) {
+	if (!customerCode && !cuit && !businessName) {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			'Debe proporcionar al menos un campo para la búsqueda (CUIT, Codigo o Razón Social).',
+			'Provide at least one search field (CUIT, customer code, or business name).',
 		);
 	}
 
 	const queryParams: Record<string, string> = {};
 	if (cuit) queryParams.Cuit = cuit;
-	if (codigo) queryParams.codigo = codigo;
-	if (razonSocial) queryParams.RazonSocial = razonSocial;
+	if (customerCode) queryParams.codigo = customerCode;
+	if (businessName) queryParams.RazonSocial = businessName;
 
 	try {
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/Clientes`, {
@@ -87,13 +90,16 @@ const buscarClientes: ResourceHandler = async (context) => {
 		});
 		return [executeFunctions.helpers.returnJsonArray(response.Items as any)];
 	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
 		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
-const buscarClientePorCuit: ResourceHandler = async (context) => {
+const searchCustomerByCuit: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
 		centumUrl,
@@ -113,7 +119,7 @@ const buscarClientePorCuit: ResourceHandler = async (context) => {
 	if (!cuit) {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			'Debe proporcionar CUIT para buscar clientes.',
+			'CUIT is required to search for customers.',
 		);
 	}
 
@@ -130,13 +136,16 @@ const buscarClientePorCuit: ResourceHandler = async (context) => {
 
 		return [executeFunctions.helpers.returnJsonArray(response.Items as any)];
 	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
 		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
-const listarClientes: ResourceHandler = async (context) => {
+const listCustomers: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
 		centumUrl,
@@ -152,32 +161,59 @@ const listarClientes: ResourceHandler = async (context) => {
 
 	try {
 		const ajustesHTTP = helperFns.getHttpSettings.call(executeFunctions, itemIndex);
-		const clientesURL = `${centumUrl}/Clientes`;
+		const pagination = ajustesHTTP.pagination ?? 'custom';
+		const startingPage = ajustesHTTP.pageNumber ?? 1;
+		const itemsPerPage = ajustesHTTP.itemsPerPage ?? 100;
+		const pageInterval = ajustesHTTP.pageInterval ?? 1000;
+		const customersUrl = `${centumUrl}/Clientes`;
+		const customers: any[] = [];
+		let currentPage = startingPage;
 
-		const fetchOptions: any = {
-			method: 'GET',
-			pagination: ajustesHTTP.pagination,
-			cantidadItemsPorPagina: ajustesHTTP.cantidadItemsPorPagina,
-			intervaloPagina: ajustesHTTP.intervaloPagina,
-			itemsField: 'Items',
-			context: executeFunctions,
-			debugItemIndex: itemIndex,
-			headers,
-		};
+		while (true) {
+			const response = await helperFns.apiRequest<any>(customersUrl, {
+				context: executeFunctions,
+				debugItemIndex: itemIndex,
+				method: 'GET',
+				headers,
+				queryParams: {
+					numeroPagina: currentPage,
+					cantidadItemsPorPagina: itemsPerPage,
+				},
+			});
 
-		let clientes: any | any[] = [];
-		const paginated = await helperFns.apiGetRequest<any>(clientesURL, fetchOptions);
-		clientes = paginated;
+			const pageItems = Array.isArray(response?.Items) ? response.Items : [];
+			customers.push(...pageItems);
 
-		return [executeFunctions.helpers.returnJsonArray(clientes as any)];
+			if (pagination !== 'all') {
+				break;
+			}
+
+			const totalItems = Number(response?.CantidadTotalItems ?? 0);
+			const reachedEnd =
+				pageItems.length === 0 ||
+				pageItems.length < itemsPerPage ||
+				(totalItems > 0 && customers.length >= totalItems);
+
+			if (reachedEnd) {
+				break;
+			}
+
+			await new Promise((resolve) => setTimeout(resolve, pageInterval));
+			currentPage += 1;
+		}
+
+		return [executeFunctions.helpers.returnJsonArray(customers as any)];
 	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
 		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
-const crearCliente: ResourceHandler = async (context) => {
+const createCustomer: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
 		centumUrl,
@@ -192,59 +228,65 @@ const crearCliente: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const razonSocial = helperFns.getNodeParameterOrThrow(executeFunctions, 'razonSocial', itemIndex);
+	const businessName = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'businessName',
+		itemIndex,
+	);
 	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, 'cuit', itemIndex);
-	const provincia = helperFns.getNodeParameterOrThrow(executeFunctions, 'idProvincia', itemIndex);
-	const pais = helperFns.getNodeParameterOrThrow(executeFunctions, 'idPais', itemIndex);
-	const zona = helperFns.getNodeParameterOrThrow(executeFunctions, 'idZona', itemIndex);
-	const condicionIVA = helperFns.getNodeParameterOrThrow(
+	const provinceId = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'provinceId', itemIndex),
+	);
+	const countryId = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'countryId', itemIndex),
+	);
+	const zoneId = helperFns.getNodeParameterOrThrow(executeFunctions, 'zoneId', itemIndex);
+	const vatConditionId = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
-		'condicionIVA',
+		'vatConditionId',
 		itemIndex,
 	);
-	const condicionVentaId = helperFns.getNodeParameterOrThrow(
+	const salesConditionId = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
-		'idCondicionVenta',
+		'salesConditionId',
 		itemIndex,
 	);
-	const bonificacionId = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'idBonificacion',
-		itemIndex,
+	const discountId = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'discountId', itemIndex),
 	);
 
 	try {
-		const crearCliente = await helperFns.apiRequest<any>(`${centumUrl}/Clientes`, {
+		const createdCustomer = await helperFns.apiRequest<any>(`${centumUrl}/Clientes`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
 			method: 'POST',
 			headers,
 			body: {
-				RazonSocial: razonSocial,
+				RazonSocial: businessName,
 				CUIT: cuit,
 				Provincia: {
-					IdProvincia: provincia,
+					IdProvincia: provinceId,
 				},
 				Pais: {
-					IdPais: pais,
+					IdPais: countryId,
 				},
 				Zona: {
-					IdZona: zona,
+					IdZona: zoneId,
 				},
 				CondicionIVA: {
-					IdCondicionIVA: condicionIVA,
+					IdCondicionIVA: vatConditionId,
 				},
 				CondicionVenta: {
-					IdCondicionVenta: condicionVentaId,
+					IdCondicionVenta: salesConditionId,
 				},
 				Vendedor: {
-					IdVendedor: 2, //Esto hay que reemplazarlo por el body entero del vendedor
+					IdVendedor: 2, // Replace this with the full seller payload
 				},
 				Transporte: {
 					IdTransporte: 1,
 				},
 				Bonificacion: {
-					IdBonificacion: bonificacionId,
+					IdBonificacion: discountId,
 				},
 				LimiteCredito: {
 					IdLimiteCredito: 46002,
@@ -281,16 +323,19 @@ const crearCliente: ResourceHandler = async (context) => {
 				},
 			},
 		});
-		return [executeFunctions.helpers.returnJsonArray(crearCliente)];
+		return [executeFunctions.helpers.returnJsonArray(createdCustomer)];
 	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			`Error al obtener la informacion de los articulos ${error}`,
+			`Failed to create customer: ${String(error)}`,
 		);
 	}
 };
 
-const buscarContribuyente: ResourceHandler = async (context) => {
+const searchTaxpayerCustomer: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
 		centumUrl,
@@ -306,28 +351,28 @@ const buscarContribuyente: ResourceHandler = async (context) => {
 	void consumerApiPublicId;
 
 	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, 'cuit', itemIndex, '') as string;
-	const razonSocial = helperFns.getNodeParameterOrThrow(
+	const businessName = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
-		'razonSocial',
+		'businessName',
 		itemIndex,
 		'',
 	) as string;
 
-	if (!cuit && !razonSocial) {
+	if (!cuit && !businessName) {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			'Debe proporcionar al menos CUIT o Razón Social para buscar contribuyentes.',
+			'Provide at least a CUIT or business name to search taxpayers.',
 		);
 	}
 
 	let url = `${centumUrl}/Clientes/BuscarContribuyente`;
 	const queryParams: Record<string, string> = {};
 
-	if (cuit && !razonSocial) {
+	if (cuit && !businessName) {
 		url += `/${cuit}`;
 	} else {
 		if (cuit) queryParams.Cuit = cuit;
-		if (razonSocial) queryParams.razonSocial = razonSocial;
+		if (businessName) queryParams.razonSocial = businessName;
 	}
 
 	const requestDetails = {
@@ -350,13 +395,16 @@ const buscarContribuyente: ResourceHandler = async (context) => {
 
 		return [executeFunctions.helpers.returnJsonArray(response as any)];
 	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
 		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
-const crearContribuyente: ResourceHandler = async (context) => {
+const createTaxpayerCustomer: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
 		centumUrl,
@@ -373,7 +421,7 @@ const crearContribuyente: ResourceHandler = async (context) => {
 
 	const bodyJson = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
-		'cuerpoHTTP',
+		'jsonBody',
 		itemIndex,
 	) as any;
 	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, 'cuit', itemIndex);
@@ -381,41 +429,44 @@ const crearContribuyente: ResourceHandler = async (context) => {
 	if (typeof cuit !== 'string' || !/^\d{11}$/.test(cuit)) {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			'El CUIT debe ser una cadena de 11 dígitos numéricos.',
+			'CUIT must be a string with 11 numeric digits.',
 		);
 	}
 
-	const contribuyenteJSON = helperFns.createContribuyenteJson(bodyJson, cuit);
+	const taxpayerCustomerJson = helperFns.createTaxpayerCustomerJson(bodyJson, cuit);
 
 	try {
-		const crearCliente = await helperFns.apiRequest(`${centumUrl}/Clientes`, {
+		const createdCustomer = await helperFns.apiRequest(`${centumUrl}/Clientes`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
 			method: 'POST',
-			body: contribuyenteJSON,
+			body: taxpayerCustomerJson,
 			headers,
 		});
 
-		return [executeFunctions.helpers.returnJsonArray([crearCliente as any])];
-	} catch (error: any) {
+		return [executeFunctions.helpers.returnJsonArray([createdCustomer as any])];
+	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
 		const statusCode = error?.response?.status;
 		const responseData = error?.response?.data;
 		const errorMessage =
 			responseData?.Message ||
 			responseData?.message ||
 			(error as any)?.message ||
-			'Error desconocido al crear el contribuyente.';
+			'Unknown error while creating the taxpayer customer.';
 
 		const fullMessage = statusCode ? `Error ${statusCode}: ${errorMessage}` : errorMessage;
 
 		throw new NodeOperationError(executeFunctions.getNode(), fullMessage, {
 			description:
-				responseData?.Detail || 'Ocurrió un error inesperado al llamar a la API de Centum.',
+				responseData?.Detail || 'An unexpected error occurred while calling the Centum API.',
 		});
 	}
 };
 
-const consultarSaldoCliente: ResourceHandler = async (context) => {
+const getCustomerBalance: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
 		centumUrl,
@@ -430,27 +481,29 @@ const consultarSaldoCliente: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const clientIdParam = helperFns.getNodeParameterOrThrow(executeFunctions, 'clienteId', itemIndex);
-	const desdeSaldoFecha = helperFns.getNodeParameterOrThrow(
+	const clientIdParam = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'customerId', itemIndex),
+	);
+	const balanceFromDate = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'priceDateModifiedTo',
 		itemIndex,
 	);
-	const soloFecha = String(desdeSaldoFecha).split('T')[0];
+	const dueDateUntil = String(balanceFromDate).split('T')[0];
 
-	// Validación de parámetros
+	// Parameter validation
 	const clientId = Number(clientIdParam);
 	if (isNaN(clientId) || clientId <= 0) {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			'clienteId debe ser un número positivo',
+			'customerId must be a positive number.',
 		);
 	}
 
 	try {
 		let url = `${centumUrl}/SaldosCuentasCorrientes/${clientId}`;
-		if (soloFecha) {
-			url += `?fechaVencimientoHasta=${soloFecha}`;
+		if (dueDateUntil) {
+			url += `?fechaVencimientoHasta=${dueDateUntil}`;
 		}
 
 		const response = await helperFns.apiRequest<any>(url, {
@@ -462,16 +515,19 @@ const consultarSaldoCliente: ResourceHandler = async (context) => {
 
 		return [executeFunctions.helpers.returnJsonArray(response)];
 	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
 		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			`Error obteniendo saldo para cliente ${clientId}: ${errorMessage}`,
+			`Error getting balance for customer ${clientId}: ${errorMessage}`,
 		);
 	}
 };
 
-const verDetalleSaldoCliente: ResourceHandler = async (context) => {
+const getCustomerBalanceDetails: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
 		centumUrl,
@@ -486,27 +542,29 @@ const verDetalleSaldoCliente: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const clientIdParam = helperFns.getNodeParameterOrThrow(executeFunctions, 'clienteId', itemIndex);
-	const hastaSaldoFecha = helperFns.getNodeParameterOrThrow(
+	const clientIdParam = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'customerId', itemIndex),
+	);
+	const balanceDateUntil = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'priceDateModifiedTo',
 		itemIndex,
 	);
-	const separarFecha = String(hastaSaldoFecha).split('T')[0];
+	const formattedBalanceDateUntil = String(balanceDateUntil).split('T')[0];
 
-	// Validación de parámetros
+	// Parameter validation
 	const clientId = Number(clientIdParam);
 	if (isNaN(clientId) || clientId <= 0) {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			'clienteId debe ser un número positivo',
+			'customerId must be a positive number.',
 		);
 	}
 
 	try {
 		let url = `${centumUrl}/SaldosCuentasCorrientes/Composicion/${clientId}`;
-		if (separarFecha) {
-			url += `?fechaVencimientoHasta=${separarFecha}`;
+		if (formattedBalanceDateUntil) {
+			url += `?fechaVencimientoHasta=${formattedBalanceDateUntil}`;
 		}
 
 		const response = await helperFns.apiRequest<any>(url, {
@@ -516,23 +574,26 @@ const verDetalleSaldoCliente: ResourceHandler = async (context) => {
 			headers,
 		});
 
-		// Validación de la respuesta
+		// Validate the response
 		if (!response || typeof response !== 'object') {
-			throw new NodeOperationError(executeFunctions.getNode(), 'Respuesta inválida del servidor');
+			throw new NodeOperationError(executeFunctions.getNode(), 'Invalid server response.');
 		}
 
 		return [executeFunctions.helpers.returnJsonArray(response)];
 	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
 		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			`Error obteniendo composición de saldo para cliente ${clientId}: ${errorMessage}`,
+			`Error getting balance breakdown for customer ${clientId}: ${errorMessage}`,
 		);
 	}
 };
 
-const listarPromocionesComercialesCliente: ResourceHandler = async (context) => {
+const listCustomerCommercialPromotions: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
 		centumUrl,
@@ -547,17 +608,19 @@ const listarPromocionesComercialesCliente: ResourceHandler = async (context) => 
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const clientIdParam = helperFns.getNodeParameterOrThrow(executeFunctions, 'clienteId', itemIndex);
+	const clientIdParam = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'customerId', itemIndex),
+	);
 	const documentDate = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'documentDate',
 		itemIndex,
 	) as string;
-	const diaSemana = helperFns.getNodeParameterOrThrow(executeFunctions, 'diaSemana', itemIndex);
+	const weekday = helperFns.getNodeParameterOrThrow(executeFunctions, 'weekday', itemIndex);
 	const clientId = Number(clientIdParam);
 
 	if (!documentDate) {
-		throw new NodeOperationError(executeFunctions.getNode(), 'documentDate es requerido');
+		throw new NodeOperationError(executeFunctions.getNode(), 'documentDate is required.');
 	}
 
 	const formattedDocumentDate = String(documentDate).split('T')[0];
@@ -566,7 +629,7 @@ const listarPromocionesComercialesCliente: ResourceHandler = async (context) => 
 		const body = {
 			FechaDocumento: formattedDocumentDate,
 			IdsCliente: clientId,
-			DiaSemana: diaSemana || '',
+			DiaSemana: weekday || '',
 		};
 
 		const response = await helperFns.apiRequest<any>(
@@ -581,7 +644,7 @@ const listarPromocionesComercialesCliente: ResourceHandler = async (context) => 
 		);
 
 		if (!response || typeof response !== 'object') {
-			throw new NodeOperationError(executeFunctions.getNode(), 'Respuesta inválida del servidor');
+			throw new NodeOperationError(executeFunctions.getNode(), 'Invalid server response.');
 		}
 
 		if (response.Items && Array.isArray(response.Items)) {
@@ -590,16 +653,19 @@ const listarPromocionesComercialesCliente: ResourceHandler = async (context) => 
 
 		return [executeFunctions.helpers.returnJsonArray(response)];
 	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
 		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			`Error obteniendo promociones para el cliente ${clientId}: \n ${errorMessage}`,
+			`Error getting promotions for customer ${clientId}:\n${errorMessage}`,
 		);
 	}
 };
 
-const frecuenciasCliente: ResourceHandler = async (context) => {
+const listCustomerFrequencies: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
 		centumUrl,
@@ -614,30 +680,36 @@ const frecuenciasCliente: ResourceHandler = async (context) => {
 	void consumerApiPublicId;
 
 	try {
-		const frecuenciasCliente = await helperFns.apiRequest<any>(`${centumUrl}/FrecuenciasCliente`, {
-			context: executeFunctions,
-			debugItemIndex: itemIndex,
-			headers,
-		});
+		const listCustomerFrequencies = await helperFns.apiRequest<any>(
+			`${centumUrl}/FrecuenciasCliente`,
+			{
+				context: executeFunctions,
+				debugItemIndex: itemIndex,
+				headers,
+			},
+		);
 
-		return [executeFunctions.helpers.returnJsonArray(frecuenciasCliente)];
+		return [executeFunctions.helpers.returnJsonArray(listCustomerFrequencies)];
 	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
 		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Error desconocido';
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
-export const clientesHandlers: ResourceHandlerMap = {
-	actualizarCliente,
-	buscarClientes,
-	buscarClientePorCuit,
-	listarClientes,
-	crearCliente,
-	buscarContribuyente,
-	crearContribuyente,
-	consultarSaldoCliente,
-	verDetalleSaldoCliente,
-	listarPromocionesComercialesCliente,
-	frecuenciasCliente,
+export const customersHandlers: ResourceHandlerMap = {
+	updateCustomer: updateCustomer,
+	searchCustomers: searchCustomers,
+	searchCustomerByCuit: searchCustomerByCuit,
+	listCustomers: listCustomers,
+	createCustomer: createCustomer,
+	searchTaxpayerCustomer: searchTaxpayerCustomer,
+	createTaxpayerCustomer: createTaxpayerCustomer,
+	getCustomerBalance: getCustomerBalance,
+	getCustomerBalanceDetails: getCustomerBalanceDetails,
+	listCustomerCommercialPromotions: listCustomerCommercialPromotions,
+	listCustomerFrequencies: listCustomerFrequencies,
 };

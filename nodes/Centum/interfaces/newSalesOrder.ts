@@ -1,4 +1,4 @@
-import { BonificacionNewCustomer, INewCustomer, VendedorNewCustomer } from './nuevoCliente';
+import { BonificacionNewCustomer, INewCustomer, VendedorNewCustomer } from './newCustomer';
 import { CobroId } from './woocommerce';
 
 export interface INewPedidoVenta {
@@ -58,7 +58,7 @@ interface SucursalFisica {
 
 export interface TurnoEntrega {
 	IdTurnoEntrega: 6083;
-	Nombre: 'Maniana';
+	Nombre: 'Morning';
 }
 
 interface ClaseDescuento {

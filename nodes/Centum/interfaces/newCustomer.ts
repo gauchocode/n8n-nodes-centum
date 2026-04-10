@@ -1,4 +1,4 @@
-import { ListaPrecio } from './clientes';
+import { ListaPrecio } from './customers';
 export interface INewCustomer {
 	TarifaServicio: TarifaServicio,
 	Bonificacion: BonificacionNewCustomer;

@@ -1,4 +1,4 @@
-export const constantsZonas = [
+export const zoneConstants = [
 	{
 		IdZona: 6095,
 		Codigo: 'CAPITAL FEDERAL',
