@@ -1,7 +1,7 @@
 import { INodeProperties } from 'n8n-workflow';
-import { CentumOperations } from './CentumOperations';
+import { CentumOperations, operationDisplayNames, resourceDisplayNames } from './CentumOperations';
 
-export { CentumOperations };
+export { CentumOperations, operationDisplayNames, resourceDisplayNames };
 
 const fieldDefinitions: INodeProperties[] = [
 	{

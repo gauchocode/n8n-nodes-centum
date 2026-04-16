@@ -1,206 +1,221 @@
 import { INodeProperties } from 'n8n-workflow';
 
+const resourceOptions = [
+	{ name: 'Articulos', value: 'articles' },
+	{ name: 'Clientes', value: 'customers' },
+	{ name: 'Extras', value: 'extras' },
+	{ name: 'Geografia', value: 'geography' },
+	{ name: 'Logistica', value: 'logistics' },
+	{ name: 'Pagos', value: 'payments' },
+	{ name: 'Compras', value: 'purchases' },
+	{ name: 'Ventas', value: 'sales' },
+	{ name: 'Stock', value: 'stock' },
+	{ name: 'Proveedores', value: 'suppliers' },
+];
+
+export const resourceDisplayNames = resourceOptions.reduce<Record<string, string>>(
+	(displayNames, option) => {
+		displayNames[option.value] = option.name;
+		return displayNames;
+	},
+	{},
+);
+
 export const CentumOperations: INodeProperties[] = [
 	{
-		displayName: 'Resource',
+		displayName: 'Recurso',
 		name: 'resource',
 		type: 'options',
 		noDataExpression: true,
-		options: [
-			{ name: 'Article', value: 'articles' },
-			{ name: 'Customer', value: 'customers' },
-			{ name: 'Extra', value: 'extras' },
-			{ name: 'Geography', value: 'geography' },
-			{ name: 'Logistic', value: 'logistics' },
-			{ name: 'Payment', value: 'payments' },
-			{ name: 'Purchase', value: 'purchases' },
-			{ name: 'Sale', value: 'sales' },
-			{ name: 'Stock', value: 'stock' },
-			{ name: 'Supplier', value: 'suppliers' },
-		],
+		options: resourceOptions,
 		default: 'sales',
 	},
 	{
-		displayName: 'Operation',
+		displayName: 'Operacion',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
 		displayOptions: { show: { resource: ['articles'] } },
 		options: [
 			{
-				name: 'By ID',
+				name: 'Por ID',
 				value: 'getProductByCode',
 				action: 'Get article by ID',
-				description: 'Return a specific article based on its unique ID',
+				description:
+					'Devuelve los datos generales de un artículo específico en función de su ID único.',
 			},
 			{
-				name: 'Search',
+				name: 'Buscar',
 				value: 'searchProducts',
 				action: 'Search articles by name',
 				description: 'Search for an article by name and return every match',
 			},
 			{
-				name: 'Filtered',
+				name: 'Filtrar',
 				value: 'listAvailableProducts',
 				action: 'List filtered articles',
-				description: 'Return a list of sellable articles using the selected filters',
+				description:
+					'Devuelve información completa de artículos para la venta en función de el ID de un cliente específico y filtros varios.',
 			},
 			{
-				name: 'Image',
+				name: 'Imagen',
 				value: 'downloadProductImages',
 				action: 'Get article image',
-				description: 'Return the binary image for an article',
+				description:
+					'Devuelve la imagen de un artículo específico en función de su ID único y número de orden	',
 			},
 			{
-				name: 'List',
+				name: 'Listar',
 				value: 'listAllProducts',
 				action: 'List article details',
-				description: 'Return a list of articles and their general data',
+				description: 'Devuelve los datos generales de artículos en función de filtros varios',
 			},
 			{
-				name: 'Price by List',
+				name: 'Precio por Lista',
 				value: 'getProductPrice',
 				action: 'Get article price by list',
-				description: 'Return the article price for the selected price list',
+				description:
+					'Devuelve los datos de precios de artículos en función de el ID de una lista de precios y filtros varios',
 			},
 			{
-				name: 'Stock by Branch and Article ID',
+				name: 'Stock por Sucursal e ID de Articulo',
 				value: 'getProductInBranch',
 				action: 'Get branch stock by article',
 				description: 'Return stock for a specific article in a physical branch',
 			},
 			{
-				name: 'Stock by Physical Branch',
+				name: 'Stock por Sucursal Fisica',
 				value: 'listProductsByBranch',
 				action: 'List stock by physical branch',
 				description: 'Return article stock for a specific physical branch',
 			},
 			{
-				name: 'Brands - Get',
+				name: 'Marcas - Obtener',
 				value: 'listBrands',
 				action: 'List brands',
-				description: 'Get the complete list of article brands',
+				description: 'Devuelve la lista completa de marcas de artículos',
 			},
 			{
-				name: 'Categories - Get',
+				name: 'Categorias - Obtener',
 				value: 'listCategories',
 				action: 'List categories',
-				description: 'Get the complete list of article categories',
+				description: 'Devuelve la lista completa de categorías de artículos',
 			},
 			{
-				name: 'Discounts - Get',
+				name: 'Descuentos - Obtener',
 				value: 'listDiscounts',
 				action: 'List discounts',
-				description: 'Get the complete list of available discounts',
+				description: 'Devuelve la lista completa de bonificaciones de clientes.',
 			},
 			{
-				name: 'Groups - Get',
+				name: 'Grupos - Obtener',
 				value: 'listGroups',
 				action: 'List groups',
-				description: 'Get the complete list of article groups',
+				description: 'Devuelve la lista completa de rubros de artículos.',
 			},
 			{
-				name: 'Product Prices - List',
+				name: 'Precios de Productos - Listar',
 				value: 'listPrices',
 				action: 'List product prices',
-				description: 'Get a list of suggested product prices',
+				description: 'Devuelve la lista completa de listas de precios',
 			},
 			{
-				name: 'Subgroups - List',
+				name: 'Subgrupos - Listar',
 				value: 'listSubgroups',
 				action: 'List subgroups',
-				description: 'Get the complete list of article subgroups or filter them by ID',
+				description:
+					'Devuelve la lista completa de subrubros pudiendo filtrar de manera opcional por IDs de rubros.',
 			},
 		],
 		default: 'searchProducts',
 	},
 	{
-		displayName: 'Operation',
+		displayName: 'Operacion',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
 		displayOptions: { show: { resource: ['customers'] } },
 		options: [
 			{
-				name: 'Create',
+				name: 'Crear',
 				value: 'createCustomer',
 				action: 'Create customer',
 				description: 'Create a new customer',
 			},
 			{
-				name: 'Get Balance',
+				name: 'Obtener Saldo',
 				value: 'getCustomerBalance',
 				action: 'Get customer balance',
 				description: 'Get the balance for the selected customer',
 			},
 			{
-				name: 'Get Balance Breakdown',
+				name: 'Obtener Desglose de Saldo',
 				value: 'getCustomerBalanceDetails',
 				action: 'Get customer balance breakdown',
 				description: 'Get the account balance breakdown for the selected customer',
 			},
 			{
-				name: 'Get Commercial Promotions',
+				name: 'Obtener Promociones Comerciales',
 				value: 'listCustomerCommercialPromotions',
 				action: 'Get customer commercial promotions',
 				description: 'Get the commercial promotions applied to a customer from the selected date',
 			},
 			{
-				name: 'Get Payment Invoices',
+				name: 'Obtener Facturas de Pago',
 				value: 'listPaymentInvoices',
 				action: 'Get payment invoices',
 				description: 'Get all payment invoices for the selected customer',
 			},
 			{
-				name: 'Get Sales Invoices',
+				name: 'Obtener Facturas de Venta',
 				value: 'listSalesInvoices',
 				action: 'Get sales invoices',
 				description: 'Get all sales invoices for the selected customer',
 			},
 			{
-				name: 'Get Sales Invoices by ID',
+				name: 'Obtener Facturas de Venta por ID',
 				value: 'listSalesInvoicesById',
 				action: 'Get sales invoices by ID',
 				description: 'Get all sales invoices for the selected customer by ID',
 			},
 			{
-				name: 'List',
+				name: 'Listar',
 				value: 'listCustomers',
 				action: 'List customers',
 				description: 'Return a list of all registered customers',
 			},
 			{
-				name: 'Search',
+				name: 'Buscar',
 				value: 'searchCustomers',
 				action: 'Search customers',
 				description: 'Return a list of customers that match the selected filters',
 			},
 			{
-				name: 'Search by CUIT',
+				name: 'Buscar por CUIT',
 				value: 'searchCustomerByCuit',
 				action: 'Search customers by CUIT',
 				description: 'Return a list of customers based on the provided CUIT',
 			},
 			{
-				name: 'Update',
+				name: 'Actualizar',
 				value: 'updateCustomer',
 				action: 'Update customer',
-				description: 'Update a customer and return the resource information and URL',
+				description: 'Actualiza un cliente y devuelve el objeto actualizado.',
 			},
 			{
-				name: 'Customer Frequencies - List',
+				name: 'Frecuencias de Clientes - Listar',
 				value: 'listCustomerFrequencies',
 				action: 'List customer frequencies',
 				description: 'Get a list of customer frequency options',
 			},
 			{
-				name: 'Taxpayer Customer - Create',
+				name: 'Cliente Contribuyente - Crear',
 				value: 'createTaxpayerCustomer',
 				action: 'Create taxpayer customer',
 				description: 'Create a new taxpayer customer',
 			},
 			{
-				name: 'Taxpayer Customer - Search',
+				name: 'Cliente Contribuyente - Buscar',
 				value: 'searchTaxpayerCustomer',
 				action: 'Search taxpayer customer',
 				description: 'Return taxpayer data by CUIT or business name',
@@ -209,62 +224,62 @@ export const CentumOperations: INodeProperties[] = [
 		default: 'updateCustomer',
 	},
 	{
-		displayName: 'Operation',
+		displayName: 'Operacion',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
 		displayOptions: { show: { resource: ['sales'] } },
 		options: [
 			{
-				name: 'Commercial Promotions - List',
+				name: 'Promociones Comerciales - Listar',
 				value: 'listPromotions',
 				action: 'List commercial promotions',
 				description: 'Get the available commercial promotions',
 			},
 			{
-				name: 'Create',
+				name: 'Crear',
 				value: 'createSale',
 				action: 'Create sale',
 				description: 'Create a sale from the completed parameters',
 			},
 			{
-				name: 'Sales Order - Create',
+				name: 'Pedido de Venta - Crear',
 				value: 'createSalesOrder',
 				action: 'Create sales order',
 				description: 'Create a sales order using the provided articles',
 			},
 			{
-				name: 'Sales Order - Get',
+				name: 'Pedido de Venta - Obtener',
 				value: 'getSalesOrderDetails',
 				action: 'Get sales order',
 				description: 'Get a sales order by its unique identifier',
 			},
 			{
-				name: 'Sales Order Statuses - List',
+				name: 'Estados de Pedido de Venta - Listar',
 				value: 'listSalesOrderStatuses',
 				action: 'List sales order statuses',
 				description: 'Get all available sales order statuses',
 			},
 			{
-				name: 'Sales Orders - List',
+				name: 'Pedidos de Venta - Listar',
 				value: 'listSalesOrders',
 				action: 'List sales orders',
 				description: 'Get all sales orders using the selected filters',
 			},
 			{
-				name: 'Sales Orders - Summary',
+				name: 'Pedidos de Venta - Resumen',
 				value: 'listFilteredSalesOrders',
 				action: 'List summarized sales orders',
 				description: 'Get sales orders with a lighter response body',
 			},
 			{
-				name: 'Sales Ranking - Get',
+				name: 'Ranking de Ventas - Obtener',
 				value: 'getSalesRanking',
 				action: 'Get sales ranking',
 				description: 'Get a ranking of customers, articles, sellers, or branches',
 			},
 			{
-				name: 'Sales Voucher - List',
+				name: 'Comprobantes de Venta - Listar',
 				value: 'listSalesVouchers',
 				action: 'List sales vouchers',
 				description: 'Get a list of sales vouchers using the selected filters',
@@ -273,20 +288,20 @@ export const CentumOperations: INodeProperties[] = [
 		default: 'listSalesVouchers',
 	},
 	{
-		displayName: 'Operation',
+		displayName: 'Operacion',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
 		displayOptions: { show: { resource: ['payments'] } },
 		options: [
 			{
-				name: 'Create',
+				name: 'Crear',
 				value: 'registerPayment',
 				action: 'Create payment',
 				description: 'Create a payment voucher',
 			},
 			{
-				name: 'List',
+				name: 'Listar',
 				value: 'listPayments',
 				action: 'List payments',
 				description: 'Get a list of payments using the selected filters',
@@ -295,50 +310,50 @@ export const CentumOperations: INodeProperties[] = [
 		default: 'registerPayment',
 	},
 	{
-		displayName: 'Operation',
+		displayName: 'Operacion',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
 		displayOptions: { show: { resource: ['purchases'] } },
 		options: [
 			{
-				name: 'Purchase Delivery Note - Create',
+				name: 'Remito de Compra - Crear',
 				value: 'createPurchaseDeliveryNote',
 				action: 'Create purchase delivery note',
 				description: 'Create a purchase delivery note from the provided parameters',
 			},
 			{
-				name: 'Purchase Order - Create',
+				name: 'Orden de Compra - Crear',
 				value: 'createPurchaseOrder',
 				action: 'Create purchase order',
 				description: 'Create a purchase order using the selected parameters',
 			},
 			{
-				name: 'Purchase Order - Get',
+				name: 'Orden de Compra - Obtener',
 				value: 'getPurchaseOrderDetails',
 				action: 'Get purchase order',
 				description: 'Get a single purchase order by ID',
 			},
 			{
-				name: 'Purchase Orders - List',
+				name: 'Ordenes de Compra - Listar',
 				value: 'listPurchaseOrders',
 				action: 'List purchase orders',
 				description: 'Get all purchase orders using the selected filters',
 			},
 			{
-				name: 'Purchase Voucher - List',
+				name: 'Comprobantes de Compra - Listar',
 				value: 'listPurchaseVouchers',
 				action: 'List purchase vouchers',
 				description: 'Get a list of purchase vouchers using the selected filters',
 			},
 			{
-				name: 'Create',
+				name: 'Crear',
 				value: 'createPurchase',
 				action: 'Create purchase',
 				description: 'Create a purchase using the selected parameters',
 			},
 			{
-				name: 'List',
+				name: 'Listar',
 				value: 'listPurchases',
 				action: 'List purchases',
 				description: 'Get a list of purchases using the selected filters',
@@ -347,26 +362,26 @@ export const CentumOperations: INodeProperties[] = [
 		default: 'createPurchase',
 	},
 	{
-		displayName: 'Operation',
+		displayName: 'Operacion',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
 		displayOptions: { show: { resource: ['suppliers'] } },
 		options: [
 			{
-				name: 'Search',
+				name: 'Buscar',
 				value: 'searchSupplier',
 				action: 'Search supplier',
 				description: 'Return supplier information based on its ID',
 			},
 			{
-				name: 'Create',
+				name: 'Crear',
 				value: 'createSupplier',
 				action: 'Create supplier',
 				description: 'Create a supplier using the provided data',
 			},
 			{
-				name: 'List',
+				name: 'Listar',
 				value: 'listSuppliers',
 				action: 'List suppliers',
 				description: 'Get a complete list of suppliers',
@@ -375,38 +390,38 @@ export const CentumOperations: INodeProperties[] = [
 		default: 'searchSupplier',
 	},
 	{
-		displayName: 'Operation',
+		displayName: 'Operacion',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
 		displayOptions: { show: { resource: ['logistics'] } },
 		options: [
 			{
-				name: 'Delivery Time Slots - List',
+				name: 'Turnos de Entrega - Listar',
 				value: 'listDeliveryTimeSlots',
 				action: 'List delivery time slots',
 				description: 'Get the full list of available delivery time slots',
 			},
 			{
-				name: 'Drivers - List',
+				name: 'Choferes - Listar',
 				value: 'listDrivers',
 				action: 'List drivers',
 				description: 'Get the complete list of available drivers',
 			},
 			{
-				name: 'Physical Branches - List',
+				name: 'Sucursales Fisicas - Listar',
 				value: 'listPhysicalBranches',
 				action: 'List physical branches',
 				description: 'Get the available physical branches',
 			},
 			{
-				name: 'Sales Delivery Note - Create',
+				name: 'Remito de Venta - Crear',
 				value: 'createSalesDeliveryNote',
 				action: 'Create sales delivery note',
 				description: 'Create a sales delivery note from the provided parameters',
 			},
 			{
-				name: 'Sellers - List',
+				name: 'Vendedores - Listar',
 				value: 'listSellers',
 				action: 'List sellers',
 				description: 'Get a list of all available sellers',
@@ -415,20 +430,21 @@ export const CentumOperations: INodeProperties[] = [
 		default: 'listDrivers',
 	},
 	{
-		displayName: 'Operation',
+		displayName: 'Operacion',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
 		displayOptions: { show: { resource: ['stock'] } },
 		options: [
 			{
-				name: 'Article Locations - List',
+				name: 'Ubicaciones de Articulos - Listar',
 				value: 'listArticleLocations',
 				action: 'List article locations',
-				description: 'Get the complete list of article locations',
+				description:
+					'Devuelve la lista completa de ubicaciones de artículos dentro de una sección sucursal.',
 			},
 			{
-				name: 'Article Locations By Section - Get',
+				name: 'Ubicaciones de Articulos por Seccion - Obtener',
 				value: 'getArticleLocationsBySection',
 				action: 'Get article locations by section',
 				description: 'Get article locations for a specific branch section',
@@ -440,7 +456,7 @@ export const CentumOperations: INodeProperties[] = [
 				description: 'Return article stock using the selected filters',
 			},
 			{
-				name: 'Transfer Order - Create',
+				name: 'Orden de Transferencia - Crear',
 				value: 'createStockMovement',
 				action: 'Create stock movement',
 				description: 'Create a stock movement adjustment',
@@ -449,26 +465,26 @@ export const CentumOperations: INodeProperties[] = [
 		default: 'getStock',
 	},
 	{
-		displayName: 'Operation',
+		displayName: 'Operacion',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
 		displayOptions: { show: { resource: ['geography'] } },
 		options: [
 			{
-				name: 'Countries - List',
+				name: 'Paises - Listar',
 				value: 'listCountries',
 				action: 'List countries',
 				description: 'Get the list of available countries',
 			},
 			{
-				name: 'Municipalities - List',
+				name: 'Municipios - Listar',
 				value: 'listMunicipalities',
 				action: 'List municipalities',
 				description: 'Get a list of municipalities, usually filtered by province',
 			},
 			{
-				name: 'Provinces - List',
+				name: 'Provincias - Listar',
 				value: 'listProvinces',
 				action: 'List provinces',
 				description: 'Get a list of provinces, usually filtered by country',
@@ -477,62 +493,62 @@ export const CentumOperations: INodeProperties[] = [
 		default: 'listMunicipalities',
 	},
 	{
-		displayName: 'Operation',
+		displayName: 'Operacion',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
 		displayOptions: { show: { resource: ['extras'] } },
 		options: [
 			{
-				name: 'Access Token - Generate',
+				name: 'Token de Acceso - Generar',
 				value: 'generateSecurityToken',
 				action: 'Generate access token',
 				description: 'Generate a token for external tools such as Postman',
 			},
 			{
-				name: 'Binary to Image',
+				name: 'Binario a Imagen',
 				value: 'syncImages',
 				action: 'Process binary images',
 				description: 'Process binary image data for WooCommerce usage',
 			},
 			{
-				name: 'Concepts - List',
+				name: 'Conceptos - Listar',
 				value: 'listConcepts',
 				action: 'List concepts',
 				description: 'Get a list of concepts',
 			},
 			{
-				name: 'Mobile Operator - Verify',
+				name: 'Operador Movil - Verificar',
 				value: 'verifyOperatorCredentials',
 				action: 'Verify mobile operator',
 				description: 'Get the data for a mobile operator using the configured credentials',
 			},
 			{
-				name: 'Mobile Operators - List',
+				name: 'Operadores Moviles - Listar',
 				value: 'listMobileOperators',
 				action: 'List mobile operators',
 				description: 'Get the list of all mobile operators',
 			},
 			{
-				name: 'Special Tax Regimes - By ID',
+				name: 'Regimenes Impositivos Especiales - Por ID',
 				value: 'getSpecialTaxRegimeDetails',
 				action: 'Get special tax regime by ID',
 				description: 'Get a special tax regime by ID',
 			},
 			{
-				name: 'Special Tax Regimes - List',
+				name: 'Regimenes Impositivos Especiales - Listar',
 				value: 'listSpecialTaxRegimes',
 				action: 'List special tax regimes',
 				description: 'Get the complete list of special tax regimes',
 			},
 			{
-				name: 'Voucher Types - List',
+				name: 'Tipos de Comprobante - Listar',
 				value: 'listVoucherTypes',
 				action: 'List voucher types',
 				description: 'Get a list of all voucher types',
 			},
 			{
-				name: 'WooCommerce Products - Generate (Product JSON)',
+				name: 'Productos WooCommerce - Generar (JSON de Producto)',
 				value: 'convertProductsForWooCommerce',
 				action: 'Convert woo commerce products',
 				description: 'Generate structured WooCommerce product JSON from Centum articles',
@@ -541,3 +557,25 @@ export const CentumOperations: INodeProperties[] = [
 		default: 'generateSecurityToken',
 	},
 ];
+
+export const operationDisplayNames = CentumOperations.reduce<Record<string, string>>(
+	(displayNames, property) => {
+		if (property.name !== 'operation' || !property.options) {
+			return displayNames;
+		}
+
+		for (const option of property.options) {
+			if (
+				'name' in option &&
+				'value' in option &&
+				typeof option.name === 'string' &&
+				typeof option.value === 'string'
+			) {
+				displayNames[option.value] = option.name;
+			}
+		}
+
+		return displayNames;
+	},
+	{},
+);

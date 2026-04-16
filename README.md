@@ -7,7 +7,7 @@ The `Centum` node simplifies interaction with the Centum API endpoints, allowing
 
 The node is built to be extensible, making it easy to add new operations for specific integration needs with Centum.
 
-> Breaking change: workflow parameter keys are now English-only. Existing workflows created against older Spanish parameter keys must be updated before reuse.
+> Breaking change: workflow parameter keys are English-only. Resource and operation labels in the UI are Spanish, but saved workflow values still use the English identifiers shown below.
 
 ## Requires 3 parameters in the **Centum API** credential:
 
@@ -22,9 +22,9 @@ The node is built to be extensible, making it easy to add new operations for spe
 
 **69 operations organized into 10 resources:**
 
-The node interface is in English and the operation IDs below match the actual values exposed by the node. Some Centum request and response fields remain in Spanish because they mirror the upstream API contract.
+The node interface shows resource and operation labels in Spanish, while the resource values and operation IDs below match the actual English values exposed by the node. Some Centum request and response fields remain in Spanish because they mirror the upstream API contract.
 
-### Articles (`articles`)
+### Articulos (`articles`)
 
 - `getProductByCode`: Get a specific article by its unique ID.
 - `searchProducts`: Search articles by name and return every match.
@@ -41,7 +41,7 @@ The node interface is in English and the operation IDs below match the actual va
 - `listPrices`: List suggested product prices.
 - `listSubgroups`: List subgroups or filter them by ID.
 
-### Customers (`customers`)
+### Clientes (`customers`)
 
 - `createCustomer`: Create a new customer.
 - `getCustomerBalance`: Get the current customer balance.
@@ -58,7 +58,7 @@ The node interface is in English and the operation IDs below match the actual va
 - `createTaxpayerCustomer`: Create a new taxpayer customer.
 - `searchTaxpayerCustomer`: Search taxpayer data by CUIT or business name.
 
-### Sales (`sales`)
+### Ventas (`sales`)
 
 - `listPromotions`: List available commercial promotions.
 - `createSale`: Generate a sale from the provided parameters.
@@ -70,12 +70,12 @@ The node interface is in English and the operation IDs below match the actual va
 - `getSalesRanking`: Get sales rankings for customers, articles, sellers, or branches.
 - `listSalesVouchers`: List sales vouchers using filters.
 
-### Payments (`payments`)
+### Pagos (`payments`)
 
 - `registerPayment`: Register a payment voucher.
 - `listPayments`: List payments using filters.
 
-### Purchases (`purchases`)
+### Compras (`purchases`)
 
 - `createPurchaseDeliveryNote`: Create a purchase delivery note.
 - `createPurchaseOrder`: Generate a purchase order.
@@ -85,13 +85,13 @@ The node interface is in English and the operation IDs below match the actual va
 - `createPurchase`: Generate a purchase.
 - `listPurchases`: List purchases using filters.
 
-### Suppliers (`suppliers`)
+### Proveedores (`suppliers`)
 
 - `searchSupplier`: Get supplier information by ID.
 - `createSupplier`: Create a supplier.
 - `listSuppliers`: List all suppliers.
 
-### Logistics (`logistics`)
+### Logistica (`logistics`)
 
 - `listDeliveryTimeSlots`: List available delivery time slots.
 - `listDrivers`: List available drivers.
@@ -105,7 +105,7 @@ The node interface is in English and the operation IDs below match the actual va
 - `getStock`: List article stock using filters.
 - `createStockMovement`: Create a stock movement adjustment.
 
-### Geography (`geography`)
+### Geografia (`geography`)
 
 - `listCountries`: List available countries.
 - `listMunicipalities`: List municipalities, usually filtered by province.

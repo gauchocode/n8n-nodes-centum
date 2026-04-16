@@ -8,7 +8,13 @@ import type {
 } from 'n8n-workflow';
 import { NodeApiError, NodeConnectionType, NodeOperationError } from 'n8n-workflow';
 
-import { CentumFields, CentumOperations, HttpOptions } from './CentumDescription';
+import {
+	CentumFields,
+	CentumOperations,
+	HttpOptions,
+	operationDisplayNames,
+	resourceDisplayNames,
+} from './CentumDescription';
 
 import {
 	buildCentumHeaders,
@@ -19,6 +25,19 @@ import { resourceHandlerGroups } from './resources';
 import type { CentumApiCredentials, CentumHeaders } from './resources/types';
 
 type SimplifiedFieldSpec = string | { key: string; fields: SimplifiedFieldSpec[] };
+
+const resourceDisplayNamesExpression = JSON.stringify(resourceDisplayNames);
+const operationDisplayNamesExpression = JSON.stringify(operationDisplayNames);
+
+const resourceSubtitleExpression = [
+	'={{$parameter["operation"] ? (',
+	`${resourceDisplayNamesExpression}[$parameter["resource"]] || $parameter["resource"]`,
+	') + ": " + (',
+	`${operationDisplayNamesExpression}[$parameter["operation"]] || $parameter["operation"]`,
+	') : (',
+	`${resourceDisplayNamesExpression}[$parameter["resource"]] || $parameter["resource"]`,
+	')}}',
+].join('');
 
 const productFields: SimplifiedFieldSpec[] = [
 	'ID',
@@ -452,8 +471,7 @@ export class Centum implements INodeType {
 		icon: 'file:centum.svg',
 		group: ['transform'],
 		version: 1,
-		subtitle:
-			'={{$parameter["operation"] ? $parameter["resource"] + ": " + $parameter["operation"] : $parameter["resource"]}}',
+		subtitle: resourceSubtitleExpression,
 		description: 'Consumes Centum API',
 		defaults: {
 			name: 'Centum',
