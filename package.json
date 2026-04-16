@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-centum",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "n8n community node for working with the Centum ERP API across customers, sales, purchases, stock, logistics, and supporting resources.",
 	"keywords": [
 		"n8n",
