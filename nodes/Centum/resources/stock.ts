@@ -28,6 +28,11 @@ const createStockMovement: ResourceHandler = async (context) => {
 		'articleLocationId',
 		itemIndex,
 	);
+	const branchSectionId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'branchSectionId',
+		itemIndex,
+	);
 	const indictmentDate = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'indictmentDate',
@@ -60,6 +65,9 @@ const createStockMovement: ResourceHandler = async (context) => {
 					],
 					SucursalFisica: {
 						IdSucursalFisica: physicalBranchId,
+					},
+					SeccionSucursal: {
+						IdSeccionSucursal: branchSectionId,
 					},
 					ConceptoVarios: {
 						IdConceptoVarios: 1,

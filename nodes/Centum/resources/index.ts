@@ -38,6 +38,7 @@ export const resourceHandlerGroups: Record<string, ResourceHandlerMap> = {
 		...stockHandlers,
 		getStock: articlesHandlers.getStock,
 		listArticleLocations: articlesHandlers.listArticleLocations,
+		getArticleLocationsBySection: articlesHandlers.getArticleLocationsBySection,
 	},
 	geography: geographyHandlers,
 	extras: {

@@ -242,7 +242,7 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 			Nombre: 'Operador de Compras Defecto',
 			EsSupervisor: false,
 		},
-		IdChofer: Number(driverId || '1'),
+		IdChofer: Number(driverId),
 	};
 
 	// 5) Send the final POST request

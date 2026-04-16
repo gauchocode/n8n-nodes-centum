@@ -590,6 +590,16 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { operation: ['createStockMovement'] } },
 	},
 	{
+		displayName: 'Branch Section ID',
+		name: 'branchSectionId',
+		required: true,
+		type: 'number',
+		default: 0,
+		displayOptions: {
+			show: { operation: ['createStockMovement', 'getArticleLocationsBySection'] },
+		},
+	},
+	{
 		displayName: 'Payment ID',
 		name: 'paymentId',
 		required: true,

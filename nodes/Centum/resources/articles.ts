@@ -881,6 +881,51 @@ const listArticleLocations: ResourceHandler = async (context) => {
 	}
 };
 
+const getArticleLocationsBySection: ResourceHandler = async (context) => {
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
+	void itemIndex;
+	void centumUrl;
+	void headers;
+	void centumApiCredentials;
+	void consumerApiPublicId;
+
+	const branchSectionId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'branchSectionId',
+		itemIndex,
+	);
+
+	try {
+		const articleLocationsResponse = await helperFns.apiRequest<any>(
+			`${centumUrl}/UbicacionesArticulos/${branchSectionId}`,
+			{
+				context: executeFunctions,
+				debugItemIndex: itemIndex,
+				method: 'GET',
+				headers,
+			},
+		);
+		return [executeFunctions.helpers.returnJsonArray(articleLocationsResponse)];
+	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			`Error getting article locations by section: ${errorMessage}`,
+		);
+	}
+};
+
 const convertProductsForWooCommerce: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
@@ -977,6 +1022,7 @@ export const articlesHandlers: ResourceHandlerMap = {
 	listGroups: listGroups,
 	listSubgroups: listSubgroups,
 	listArticleLocations: listArticleLocations,
+	getArticleLocationsBySection: getArticleLocationsBySection,
 	convertProductsForWooCommerce: convertProductsForWooCommerce,
 	syncImages: syncImages,
 };
