@@ -7,7 +7,7 @@ The `Centum` node simplifies interaction with the Centum API endpoints, allowing
 
 The node is built to be extensible, making it easy to add new operations for specific integration needs with Centum.
 
-> Breaking change: workflow parameter keys are English-only. Resource and operation labels in the UI are Spanish, but saved workflow values still use the English identifiers shown below.
+> Breaking change: resource values now follow normalized identifiers derived from the CSV `Resource New` column. Existing workflows created with the previous resource values must be updated before reuse.
 
 ## Requires 3 parameters in the **Centum API** credential:
 
@@ -20,11 +20,19 @@ The node is built to be extensible, making it easy to add new operations for spe
 
 ## Available Operations
 
-**69 operations organized into 10 resources:**
+**69 operations organized into 32 resources:**
 
-The node interface shows resource and operation labels in Spanish, while the resource values and operation IDs below match the actual English values exposed by the node. Some Centum request and response fields remain in Spanish because they mirror the upstream API contract.
+The node interface shows resource and operation labels in Spanish. Saved resource values use normalized Spanish identifiers, while operation IDs still use the internal operation identifiers shown below. Some Centum request and response fields remain in Spanish because they mirror the upstream API contract.
 
-### Articulos (`articles`)
+### Access Token (`accessToken`)
+
+- `generateSecurityToken`: Generate a token for external tools such as Postman.
+
+### Ajustes Movimientos Stock (`ajustesMovimientosStock`)
+
+- `createStockMovement`: Create a stock movement adjustment.
+
+### Articulos (`articulos`)
 
 - `getProductByCode`: Get a specific article by its unique ID.
 - `searchProducts`: Search articles by name and return every match.
@@ -33,95 +41,153 @@ The node interface shows resource and operation labels in Spanish, while the res
 - `listAllProducts`: List article general data.
 - `getProductPrice`: Get the price of an article for a selected price list.
 - `getProductInBranch`: Get stock for a specific article in a physical branch.
+- `getStock`: List article stock using filters.
 - `listProductsByBranch`: List article stock for a physical branch.
-- `listBrands`: List article brands.
-- `listCategories`: List article categories.
-- `listDiscounts`: List available discounts.
-- `listGroups`: List article groups.
-- `listPrices`: List suggested product prices.
-- `listSubgroups`: List subgroups or filter them by ID.
+- `convertProductsForWooCommerce`: Generate WooCommerce-ready product JSON from Centum articles.
 
-### Clientes (`customers`)
+### Bonificaciones (`bonificaciones`)
+
+- `listDiscounts`: List available discounts.
+
+### Categorias Articulo (`categoriasArticulo`)
+
+- `listCategories`: List article categories.
+
+### Choferes Guia Logistica (`choferesGuiaLogistica`)
+
+- `listDrivers`: List available drivers.
+
+### Clientes (`clientes`)
 
 - `createCustomer`: Create a new customer.
 - `getCustomerBalance`: Get the current customer balance.
 - `getCustomerBalanceDetails`: Get the detailed account balance composition for a customer.
-- `listCustomerCommercialPromotions`: Get commercial promotions applied to a customer from a selected date.
-- `listPaymentInvoices`: Get all payment invoices for a customer.
-- `listSalesInvoices`: Get all sales invoices for a customer.
-- `listSalesInvoicesById`: Get sales invoices for a customer by ID.
 - `listCustomers`: List all registered customers.
 - `searchCustomers`: Search customers using filters.
 - `searchCustomerByCuit`: Search customers by CUIT.
 - `updateCustomer`: Update a customer and return the updated resource information.
-- `listCustomerFrequencies`: List customer frequency options.
 - `createTaxpayerCustomer`: Create a new taxpayer customer.
 - `searchTaxpayerCustomer`: Search taxpayer data by CUIT or business name.
 
-### Ventas (`sales`)
+### Cobros (`cobros`)
 
-- `listPromotions`: List available commercial promotions.
-- `createSale`: Generate a sale from the provided parameters.
+- `listPaymentInvoices`: Get all payment invoices for a customer.
+- `registerPayment`: Register a payment voucher.
+- `listPayments`: List payments using filters.
+
+### Compras (`compras`)
+
+- `createPurchase`: Generate a purchase.
+- `listPurchases`: List purchases using filters.
+
+### Conceptos (`conceptos`)
+
+- `listConcepts`: List concepts.
+
+### Departamentos (`departamentos`)
+
+- `listMunicipalities`: List municipalities, usually filtered by province.
+
+### Frecuencia de Clientes (`frecuenciaClientes`)
+
+- `listCustomerFrequencies`: List customer frequency options.
+
+### Listas Precios (`listasPrecios`)
+
+- `listPrices`: List complete price lists.
+
+### Marcas (`marcas`)
+
+- `listBrands`: List article brands.
+
+### Operadores Moviles (`operadoresMoviles`)
+
+- `verifyOperatorCredentials`: Get mobile operator data using the configured credentials.
+- `listMobileOperators`: List mobile operators.
+
+### Ordenes Compra (`ordenesCompra`)
+
+- `createPurchaseOrder`: Generate a purchase order.
+- `getPurchaseOrderDetails`: Get a purchase order by ID.
+- `listPurchaseOrders`: List purchase orders using filters.
+
+### Paises (`paises`)
+
+- `listCountries`: List available countries.
+
+### Pedidos Venta (`pedidosVenta`)
+
 - `createSalesOrder`: Create a sales order for selected articles.
 - `getSalesOrderDetails`: Get a sales order by its unique ID.
 - `listSalesOrderStatuses`: List available sales order statuses.
 - `listSalesOrders`: List sales orders using filters.
 - `listFilteredSalesOrders`: List sales orders with a lighter response body.
-- `getSalesRanking`: Get sales rankings for customers, articles, sellers, or branches.
-- `listSalesVouchers`: List sales vouchers using filters.
 
-### Pagos (`payments`)
+### Promociones Comerciales (`promocionesComerciales`)
 
-- `registerPayment`: Register a payment voucher.
-- `listPayments`: List payments using filters.
+- `listCustomerCommercialPromotions`: Get commercial promotions applied to a customer from a selected date.
+- `listPromotions`: List available commercial promotions.
 
-### Compras (`purchases`)
-
-- `createPurchaseDeliveryNote`: Create a purchase delivery note.
-- `createPurchaseOrder`: Generate a purchase order.
-- `getPurchaseOrderDetails`: Get a purchase order by ID.
-- `listPurchaseOrders`: List purchase orders using filters.
-- `listPurchaseVouchers`: List purchase vouchers using filters.
-- `createPurchase`: Generate a purchase.
-- `listPurchases`: List purchases using filters.
-
-### Proveedores (`suppliers`)
+### Proveedores (`proveedores`)
 
 - `searchSupplier`: Get supplier information by ID.
 - `createSupplier`: Create a supplier.
 - `listSuppliers`: List all suppliers.
 
-### Logistica (`logistics`)
+### Provincias (`provincias`)
 
-- `listDeliveryTimeSlots`: List available delivery time slots.
-- `listDrivers`: List available drivers.
-- `listPhysicalBranches`: List physical branches.
-- `createSalesDeliveryNote`: Create a sales delivery note.
-- `listSellers`: List available sellers.
-
-### Stock (`stock`)
-
-- `listArticleLocations`: List article locations.
-- `getStock`: List article stock using filters.
-- `createStockMovement`: Create a stock movement adjustment.
-
-### Geografia (`geography`)
-
-- `listCountries`: List available countries.
-- `listMunicipalities`: List municipalities, usually filtered by province.
 - `listProvinces`: List provinces, usually filtered by country.
 
-### Extras (`extras`)
+### Regimenes Especiales (`regimenesEspeciales`)
 
-- `generateSecurityToken`: Generate a token for external tools such as Postman.
-- `syncImages`: Process binary image data for WooCommerce usage.
-- `listConcepts`: List concepts.
-- `verifyOperatorCredentials`: Get mobile operator data using the configured credentials.
-- `listMobileOperators`: List mobile operators.
 - `getSpecialTaxRegimeDetails`: Get a special tax regime by ID.
 - `listSpecialTaxRegimes`: List special tax regimes.
-- `listVoucherTypes`: List voucher types.
-- `convertProductsForWooCommerce`: Generate WooCommerce-ready product JSON from Centum articles.
+
+### Remitos Compra (`remitosCompra`)
+
+- `createPurchaseDeliveryNote`: Create a purchase delivery note.
+
+### Remitos Venta (`remitosVenta`)
+
+- `createSalesDeliveryNote`: Create a sales delivery note.
+
+### Rubros (`rubros`)
+
+- `listGroups`: List article groups.
+
+### SubRubros (`subRubros`)
+
+- `listSubgroups`: List subgroups or filter them by ID.
+
+### Sucursales Fisicas (`sucursalesFisicas`)
+
+- `listPhysicalBranches`: List physical branches.
+
+### Tipos Comprobante (`tiposComprobante`)
+
+- `listVoucherTypes`: List generic voucher types.
+- `listPurchaseVouchers`: List purchase vouchers using filters.
+- `listSalesVouchers`: List sales vouchers using filters.
+
+### Turnos Entrega (`turnosEntrega`)
+
+- `listDeliveryTimeSlots`: List available delivery time slots.
+
+### Ubicaciones Articulos (`ubicacionesArticulos`)
+
+- `listArticleLocations`: List article locations.
+- `getArticleLocationsBySection`: Get article locations by branch section.
+
+### Vendedores (`vendedores`)
+
+- `listSellers`: List available sellers.
+
+### Ventas (`ventas`)
+
+- `listSalesInvoices`: Get all sales invoices for a customer.
+- `listSalesInvoicesById`: Get sales invoices for a customer by ID.
+- `createSale`: Generate a sale from the provided parameters.
+- `getSalesRanking`: Get sales rankings for customers, articles, sellers, or branches.
 
 ## Prerequisites
 

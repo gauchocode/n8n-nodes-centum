@@ -948,65 +948,6 @@ const convertProductsForWooCommerce: ResourceHandler = async (context) => {
 	return [executeFunctions.helpers.returnJsonArray(json as any)];
 };
 
-const syncImages: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
-	void itemIndex;
-	void centumUrl;
-	void headers;
-	void centumApiCredentials;
-	void consumerApiPublicId;
-
-	const dataImages = helperFns.getNodeParameterOrThrow(executeFunctions, 'dataImg', itemIndex) as {
-		json: {
-			idArticulo: number;
-			images: any[];
-			infoImages: { lastModified: string; orderNumber: number }[];
-		};
-	}[];
-	const db = helperFns.getNodeParameterOrThrow(executeFunctions, 'lastModifiedImg', itemIndex) as {
-		articleId: number;
-		dataImage: { orderNumber: number; lastModified: string }[];
-	}[];
-
-	const result: any[] = [];
-
-	for (let i = 0; i < dataImages.length; i++) {
-		const element = dataImages[i];
-
-		for (let j = 0; j < element.json.images?.length; j++) {
-			const currentData = element.json.images[j];
-			const currentInfoImage = element.json.infoImages[j];
-
-			const articleInDB = db.find((dbData) => dbData.articleId === element.json.idArticulo);
-
-			if (!articleInDB) {
-				result.push({ json: {}, binary: currentData });
-			} else {
-				const currentImageInDB = articleInDB.dataImage.find(
-					(dataImageDB) => dataImageDB.orderNumber === currentInfoImage.orderNumber,
-				);
-
-				if (currentImageInDB?.lastModified !== currentInfoImage.lastModified) {
-					result.push({ json: {}, binary: currentData });
-				}
-			}
-		}
-	}
-
-	if (result.length === 0) {
-		result.push({ json: {} });
-	}
-
-	return [result];
-};
-
 export const articlesHandlers: ResourceHandlerMap = {
 	searchProducts: searchProducts,
 	getProductByCode: getProductByCode,
@@ -1024,5 +965,4 @@ export const articlesHandlers: ResourceHandlerMap = {
 	listArticleLocations: listArticleLocations,
 	getArticleLocationsBySection: getArticleLocationsBySection,
 	convertProductsForWooCommerce: convertProductsForWooCommerce,
-	syncImages: syncImages,
 };

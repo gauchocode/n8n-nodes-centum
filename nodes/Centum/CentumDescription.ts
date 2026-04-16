@@ -219,14 +219,6 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Image Data',
-		name: 'dataImg',
-		type: 'json',
-		required: true,
-		default: {},
-		displayOptions: { show: { operation: ['syncImages'] } },
-	},
-	{
 		displayName: 'Day of Week',
 		name: 'weekday',
 		type: 'number',
@@ -456,7 +448,6 @@ const fieldDefinitions: INodeProperties[] = [
 		required: true,
 		default: '',
 		placeholder: 'Enter discount ID',
-		description: 'Discount ID',
 		displayOptions: {
 			show: { operation: ['createSalesOrder', 'createSale', 'createCustomer'] },
 		},
@@ -468,7 +459,6 @@ const fieldDefinitions: INodeProperties[] = [
 		required: true,
 		default: '',
 		placeholder: 'Enter delivery time slot ID',
-		description: 'Delivery time slot ID',
 		displayOptions: {
 			show: {
 				operation: [
@@ -996,14 +986,6 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '7345',
 		description: 'Physical branch ID separated by comma',
 		displayOptions: { show: { operation: ['getStock'] } },
-	},
-	{
-		displayName: 'Last Image Update',
-		name: 'lastModifiedImg',
-		type: 'json',
-		required: true,
-		default: {},
-		displayOptions: { show: { operation: ['syncImages'] } },
 	},
 	{
 		displayName: 'Username',
