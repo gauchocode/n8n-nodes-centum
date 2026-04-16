@@ -3,7 +3,7 @@ services:
     build: .
     volumes:
       - ./dist:/app/dist
-    command: pnpm build
+    command: sh -lc "rm -rf dist/* && pnpm exec tsc && pnpm exec gulp build:icons"
 
   publish:
     build: .

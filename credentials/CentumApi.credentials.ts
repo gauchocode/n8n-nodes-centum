@@ -1,4 +1,4 @@
-import { ICredentialType, INodeProperties } from 'n8n-workflow';
+import type { ICredentialTestRequest, ICredentialType, INodeProperties } from 'n8n-workflow';
 
 export class CentumApi implements ICredentialType {
 	name = 'centumApi';
@@ -11,27 +11,36 @@ export class CentumApi implements ICredentialType {
 			type: 'string',
 			typeOptions: { password: true },
 			default: '',
-			description: 'Clave pública usada para generar el token hash en cada request',
+			required: true,
+			description: 'Public key used to generate the request access-token hash.',
 		},
 		{
-			displayName: 'CentumSuiteConsumidorApiPublicaId',
+			displayName: 'Consumer API Public ID',
 			name: 'consumerApiPublicId',
 			type: 'number',
 			default: 0,
-			description: 'ID público del consumidor enviado en cada request',
+			required: true,
+			description:
+				'Public consumer ID sent with each API request (Centum header: CentumSuiteConsumidorApiPublicaId).',
 		},
 		{
-			displayName: 'Centum URL',
+			displayName: 'Base URL',
 			name: 'centumUrl',
 			type: 'string',
 			default: 'https://plataforma1.centum.com.ar:23990/BL2',
-			description: 'Base URL de la API de Centum',
+			required: true,
+			description: 'Base URL for the Centum API tenant.',
 		},
 	];
-	// test: ICredentialTestRequest = {
-	//   request: {
-	//     baseURL: '={{$credentials?.domain}}',
-	//     url: '/bearer',
-	//   },
-	// };
+
+	// Centum authentication requires a short-lived SHA1 token generated from the
+	// current timestamp and a random nonce, so the standard credential test can only
+	// validate endpoint reachability rather than full credential correctness.
+	test: ICredentialTestRequest = {
+		request: {
+			baseURL: '={{$credentials.centumUrl}}',
+			url: '/',
+			method: 'GET',
+		},
+	};
 }

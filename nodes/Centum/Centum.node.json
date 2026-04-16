@@ -1,0 +1,18 @@
+{
+	"node": "n8n-nodes-centum.Centum",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Operations", "Finance", "Sales"],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://www.centum.com.ar/ApiPublica.pdf"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://github.com/gauchocode/n8n-nodes-centum/blob/main/README.md"
+			}
+		]
+	}
+}

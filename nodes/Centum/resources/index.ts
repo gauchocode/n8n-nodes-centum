@@ -1,49 +1,50 @@
-import type { ResourceHandlerMap } from "./tipos";
+import type { ResourceHandlerMap } from './types';
 
-import { articulosHandlers } from "./articulos";
-import { clientesHandlers } from "./clientes";
-import { ventasHandlers } from "./ventas";
-import { cobrosHandlers } from "./cobros";
-import { comprasHandlers } from "./compras";
-import { proveedoresHandlers } from "./proveedores";
-import { logisticaHandlers } from "./logistica";
-import { stockHandlers } from "./stock";
-import { geografiaHandlers } from "./geografia";
-import { extrasHandlers } from "./extras";
+import { articlesHandlers } from './articles';
+import { customersHandlers } from './customers';
+import { salesHandlers } from './sales';
+import { paymentsHandlers } from './payments';
+import { purchasesHandlers } from './purchases';
+import { suppliersHandlers } from './suppliers';
+import { logisticsHandlers } from './logistics';
+import { stockHandlers } from './stock';
+import { geographyHandlers } from './geography';
+import { extrasHandlers } from './extras';
 
 export const resourceHandlerGroups: Record<string, ResourceHandlerMap> = {
-	articulos: {
-		...articulosHandlers,
-		listarBonificaciones: extrasHandlers.listarBonificaciones,
-		listarPrecios: ventasHandlers.listarPrecios,
+	articles: {
+		...articlesHandlers,
+		listDiscounts: extrasHandlers.listDiscounts,
+		listPrices: salesHandlers.listPrices,
 	},
-	clientes: {
-		...clientesHandlers,
-		listarFacturasCobros: cobrosHandlers.listarFacturasCobros,
-		listarFacturasVenta: ventasHandlers.listarFacturasVenta,
-		listarFacturasVentasPorID: ventasHandlers.listarFacturasVentasPorID,
+	customers: {
+		...customersHandlers,
+		listPaymentInvoices: paymentsHandlers.listPaymentInvoices,
+		listSalesInvoices: salesHandlers.listSalesInvoices,
+		listSalesInvoicesById: salesHandlers.listSalesInvoicesById,
 	},
-	ventas: ventasHandlers,
-	cobros: cobrosHandlers,
-	compras: {
-		...comprasHandlers,
-		crearRemitoCompra: logisticaHandlers.crearRemitoCompra,
+	sales: salesHandlers,
+	payments: paymentsHandlers,
+	purchases: {
+		...purchasesHandlers,
+		createPurchaseDeliveryNote: logisticsHandlers.createPurchaseDeliveryNote,
 	},
-	proveedores: proveedoresHandlers,
-	logistica: {
-		...logisticaHandlers,
-		listarVendedores: extrasHandlers.listarVendedores,
+	suppliers: suppliersHandlers,
+	logistics: {
+		...logisticsHandlers,
+		listSellers: extrasHandlers.listSellers,
 	},
 	stock: {
 		...stockHandlers,
-		consultarStock: articulosHandlers.consultarStock,
-		listarUbicacionArticulos: articulosHandlers.listarUbicacionArticulos,
+		getStock: articlesHandlers.getStock,
+		listArticleLocations: articlesHandlers.listArticleLocations,
+		getArticleLocationsBySection: articlesHandlers.getArticleLocationsBySection,
 	},
-	geografia: geografiaHandlers,
+	geography: geographyHandlers,
 	extras: {
 		...extrasHandlers,
-		sincronizarImagenes: articulosHandlers.sincronizarImagenes,
-		convertirProductosParaWooCommerce: articulosHandlers.convertirProductosParaWooCommerce,
+		syncImages: articlesHandlers.syncImages,
+		convertProductsForWooCommerce: articlesHandlers.convertProductsForWooCommerce,
 	},
 };
 

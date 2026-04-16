@@ -1,3 +1,3 @@
-export * from './provincias';
-export * from './zonas';
-export * from './condiciones';
+export * from './provinces';
+export * from './zones';
+export * from './conditions';

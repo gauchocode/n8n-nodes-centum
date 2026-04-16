@@ -1,14 +1,22 @@
 import type {
 	IExecuteFunctions,
+	ILoadOptionsFunctions,
 	INodeExecutionData,
+	INodePropertyOptions,
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
+import { NodeApiError, NodeConnectionType, NodeOperationError } from 'n8n-workflow';
 
 import { CentumFields, CentumOperations, HttpOptions } from './CentumDescription';
+
+import {
+	buildCentumHeaders,
+	getErrorDescription,
+	getResourceLocatorValue,
+} from './helpers/functions';
 import { resourceHandlerGroups } from './resources';
-import type { CentumApiCredentials, CentumHeaders } from './resources/tipos';
+import type { CentumApiCredentials, CentumHeaders } from './resources/types';
 
 type SimplifiedFieldSpec = string | { key: string; fields: SimplifiedFieldSpec[] };
 
@@ -89,7 +97,7 @@ const supplierFields: SimplifiedFieldSpec[] = [
 	{ key: 'Zona', fields: ['IdZona', 'Nombre'] },
 ];
 
-const comprobanteVentaFields: SimplifiedFieldSpec[] = [
+const salesVoucherFields: SimplifiedFieldSpec[] = [
 	'IdTipoComprobanteVenta',
 	'IdTipoComprobante',
 	'Codigo',
@@ -98,7 +106,7 @@ const comprobanteVentaFields: SimplifiedFieldSpec[] = [
 	'Activo',
 ];
 
-const comprobanteCompraFields: SimplifiedFieldSpec[] = [
+const purchaseVoucherFields: SimplifiedFieldSpec[] = [
 	'IdTipoComprobanteCompra',
 	'IdTipoComprobante',
 	'Codigo',
@@ -137,23 +145,23 @@ const documentFields: SimplifiedFieldSpec[] = [
 ];
 
 const simplifiedOutputFields: Record<string, SimplifiedFieldSpec[]> = {
-	buscarProductos: productFields,
-	buscarProductoPorCodigo: productFields,
-	listarProductosDisponibles: productFields,
-	listarTodosLosProductos: productFields,
-	consultarPrecioProducto: [...productFields, 'IdListaPrecio', 'NombreListaPrecio', 'Moneda'],
-	listarProductosPorSucursal: branchStockFields,
-	buscarProductoEnSucursal: branchStockFields,
-	listarClientes: customerFields,
-	buscarClientes: customerFields,
-	buscarClientePorCuit: customerFields,
-	buscarContribuyente: customerFields,
-	consultarSaldoCliente: [...customerFields, 'FechaVencimiento', 'Importe', 'ImportePendiente'],
-	verDetalleSaldoCliente: [...documentFields, 'FechaVencimiento', 'Importe', 'ImportePendiente'],
-	listarFacturasCobros: documentFields,
-	listarFacturasVenta: documentFields,
-	listarFacturasVentasPorID: documentFields,
-	listarPromocionesComercialesCliente: [
+	searchProducts: productFields,
+	getProductByCode: productFields,
+	listAvailableProducts: productFields,
+	listAllProducts: productFields,
+	getProductPrice: [...productFields, 'IdListaPrecio', 'NombreListaPrecio', 'Moneda'],
+	listProductsByBranch: branchStockFields,
+	getProductInBranch: branchStockFields,
+	listCustomers: customerFields,
+	searchCustomers: customerFields,
+	searchCustomerByCuit: customerFields,
+	searchTaxpayerCustomer: customerFields,
+	getCustomerBalance: [...customerFields, 'FechaVencimiento', 'Importe', 'ImportePendiente'],
+	getCustomerBalanceDetails: [...documentFields, 'FechaVencimiento', 'Importe', 'ImportePendiente'],
+	listPaymentInvoices: documentFields,
+	listSalesInvoices: documentFields,
+	listSalesInvoicesById: documentFields,
+	listCustomerCommercialPromotions: [
 		'IdPromocionComercial',
 		'Codigo',
 		'Nombre',
@@ -162,8 +170,8 @@ const simplifiedOutputFields: Record<string, SimplifiedFieldSpec[]> = {
 		'FechaHasta',
 		'Activa',
 	],
-	listarComprobantesVenta: comprobanteVentaFields,
-	estadisticaVentaRanking: [
+	listSalesVouchers: salesVoucherFields,
+	getSalesRanking: [
 		'IdCliente',
 		'IdArticulo',
 		'Codigo',
@@ -174,14 +182,14 @@ const simplifiedOutputFields: Record<string, SimplifiedFieldSpec[]> = {
 		{ key: 'Cliente', fields: ['IdCliente', 'Codigo', 'RazonSocial'] },
 		{ key: 'Articulo', fields: ['IdArticulo', 'Codigo', 'Nombre'] },
 	],
-	listarPedidosVenta: documentFields,
-	listarPedidosVentaFiltrados: documentFields,
-	listarCobros: [...documentFields, 'FechaCobro', 'ImporteCobrado', 'ImporteAplicado'],
-	listarCompras: documentFields,
-	listarComprobantesCompra: comprobanteCompraFields,
-	listarOrdenesCompra: documentFields,
-	verDetalleOrdenCompra: documentFields,
-	listarProveedores: supplierFields,
+	listSalesOrders: documentFields,
+	listFilteredSalesOrders: documentFields,
+	listPayments: [...documentFields, 'FechaCobro', 'ImporteCobrado', 'ImporteAplicado'],
+	listPurchases: documentFields,
+	listPurchaseVouchers: purchaseVoucherFields,
+	listPurchaseOrders: documentFields,
+	getPurchaseOrderDetails: documentFields,
+	listSuppliers: supplierFields,
 };
 
 function pickSimplifiedValue(value: unknown, fields: SimplifiedFieldSpec[]): unknown {
@@ -303,6 +311,140 @@ function simplifyOutputItem(item: INodeExecutionData, operation: string): INodeE
 	};
 }
 
+function linkOutputItems(items: INodeExecutionData[], itemIndex: number): INodeExecutionData[] {
+	return items.map((item) => ({
+		...item,
+		pairedItem: item.pairedItem ?? { item: itemIndex },
+	}));
+}
+
+type LoadOptionItem = Record<string, unknown>;
+
+const loadOptionCollectionKeys = [
+	'Items',
+	'Articulos',
+	'Clientes',
+	'Proveedores',
+	'SucursalesFisicas',
+	'TurnosEntrega',
+	'Paises',
+	'Provincias',
+	'Bonificaciones',
+	'TiposComprobante',
+	'Vendedores',
+	'EstadosPedidoVenta',
+] as const;
+
+function asArray(value: unknown): LoadOptionItem[] {
+	if (Array.isArray(value)) {
+		return value.filter(
+			(item): item is LoadOptionItem => typeof item === 'object' && item !== null,
+		);
+	}
+
+	if (!value || typeof value !== 'object') {
+		return [];
+	}
+
+	const source = value as Record<string, unknown>;
+
+	for (const key of loadOptionCollectionKeys) {
+		const nested = source[key];
+		if (nested === undefined) {
+			continue;
+		}
+
+		const nestedItems = asArray(nested);
+		if (nestedItems.length > 0) {
+			return nestedItems;
+		}
+	}
+
+	const nestedValues = Object.values(source);
+	if (nestedValues.length === 1) {
+		const nestedItems = asArray(nestedValues[0]);
+		if (nestedItems.length > 0) {
+			return nestedItems;
+		}
+	}
+
+	return [source];
+}
+
+function readField(item: LoadOptionItem, keys: string[]): unknown {
+	for (const key of keys) {
+		if (item[key] !== undefined && item[key] !== null && String(item[key]).trim() !== '') {
+			return item[key];
+		}
+	}
+
+	return undefined;
+}
+
+function toOptions(
+	items: unknown,
+	valueKeys: string[],
+	nameKeys: string[],
+	fallbackLabel: string,
+): INodePropertyOptions[] {
+	const options: INodePropertyOptions[] = [];
+
+	for (const item of asArray(items)) {
+		const value = readField(item, valueKeys);
+		if (value === undefined) {
+			continue;
+		}
+
+		const name = readField(item, nameKeys);
+		options.push({
+			name: name === undefined ? `${fallbackLabel} ${String(value)}` : String(name),
+			value: String(value),
+		});
+	}
+
+	return options;
+}
+
+async function fetchLoadOptionData(
+	context: ILoadOptionsFunctions,
+	path: string,
+	queryParams?: Record<string, string | number | boolean>,
+): Promise<unknown> {
+	const credentials = (await context.getCredentials(
+		'centumApi',
+	)) as unknown as CentumApiCredentials;
+	const centumUrl = String(credentials.centumUrl);
+	const headers = buildCentumHeaders(
+		credentials.consumerApiPublicId as string | number,
+		String(credentials.publicAccessKey),
+	);
+	const requestUrl = new URL(`${centumUrl}${path}`);
+
+	for (const [key, value] of Object.entries(queryParams ?? {})) {
+		if (value !== '' && value !== undefined && value !== null) {
+			requestUrl.searchParams.append(key, String(value));
+		}
+	}
+
+	const response = await fetch(requestUrl.toString(), {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			...headers,
+		},
+	});
+
+	if (!response.ok) {
+		throw new NodeOperationError(
+			context.getNode(),
+			`Load options request failed: ${response.status} ${response.statusText}`,
+		);
+	}
+
+	const rawText = await response.text();
+	return rawText.trim() ? (JSON.parse(rawText) as unknown) : [];
+}
+
 export class Centum implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Centum',
@@ -328,6 +470,116 @@ export class Centum implements INodeType {
 		properties: [...CentumOperations, ...CentumFields, ...HttpOptions],
 	};
 
+	methods = {
+		loadOptions: {
+			async getCustomers(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const response = await fetchLoadOptionData(this, '/Clientes');
+				return toOptions(
+					response,
+					['IdCliente', 'ID', 'Id'],
+					['RazonSocial', 'NombreFantasia', 'Codigo'],
+					'Customer',
+				);
+			},
+			async getSuppliers(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const response = await fetchLoadOptionData(this, '/Proveedores');
+				return toOptions(
+					response,
+					['IdProveedor', 'ID', 'Id'],
+					['RazonSocial', 'Codigo', 'Nombre'],
+					'Supplier',
+				);
+			},
+			async getPhysicalBranches(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const response = await fetchLoadOptionData(this, '/SucursalesFisicas');
+				return toOptions(
+					response,
+					['IdSucursalFisica', 'ID', 'Id'],
+					['Nombre', 'Codigo'],
+					'Branch',
+				);
+			},
+			async getDeliveryTimeSlots(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const response = await fetchLoadOptionData(this, '/TurnosEntrega');
+				return toOptions(
+					response,
+					['IdTurnoEntrega', 'ID', 'Id'],
+					['Nombre', 'Codigo', 'Descripcion'],
+					'Delivery Slot',
+				);
+			},
+			async getCountries(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const response = await fetchLoadOptionData(this, '/Paises');
+				return toOptions(response, ['IdPais', 'ID', 'Id'], ['Nombre', 'Codigo'], 'Country');
+			},
+			async getProvinces(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const currentNodeParameter = (
+					this as unknown as {
+						getCurrentNodeParameter?: (name: string) => unknown;
+					}
+				).getCurrentNodeParameter;
+				const countryId = getResourceLocatorValue(currentNodeParameter?.('countryId'));
+				const response = await fetchLoadOptionData(
+					this,
+					'/Provincias',
+					countryId ? { idPais: countryId } : undefined,
+				);
+				return toOptions(response, ['IdProvincia', 'ID', 'Id'], ['Nombre', 'Codigo'], 'Province');
+			},
+			async getDiscounts(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const response = await fetchLoadOptionData(this, '/Bonificaciones');
+				return toOptions(
+					response,
+					['IdBonificacion', 'ID', 'Id'],
+					['Nombre', 'Codigo', 'Descripcion'],
+					'Discount',
+				);
+			},
+			async getVoucherTypes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const response = await fetchLoadOptionData(this, '/TiposComprobante');
+				return toOptions(
+					response,
+					['IdTipoComprobante', 'ID', 'Id'],
+					['Nombre', 'Codigo', 'Descripcion'],
+					'Voucher Type',
+				);
+			},
+			async getSellers(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const response = await fetchLoadOptionData(this, '/Vendedores');
+				return toOptions(response, ['IdVendedor', 'ID', 'Id'], ['Nombre', 'Codigo'], 'Seller');
+			},
+			async getDrivers(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const response = await fetchLoadOptionData(this, '/GuiaLogisticaChoferes');
+				return toOptions(
+					response,
+					['IdChofer', 'ID', 'Id'],
+					['Nombre', 'Apellido', 'Descripcion', 'Codigo'],
+					'Driver',
+				);
+			},
+			async getPriceLists(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const response = await fetchLoadOptionData(this, '/ListasPrecios');
+				return toOptions(
+					response,
+					['IdListaPrecio', 'ID', 'Id'],
+					['Nombre', 'Descripcion', 'Codigo'],
+					'Price List',
+				);
+			},
+			async getSalesOrderStatuses(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const response = await fetchLoadOptionData(this, '/EstadosPedidoVenta', {
+					bIncluirTodosEstados: true,
+				});
+				return toOptions(
+					response,
+					['IdEstadoPedidoVenta', 'IdEstado', 'ID', 'Id'],
+					['Nombre', 'Codigo', 'Descripcion'],
+					'Status',
+				);
+			},
+		},
+	};
+
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const centumApiCredentials = (await this.getCredentials(
 			'centumApi',
@@ -351,7 +603,7 @@ export class Centum implements INodeType {
 				if (!handler) {
 					throw new NodeOperationError(
 						this.getNode(),
-						`Operación no implementada para ${resource}: ${operation}`,
+						`Operation not implemented for ${resource}: ${operation}`,
 						{ itemIndex },
 					);
 				}
@@ -374,7 +626,7 @@ export class Centum implements INodeType {
 					? handlerResult[0].map((entry) => simplifyOutputItem(entry, operation))
 					: handlerResult[0];
 
-				returnData.push(...outputItems);
+				returnData.push(...linkOutputItems(outputItems, itemIndex));
 			} catch (error) {
 				const message = error instanceof Error ? error.message : String(error);
 
@@ -386,8 +638,16 @@ export class Centum implements INodeType {
 					continue;
 				}
 
-				if (error instanceof NodeOperationError) {
-					throw error;
+				if (error instanceof NodeOperationError || error instanceof NodeApiError) {
+					if (error instanceof NodeApiError) {
+						throw error;
+					}
+
+					const description = getErrorDescription(error);
+					throw new NodeOperationError(this.getNode(), message, {
+						itemIndex,
+						...(description ? { description } : {}),
+					});
 				}
 
 				throw new NodeOperationError(this.getNode(), message, { itemIndex });

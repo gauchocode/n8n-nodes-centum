@@ -1,11 +1,12 @@
 import { randomUUID, createHash as cryptoCreateHash } from 'crypto';
+import { setTimeout as delay } from 'node:timers/promises';
 import {
-	constantProvincias,
-	wooToCentumProvinciaMap,
-	constantsZonas,
-	CondicionesIVA,
-	CondicionesIIBB,
-	CategoriasIIBB,
+	provinceConstants,
+	wooToCentumProvinceMap,
+	zoneConstants,
+	vatConditions,
+	grossIncomeConditions,
+	grossIncomeCategories,
 } from '../constants';
 
 import {
@@ -34,10 +35,11 @@ import {
 import {
 	NodeParameterValue,
 	IExecuteFunctions,
+	NodeApiError,
 	NodeOperationError,
 	NodeParameterValueType,
 } from 'n8n-workflow';
-import type { CentumHeaders } from '../resources/tipos';
+import type { CentumHeaders } from '../resources/types';
 
 export const createHash = (publicAccessKey: string): string => {
 	const uuid = randomUUID().replace(/-/gi, '');
@@ -63,9 +65,9 @@ export const createCustomerJson = (respWoo: IWoo, dni: string) => {
 		RazonSocial: `${respWoo.billing.first_name} ${respWoo.billing.last_name}`,
 		Email: respWoo.billing.email || '',
 		Provincia:
-			constantProvincias.find(
+			provinceConstants.find(
 				(prov) => prov.Nombre.toLocaleLowerCase() === respWoo.billing.state.toLocaleLowerCase(),
-			) || constantProvincias[5],
+			) || provinceConstants[5],
 		Pais: {
 			Codigo: 'ARG',
 			IdPais: 4657,
@@ -188,9 +190,9 @@ export const createCustomerJson = (respWoo: IWoo, dni: string) => {
 			Nombre: 'Otros',
 		},
 		Zona:
-			constantsZonas.find(
+			zoneConstants.find(
 				(zone) => zone.Nombre.toLocaleLowerCase() === respWoo.billing.city.toLocaleLowerCase(),
-			) || constantsZonas[0],
+			) || zoneConstants[0],
 		ListaPrecio: {
 			Codigo: ListaPrecioCodigo.Exitoweb,
 			Descripcion: Descripcion.TiendaOnLineExito,
@@ -212,17 +214,17 @@ export const createCustomerJson = (respWoo: IWoo, dni: string) => {
 	return customerObj;
 };
 
-function getProvinciaCentumFromWoo(wooCode: string): IProvincias | null {
-	return wooToCentumProvinciaMap[wooCode] ?? null;
+function getCentumProvinceFromWoo(wooCode: string): IProvincias | null {
+	return wooToCentumProvinceMap[wooCode] ?? null;
 }
 
-export const createContribuyenteJson = (body: IContribuyenteBodyInput, cuit: string) => {
-	const provinciaCentum =
-		getProvinciaCentumFromWoo(body.Provincia ?? '') ??
-		constantProvincias.find(
+export const createTaxpayerCustomerJson = (body: IContribuyenteBodyInput, cuit: string) => {
+	const centumProvince =
+		getCentumProvinceFromWoo(body.Provincia ?? '') ??
+		provinceConstants.find(
 			(prov) => prov.Nombre.toLowerCase() === (body.Provincia ?? '').toLowerCase(),
 		) ??
-		constantProvincias[5]; // fallback a Buenos Aires
+		provinceConstants[5]; // fallback a Buenos Aires
 
 	const cuitStr = String(cuit);
 	const fullAddress = [body.Direccion || '', body.NroDireccion || '', body.PisoDepartamento || '']
@@ -239,14 +241,14 @@ export const createContribuyenteJson = (body: IContribuyenteBodyInput, cuit: str
 		CodigoPostal: body.CodigoPostal,
 		Localidad: body.Localidad,
 		Direccion: fullAddress,
-		Provincia: provinciaCentum,
-		Zona: constantsZonas[0],
+		Provincia: centumProvince,
+		Zona: zoneConstants[0],
 		Pais: {
 			Codigo: 'ARG',
 			IdPais: 4657,
 			Nombre: 'Argentina',
 		},
-		CondicionIVA: CondicionesIVA.find(
+		CondicionIVA: vatConditions.find(
 			(condicion) =>
 				condicion.Nombre.toLocaleLowerCase() === (body.CondicionIVA ?? '').toLocaleLowerCase(),
 		) || {
@@ -254,14 +256,14 @@ export const createContribuyenteJson = (body: IContribuyenteBodyInput, cuit: str
 			Codigo: 'RI',
 			Nombre: 'Responsable Inscripto' as CondicionIVANombre,
 		},
-		CondicionIIBB: CondicionesIIBB.find(
+		CondicionIIBB: grossIncomeConditions.find(
 			(condicion) =>
 				condicion.Codigo.toLocaleLowerCase() === (body.CondicionIIBB ?? '').toLocaleLowerCase(),
 		) || {
 			IdCondicionIIBB: 6051,
 			Codigo: 'Exento' as CondicionIIBBCodigo,
 		},
-		CategoriaIIBB: CategoriasIIBB.find(
+		CategoriaIIBB: grossIncomeCategories.find(
 			(categoria) =>
 				categoria.Codigo.toLowerCase() === (body.CategoriaIIBB ?? '').toLocaleLowerCase(),
 		),
@@ -463,19 +465,19 @@ export const createOrderSaleJson = (
 		PorcentajeDescuento: dbArticle?.PorcentajeDescuento || 0,
 		TurnoEntrega: {
 			IdTurnoEntrega: 6083,
-			Nombre: 'Maniana',
+			Nombre: 'Morning',
 		},
 	};
 
-	//Verificar si el envío ya existe en el pedido. Si existe, ignora, si no, agrega.
+	// Check whether the shipping line already exists in the order. If it does, skip it.
 	const isShippingAlreadyIncluded = articlesOrder.some((item) => item.sku === 'R06SR0601P00010007');
-	// Agregar costo de envío como artículo extra si existe & tiene precio
+	// Add shipping cost as an extra article when it exists and has a positive price
 	if (shippingSalesOrder.length > 0 && !isShippingAlreadyIncluded) {
-		const shipping = shippingSalesOrder[0]; // WooCommerce generalmente solo tiene uno
+		const shipping = shippingSalesOrder[0]; // WooCommerce usually only has one entry
 		const shippingCost = Number(shipping.total || 0);
 		if (shippingCost > 0) {
 			const shippingItem: IArticuloPedidoVenta = {
-				Nombre: shipping.method_title || 'Costo de Envío',
+				Nombre: shipping.method_title || 'Shipping Cost',
 				Codigo: 'R06SR0601P00010007',
 				Cantidad: 1,
 				CategoriaImpuestoIVA: {
@@ -513,15 +515,15 @@ export const createChargeJson = (
 	shippingChargeOrder: ShippingLine[],
 ) => {
 	if (shippingChargeOrder.length > 0) {
-		const shipping = shippingChargeOrder[0]; // WooCommerce generalmente solo tiene uno
+		const shipping = shippingChargeOrder[0]; // WooCommerce usually only has one entry
 		const shippingCost = Number(shipping.total || 0);
 		if (shippingCost > 0) {
 			const shippingChargeItem: LineItem = {
 				id: shipping.id,
-				name: shipping.method_title || 'Costo de Envío',
+				name: shipping.method_title || 'Shipping Cost',
 				total: shipping.total,
 				meta_data: shipping.meta_data,
-				product_id: 2126, // Tob Note: ID Del articulo extraido de dataArticulosExistencias
+				product_id: 2126, // Tob Note: article ID extracted from dataArticulosExistencias
 				variation_id: 0,
 				quantity: 1,
 				tax_class: '',
@@ -529,7 +531,7 @@ export const createChargeJson = (
 				subtotal_tax: '',
 				total_tax: '',
 				taxes: [],
-				sku: 'R06SR0601P00010007', // Tob Note: SKU del envio extraido de centum
+				sku: 'R06SR0601P00010007', // Tob Note: shipping SKU extracted from Centum
 				price: shippingCost,
 				image: {
 					id: 0,
@@ -720,7 +722,7 @@ function centumGetArticleVariations(groupId: number, arrArticles: any) {
 			description: article.json.Detalle ?? '',
 		};
 
-		// ⬇️ Solo setear sale_price si existe la propiedad y es válido (< regular)
+		// Set sale_price only when the property exists and the value is valid (< regular)
 		if (article.json.DescuentoPromocion != null) {
 			const desc = Math.abs(Number(article.json.DescuentoPromocion));
 			const sale = regular - desc;
@@ -746,7 +748,7 @@ export const createJsonProducts = (arrArticles: IMergeArticulos[]) => {
 
 	for (const article of arrArticles) {
 		const obj: any = {};
-		// Nueva validación para continuar si el articulo no es json
+		// Skip entries that do not include a JSON payload
 		if (!article?.json) {
 			continue;
 		}
@@ -763,7 +765,7 @@ export const createJsonProducts = (arrArticles: IMergeArticulos[]) => {
 		}
 		obj.regular_price = article.json.Precio;
 
-		// Actualización de description para no hacer match sobre undefined
+		// Normalize description so matching logic does not run on undefined
 		const description = article?.json?.Detalle || '';
 
 		const pattern = /\/{2,}/g;
@@ -776,7 +778,7 @@ export const createJsonProducts = (arrArticles: IMergeArticulos[]) => {
 		} else {
 			obj.description = description;
 		}
-		// fin actualización
+		// End normalization
 
 		// obj.categories = [
 		// 	{
@@ -927,7 +929,7 @@ export const centumImageName = (
 export interface HttpSettings {
 	method?: 'GET' | 'POST';
 	pagination: 'all' | 'default' | 'custom';
-	cantidadItemsPorPagina?: number;
+	itemsPerPage?: number;
 }
 
 interface DebugSettings {
@@ -945,13 +947,30 @@ export function buildCentumHeaders(
 	};
 }
 
+export function getResourceLocatorValue(value: unknown): string {
+	if (value === undefined || value === null) {
+		return '';
+	}
+
+	if (typeof value === 'string' || typeof value === 'number') {
+		return String(value);
+	}
+
+	if (typeof value === 'object' && 'value' in value) {
+		const locatorValue = (value as { value?: unknown }).value;
+		return locatorValue === undefined || locatorValue === null ? '' : String(locatorValue);
+	}
+
+	return '';
+}
+
 export function getHttpSettings(
 	this: IExecuteFunctions,
 	itemIndex = 0,
-): HttpSettings & { intervaloPagina?: number; numeroPagina?: number } {
+): HttpSettings & { pageInterval?: number; pageNumber?: number } {
 	const httpSettings = this.getNodeParameter('httpSettings', itemIndex, {}) as HttpSettings & {
-		intervaloPagina?: number;
-		numeroPagina?: number;
+		pageInterval?: number;
+		pageNumber?: number;
 	};
 
 	return httpSettings;
@@ -986,12 +1005,12 @@ export function getNodeParameterOrThrow<T = NodeParameterValueType | object>(
 		} catch {}
 
 		const scope = [resource, operation].filter(Boolean).join('/');
-		const location = scope ? ` en ${scope}` : '';
+		const location = scope ? ` in ${scope}` : '';
 		const detail = getErrorMessage(error, 'Could not get parameter');
 
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			`No se pudo obtener el parámetro "${name}"${location} (item ${itemIndex + 1}). ${detail}`,
+			`Could not get parameter "${name}"${location} (item ${itemIndex + 1}). ${detail}`,
 			{ itemIndex },
 		);
 	}
@@ -1002,10 +1021,10 @@ export interface FetchOptions {
 	headers?: CentumHeaders;
 	queryParams?: Record<string, object | NodeParameterValueType>;
 	body?: object | NodeParameterValueType;
-	cantidadItemsPorPagina?: number;
+	itemsPerPage?: number;
 	itemsField?: string;
-	intervaloPagina?: number;
-	numeroPagina?: number;
+	pageInterval?: number;
+	pageNumber?: number;
 	context?: IExecuteFunctions;
 	debugItemIndex?: number;
 	pagination?: 'all' | 'default' | 'custom';
@@ -1039,7 +1058,34 @@ function logDebugMessage(
 	message: string,
 	data: unknown,
 ): void {
-	context?.logger?.info?.(message, data as Record<string, unknown>);
+	let serializedData = '';
+
+	if (data !== undefined) {
+		try {
+			serializedData = ` ${typeof data === 'string' ? data : JSON.stringify(data)}`;
+		} catch {
+			serializedData = ' [unserializable debug payload]';
+		}
+	}
+
+	context?.logger?.info?.(`${message}${serializedData}`);
+}
+
+function logDebugErrorRequestBody(
+	context: IExecuteFunctions | undefined,
+	url: string,
+	method: string,
+	body: unknown,
+): void {
+	if (body === undefined) {
+		return;
+	}
+
+	logDebugMessage(context, '[Centum debug] Error request body', {
+		url,
+		method,
+		body,
+	});
 }
 
 function getDebugConfig(
@@ -1056,15 +1102,55 @@ function getDebugConfig(
 	return { shouldDebug };
 }
 
-export function safeThrow(context: IExecuteFunctions | undefined, mensaje: string): never {
+export function safeThrow(context: IExecuteFunctions | undefined, message: string): never {
 	if (context) {
-		throw new NodeOperationError(context.getNode(), mensaje);
+		throw new NodeOperationError(context.getNode(), message);
 	} else {
-		throw new Error(mensaje);
+		throw new Error(message);
 	}
 }
 
-export function getErrorMessage(error: unknown, fallback = 'Error desconocido'): string {
+export function safeThrowWithItemIndex(
+	context: IExecuteFunctions | undefined,
+	message: string,
+	itemIndex?: number,
+): never {
+	if (context) {
+		throw new NodeOperationError(context.getNode(), message, {
+			...(itemIndex === undefined ? {} : { itemIndex }),
+		});
+	}
+
+	throw new Error(message);
+}
+
+export function safeThrowApi(
+	context: IExecuteFunctions | undefined,
+	message: string,
+	description?: string,
+	httpCode?: number,
+	itemIndex?: number,
+): never {
+	if (context) {
+		throw new NodeApiError(
+			context.getNode(),
+			{
+				message,
+				description,
+				httpCode,
+			} as never,
+			{
+				message,
+				description,
+				...(itemIndex === undefined ? {} : { itemIndex }),
+			},
+		);
+	}
+
+	throw new Error(description ? `${message} ${description}` : message);
+}
+
+export function getErrorMessage(error: unknown, fallback = 'Unknown error'): string {
 	if (error instanceof Error && error.message) {
 		return error.message;
 	}
@@ -1085,6 +1171,21 @@ export function getErrorMessage(error: unknown, fallback = 'Error desconocido'):
 	return fallback;
 }
 
+export function getErrorDescription(error: unknown): string | undefined {
+	if (typeof error !== 'object' || error === null) {
+		return undefined;
+	}
+
+	const maybeError = error as {
+		description?: string;
+		response?: { data?: ApiErrorBody };
+	};
+
+	return (
+		maybeError.response?.data?.Detail ?? maybeError.response?.data?.detail ?? maybeError.description
+	);
+}
+
 function buildUrl(baseUrl: string, queryParams: Record<string, any> = {}): string {
 	const params = new URLSearchParams();
 	Object.entries(queryParams).forEach(([key, value]) => {
@@ -1097,7 +1198,7 @@ function buildUrl(baseUrl: string, queryParams: Record<string, any> = {}): strin
 
 function extractItems<T>(data: any, itemsField?: string): T[] {
 	if (data == null) {
-		safeThrow(undefined, 'Respuesta inválida: no se encontraron items.');
+		safeThrow(undefined, 'Invalid response: no items were found.');
 	}
 
 	if (itemsField && data[itemsField] && Array.isArray(data[itemsField])) {
@@ -1110,7 +1211,7 @@ function extractItems<T>(data: any, itemsField?: string): T[] {
 		const arrayField = Object.values(data).find(Array.isArray);
 		return arrayField || [data];
 	}
-	safeThrow(undefined, 'Respuesta inválida: no se encontraron items.');
+	safeThrow(undefined, 'Invalid response: no items were found.');
 }
 
 export async function apiGetRequest<T = any>(
@@ -1121,23 +1222,25 @@ export async function apiGetRequest<T = any>(
 		headers = {} as CentumHeaders,
 		method = 'GET',
 		queryParams = {},
-		cantidadItemsPorPagina,
+		itemsPerPage,
 		itemsField = 'Items',
-		numeroPagina,
+		pageNumber,
 		context,
 		pagination = 'all',
-		// intervaloPagina,
+		debugItemIndex,
+		// pageInterval,
 	} = options;
 
-	if (!url.trim()) safeThrow(context, 'El Endpoint es obligatorio.');
+	if (!url.trim()) safeThrowWithItemIndex(context, 'Endpoint is required.', debugItemIndex);
 
 	if (method === 'POST')
-		safeThrow(
+		safeThrowWithItemIndex(
 			context,
-			'Se está intentando hacer una solicitud GET sin un metodo asignado o se asignó el metodo equivocado.',
+			'A GET request was attempted without the correct method being assigned.',
+			debugItemIndex,
 		);
 
-	const finalUrl = buildUrl(url, queryParams); // Sin parámetros de paginación
+	const finalUrl = buildUrl(url, queryParams); // Without pagination parameters
 	const requestHeaders = buildCentumHeaders(
 		headers.CentumSuiteConsumidorApiPublicaId,
 		headers.publicAccessKey,
@@ -1167,30 +1270,37 @@ export async function apiGetRequest<T = any>(
 			statusText: response.statusText,
 			contentType: response.headers.get('content-type') || '',
 			bodyLength: responseText.length,
+			body: responseText,
 		});
 	}
 
 	if (!response.ok) {
-		safeThrow(context, `Error GET: ${response.status} - ${responseText}`);
+		safeThrowApi(
+			context,
+			`GET request failed with status ${response.status}`,
+			responseText || response.statusText,
+			response.status,
+			debugItemIndex,
+		);
 	}
 
 	const data = responseText.trim() ? JSON.parse(responseText) : {};
 	const allItems = extractItems<T>(data, itemsField);
 
-	// Si no hay paginación configurada o es 'all', devolver todo
-	if (pagination === 'all' || !cantidadItemsPorPagina) {
+	// Return all items when pagination is disabled or set to 'all'
+	if (pagination === 'all' || !itemsPerPage) {
 		return allItems;
 	}
 
-	// Paginación interna: dividir el array en chunks
-	const itemsPerPage = cantidadItemsPorPagina;
-	const startIndex = ((numeroPagina || 1) - 1) * itemsPerPage;
-	const endIndex = startIndex + itemsPerPage;
+	// Internal pagination: split the array into chunks
+	const requestedItemsPerPage = itemsPerPage;
+	const startIndex = ((pageNumber || 1) - 1) * requestedItemsPerPage;
+	const endIndex = startIndex + requestedItemsPerPage;
 
 	return allItems.slice(startIndex, endIndex);
 }
 
-// POST sin paginación (con validación explícita)
+// POST without pagination, with explicit validation
 export async function apiPostRequest<T = any>(
 	url: string,
 	options: FetchOptions = {},
@@ -1201,21 +1311,23 @@ export async function apiPostRequest<T = any>(
 		queryParams = {},
 		context,
 		method = 'POST',
+		debugItemIndex,
 	} = options;
 
 	if (!url || url.trim() === '') {
-		safeThrow(context, 'El campo "Endpoint" es obligatorio.');
+		safeThrowWithItemIndex(context, 'The "Endpoint" field is required.', debugItemIndex);
 	}
 
 	if (method === 'GET') {
-		safeThrow(
+		safeThrowWithItemIndex(
 			context,
-			'Se está intentando hacer una solicitud POST sin un metodo asignado o se asignó el metodo equivocado.',
+			'A POST request was attempted without the correct method being assigned.',
+			debugItemIndex,
 		);
 	}
 
 	if (!body) {
-		safeThrow(context, 'El cuerpo (body) de la solicitud POST es obligatorio.');
+		safeThrowWithItemIndex(context, 'The POST request body is required.', debugItemIndex);
 	}
 	const requestHeaders = buildCentumHeaders(
 		headers.CentumSuiteConsumidorApiPublicaId,
@@ -1250,11 +1362,22 @@ export async function apiPostRequest<T = any>(
 			statusText: response.statusText,
 			contentType: response.headers.get('content-type') || '',
 			bodyLength: responseText.length,
+			body: responseText,
 		});
 	}
 
 	if (!response.ok) {
-		safeThrow(context, `Error en la solicitud POST: ${response.status} - ${responseText}`);
+		if (shouldDebug) {
+			logDebugErrorRequestBody(context, finalUrl, 'POST', body);
+		}
+
+		safeThrowApi(
+			context,
+			`POST request failed with status ${response.status}`,
+			responseText || response.statusText,
+			response.status,
+			debugItemIndex,
+		);
 	}
 
 	const data = responseText.trim() ? JSON.parse(responseText) : {};
@@ -1271,25 +1394,26 @@ export async function apiPostRequestPaginated<T = any>(
 		method = 'POST',
 		body,
 		queryParams = {},
-		cantidadItemsPorPagina,
+		itemsPerPage,
 		itemsField = 'Items',
-		numeroPagina,
+		pageNumber,
 		context,
 		pagination = 'all',
-		intervaloPagina,
+		pageInterval,
 	} = options;
 
 	if (!url || url.trim() === '') {
-		safeThrow(context, 'El campo "Endpoint" es obligatorio.');
+		safeThrowWithItemIndex(context, 'The "Endpoint" field is required.', options.debugItemIndex);
 	}
 	if (method === 'GET') {
-		safeThrow(
+		safeThrowWithItemIndex(
 			context,
-			'Se está intentando hacer una solicitud POST sin un metodo asignado o se asignó el metodo equivocado.',
+			'A POST request was attempted without the correct method being assigned.',
+			options.debugItemIndex,
 		);
 	}
 	if (!body) {
-		safeThrow(context, 'El cuerpo (body) de la solicitud POST es obligatorio.');
+		safeThrowWithItemIndex(context, 'The POST request body is required.', options.debugItemIndex);
 	}
 
 	const requestHeaders = buildCentumHeaders(
@@ -1297,16 +1421,16 @@ export async function apiPostRequestPaginated<T = any>(
 		headers.publicAccessKey,
 	);
 	const allItems: T[] = [];
-	let currentPage = numeroPagina || 1;
-	const itemsPerPage = pagination === 'all' ? 1000 : cantidadItemsPorPagina || 100;
-	const intervaloMs = pagination === 'all' ? 1000 : (intervaloPagina ?? 1000);
+	let currentPage = pageNumber || 1;
+	const requestedItemsPerPage = pagination === 'all' ? 1000 : itemsPerPage || 100;
+	const intervalMs = pagination === 'all' ? 1000 : (pageInterval ?? 1000);
 
 	while (true) {
 		const totalStart = Date.now();
 		const paginatedParams = {
 			...queryParams,
 			numeroPagina: currentPage,
-			cantidadItemsPorPagina: itemsPerPage,
+			cantidadItemsPorPagina: requestedItemsPerPage,
 		};
 		const finalUrl = buildUrl(url, paginatedParams);
 		const { shouldDebug } = getDebugConfig(context, finalUrl, options.debugItemIndex ?? 0);
@@ -1333,19 +1457,30 @@ export async function apiPostRequestPaginated<T = any>(
 				statusText: response.statusText,
 				contentType: response.headers.get('content-type') || '',
 				bodyLength: responseText.length,
+				body: responseText,
 			});
 		}
 		if (!response.ok) {
-			safeThrow(context, `Error POST (pág ${currentPage}): ${response.status} - ${responseText}`);
+			if (shouldDebug) {
+				logDebugErrorRequestBody(context, finalUrl, 'POST', body);
+			}
+
+			safeThrowApi(
+				context,
+				`POST error on page ${currentPage} with status ${response.status}`,
+				responseText || response.statusText,
+				response.status,
+				options.debugItemIndex,
+			);
 		}
 		const data = responseText.trim() ? JSON.parse(responseText) : {};
 		const pageItems = extractItems<T>(data, itemsField);
 		allItems.push(...pageItems);
 		const processingDuration = Date.now() - totalStart;
-		const nextPage = pageItems.length >= itemsPerPage;
+		const nextPage = pageItems.length >= requestedItemsPerPage;
 		void processingDuration;
 		if (!nextPage) break;
-		await new Promise((resolve) => setTimeout(resolve, intervaloMs));
+		await delay(intervalMs);
 		currentPage++;
 	}
 	return allItems;
@@ -1358,7 +1493,7 @@ export async function apiPostRequestPaginated<T = any>(
 // 	options: FetchOptions = {},
 // 	context?: IExecuteFunctions,
 // ): Promise<T> {
-// 	// Por defecto las peticiones se hacen con el método GET y respuesta en formato JSON
+// 	// Requests default to the GET method and JSON response format
 // 	const { method = 'GET', headers = {}, body, queryParams, responseType } = options;
 // 	// console.log(options)
 // 	let finalUrl = buildUrl(url, queryParams)
@@ -1372,7 +1507,7 @@ export async function apiPostRequestPaginated<T = any>(
 
 // 	if (body) {
 // 		if (typeof body !== 'object') {
-// 			throw new Error('El body debe ser un objeto válido y no una cadena');
+// 			throw new Error('The body must be a valid object and not a string');
 // 		}
 
 // 		fetchOptions.body = JSON.stringify(body);
@@ -1440,7 +1575,11 @@ export async function apiRequest<T>(
 
 	if (body) {
 		if (typeof body !== 'object') {
-			safeThrow(effectiveContext, 'El body debe ser un objeto válido (no una cadena u otro tipo)');
+			safeThrowWithItemIndex(
+				effectiveContext,
+				'The body must be a valid object (not a string or another type).',
+				options.debugItemIndex,
+			);
 		}
 		fetchOptions.body = JSON.stringify(body);
 	}
@@ -1461,7 +1600,18 @@ export async function apiRequest<T>(
 		if (responseType === 'arraybuffer') {
 			if (!response.ok) {
 				const errorText = await response.text();
-				safeThrow(effectiveContext, `Error ${response.status} - ${errorText}`);
+
+				if (shouldDebug) {
+					logDebugErrorRequestBody(effectiveContext, finalUrl, method, body);
+				}
+
+				safeThrowApi(
+					effectiveContext,
+					`Request failed with status ${response.status}`,
+					errorText || response.statusText,
+					response.status,
+					options.debugItemIndex,
+				);
 			}
 
 			return (await response.arrayBuffer()) as any;
@@ -1476,12 +1626,17 @@ export async function apiRequest<T>(
 				statusText: response.statusText,
 				contentType: response.headers.get('content-type') || '',
 				bodyLength: rawText.length,
+				body: rawText,
 			});
 		}
 
 		if (!response.ok) {
 			const contentType = response.headers.get('content-type') || '';
 			const status = response.status;
+
+			if (shouldDebug) {
+				logDebugErrorRequestBody(effectiveContext, finalUrl, method, body);
+			}
 
 			let errorData: ApiErrorBody | string = rawText;
 			if (contentType.includes('application/json')) {
@@ -1492,18 +1647,23 @@ export async function apiRequest<T>(
 				}
 			}
 
-			const mensaje =
+			const messageText =
 				typeof errorData === 'object'
-					? errorData.message || errorData.Message || 'Sin mensaje en body'
-					: rawText || 'Sin cuerpo de respuesta';
+					? errorData.message || errorData.Message || 'No message in response body'
+					: rawText || 'Empty response body';
 
-			const descripcion =
+			const descriptionText =
 				typeof errorData === 'object'
-					? errorData.detail || errorData.Detail || 'Sin detalles adicionales'
-					: 'Texto plano sin JSON';
+					? errorData.detail || errorData.Detail || 'No additional details'
+					: 'Plain text response without JSON';
 
-			const errorMessage = `Error ${status} - ${mensaje}\n${descripcion}`;
-			safeThrow(effectiveContext, errorMessage);
+			safeThrowApi(
+				effectiveContext,
+				`Request failed with status ${status}: ${messageText}`,
+				descriptionText,
+				status,
+				options.debugItemIndex,
+			);
 		}
 
 		if (!rawText.trim()) {
@@ -1516,6 +1676,12 @@ export async function apiRequest<T>(
 			effectiveContext.logger?.error?.('API request failed', { error });
 		}
 
-		safeThrow(effectiveContext, getErrorMessage(error, 'Error desconocido en fetch'));
+		safeThrowApi(
+			effectiveContext,
+			'Centum API request failed',
+			getErrorMessage(error, 'Unknown fetch error'),
+			undefined,
+			options.debugItemIndex,
+		);
 	}
 }

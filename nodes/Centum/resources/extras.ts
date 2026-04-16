@@ -1,9 +1,16 @@
-import { NodeOperationError } from "n8n-workflow";
-import * as helperFns from "../helpers/functions";
-import type { ResourceHandler, ResourceHandlerMap } from "./tipos";
+import { NodeApiError, NodeOperationError } from 'n8n-workflow';
+import * as helperFns from '../helpers/functions';
+import type { ResourceHandler, ResourceHandlerMap } from './types';
 
-const generarTokenSeguridad: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+const generateSecurityToken: ResourceHandler = async (context) => {
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
@@ -15,13 +22,24 @@ const generarTokenSeguridad: ResourceHandler = async (context) => {
 
 		return [executeFunctions.helpers.returnJsonArray([{ token: tokenGenerado }])];
 	} catch (error) {
-		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
-const listarBonificaciones: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+const listDiscounts: ResourceHandler = async (context) => {
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
@@ -29,26 +47,41 @@ const listarBonificaciones: ResourceHandler = async (context) => {
 	void consumerApiPublicId;
 
 	try {
-		const bonificaciones = await helperFns.apiRequest<any>(`${centumUrl}/Bonificaciones`, {
+		const discounts = await helperFns.apiRequest<any>(`${centumUrl}/Bonificaciones`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: "GET",
+			method: 'GET',
 			headers,
 		});
-		return [executeFunctions.helpers.returnJsonArray([bonificaciones])];
+		return [executeFunctions.helpers.returnJsonArray([discounts])];
 	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
 		const statusCode = error?.response?.status;
 		const responseData = error?.response?.data;
-		const errorMessage = responseData?.Message || responseData?.message || (error as any)?.message || "Error desconocido al crear el contribuyente.";
+		const errorMessage =
+			responseData?.Message ||
+			responseData?.message ||
+			(error as any)?.message ||
+			'Unknown error while creating the taxpayer customer.';
 		const fullMessage = statusCode ? `Error ${statusCode}: ${errorMessage}` : errorMessage;
 		throw new NodeOperationError(executeFunctions.getNode(), fullMessage, {
-			description: responseData?.Detail || "Ocurrió un error inesperado al llamar a la API de Centum.",
+			description:
+				responseData?.Detail || 'An unexpected error occurred while calling the Centum API.',
 		});
 	}
 };
 
-const listarConceptos: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+const listConcepts: ResourceHandler = async (context) => {
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
@@ -61,17 +94,30 @@ const listarConceptos: ResourceHandler = async (context) => {
 		const response = await helperFns.apiRequest<any>(url, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: "GET",
+			method: 'GET',
 			headers,
 		});
 		return [executeFunctions.helpers.returnJsonArray(response)];
 	} catch (error) {
-		throw new NodeOperationError(executeFunctions.getNode(), `Hubo un error al obtener el listado de conceptos. Error: ${error}`);
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			`Error getting concept list: ${error}`,
+		);
 	}
 };
 
-const listarRegimenesEspeciales: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+const listSpecialTaxRegimes: ResourceHandler = async (context) => {
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
@@ -82,45 +128,70 @@ const listarRegimenesEspeciales: ResourceHandler = async (context) => {
 		const dataRegimenesList = await helperFns.apiRequest<any>(`${centumUrl}/RegimenesEspeciales`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: "GET",
+			method: 'GET',
 			headers,
 		});
 		return [executeFunctions.helpers.returnJsonArray(dataRegimenesList)];
 	} catch (error) {
-		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
-const verDetalleRegimenEspecial: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+const getSpecialTaxRegimeDetails: ResourceHandler = async (context) => {
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const regimenId = helperFns.getNodeParameterOrThrow(executeFunctions, "id", itemIndex);
-	if (!regimenId) {
-		throw new NodeOperationError(executeFunctions.getNode(), "El ID del regimen es requerido");
+	const specialTaxRegimeId = helperFns.getNodeParameterOrThrow(executeFunctions, 'id', itemIndex);
+	if (!specialTaxRegimeId) {
+		throw new NodeOperationError(executeFunctions.getNode(), 'Special tax regime ID is required.');
 	}
 
 	try {
-		const regimen = await helperFns.apiRequest<any>(`${centumUrl}/RegimenesEspeciales/${regimenId}`, {
-			context: executeFunctions,
-			debugItemIndex: itemIndex,
-			method: "GET",
-			headers,
-		});
-		return [executeFunctions.helpers.returnJsonArray(regimen)];
+		const specialTaxRegime = await helperFns.apiRequest<any>(
+			`${centumUrl}/RegimenesEspeciales/${specialTaxRegimeId}`,
+			{
+				context: executeFunctions,
+				debugItemIndex: itemIndex,
+				method: 'GET',
+				headers,
+			},
+		);
+		return [executeFunctions.helpers.returnJsonArray(specialTaxRegime)];
 	} catch (error) {
-		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
-const listarTiposComprobante: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+const listVoucherTypes: ResourceHandler = async (context) => {
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
@@ -128,22 +199,33 @@ const listarTiposComprobante: ResourceHandler = async (context) => {
 	void consumerApiPublicId;
 
 	try {
-		const comprobanteList = await helperFns.apiRequest<any>(`${centumUrl}/TiposComprobante`, {
+		const voucherTypeList = await helperFns.apiRequest<any>(`${centumUrl}/TiposComprobante`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: "GET",
+			method: 'GET',
 			headers,
 		});
 
-		return [executeFunctions.helpers.returnJsonArray(comprobanteList)];
+		return [executeFunctions.helpers.returnJsonArray(voucherTypeList)];
 	} catch (error) {
-		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
-const listarVendedores: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+const listSellers: ResourceHandler = async (context) => {
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
@@ -151,84 +233,124 @@ const listarVendedores: ResourceHandler = async (context) => {
 	void consumerApiPublicId;
 
 	try {
-		const turnoEntrega = await helperFns.apiRequest<any>(`${centumUrl}/Vendedores`, {
+		const sellersResponse = await helperFns.apiRequest<any>(`${centumUrl}/Vendedores`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: "GET",
+			method: 'GET',
 			headers,
 		});
-		return [executeFunctions.helpers.returnJsonArray(turnoEntrega)];
+		return [executeFunctions.helpers.returnJsonArray(sellersResponse)];
 	} catch (error) {
-		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
-		throw new NodeOperationError(executeFunctions.getNode(), `Error obteniendo los vendedores: ${errorMessage}`);
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			`Error getting sellers: ${errorMessage}`,
+		);
 	}
 };
 
-const listarOperadoresMoviles: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+const listMobileOperators: ResourceHandler = async (context) => {
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const username = helperFns.getNodeParameterOrThrow(executeFunctions, "username", itemIndex) as string;
-	const email = helperFns.getNodeParameterOrThrow(executeFunctions, "email", itemIndex) as string;
+	const username = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'username',
+		itemIndex,
+	) as string;
+	const email = helperFns.getNodeParameterOrThrow(executeFunctions, 'email', itemIndex) as string;
 
 	const searchParams = new URLSearchParams();
 	if (username) {
-		searchParams.set("usuario", username);
+		searchParams.set('usuario', username);
 	}
 	if (email) {
-		searchParams.set("email", email);
+		searchParams.set('email', email);
 	}
-	const params = searchParams.toString() ? `?${searchParams.toString()}` : "";
+	const params = searchParams.toString() ? `?${searchParams.toString()}` : '';
 
 	try {
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/OperadoresMoviles${params}`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
 			headers,
-			method: "GET",
+			method: 'GET',
 		});
 		return [executeFunctions.helpers.returnJsonArray(response)];
 	} catch (err) {
-		const errorMessage = err?.response?.data?.Message || (err as any).message || "Error Desconocido";
-		throw new NodeOperationError(executeFunctions.getNode(), `Error en obtener el listado de marcas. \n ${errorMessage}`);
+		const errorMessage = err?.response?.data?.Message || (err as any).message || 'Unknown error';
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			`Error getting mobile operator list.\n${errorMessage}`,
+		);
 	}
 };
 
-const verificarCredencialesOperador: ResourceHandler = async (context) => {
-	const { executeFunctions, centumUrl, headers, centumApiCredentials, consumerApiPublicId, itemIndex } = context;
+const verifyOperatorCredentials: ResourceHandler = async (context) => {
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
 	void itemIndex;
 	void centumUrl;
 	void headers;
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const username = helperFns.getNodeParameterOrThrow(executeFunctions, "username", itemIndex, "") as string;
+	const username = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'username',
+		itemIndex,
+		'',
+	) as string;
 	try {
-		const operadoresActividad = await helperFns.apiRequest<any>(`${centumUrl}/OperadoresMoviles?Usuario=${username}`, {
-			context: executeFunctions,
-			debugItemIndex: itemIndex,
-			method: "GET",
-			headers,
-		});
-		return [executeFunctions.helpers.returnJsonArray(operadoresActividad)];
+		const mobileOperatorActivity = await helperFns.apiRequest<any>(
+			`${centumUrl}/OperadoresMoviles?Usuario=${username}`,
+			{
+				context: executeFunctions,
+				debugItemIndex: itemIndex,
+				method: 'GET',
+				headers,
+			},
+		);
+		return [executeFunctions.helpers.returnJsonArray(mobileOperatorActivity)];
 	} catch (error) {
-		const errorMessage = error?.response?.data?.Message || (error as any).message || "Error desconocido";
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
 
 export const extrasHandlers: ResourceHandlerMap = {
-	generarTokenSeguridad,
-	listarBonificaciones,
-	listarConceptos,
-	listarRegimenesEspeciales,
-	verDetalleRegimenEspecial,
-	listarTiposComprobante,
-	listarVendedores,
-	listarOperadoresMoviles,
-	verificarCredencialesOperador,
+	generateSecurityToken: generateSecurityToken,
+	listDiscounts: listDiscounts,
+	listConcepts: listConcepts,
+	listSpecialTaxRegimes: listSpecialTaxRegimes,
+	getSpecialTaxRegimeDetails: getSpecialTaxRegimeDetails,
+	listVoucherTypes: listVoucherTypes,
+	listSellers: listSellers,
+	listMobileOperators: listMobileOperators,
+	verifyOperatorCredentials: verifyOperatorCredentials,
 };

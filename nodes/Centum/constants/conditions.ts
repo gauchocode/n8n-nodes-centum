@@ -1,7 +1,7 @@
 
 import { CondicionIIBB, CondicionIIBBCodigo } from '../interfaces';
 
-export const CondicionesIVA = [
+export const vatConditions = [
 	{
 		IdCondicionIVA:1892,
 		Codigo:"CF",
@@ -45,7 +45,7 @@ export const CondicionesIVA = [
 ];
 
 // Solamente se est
-export const CondicionesIIBB: CondicionIIBB[] = [
+export const grossIncomeConditions: CondicionIIBB[] = [
 
 	  {
         IdCondicionIIBB: 6051,
@@ -61,7 +61,7 @@ export const CondicionesIIBB: CondicionIIBB[] = [
     },
 ];
 
-export const CategoriasIIBB = [
+export const grossIncomeCategories = [
 	{
 		IdCategoriaIIBB: 6054,
 		Codigo: "Cosas Muebles"
