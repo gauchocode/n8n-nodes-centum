@@ -68,96 +68,10 @@ const searchCustomers: ResourceHandler = async (context) => {
 		'',
 	) as string;
 
-	if (!customerCode && !cuit && !businessName) {
-		throw new NodeOperationError(
-			executeFunctions.getNode(),
-			'Provide at least one search field (CUIT, customer code, or business name).',
-		);
-	}
-
 	const queryParams: Record<string, string> = {};
 	if (cuit) queryParams.Cuit = cuit;
 	if (customerCode) queryParams.codigo = customerCode;
 	if (businessName) queryParams.RazonSocial = businessName;
-
-	try {
-		const response = await helperFns.apiRequest<any>(`${centumUrl}/Clientes`, {
-			context: executeFunctions,
-			debugItemIndex: itemIndex,
-			method: 'GET',
-			headers,
-			queryParams,
-		});
-		return [executeFunctions.helpers.returnJsonArray(response.Items as any)];
-	} catch (error) {
-		if (error instanceof NodeApiError) {
-			throw error;
-		}
-		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Unknown error';
-		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
-	}
-};
-
-const searchCustomerByCuit: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
-	void itemIndex;
-	void centumUrl;
-	void headers;
-	void centumApiCredentials;
-	void consumerApiPublicId;
-
-	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, 'cuit', itemIndex, '') as string;
-
-	if (!cuit) {
-		throw new NodeOperationError(
-			executeFunctions.getNode(),
-			'CUIT is required to search for customers.',
-		);
-	}
-
-	const queryParams: Record<string, string> = { Cuit: cuit };
-
-	try {
-		const response = await helperFns.apiRequest<any>(`${centumUrl}/Clientes`, {
-			context: executeFunctions,
-			debugItemIndex: itemIndex,
-			method: 'GET',
-			headers,
-			queryParams,
-		});
-
-		return [executeFunctions.helpers.returnJsonArray(response.Items as any)];
-	} catch (error) {
-		if (error instanceof NodeApiError) {
-			throw error;
-		}
-		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Unknown error';
-		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
-	}
-};
-
-const listCustomers: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
-	void centumUrl;
-	void headers;
-	void centumApiCredentials;
-	void consumerApiPublicId;
 
 	try {
 		const ajustesHTTP = helperFns.getHttpSettings.call(executeFunctions, itemIndex);
@@ -165,17 +79,17 @@ const listCustomers: ResourceHandler = async (context) => {
 		const startingPage = ajustesHTTP.pageNumber ?? 1;
 		const itemsPerPage = ajustesHTTP.itemsPerPage ?? 100;
 		const pageInterval = ajustesHTTP.pageInterval ?? 1000;
-		const customersUrl = `${centumUrl}/Clientes`;
 		const customers: any[] = [];
 		let currentPage = startingPage;
 
 		while (true) {
-			const response = await helperFns.apiRequest<any>(customersUrl, {
+			const response = await helperFns.apiRequest<any>(`${centumUrl}/Clientes`, {
 				context: executeFunctions,
 				debugItemIndex: itemIndex,
 				method: 'GET',
 				headers,
 				queryParams: {
+					...queryParams,
 					numeroPagina: currentPage,
 					cantidadItemsPorPagina: itemsPerPage,
 				},
@@ -212,6 +126,10 @@ const listCustomers: ResourceHandler = async (context) => {
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 };
+
+const searchCustomerByCuit: ResourceHandler = searchCustomers;
+
+const listCustomers: ResourceHandler = searchCustomers;
 
 const createCustomer: ResourceHandler = async (context) => {
 	const {
@@ -701,6 +619,7 @@ const listCustomerFrequencies: ResourceHandler = async (context) => {
 };
 
 export const customersHandlers: ResourceHandlerMap = {
+	Get: searchCustomers,
 	updateCustomer: updateCustomer,
 	searchCustomers: searchCustomers,
 	searchCustomerByCuit: searchCustomerByCuit,

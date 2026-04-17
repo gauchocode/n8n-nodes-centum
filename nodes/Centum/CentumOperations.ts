@@ -88,16 +88,9 @@ const operationGroups: OperationGroup[] = [
 					'Devuelve los datos de precios de artículos en función de el ID de una lista de precios y filtros varios',
 			},
 			{
-				name: 'Stock By Branch And Article ID',
-				value: 'getProductInBranch',
-				action: 'Get branch stock by article',
-				description:
-					'Devuelve las exitencias y stock comprometido de artículos en función de filtros varios.',
-			},
-			{
-				name: 'Stock By Physical Branch',
-				value: 'listProductsByBranch',
-				action: 'List stock by physical branch',
+				name: 'GetExistenciasIndicadores',
+				value: 'GetExistenciasIndicadores',
+				action: 'GetExistenciasIndicadores',
 				description:
 					'Devuelve las existencias de artículos junto con los indicadores dentro de un depósito en función de filtros varios.',
 			},
@@ -209,8 +202,14 @@ const operationGroups: OperationGroup[] = [
 	},
 	{
 		resource: 'clientes',
-		default: 'Update',
+		default: 'Get',
 		options: [
+			{
+				name: 'Get',
+				value: 'Get',
+				action: 'Get',
+				description: 'Devuelve los datos de clientes en función de filtros varios.',
+			},
 			{
 				name: 'Update',
 				value: 'Update',
@@ -237,29 +236,11 @@ const operationGroups: OperationGroup[] = [
 				description: 'Crea un cliente',
 			},
 			{
-				name: 'List',
-				value: 'listCustomers',
-				action: 'List customers',
-				description: 'Devuelve los datos de clientes en función de filtros varios.',
-			},
-			{
 				name: 'GetComposicionSaldoCuentaCorriente',
 				value: 'GetComposicionSaldoCuentaCorriente',
 				action: 'GetComposicionSaldoCuentaCorriente',
 				description:
 					'Devuelve la composición del saldo de cuenta corriente de un cliente en función de su ID único.',
-			},
-			{
-				name: 'Search',
-				value: 'searchCustomers',
-				action: 'Search customers',
-				description: 'Devuelve los datos de clientes en función de filtros varios.',
-			},
-			{
-				name: 'Search By CUIT',
-				value: 'searchCustomerByCuit',
-				action: 'Search customers by CUIT',
-				description: 'Devuelve los datos de clientes en función de filtros varios.',
 			},
 			{
 				name: 'GetOneContribuyente',
@@ -275,9 +256,9 @@ const operationGroups: OperationGroup[] = [
 		default: 'Create',
 		options: [
 			{
-				name: 'Invoices - Get',
-				value: 'listSalesInvoices',
-				action: 'Get sales invoices',
+				name: 'GetConsulta',
+				value: 'GetConsulta',
+				action: 'GetConsulta',
 				description:
 					'Devuelve los datos de comprobantes de venta con detalle de totales en función de filtros varios.',
 			},
@@ -305,18 +286,12 @@ const operationGroups: OperationGroup[] = [
 	},
 	{
 		resource: 'promocionesComerciales',
-		default: 'listPromotions',
+		default: 'Get',
 		options: [
 			{
-				name: 'By Customer - Get',
-				value: 'listCustomerCommercialPromotions',
-				action: 'Get customer commercial promotions',
-				description: 'Devuelve los datos de promociones comerciales en función de filtros varios.',
-			},
-			{
-				name: 'List',
-				value: 'listPromotions',
-				action: 'List commercial promotions',
+				name: 'Get',
+				value: 'Get',
+				action: 'Get',
 				description: 'Devuelve los datos de promociones comerciales en función de filtros varios.',
 			},
 		],
@@ -326,21 +301,15 @@ const operationGroups: OperationGroup[] = [
 		default: 'registerPayment',
 		options: [
 			{
-				name: 'Invoices - Get',
-				value: 'listPaymentInvoices',
-				action: 'Get payment invoices',
-				description: 'Devuelve los datos de cobranzas realizadas en funcion de filtros varios.',
-			},
-			{
 				name: 'Create',
 				value: 'registerPayment',
 				action: 'Create payment',
 				description: 'Crea un cobro (recibo) a un cliente específico.',
 			},
 			{
-				name: 'List',
-				value: 'listPayments',
-				action: 'List payments',
+				name: 'Get',
+				value: 'Get',
+				action: 'Get',
 				description: 'Devuelve los datos de cobranzas realizadas en funcion de filtros varios.',
 			},
 		],

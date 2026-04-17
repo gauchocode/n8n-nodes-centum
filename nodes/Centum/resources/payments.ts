@@ -194,6 +194,7 @@ const listPaymentInvoices: ResourceHandler = async (context) => {
 };
 
 export const paymentsHandlers: ResourceHandlerMap = {
+	Get: listPayments,
 	registerPayment: registerPayment,
 	listPayments: listPayments,
 	listPaymentInvoices: listPaymentInvoices,

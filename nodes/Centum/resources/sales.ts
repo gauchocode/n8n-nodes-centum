@@ -982,11 +982,24 @@ const listPromotions: ResourceHandler = async (context) => {
 		'documentDate',
 		itemIndex,
 	) as string;
+	const customerId = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'customerId', itemIndex, ''),
+	);
+	const weekday = helperFns.getNodeParameterOrThrow(executeFunctions, 'weekday', itemIndex, '');
 	const formattedDocumentDate = String(documentDate).split('T')[0];
 
-	const body = {
+	const body: Record<string, unknown> = {
 		FechaDocumento: formattedDocumentDate,
 	};
+
+	if (customerId) {
+		body.IdsCliente = Number(customerId);
+	}
+
+	if (weekday !== '' && weekday !== null && weekday !== undefined) {
+		body.DiaSemana = weekday;
+	}
+
 	try {
 		const response = await helperFns.apiRequest<any>(
 			`${centumUrl}/PromocionesComerciales/FiltrosPromocionComercial`,
@@ -1128,6 +1141,7 @@ const getSalesRanking: ResourceHandler = async (context) => {
 };
 
 export const salesHandlers: ResourceHandlerMap = {
+	Get: listPromotions,
 	createSalesOrder: createSalesOrder,
 	getSalesOrderDetails: getSalesOrderDetails,
 	listSalesOrderStatuses: listSalesOrderStatuses,

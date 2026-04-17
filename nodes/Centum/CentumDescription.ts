@@ -255,18 +255,8 @@ const fieldDefinitions: INodeProperties[] = [
 					'GetVenta',
 					'GetSaldoCuentaCorriente',
 					'GetComposicionSaldoCuentaCorriente',
-					'listSalesInvoices',
-					'listPaymentInvoices',
-					'listCustomerCommercialPromotions',
-					'Get',
-					'Get',
-					'listPayments',
-					'Get',
-					'Create',
 					'GetConsulta',
-					// "getProductPrice",
-					'Create',
-					'Create',
+					'Get',
 				],
 			},
 		},
@@ -280,6 +270,7 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Article code to search for. Separate multiple values with a comma.',
 		displayOptions: {
 			show: {
+				resource: ['articulos'],
 				operation: ['GetOne', 'GetDatosGenerales'],
 			},
 		},
@@ -358,15 +349,7 @@ const fieldDefinitions: INodeProperties[] = [
 		placeholder: 'Enter the CUIT...',
 		displayOptions: {
 			show: {
-				operation: [
-					'Create',
-					'createCustomer',
-					'GetOneContribuyente',
-					'createTaxpayerCustomer',
-					'searchCustomerByCuit',
-					'searchCustomers',
-					'Get',
-				],
+				operation: ['Create', 'GetOneContribuyente', 'createTaxpayerCustomer', 'Get'],
 				resource: ['proveedores', 'clientes'],
 			},
 		},
@@ -377,7 +360,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'number',
 		default: 0,
 		description: 'Weekday number used to filter applied promotions (0 is Monday)',
-		displayOptions: { show: { operation: ['listCustomerCommercialPromotions'] } },
+		displayOptions: { show: { resource: ['promocionesComerciales'], operation: ['Get'] } },
 	},
 	// {
 	// 	displayName: 'DNI',
@@ -400,20 +383,8 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				operation: [
-					'Create',
-					'Get',
-					'listSalesInvoices',
-					'listPaymentInvoices',
-					'Get',
-					'GetConsulta',
-					'Get',
-					'listPayments',
-					'Get',
-					'Create',
-					'Get',
-					'GetEstadisticas',
-				],
+				resource: ['ventas', 'cobros', 'compras', 'pedidosVenta', 'ordenesCompra'],
+				operation: ['Create', 'Get', 'GetConsulta', 'GetEstadisticas'],
 			},
 		},
 	},
@@ -424,18 +395,8 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				operation: [
-					'Get',
-					'listSalesInvoices',
-					'listPaymentInvoices',
-					'Get',
-					'GetConsulta',
-					'Get',
-					'listPayments',
-					'Get',
-					'Get',
-					'GetEstadisticas',
-				],
+				resource: ['ventas', 'cobros', 'compras', 'pedidosVenta', 'ordenesCompra'],
+				operation: ['Get', 'GetConsulta', 'GetEstadisticas'],
 			},
 		},
 	},
@@ -448,16 +409,14 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Date body parameter used for the request',
 		displayOptions: {
 			show: {
-				operation: [
-					'Create',
-					'GetVenta',
-					'Create',
-					'listCustomerCommercialPromotions',
-					'Create',
-					'Create',
-					'Create',
-					'listPromotions',
+				resource: [
+					'pedidosVenta',
+					'ordenesCompra',
+					'remitosCompra',
+					'remitosVenta',
+					'promocionesComerciales',
 				],
+				operation: ['Create', 'GetVenta', 'Get'],
 			},
 		},
 	},
@@ -659,6 +618,7 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
+				resource: ['clientes', 'articulos'],
 				operation: ['GetSaldoCuentaCorriente', 'GetComposicionSaldoCuentaCorriente', 'GetPrecios'],
 			},
 		},
@@ -720,13 +680,13 @@ const fieldDefinitions: INodeProperties[] = [
 		placeholder: '1467',
 		displayOptions: {
 			show: {
+				resource: ['articulos'],
 				operation: [
 					'GetOneImagen',
 					'GetDatosGenerales',
 					'GetOne',
-					'getProductInBranch',
+					'GetExistenciasIndicadores',
 					'GetPrecios',
-					'listProductsByBranch',
 					'Create',
 				],
 			},
@@ -766,7 +726,7 @@ const fieldDefinitions: INodeProperties[] = [
 		required: true,
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { resource: ['cobros'], operation: ['listPayments'] } },
+		displayOptions: { show: { resource: ['cobros'], operation: ['Get'] } },
 	},
 	{
 		displayName: 'Purchase ID',
@@ -815,7 +775,7 @@ const fieldDefinitions: INodeProperties[] = [
 		placeholder: 'Enter voucher type ID',
 		description: 'Invoice voucher type ID',
 		displayOptions: {
-			show: { resource: ['compras', 'ventas'], operation: ['Create', 'listSalesInvoices'] },
+			show: { resource: ['compras', 'ventas'], operation: ['Create', 'GetConsulta'] },
 		},
 	},
 	{
@@ -825,7 +785,7 @@ const fieldDefinitions: INodeProperties[] = [
 		default: 0,
 		placeholder: '1',
 		description: 'Current-account customer ID for the sales voucher',
-		displayOptions: { show: { operation: ['listSalesInvoices'] } },
+		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta'] } },
 	},
 	{
 		displayName: 'Seller ID',
@@ -834,7 +794,7 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		placeholder: 'Enter seller ID',
 		displayOptions: {
-			show: { resource: ['ventas', 'remitosVenta'], operation: ['Create', 'listSalesInvoices'] },
+			show: { resource: ['ventas', 'remitosVenta'], operation: ['Create', 'GetConsulta'] },
 		},
 	},
 	{
@@ -845,7 +805,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['ventas', 'pedidosVenta'],
-				operation: ['listSalesInvoices', 'Get', 'Get'],
+				operation: ['GetConsulta', 'Get'],
 			},
 		},
 	},
@@ -862,7 +822,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'boolean',
 		default: false,
 		displayOptions: {
-			show: { resource: ['ventas', 'pedidosVenta'], operation: ['listSalesInvoices', 'Get'] },
+			show: { resource: ['ventas', 'pedidosVenta'], operation: ['GetConsulta', 'Get'] },
 		},
 	},
 	{
@@ -870,14 +830,14 @@ const fieldDefinitions: INodeProperties[] = [
 		name: 'salesChannelId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { operation: ['listSalesInvoices'] } },
+		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta'] } },
 	},
 	{
 		displayName: 'Business Division ID',
 		name: 'businessDivisionId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { operation: ['listSalesInvoices'] } },
+		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta'] } },
 	},
 	{
 		displayName: 'Created By User ID',
@@ -886,7 +846,7 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'User ID that created the sales voucher',
 		default: 0,
 		displayOptions: {
-			show: { resource: ['ventas', 'pedidosVenta'], operation: ['listSalesInvoices', 'Get'] },
+			show: { resource: ['ventas', 'pedidosVenta'], operation: ['GetConsulta', 'Get'] },
 		},
 	},
 	{
@@ -896,7 +856,7 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Transport ID associated with the sales voucher',
 		default: 0,
 		displayOptions: {
-			show: { resource: ['ventas', 'pedidosVenta'], operation: ['listSalesInvoices', 'Get'] },
+			show: { resource: ['ventas', 'pedidosVenta'], operation: ['GetConsulta', 'Get'] },
 		},
 	},
 	{
@@ -933,18 +893,16 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'The ID of the physical branch to filter stock (optional)',
 		displayOptions: {
 			show: {
-				operation: [
-					'Create',
-					'Create',
-					'Create',
-					'Create',
-					'getProductInBranch',
-					'Create',
-					'Create',
-					'listProductsByBranch',
-					'listSalesInvoices',
-					'Get',
+				resource: [
+					'remitosCompra',
+					'remitosVenta',
+					'ordenesCompra',
+					'pedidosVenta',
+					'ventas',
+					'articulos',
+					'ajustesMovimientosStock',
 				],
+				operation: ['Create', 'GetExistenciasIndicadores', 'GetConsulta', 'Get'],
 			},
 		},
 	},
@@ -1036,7 +994,12 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		placeholder: 'Chocolate Bars',
-		displayOptions: { show: { operation: ['GetDatosGenerales', 'listProductsByBranch'] } },
+		displayOptions: {
+			show: {
+				resource: ['articulos'],
+				operation: ['GetDatosGenerales', 'GetExistenciasIndicadores'],
+			},
+		},
 		description: 'Name of the product to search for',
 	},
 	{
@@ -1097,15 +1060,7 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Customer business name to search for',
 		displayOptions: {
 			show: {
-				operation: [
-					'GetOneContribuyente',
-					'searchCustomers',
-					'Create',
-					'Create',
-					'Get',
-					'Create',
-					'createCustomer',
-				],
+				operation: ['GetOneContribuyente', 'Create', 'Get'],
 				resource: ['clientes', 'proveedores', 'pedidosVenta', 'ordenesCompra'],
 			},
 		},
@@ -1127,7 +1082,7 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Group ID used to search for articles',
 		displayOptions: {
 			show: {
-				operation: ['GetEstadisticas', 'listProductsByBranch', 'GetAll'],
+				operation: ['GetEstadisticas', 'GetExistenciasIndicadores', 'GetAll'],
 				resource: ['ventas', 'articulos', 'subRubros'],
 			},
 		},
@@ -1150,7 +1105,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['categoriasArticulo', 'articulos'],
-				operation: ['GetAll', 'listProductsByBranch'],
+				operation: ['GetAll', 'GetExistenciasIndicadores'],
 			},
 		},
 	},
@@ -1205,7 +1160,8 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				operation: ['listProductsByBranch'],
+				resource: ['articulos'],
+				operation: ['GetExistenciasIndicadores'],
 			},
 		},
 	},
@@ -1217,7 +1173,8 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				operation: ['listProductsByBranch'],
+				resource: ['articulos'],
+				operation: ['GetExistenciasIndicadores'],
 			},
 		},
 	},
@@ -1229,30 +1186,32 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Whether to return only the most useful top-level fields',
 		displayOptions: {
 			show: {
+				resource: [
+					'articulos',
+					'clientes',
+					'ventas',
+					'pedidosVenta',
+					'cobros',
+					'compras',
+					'tiposComprobante',
+					'ordenesCompra',
+					'proveedores',
+					'promocionesComerciales',
+				],
 				operation: [
 					'GetDatosGenerales',
 					'GetOne',
 					'GetVenta',
 					'GetPrecios',
-					'listProductsByBranch',
-					'getProductInBranch',
-					'searchCustomers',
-					'searchCustomerByCuit',
-					'listCustomers',
+					'GetExistenciasIndicadores',
+					'Get',
 					'GetSaldoCuentaCorriente',
 					'GetComposicionSaldoCuentaCorriente',
-					'listPaymentInvoices',
-					'listSalesInvoices',
-					'Get',
-					'listCustomerCommercialPromotions',
+					'GetConsulta',
 					'GetOneContribuyente',
 					'GetAllVentas',
-					'GetConsulta',
 					'GetEstadisticas',
-					'listPayments',
-					'Get',
 					'GetAllCompras',
-					'GetOne',
 				],
 			},
 		},
@@ -1337,7 +1296,8 @@ export const HttpOptions: INodeProperties[] = [
 		],
 		displayOptions: {
 			show: {
-				operation: ['listCustomers', 'GetDatosGenerales', 'GetVenta'],
+				resource: ['clientes', 'articulos'],
+				operation: ['Get', 'GetDatosGenerales', 'GetVenta'],
 			},
 		},
 	},

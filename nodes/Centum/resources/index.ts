@@ -26,6 +26,7 @@ export const resourceHandlerGroups: Record<string, ResourceHandlerMap> = {
 		GetVenta: articlesHandlers.listAvailableProducts,
 		GetOneImagen: articlesHandlers.downloadProductImages,
 		GetPrecios: articlesHandlers.getProductPrice,
+		GetExistenciasIndicadores: articlesHandlers.GetExistenciasIndicadores,
 		GetExistencias: articlesHandlers.getStock,
 		getProductByCode: articlesHandlers.getProductByCode,
 		searchProducts: articlesHandlers.searchProducts,
@@ -51,6 +52,7 @@ export const resourceHandlerGroups: Record<string, ResourceHandlerMap> = {
 		listDrivers: logisticsHandlers.listDrivers,
 	},
 	clientes: {
+		Get: customersHandlers.Get,
 		Update: customersHandlers.updateCustomer,
 		GetSaldoCuentaCorriente: customersHandlers.getCustomerBalance,
 		GetComposicionSaldoCuentaCorriente: customersHandlers.getCustomerBalanceDetails,
@@ -66,6 +68,7 @@ export const resourceHandlerGroups: Record<string, ResourceHandlerMap> = {
 		searchTaxpayerCustomer: customersHandlers.searchTaxpayerCustomer,
 	},
 	cobros: {
+		Get: paymentsHandlers.Get,
 		listPaymentInvoices: paymentsHandlers.listPaymentInvoices,
 		registerPayment: paymentsHandlers.registerPayment,
 		listPayments: paymentsHandlers.listPayments,
@@ -127,6 +130,7 @@ export const resourceHandlerGroups: Record<string, ResourceHandlerMap> = {
 		listFilteredSalesOrders: salesHandlers.listFilteredSalesOrders,
 	},
 	promocionesComerciales: {
+		Get: salesHandlers.Get,
 		listCustomerCommercialPromotions: customersHandlers.listCustomerCommercialPromotions,
 		listPromotions: salesHandlers.listPromotions,
 	},
@@ -191,6 +195,7 @@ export const resourceHandlerGroups: Record<string, ResourceHandlerMap> = {
 	},
 	ventas: {
 		Get: salesHandlers.listSalesInvoicesById,
+		GetConsulta: salesHandlers.listSalesInvoices,
 		Create: salesHandlers.createSale,
 		GetEstadisticas: salesHandlers.getSalesRanking,
 		listSalesInvoices: salesHandlers.listSalesInvoices,

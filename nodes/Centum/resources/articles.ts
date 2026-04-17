@@ -609,9 +609,10 @@ const listProductsByBranch: ResourceHandler = async (context) => {
 		'articleBrandId',
 		itemIndex,
 	) as string;
+	const hasSpecificArticleLookup = Boolean(physicalBranchId && IdArticulo);
 
-	// When article filtering is not used, branch plus at least one segmentation field is required
-	if (!IdArticulo) {
+	// Allow both a point lookup and a broader branch listing with segmentation filters.
+	if (!hasSpecificArticleLookup) {
 		if (!physicalBranchId) {
 			throw new NodeOperationError(
 				executeFunctions.getNode(),
@@ -982,6 +983,7 @@ const convertProductsForWooCommerce: ResourceHandler = async (context) => {
 
 export const articlesHandlers: ResourceHandlerMap = {
 	GetDatosGenerales: listAllProducts,
+	GetExistenciasIndicadores: listProductsByBranch,
 	searchProducts: searchProducts,
 	getProductByCode: getProductByCode,
 	getStock: getStock,
