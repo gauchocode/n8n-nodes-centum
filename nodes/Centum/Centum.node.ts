@@ -165,6 +165,7 @@ const documentFields: SimplifiedFieldSpec[] = [
 
 const simplifiedOutputFields: Record<string, SimplifiedFieldSpec[]> = {
 	searchProducts: productFields,
+	GetDatosGenerales: productFields,
 	getProductByCode: productFields,
 	listAvailableProducts: productFields,
 	listAllProducts: productFields,

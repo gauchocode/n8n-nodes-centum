@@ -408,16 +408,48 @@ const listAllProducts: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
+	const articleName = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'articleName',
+		itemIndex,
+		'',
+	) as string;
+	const articleCode = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'articleCode',
+		itemIndex,
+		'',
+	) as string;
+	const articleIds = String(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'articleId', itemIndex, ''),
+	)
+		.split(',')
+		.map((value) => value.trim())
+		.filter(Boolean);
+
 	try {
 		const ajustesHTTP = helperFns.getHttpSettings.call(executeFunctions, itemIndex);
 		const articlesUrl = `${centumUrl}/Articulos/DatosGenerales`;
+		const requestBody: Record<string, unknown> = {};
+
+		if (articleName) {
+			requestBody.Nombre = articleName;
+		}
+
+		if (articleCode) {
+			requestBody.Codigo = articleCode;
+		}
+
+		if (articleIds.length > 0) {
+			requestBody.Ids = articleIds;
+		}
 
 		const fetchOptions: any = {
 			method: 'POST',
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
 			headers,
-			body: {},
+			body: requestBody,
 			queryParams: { tipoOrdenArticulos: 'Nombre' },
 			pagination: ajustesHTTP.pagination,
 			itemsPerPage: ajustesHTTP.itemsPerPage,
@@ -949,6 +981,7 @@ const convertProductsForWooCommerce: ResourceHandler = async (context) => {
 };
 
 export const articlesHandlers: ResourceHandlerMap = {
+	GetDatosGenerales: listAllProducts,
 	searchProducts: searchProducts,
 	getProductByCode: getProductByCode,
 	getStock: getStock,

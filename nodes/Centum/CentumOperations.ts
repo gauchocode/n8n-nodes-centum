@@ -51,45 +51,39 @@ export const resourceDisplayNames: Record<string, string> = {
 const operationGroups: OperationGroup[] = [
 	{
 		resource: 'articulos',
-		default: 'searchProducts',
+		default: 'GetDatosGenerales',
 		options: [
 			{
-				name: 'By ID',
-				value: 'getProductByCode',
-				action: 'Get article by ID',
+				name: 'GetOne',
+				value: 'GetOne',
+				action: 'GetOne',
 				description:
 					'Devuelve los datos generales de un artículo específico en función de su ID único',
 			},
 			{
-				name: 'Search',
-				value: 'searchProducts',
-				action: 'Search articles by name',
+				name: 'GetDatosGenerales',
+				value: 'GetDatosGenerales',
+				action: 'GetDatosGenerales',
 				description: 'Devuelve los datos generales de artículos en función de filtros varios.',
 			},
 			{
-				name: 'Filter',
-				value: 'listAvailableProducts',
-				action: 'List filtered articles',
+				name: 'GetVenta',
+				value: 'GetVenta',
+				action: 'GetVenta',
 				description:
 					'Devuelve información completa de artículos para la venta en función de el ID de un cliente específico y filtros varios',
 			},
 			{
-				name: 'Image',
-				value: 'downloadProductImages',
-				action: 'Get article image',
+				name: 'GetOneImagen',
+				value: 'GetOneImagen',
+				action: 'GetOneImagen',
 				description:
 					'Devuelve la imagen de un artículo específico en función de su ID único y número de orden',
 			},
 			{
-				name: 'List',
-				value: 'listAllProducts',
-				action: 'List article details',
-				description: 'Devuelve los datos generales de artículos en función de filtros varios',
-			},
-			{
-				name: 'Price By List',
-				value: 'getProductPrice',
-				action: 'Get article price by list',
+				name: 'GetPrecios',
+				value: 'GetPrecios',
+				action: 'GetPrecios',
 				description:
 					'Devuelve los datos de precios de artículos en función de el ID de una lista de precios y filtros varios',
 			},
@@ -97,18 +91,20 @@ const operationGroups: OperationGroup[] = [
 				name: 'Stock By Branch And Article ID',
 				value: 'getProductInBranch',
 				action: 'Get branch stock by article',
-				description: 'Devuelve las exitencias y stock comprometido de artículos en función de filtros varios.',
+				description:
+					'Devuelve las exitencias y stock comprometido de artículos en función de filtros varios.',
 			},
 			{
 				name: 'Stock By Physical Branch',
 				value: 'listProductsByBranch',
 				action: 'List stock by physical branch',
-				description: 'Devuelve las existencias de artículos junto con los indicadores dentro de un depósito en función de filtros varios.',
+				description:
+					'Devuelve las existencias de artículos junto con los indicadores dentro de un depósito en función de filtros varios.',
 			},
 			{
-				name: 'Stock',
-				value: 'getStock',
-				action: 'Get article stock',
+				name: 'GetExistencias',
+				value: 'GetExistencias',
+				action: 'GetExistencias',
 				description: 'Devuelva el artículo en stock utilizando los filtros seleccionados.',
 			},
 			{
@@ -121,72 +117,72 @@ const operationGroups: OperationGroup[] = [
 	},
 	{
 		resource: 'marcas',
-		default: 'listBrands',
+		default: 'GetAll',
 		options: [
 			{
-				name: 'List',
-				value: 'listBrands',
-				action: 'List brands',
+				name: 'GetAll',
+				value: 'GetAll',
+				action: 'GetAll',
 				description: 'Devuelve la lista completa de marcas de artículos',
 			},
 		],
 	},
 	{
 		resource: 'categoriasArticulo',
-		default: 'listCategories',
+		default: 'GetAll',
 		options: [
 			{
-				name: 'List',
-				value: 'listCategories',
-				action: 'List categories',
+				name: 'GetAll',
+				value: 'GetAll',
+				action: 'GetAll',
 				description: 'Devuelve la lista completa de categorías de artículos',
 			},
 		],
 	},
 	{
 		resource: 'bonificaciones',
-		default: 'listDiscounts',
+		default: 'GetAll',
 		options: [
 			{
-				name: 'List',
-				value: 'listDiscounts',
-				action: 'List discounts',
+				name: 'GetAll',
+				value: 'GetAll',
+				action: 'GetAll',
 				description: 'Devuelve la lista completa de bonificaciones de clientes',
 			},
 		],
 	},
 	{
 		resource: 'rubros',
-		default: 'listGroups',
+		default: 'GetAll',
 		options: [
 			{
-				name: 'List',
-				value: 'listGroups',
-				action: 'List groups',
+				name: 'GetAll',
+				value: 'GetAll',
+				action: 'GetAll',
 				description: 'Devuelve la lista completa de rubros de artículos',
 			},
 		],
 	},
 	{
 		resource: 'listasPrecios',
-		default: 'listPrices',
+		default: 'GetAll',
 		options: [
 			{
-				name: 'List',
-				value: 'listPrices',
-				action: 'List product prices',
+				name: 'GetAll',
+				value: 'GetAll',
+				action: 'GetAll',
 				description: 'Devuelve la lista completa de listas de precios',
 			},
 		],
 	},
 	{
 		resource: 'subRubros',
-		default: 'listSubgroups',
+		default: 'GetAll',
 		options: [
 			{
-				name: 'List',
-				value: 'listSubgroups',
-				action: 'List subgroups',
+				name: 'GetAll',
+				value: 'GetAll',
+				action: 'GetAll',
 				description:
 					'Devuelve la lista completa de subrubros pudiendo filtrar de manera opcional por IDs de rubros',
 			},
@@ -194,12 +190,12 @@ const operationGroups: OperationGroup[] = [
 	},
 	{
 		resource: 'ubicacionesArticulos',
-		default: 'listArticleLocations',
+		default: 'GetAll',
 		options: [
 			{
-				name: 'List',
-				value: 'listArticleLocations',
-				action: 'List article locations',
+				name: 'GetAll',
+				value: 'GetAll',
+				action: 'GetAll',
 				description:
 					'Devuelve la lista completa de ubicaciones de artículos dentro de una sección sucursal',
 			},
@@ -213,12 +209,12 @@ const operationGroups: OperationGroup[] = [
 	},
 	{
 		resource: 'clientes',
-		default: 'updateCustomer',
+		default: 'Update',
 		options: [
 			{
 				name: 'Update',
-				value: 'updateCustomer',
-				action: 'Update customer',
+				value: 'Update',
+				action: 'Update',
 				description: 'Actualiza un cliente y devuelve el objeto actualizado',
 			},
 			{
@@ -228,10 +224,11 @@ const operationGroups: OperationGroup[] = [
 				description: 'Crea un cliente',
 			},
 			{
-				name: 'Get Balance',
-				value: 'getCustomerBalance',
-				action: 'Get customer balance',
-				description: 'Devuelve el saldo de cuenta corriente de un cliente en función de su ID único.',
+				name: 'GetSaldoCuentaCorriente',
+				value: 'GetSaldoCuentaCorriente',
+				action: 'GetSaldoCuentaCorriente',
+				description:
+					'Devuelve el saldo de cuenta corriente de un cliente en función de su ID único.',
 			},
 			{
 				name: 'Create',
@@ -246,10 +243,11 @@ const operationGroups: OperationGroup[] = [
 				description: 'Devuelve los datos de clientes en función de filtros varios.',
 			},
 			{
-				name: 'Get Balance Breakdown',
-				value: 'getCustomerBalanceDetails',
-				action: 'Get customer balance breakdown',
-				description: 'Devuelve la composición del saldo de cuenta corriente de un cliente en función de su ID único.',
+				name: 'GetComposicionSaldoCuentaCorriente',
+				value: 'GetComposicionSaldoCuentaCorriente',
+				action: 'GetComposicionSaldoCuentaCorriente',
+				description:
+					'Devuelve la composición del saldo de cuenta corriente de un cliente en función de su ID único.',
 			},
 			{
 				name: 'Search',
@@ -264,40 +262,44 @@ const operationGroups: OperationGroup[] = [
 				description: 'Devuelve los datos de clientes en función de filtros varios.',
 			},
 			{
-				name: 'Taxpayer Customer - Search',
-				value: 'searchTaxpayerCustomer',
-				action: 'Search taxpayer customer',
-				description: 'Devuelve datos básicos de un contribuyente obtenidos del padrón en función de un CUIT.',
+				name: 'GetOneContribuyente',
+				value: 'GetOneContribuyente',
+				action: 'GetOneContribuyente',
+				description:
+					'Devuelve datos básicos de un contribuyente obtenidos del padrón en función de un CUIT.',
 			},
 		],
 	},
 	{
 		resource: 'ventas',
-		default: 'createSale',
+		default: 'Create',
 		options: [
 			{
 				name: 'Invoices - Get',
 				value: 'listSalesInvoices',
 				action: 'Get sales invoices',
-				description: 'Devuelve los datos de comprobantes de venta con detalle de totales en función de filtros varios.',
+				description:
+					'Devuelve los datos de comprobantes de venta con detalle de totales en función de filtros varios.',
 			},
 			{
-				name: 'Invoices By ID - Get',
-				value: 'listSalesInvoicesById',
-				action: 'Get sales invoices by ID',
+				name: 'Get',
+				value: 'Get',
+				action: 'Get',
 				description: 'Devuelve los datos de comprobantes de venta en función de filtros varios.',
 			},
 			{
 				name: 'Create',
-				value: 'createSale',
-				action: 'Create sale',
-				description: 'Crea un comprobante de venta (factura de venta, nota de crédito de ventas, entre otros) a un cliente específico.',
+				value: 'Create',
+				action: 'Create',
+				description:
+					'Crea un comprobante de venta (factura de venta, nota de crédito de ventas, entre otros) a un cliente específico.',
 			},
 			{
-				name: 'Ranking - Get',
-				value: 'getSalesRanking',
-				action: 'Get sales ranking',
-				description: 'Devuelve información estadística de ventas por clientes, artículos, vendedores o sucursales fisicas en función de filtros varios.',
+				name: 'GetEstadisticas',
+				value: 'GetEstadisticas',
+				action: 'GetEstadisticas',
+				description:
+					'Devuelve información estadística de ventas por clientes, artículos, vendedores o sucursales fisicas en función de filtros varios.',
 			},
 		],
 	},
@@ -345,66 +347,69 @@ const operationGroups: OperationGroup[] = [
 	},
 	{
 		resource: 'frecuenciaClientes',
-		default: 'listCustomerFrequencies',
+		default: 'GetAll',
 		options: [
 			{
-				name: 'List',
-				value: 'listCustomerFrequencies',
-				action: 'List customer frequencies',
+				name: 'GetAll',
+				value: 'GetAll',
+				action: 'GetAll',
 				description: 'Devuelve la lista completa de frecuencias de compra de un cliente.',
 			},
 		],
 	},
 	{
 		resource: 'compras',
-		default: 'createPurchase',
+		default: 'Create',
 		options: [
 			{
 				name: 'Create',
-				value: 'createPurchase',
-				action: 'Create purchase',
-				description: 'Crea un comprobante de compra (factura de compra, nota de crédito de compras, entre otros) a un proveedor específico.',
+				value: 'Create',
+				action: 'Create',
+				description:
+					'Crea un comprobante de compra (factura de compra, nota de crédito de compras, entre otros) a un proveedor específico.',
 			},
 			{
-				name: 'List',
-				value: 'listPurchases',
-				action: 'List purchases',
-				description: 'Devuelve los datos de comprobantes de compras realizadas en funcion de filtros varios.',
+				name: 'Get',
+				value: 'Get',
+				action: 'Get',
+				description:
+					'Devuelve los datos de comprobantes de compras realizadas en funcion de filtros varios.',
 			},
 		],
 	},
 	{
 		resource: 'remitosCompra',
-		default: 'createPurchaseDeliveryNote',
+		default: 'Create',
 		options: [
 			{
 				name: 'Create',
-				value: 'createPurchaseDeliveryNote',
-				action: 'Create purchase delivery note',
+				value: 'Create',
+				action: 'Create',
 				description: 'Crea un remito de compra a un proveedor específico.',
 			},
 		],
 	},
 	{
 		resource: 'ordenesCompra',
-		default: 'createPurchaseOrder',
+		default: 'Create',
 		options: [
 			{
 				name: 'Create',
-				value: 'createPurchaseOrder',
-				action: 'Create purchase order',
+				value: 'Create',
+				action: 'Create',
 				description: 'Crea una orden de compra a un proveedor específico.',
 			},
 			{
-				name: 'By ID',
-				value: 'getPurchaseOrderDetails',
-				action: 'Get purchase order',
-				description: 'Devuelve los datos de una orden de compra específica en función de su ID único.',
+				name: 'GetOne',
+				value: 'GetOne',
+				action: 'GetOne',
+				description:
+					'Devuelve los datos de una orden de compra específica en función de su ID único.',
 			},
 			{
-				name: 'List',
-				value: 'listPurchaseOrders',
-				action: 'List purchase orders',
+				name: 'Get',
+				value: 'Get',
+				action: 'Get',
 				description: 'Devuelve los datos de ordenes de compra en función de filtros varios.',
 			},
 		],
@@ -423,13 +428,15 @@ const operationGroups: OperationGroup[] = [
 				name: 'Purchases - List',
 				value: 'listPurchaseVouchers',
 				action: 'List purchase vouchers',
-				description: 'Devuelve la lista completa de tipos de comprobantes utilizados en el circuito de compras.',
+				description:
+					'Devuelve la lista completa de tipos de comprobantes utilizados en el circuito de compras.',
 			},
 			{
 				name: 'Sales - List',
 				value: 'listSalesVouchers',
 				action: 'List sales vouchers',
-				description: 'Devuelve la lista completa de tipos de comprobantes utilizados en el circuito de ventas.',
+				description:
+					'Devuelve la lista completa de tipos de comprobantes utilizados en el circuito de ventas.',
 			},
 		],
 	},
@@ -453,7 +460,8 @@ const operationGroups: OperationGroup[] = [
 				name: 'List',
 				value: 'listMunicipalities',
 				action: 'List municipalities',
-				description: 'Devuelve una lista de departamentos en funcion del ID específico de una provincia.',
+				description:
+					'Devuelve una lista de departamentos en funcion del ID específico de una provincia.',
 			},
 		],
 	},
@@ -543,7 +551,8 @@ const operationGroups: OperationGroup[] = [
 				name: 'Verify',
 				value: 'verifyOperatorCredentials',
 				action: 'Verify mobile operator',
-				description: 'Devuelve los datos de un operador móvil en función de sus credenciales (usuarios y contraseñas).',
+				description:
+					'Devuelve los datos de un operador móvil en función de sus credenciales (usuarios y contraseñas).',
 			},
 		],
 	},
@@ -555,7 +564,8 @@ const operationGroups: OperationGroup[] = [
 				name: 'By ID',
 				value: 'getSpecialTaxRegimeDetails',
 				action: 'Get special tax regime by ID',
-				description: 'Devuelve los datos de un regimen especial específico en función de su ID único.',
+				description:
+					'Devuelve los datos de un regimen especial específico en función de su ID único.',
 			},
 			{
 				name: 'List',
@@ -627,13 +637,15 @@ const operationGroups: OperationGroup[] = [
 				name: 'By ID',
 				value: 'getSalesOrderDetails',
 				action: 'Get sales order',
-				description: 'Devuelve los datos de un pedido de venta específico en función de su ID único.',
+				description:
+					'Devuelve los datos de un pedido de venta específico en función de su ID único.',
 			},
 			{
 				name: 'Statuses - List',
 				value: 'listSalesOrderStatuses',
 				action: 'List sales order statuses',
-				description: 'Devuelve los datos de pedidos de venta con detalle de totales en función de filtros varios.',
+				description:
+					'Devuelve los datos de pedidos de venta con detalle de totales en función de filtros varios.',
 			},
 			{
 				name: 'List',

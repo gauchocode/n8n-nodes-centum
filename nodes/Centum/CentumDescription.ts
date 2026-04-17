@@ -259,7 +259,7 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Article code to search for. Separate multiple values with a comma.',
 		displayOptions: {
 			show: {
-				operation: ['getProductByCode', 'searchProducts'],
+				operation: ['getProductByCode', 'GetDatosGenerales'],
 			},
 		},
 	},
@@ -699,6 +699,7 @@ const fieldDefinitions: INodeProperties[] = [
 			show: {
 				operation: [
 					'downloadProductImages',
+					'GetDatosGenerales',
 					'getProductByCode',
 					'getProductInBranch',
 					'getProductPrice',
@@ -998,7 +999,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		placeholder: 'Chocolate Bars',
-		displayOptions: { show: { operation: ['searchProducts', 'listProductsByBranch'] } },
+		displayOptions: { show: { operation: ['GetDatosGenerales', 'listProductsByBranch'] } },
 		description: 'Name of the product to search for',
 	},
 	{
@@ -1196,10 +1197,9 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				operation: [
-					'searchProducts',
+					'GetDatosGenerales',
 					'getProductByCode',
 					'listAvailableProducts',
-					'listAllProducts',
 					'getProductPrice',
 					'listProductsByBranch',
 					'getProductInBranch',
@@ -1307,7 +1307,7 @@ export const HttpOptions: INodeProperties[] = [
 		],
 		displayOptions: {
 			show: {
-				operation: ['listCustomers', 'listAllProducts', 'listAvailableProducts'],
+				operation: ['listCustomers', 'GetDatosGenerales', 'listAvailableProducts'],
 			},
 		},
 	},
