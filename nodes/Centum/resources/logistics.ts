@@ -21,6 +21,7 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		ID?: number;
 		Codigo?: string;
 		Cantidad: number;
+		Precio?: number;
 	};
 
 	const customerId = helperFns.getResourceLocatorValue(
@@ -34,7 +35,12 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 	const numero =
 		(helperFns.getNodeParameterOrThrow(executeFunctions, 'documentNumber', itemIndex) as string) ??
 		'';
-	const articlesRaw = helperFns.getNodeParameterOrThrow(executeFunctions, 'article', itemIndex);
+	const useSinglePurchaseDeliveryArticle = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'useSinglePurchaseDeliveryArticle',
+		itemIndex,
+		false,
+	) as boolean;
 	const documentDate = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'documentDate',
@@ -87,6 +93,7 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		ID: typeof x?.ID === 'number' ? x.ID : undefined,
 		Codigo: typeof x?.Codigo === 'string' ? x.Codigo : undefined,
 		Cantidad: Number(x?.Cantidad),
+		Precio: x?.Precio !== undefined ? Number(x.Precio) : undefined,
 	});
 
 	const isArticuloInput = (x: any): x is ArticuloInput => {
@@ -98,25 +105,51 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		return hasIdOrCodigo && cantOk;
 	};
 
-	if (typeof articlesRaw === 'string') {
-		try {
-			const parsed = JSON.parse(articlesRaw);
-			const arr = Array.isArray(parsed) ? parsed : [parsed];
-			articles = arr.map(toArticuloInput).filter(isArticuloInput);
-		} catch {
-			throw new NodeOperationError(executeFunctions.getNode(), parseInvalidMsg);
-		}
-	} else if (Array.isArray(articlesRaw)) {
-		// Avoid TS2322 by normalizing and filtering instead of assigning directly
-		articles = (articlesRaw as any[]).map(toArticuloInput).filter(isArticuloInput);
-	} else if (typeof articlesRaw === 'object' && articlesRaw !== null) {
-		const one = toArticuloInput(articlesRaw as any);
-		articles = isArticuloInput(one) ? [one] : [];
-	} else {
-		throw new NodeOperationError(
-			executeFunctions.getNode(),
-			`Unexpected data type: ${typeof articlesRaw}`,
+	if (useSinglePurchaseDeliveryArticle) {
+		const singleArticleId = helperFns.getResourceLocatorValue(
+			helperFns.getNodeParameterOrThrow(executeFunctions, 'purchaseDeliveryArticleId', itemIndex),
 		);
+		const singleArticlePrice = helperFns.getNodeParameterOrThrow(
+			executeFunctions,
+			'purchaseDeliveryArticlePrice',
+			itemIndex,
+		) as number;
+		const singleArticleQuantity = helperFns.getNodeParameterOrThrow(
+			executeFunctions,
+			'purchaseDeliveryArticleQuantity',
+			itemIndex,
+		) as number;
+
+		articles = [
+			{
+				ID: Number(singleArticleId),
+				Cantidad: singleArticleQuantity,
+				Precio: singleArticlePrice,
+			},
+		];
+	} else {
+		const articlesRaw = helperFns.getNodeParameterOrThrow(executeFunctions, 'article', itemIndex);
+
+		if (typeof articlesRaw === 'string') {
+			try {
+				const parsed = JSON.parse(articlesRaw);
+				const arr = Array.isArray(parsed) ? parsed : [parsed];
+				articles = arr.map(toArticuloInput).filter(isArticuloInput);
+			} catch {
+				throw new NodeOperationError(executeFunctions.getNode(), parseInvalidMsg);
+			}
+		} else if (Array.isArray(articlesRaw)) {
+			// Avoid TS2322 by normalizing and filtering instead of assigning directly
+			articles = (articlesRaw as any[]).map(toArticuloInput).filter(isArticuloInput);
+		} else if (typeof articlesRaw === 'object' && articlesRaw !== null) {
+			const one = toArticuloInput(articlesRaw as any);
+			articles = isArticuloInput(one) ? [one] : [];
+		} else {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`Unexpected data type: ${typeof articlesRaw}`,
+			);
+		}
 	}
 
 	if (!customerId) {
@@ -178,6 +211,7 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 				purchaseDeliveryNoteArticles.push({
 					...item,
 					Cantidad: articleInput.Cantidad,
+					Precio: articleInput.Precio ?? item.Precio,
 				});
 			}
 		} catch (error) {
@@ -306,25 +340,40 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 		'documentDate',
 		itemIndex,
 	) as string;
-	const formattedDocumentDate = documentDate.replace(/\..+/, '');
+	const normalizeDateTime = (value: unknown): string | undefined => {
+		if (value === null || value === undefined || value === '') {
+			return undefined;
+		}
+
+		return String(value).replace(/\..+/, '');
+	};
+	const formattedDocumentDate = normalizeDateTime(documentDate);
+
+	if (!formattedDocumentDate) {
+		throw new NodeOperationError(executeFunctions.getNode(), 'documentDate is required.');
+	}
+
 	const shipmentDate = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'shipmentDate',
 		itemIndex,
+		'',
 	) as string;
-	const formattedShipmentDate = shipmentDate.replace(/\..+/, '');
+	const formattedShipmentDate = normalizeDateTime(shipmentDate);
 	const indictmentDate = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'indictmentDate',
 		itemIndex,
+		'',
 	) as string;
-	const formattedIndictmentDate = indictmentDate.replace(/\..+/, '');
+	const formattedIndictmentDate = normalizeDateTime(indictmentDate);
 	const deliveryDate = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'deliveryDate',
 		itemIndex,
+		'',
 	) as string;
-	const formattedDeliveryDate = deliveryDate.replace(/\..+/, '');
+	const formattedDeliveryDate = normalizeDateTime(deliveryDate);
 	const sellerId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'sellerId', itemIndex),
 	);
@@ -334,28 +383,61 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 	const customerId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'customerId', itemIndex),
 	);
-	const rawArticles = helperFns.getNodeParameterOrThrow(
+	const useSingleSalesDeliveryArticle = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
-		'articlesCollection',
+		'useSingleSalesDeliveryArticle',
 		itemIndex,
-	);
+		false,
+	) as boolean;
 
-	let articlesArray: { ID: string; Cantidad: number }[] = [];
+	type SalesDeliveryArticleInput = { ID: string; Cantidad: number; Precio?: number };
 
-	if (typeof rawArticles === 'string') {
-		try {
-			articlesArray = JSON.parse(rawArticles) as { ID: string; Cantidad: number }[];
-		} catch (error) {
-			if (error instanceof NodeApiError) {
-				throw error;
-			}
-			throw new NodeOperationError(
-				executeFunctions.getNode(),
-				`The articlesCollection field must contain valid JSON. ${error}`,
-			);
-		}
+	let articlesArray: SalesDeliveryArticleInput[] = [];
+
+	if (useSingleSalesDeliveryArticle) {
+		const singleArticleId = helperFns.getResourceLocatorValue(
+			helperFns.getNodeParameterOrThrow(executeFunctions, 'salesDeliveryArticleId', itemIndex),
+		);
+		const singleArticlePrice = helperFns.getNodeParameterOrThrow(
+			executeFunctions,
+			'salesDeliveryArticlePrice',
+			itemIndex,
+		) as number;
+		const singleArticleQuantity = helperFns.getNodeParameterOrThrow(
+			executeFunctions,
+			'salesDeliveryArticleQuantity',
+			itemIndex,
+		) as number;
+
+		articlesArray = [
+			{
+				ID: String(singleArticleId),
+				Cantidad: singleArticleQuantity,
+				Precio: singleArticlePrice,
+			},
+		];
 	} else {
-		articlesArray = rawArticles as { ID: string; Cantidad: number }[];
+		const rawArticles = helperFns.getNodeParameterOrThrow(
+			executeFunctions,
+			'articlesCollection',
+			itemIndex,
+		);
+
+		if (typeof rawArticles === 'string') {
+			try {
+				articlesArray = JSON.parse(rawArticles) as SalesDeliveryArticleInput[];
+			} catch (error) {
+				if (error instanceof NodeApiError) {
+					throw error;
+				}
+				throw new NodeOperationError(
+					executeFunctions.getNode(),
+					`The articlesCollection field must contain valid JSON. ${error}`,
+				);
+			}
+		} else {
+			articlesArray = rawArticles as SalesDeliveryArticleInput[];
+		}
 	}
 
 	// Only the IDs are sent to the /Articulos/Venta request
@@ -363,6 +445,9 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 	// Map article ID to quantity
 	const qtyById: Record<string, number> = Object.fromEntries(
 		articlesArray.map((a) => [a.ID, a.Cantidad]),
+	);
+	const priceById: Record<string, number> = Object.fromEntries(
+		articlesArray.filter((a) => a.Precio !== undefined).map((a) => [a.ID, a.Precio as number]),
 	);
 	const purchaseArticlesBody = {
 		IdCliente: customerId,
@@ -403,6 +488,7 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 	const purchaseItemsWithQuantity = itemsRespuesta.map((art: any) => ({
 		...art,
 		Cantidad: qtyById[String(art.IdArticulo)] ?? 0,
+		Precio: priceById[String(art.IdArticulo)] ?? art.Precio,
 	}));
 
 	let clientInfo: Record<string, unknown>;
@@ -428,38 +514,48 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
 	}
 
+	const salesDeliveryNoteBody: Record<string, unknown> = {
+		SucursalFisica: {
+			IdSucursalFisica: physicalBranchId,
+		},
+		NumeroDocumento: {
+			LetraDocumento: documentLetter,
+			PuntoVenta: pointOfSale,
+			Numero: numeroDocumento,
+		},
+		FechaDocumento: formattedDocumentDate,
+		TurnoEntrega: {
+			IdTurnoEntrega: deliveryTimeSlotId,
+		},
+		Cliente: clientInfo,
+		Vendedor: {
+			IdVendedor: sellerId,
+		},
+		IdChofer: Number(driverId || '1'),
+		PorcentajeDescuento: 0.0,
+		Observaciones: 'Remito creado desde n8n.',
+		RemitoVentaArticulos: purchaseItemsWithQuantity,
+	};
+
+	if (formattedShipmentDate) {
+		salesDeliveryNoteBody.FechaEmbarque = formattedShipmentDate;
+	}
+
+	if (formattedIndictmentDate) {
+		salesDeliveryNoteBody.FechaImputacion = formattedIndictmentDate;
+	}
+
+	if (formattedDeliveryDate) {
+		salesDeliveryNoteBody.FechaEntrega = formattedDeliveryDate;
+	}
+
 	try {
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/RemitosVenta`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
 			headers,
 			method: 'POST',
-			body: {
-				SucursalFisica: {
-					IdSucursalFisica: physicalBranchId, // Optional
-				},
-				NumeroDocumento: {
-					// Optional
-					LetraDocumento: documentLetter,
-					PuntoVenta: pointOfSale,
-					Numero: numeroDocumento,
-				},
-				FechaDocumento: formattedDocumentDate, // Optional
-				FechaEmbarque: formattedShipmentDate, // Optional
-				FechaImputacion: formattedIndictmentDate, // Optional
-				FechaEntrega: formattedDeliveryDate, // Optional
-				TurnoEntrega: {
-					IdTurnoEntrega: deliveryTimeSlotId, // Required
-				},
-				Cliente: clientInfo,
-				Vendedor: {
-					IdVendedor: sellerId,
-				},
-				IdChofer: Number(driverId || '1'),
-				PorcentajeDescuento: 0.0, // Optional
-				Observaciones: 'Remito creado desde n8n.',
-				RemitoVentaArticulos: purchaseItemsWithQuantity,
-			},
+			body: salesDeliveryNoteBody,
 		});
 		return [executeFunctions.helpers.returnJsonArray(response)];
 	} catch (error) {

@@ -21,12 +21,73 @@ const fieldDefinitions: INodeProperties[] = [
 		default: {},
 		displayOptions: {
 			show: {
-				operation: [
-					'registerPayment',
-					'createSalesOrder',
-					'createPurchaseOrder',
-					'createPurchaseDeliveryNote',
-				],
+				operation: ['registerPayment', 'createSalesOrder', 'createPurchaseOrder'],
+			},
+		},
+	},
+	{
+		displayName: 'Articles',
+		name: 'article',
+		required: true,
+		type: 'json',
+		default: {},
+		description: 'Article object or array with ID or Codigo and Cantidad',
+		displayOptions: {
+			show: {
+				operation: ['createPurchaseDeliveryNote'],
+				useSinglePurchaseDeliveryArticle: [false],
+			},
+		},
+	},
+	{
+		displayName: 'Use Single Article Input',
+		name: 'useSinglePurchaseDeliveryArticle',
+		type: 'boolean',
+		default: false,
+		description: 'Use individual ID, price, and quantity fields instead of article JSON',
+		displayOptions: {
+			show: { operation: ['createPurchaseDeliveryNote'] },
+		},
+	},
+	{
+		displayName: 'Article ID',
+		name: 'purchaseDeliveryArticleId',
+		type: 'string',
+		required: true,
+		default: '',
+		description: 'Article ID for the purchase delivery note',
+		displayOptions: {
+			show: {
+				operation: ['createPurchaseDeliveryNote'],
+				useSinglePurchaseDeliveryArticle: [true],
+			},
+		},
+	},
+	{
+		displayName: 'Article Price',
+		name: 'purchaseDeliveryArticlePrice',
+		type: 'number',
+		required: true,
+		default: 0,
+		description: 'Price to send in RemitoCompraArticulos',
+		displayOptions: {
+			show: {
+				operation: ['createPurchaseDeliveryNote'],
+				useSinglePurchaseDeliveryArticle: [true],
+			},
+		},
+	},
+	{
+		displayName: 'Article Quantity',
+		name: 'purchaseDeliveryArticleQuantity',
+		type: 'number',
+		required: true,
+		default: 1,
+		description: 'Quantity to send in RemitoCompraArticulos',
+		displayOptions: {
+			show: {
+				operation: ['createPurchaseDeliveryNote'],
+				useSinglePurchaseDeliveryArticle: [true],
 			},
 		},
 	},
@@ -38,7 +99,75 @@ const fieldDefinitions: INodeProperties[] = [
 		default: [],
 		description: 'List of articles as a JSON array with ID or Code and Quantity',
 		displayOptions: {
-			show: { operation: ['createPurchase', 'createSale', 'createSalesDeliveryNote'] },
+			show: {
+				operation: ['createPurchase', 'createSale'],
+			},
+		},
+	},
+	{
+		displayName: 'Articles',
+		name: 'articlesCollection',
+		type: 'json',
+		placeholder: '[{"ID": 1234, "Cantidad": 10}]',
+		default: [],
+		description: 'List of articles as a JSON array with ID and Cantidad',
+		displayOptions: {
+			show: {
+				operation: ['createSalesDeliveryNote'],
+				useSingleSalesDeliveryArticle: [false],
+			},
+		},
+	},
+	{
+		displayName: 'Use Single Article Input',
+		name: 'useSingleSalesDeliveryArticle',
+		type: 'boolean',
+		default: false,
+		description: 'Use individual ID, price, and quantity fields instead of articlesCollection',
+		displayOptions: {
+			show: { operation: ['createSalesDeliveryNote'] },
+		},
+	},
+	{
+		displayName: 'Article ID',
+		name: 'salesDeliveryArticleId',
+		type: 'string',
+		required: true,
+		default: '',
+		description: 'Article ID for the sales delivery note',
+		displayOptions: {
+			show: {
+				operation: ['createSalesDeliveryNote'],
+				useSingleSalesDeliveryArticle: [true],
+			},
+		},
+	},
+	{
+		displayName: 'Article Price',
+		name: 'salesDeliveryArticlePrice',
+		type: 'number',
+		required: true,
+		default: 0,
+		description: 'Price to send in RemitoVentaArticulos',
+		displayOptions: {
+			show: {
+				operation: ['createSalesDeliveryNote'],
+				useSingleSalesDeliveryArticle: [true],
+			},
+		},
+	},
+	{
+		displayName: 'Article Quantity',
+		name: 'salesDeliveryArticleQuantity',
+		type: 'number',
+		required: true,
+		default: 1,
+		description: 'Quantity to send in RemitoVentaArticulos',
+		displayOptions: {
+			show: {
+				operation: ['createSalesDeliveryNote'],
+				useSingleSalesDeliveryArticle: [true],
+			},
 		},
 	},
 	{
@@ -317,12 +446,19 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Document delivery date',
 		displayOptions: {
 			show: {
-				operation: [
-					'createPurchaseOrder',
-					'createPurchaseDeliveryNote',
-					'createSalesDeliveryNote',
-					'createSalesOrder',
-				],
+				operation: ['createPurchaseOrder', 'createPurchaseDeliveryNote', 'createSalesOrder'],
+			},
+		},
+	},
+	{
+		displayName: 'Delivery Date',
+		name: 'deliveryDate',
+		type: 'dateTime',
+		default: '',
+		description: 'Document delivery date',
+		displayOptions: {
+			show: {
+				operation: ['createSalesDeliveryNote'],
 			},
 		},
 	},
@@ -330,8 +466,16 @@ const fieldDefinitions: INodeProperties[] = [
 		displayName: 'Shipment Date',
 		name: 'shipmentDate',
 		type: 'dateTime',
-		required: true,
-		default: undefined,
+		default: '',
+		displayOptions: {
+			show: { operation: ['createSalesDeliveryNote'] },
+		},
+	},
+	{
+		displayName: 'Posting Date',
+		name: 'indictmentDate',
+		type: 'dateTime',
+		default: '',
 		displayOptions: {
 			show: { operation: ['createSalesDeliveryNote'] },
 		},
@@ -343,7 +487,7 @@ const fieldDefinitions: INodeProperties[] = [
 		required: true,
 		default: undefined,
 		displayOptions: {
-			show: { operation: ['createSalesDeliveryNote', 'createStockMovement'] },
+			show: { operation: ['createStockMovement'] },
 		},
 	},
 	{

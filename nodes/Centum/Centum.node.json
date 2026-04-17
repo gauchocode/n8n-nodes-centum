@@ -1,5 +1,5 @@
 {
-	"node": "n8n-nodes-centum.Centum",
+	"node": "n8n-nodes-centum-v2.Centum",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
 	"categories": ["Operations", "Finance", "Sales"],

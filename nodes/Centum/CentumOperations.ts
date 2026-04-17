@@ -14,7 +14,7 @@ type OperationGroup = {
 };
 
 export const resourceDisplayNames: Record<string, string> = {
-	accessToken: 'Access Token',
+	accessToken: 'Token De Acceso',
 	ajustesMovimientosStock: 'Ajuste Movimiento Stock',
 	articulos: 'Articulo',
 	bonificaciones: 'Bonificacion',
@@ -30,7 +30,7 @@ export const resourceDisplayNames: Record<string, string> = {
 	marcas: 'Marca',
 	operadoresMoviles: 'Operador Movil',
 	ordenesCompra: 'Orden Compra',
-	paises: 'Country',
+	paises: 'País',
 	pedidosVenta: 'Pedido Venta',
 	promocionesComerciales: 'Promocion Comercial',
 	proveedores: 'Proveedor',
@@ -54,53 +54,53 @@ const operationGroups: OperationGroup[] = [
 		default: 'searchProducts',
 		options: [
 			{
-				name: 'Por ID',
+				name: 'By ID',
 				value: 'getProductByCode',
 				action: 'Get article by ID',
 				description:
 					'Devuelve los datos generales de un artículo específico en función de su ID único',
 			},
 			{
-				name: 'Buscar',
+				name: 'Search',
 				value: 'searchProducts',
 				action: 'Search articles by name',
 				description: 'Search for an article by name and return every match',
 			},
 			{
-				name: 'Filtrar',
+				name: 'Filter',
 				value: 'listAvailableProducts',
 				action: 'List filtered articles',
 				description:
 					'Devuelve información completa de artículos para la venta en función de el ID de un cliente específico y filtros varios',
 			},
 			{
-				name: 'Imagen',
+				name: 'Image',
 				value: 'downloadProductImages',
 				action: 'Get article image',
 				description:
 					'Devuelve la imagen de un artículo específico en función de su ID único y número de orden',
 			},
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listAllProducts',
 				action: 'List article details',
 				description: 'Devuelve los datos generales de artículos en función de filtros varios',
 			},
 			{
-				name: 'Precio Por Lista',
+				name: 'Price By List',
 				value: 'getProductPrice',
 				action: 'Get article price by list',
 				description:
 					'Devuelve los datos de precios de artículos en función de el ID de una lista de precios y filtros varios',
 			},
 			{
-				name: 'Stock Por Sucursal E ID De Articulo',
+				name: 'Stock By Branch And Article ID',
 				value: 'getProductInBranch',
 				action: 'Get branch stock by article',
 				description: 'Return stock for a specific article in a physical branch',
 			},
 			{
-				name: 'Stock Por Sucursal Fisica',
+				name: 'Stock By Physical Branch',
 				value: 'listProductsByBranch',
 				action: 'List stock by physical branch',
 				description: 'Return article stock for a specific physical branch',
@@ -112,7 +112,7 @@ const operationGroups: OperationGroup[] = [
 				description: 'Return article stock using the selected filters',
 			},
 			{
-				name: 'WooCommerce - Generar JSON',
+				name: 'WooCommerce - Generate JSON',
 				value: 'convertProductsForWooCommerce',
 				action: 'Convert woo commerce products',
 				description: 'Generate structured WooCommerce product JSON from Centum articles',
@@ -124,7 +124,7 @@ const operationGroups: OperationGroup[] = [
 		default: 'listBrands',
 		options: [
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listBrands',
 				action: 'List brands',
 				description: 'Devuelve la lista completa de marcas de artículos',
@@ -136,7 +136,7 @@ const operationGroups: OperationGroup[] = [
 		default: 'listCategories',
 		options: [
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listCategories',
 				action: 'List categories',
 				description: 'Devuelve la lista completa de categorías de artículos',
@@ -148,7 +148,7 @@ const operationGroups: OperationGroup[] = [
 		default: 'listDiscounts',
 		options: [
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listDiscounts',
 				action: 'List discounts',
 				description: 'Devuelve la lista completa de bonificaciones de clientes',
@@ -160,7 +160,7 @@ const operationGroups: OperationGroup[] = [
 		default: 'listGroups',
 		options: [
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listGroups',
 				action: 'List groups',
 				description: 'Devuelve la lista completa de rubros de artículos',
@@ -172,7 +172,7 @@ const operationGroups: OperationGroup[] = [
 		default: 'listPrices',
 		options: [
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listPrices',
 				action: 'List product prices',
 				description: 'Devuelve la lista completa de listas de precios',
@@ -184,7 +184,7 @@ const operationGroups: OperationGroup[] = [
 		default: 'listSubgroups',
 		options: [
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listSubgroups',
 				action: 'List subgroups',
 				description:
@@ -197,14 +197,14 @@ const operationGroups: OperationGroup[] = [
 		default: 'listArticleLocations',
 		options: [
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listArticleLocations',
 				action: 'List article locations',
 				description:
 					'Devuelve la lista completa de ubicaciones de artículos dentro de una sección sucursal',
 			},
 			{
-				name: 'Por Seccion - Obtener',
+				name: 'By Section - Get',
 				value: 'getArticleLocationsBySection',
 				action: 'Get article locations by section',
 				description: 'Get article locations for a specific branch section',
@@ -216,55 +216,55 @@ const operationGroups: OperationGroup[] = [
 		default: 'updateCustomer',
 		options: [
 			{
-				name: 'Actualizar',
+				name: 'Update',
 				value: 'updateCustomer',
 				action: 'Update customer',
 				description: 'Actualiza un cliente y devuelve el objeto actualizado',
 			},
 			{
-				name: 'Cliente Contribuyente - Crear',
+				name: 'Taxpayer Customer - Create',
 				value: 'createTaxpayerCustomer',
 				action: 'Create taxpayer customer',
 				description: 'Create a new taxpayer customer',
 			},
 			{
-				name: 'Obtener Saldo',
+				name: 'Get Balance',
 				value: 'getCustomerBalance',
 				action: 'Get customer balance',
 				description: 'Get the balance for the selected customer',
 			},
 			{
-				name: 'Crear',
+				name: 'Create',
 				value: 'createCustomer',
 				action: 'Create customer',
 				description: 'Create a new customer',
 			},
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listCustomers',
 				action: 'List customers',
 				description: 'Return a list of all registered customers',
 			},
 			{
-				name: 'Obtener Desglose De Saldo',
+				name: 'Get Balance Breakdown',
 				value: 'getCustomerBalanceDetails',
 				action: 'Get customer balance breakdown',
 				description: 'Get the account balance breakdown for the selected customer',
 			},
 			{
-				name: 'Buscar',
+				name: 'Search',
 				value: 'searchCustomers',
 				action: 'Search customers',
 				description: 'Return a list of customers that match the selected filters',
 			},
 			{
-				name: 'Buscar Por CUIT',
+				name: 'Search By CUIT',
 				value: 'searchCustomerByCuit',
 				action: 'Search customers by CUIT',
 				description: 'Return a list of customers based on the provided CUIT',
 			},
 			{
-				name: 'Cliente Contribuyente - Buscar',
+				name: 'Taxpayer Customer - Search',
 				value: 'searchTaxpayerCustomer',
 				action: 'Search taxpayer customer',
 				description: 'Return taxpayer data by CUIT or business name',
@@ -276,25 +276,25 @@ const operationGroups: OperationGroup[] = [
 		default: 'createSale',
 		options: [
 			{
-				name: 'Facturas - Obtener',
+				name: 'Invoices - Get',
 				value: 'listSalesInvoices',
 				action: 'Get sales invoices',
 				description: 'Get all sales invoices for the selected customer',
 			},
 			{
-				name: 'Facturas Por ID - Obtener',
+				name: 'Invoices By ID - Get',
 				value: 'listSalesInvoicesById',
 				action: 'Get sales invoices by ID',
 				description: 'Get all sales invoices for the selected customer by ID',
 			},
 			{
-				name: 'Crear',
+				name: 'Create',
 				value: 'createSale',
 				action: 'Create sale',
 				description: 'Create a sale from the completed parameters',
 			},
 			{
-				name: 'Ranking - Obtener',
+				name: 'Ranking - Get',
 				value: 'getSalesRanking',
 				action: 'Get sales ranking',
 				description: 'Get a ranking of customers, articles, sellers, or branches',
@@ -306,13 +306,13 @@ const operationGroups: OperationGroup[] = [
 		default: 'listPromotions',
 		options: [
 			{
-				name: 'Por Cliente - Obtener',
+				name: 'By Customer - Get',
 				value: 'listCustomerCommercialPromotions',
 				action: 'Get customer commercial promotions',
 				description: 'Get the commercial promotions applied to a customer from the selected date',
 			},
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listPromotions',
 				action: 'List commercial promotions',
 				description: 'Get the available commercial promotions',
@@ -324,19 +324,19 @@ const operationGroups: OperationGroup[] = [
 		default: 'registerPayment',
 		options: [
 			{
-				name: 'Facturas - Obtener',
+				name: 'Invoices - Get',
 				value: 'listPaymentInvoices',
 				action: 'Get payment invoices',
 				description: 'Get all payment invoices for the selected customer',
 			},
 			{
-				name: 'Crear',
+				name: 'Create',
 				value: 'registerPayment',
 				action: 'Create payment',
 				description: 'Create a payment voucher',
 			},
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listPayments',
 				action: 'List payments',
 				description: 'Get a list of payments using the selected filters',
@@ -348,7 +348,7 @@ const operationGroups: OperationGroup[] = [
 		default: 'listCustomerFrequencies',
 		options: [
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listCustomerFrequencies',
 				action: 'List customer frequencies',
 				description: 'Get a list of customer frequency options',
@@ -360,13 +360,13 @@ const operationGroups: OperationGroup[] = [
 		default: 'createPurchase',
 		options: [
 			{
-				name: 'Crear',
+				name: 'Create',
 				value: 'createPurchase',
 				action: 'Create purchase',
 				description: 'Create a purchase using the selected parameters',
 			},
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listPurchases',
 				action: 'List purchases',
 				description: 'Get a list of purchases using the selected filters',
@@ -378,7 +378,7 @@ const operationGroups: OperationGroup[] = [
 		default: 'createPurchaseDeliveryNote',
 		options: [
 			{
-				name: 'Crear',
+				name: 'Create',
 				value: 'createPurchaseDeliveryNote',
 				action: 'Create purchase delivery note',
 				description: 'Create a purchase delivery note from the provided parameters',
@@ -390,19 +390,19 @@ const operationGroups: OperationGroup[] = [
 		default: 'createPurchaseOrder',
 		options: [
 			{
-				name: 'Crear',
+				name: 'Create',
 				value: 'createPurchaseOrder',
 				action: 'Create purchase order',
 				description: 'Create a purchase order using the selected parameters',
 			},
 			{
-				name: 'Por ID',
+				name: 'By ID',
 				value: 'getPurchaseOrderDetails',
 				action: 'Get purchase order',
 				description: 'Get a single purchase order by ID',
 			},
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listPurchaseOrders',
 				action: 'List purchase orders',
 				description: 'Get all purchase orders using the selected filters',
@@ -414,19 +414,19 @@ const operationGroups: OperationGroup[] = [
 		default: 'listVoucherTypes',
 		options: [
 			{
-				name: 'General - Listar',
+				name: 'General - List',
 				value: 'listVoucherTypes',
 				action: 'List voucher types',
 				description: 'Get a list of all voucher types',
 			},
 			{
-				name: 'Compras - Listar',
+				name: 'Purchases - List',
 				value: 'listPurchaseVouchers',
 				action: 'List purchase vouchers',
 				description: 'Get a list of purchase vouchers using the selected filters',
 			},
 			{
-				name: 'Ventas - Listar',
+				name: 'Sales - List',
 				value: 'listSalesVouchers',
 				action: 'List sales vouchers',
 				description: 'Get a list of sales vouchers using the selected filters',
@@ -438,7 +438,7 @@ const operationGroups: OperationGroup[] = [
 		default: 'listCountries',
 		options: [
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listCountries',
 				action: 'List countries',
 				description: 'Get the list of available countries',
@@ -450,7 +450,7 @@ const operationGroups: OperationGroup[] = [
 		default: 'listMunicipalities',
 		options: [
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listMunicipalities',
 				action: 'List municipalities',
 				description: 'Get a list of municipalities, usually filtered by province',
@@ -462,7 +462,7 @@ const operationGroups: OperationGroup[] = [
 		default: 'listProvinces',
 		options: [
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listProvinces',
 				action: 'List provinces',
 				description: 'Get a list of provinces, usually filtered by country',
@@ -474,7 +474,7 @@ const operationGroups: OperationGroup[] = [
 		default: 'listDeliveryTimeSlots',
 		options: [
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listDeliveryTimeSlots',
 				action: 'List delivery time slots',
 				description: 'Get the full list of available delivery time slots',
@@ -486,7 +486,7 @@ const operationGroups: OperationGroup[] = [
 		default: 'listDrivers',
 		options: [
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listDrivers',
 				action: 'List drivers',
 				description: 'Get the complete list of available drivers',
@@ -498,7 +498,7 @@ const operationGroups: OperationGroup[] = [
 		default: 'listPhysicalBranches',
 		options: [
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listPhysicalBranches',
 				action: 'List physical branches',
 				description: 'Get the available physical branches',
@@ -510,7 +510,7 @@ const operationGroups: OperationGroup[] = [
 		default: 'listSellers',
 		options: [
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listSellers',
 				action: 'List sellers',
 				description: 'Get a list of all available sellers',
@@ -522,7 +522,7 @@ const operationGroups: OperationGroup[] = [
 		default: 'generateSecurityToken',
 		options: [
 			{
-				name: 'Generar',
+				name: 'Generate',
 				value: 'generateSecurityToken',
 				action: 'Generate access token',
 				description: 'Generate a token for external tools such as Postman',
@@ -534,13 +534,13 @@ const operationGroups: OperationGroup[] = [
 		default: 'listMobileOperators',
 		options: [
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listMobileOperators',
 				action: 'List mobile operators',
 				description: 'Get the list of all mobile operators',
 			},
 			{
-				name: 'Verificar',
+				name: 'Verify',
 				value: 'verifyOperatorCredentials',
 				action: 'Verify mobile operator',
 				description: 'Get the data for a mobile operator using the configured credentials',
@@ -552,13 +552,13 @@ const operationGroups: OperationGroup[] = [
 		default: 'listSpecialTaxRegimes',
 		options: [
 			{
-				name: 'Por ID',
+				name: 'By ID',
 				value: 'getSpecialTaxRegimeDetails',
 				action: 'Get special tax regime by ID',
 				description: 'Get a special tax regime by ID',
 			},
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listSpecialTaxRegimes',
 				action: 'List special tax regimes',
 				description: 'Get the complete list of special tax regimes',
@@ -570,7 +570,7 @@ const operationGroups: OperationGroup[] = [
 		default: 'listConcepts',
 		options: [
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listConcepts',
 				action: 'List concepts',
 				description: 'Get a list of concepts',
@@ -582,19 +582,19 @@ const operationGroups: OperationGroup[] = [
 		default: 'searchSupplier',
 		options: [
 			{
-				name: 'Buscar',
+				name: 'Search',
 				value: 'searchSupplier',
 				action: 'Search supplier',
 				description: 'Return supplier information based on its ID',
 			},
 			{
-				name: 'Crear',
+				name: 'Create',
 				value: 'createSupplier',
 				action: 'Create supplier',
 				description: 'Create a supplier using the provided data',
 			},
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listSuppliers',
 				action: 'List suppliers',
 				description: 'Get a complete list of suppliers',
@@ -606,7 +606,7 @@ const operationGroups: OperationGroup[] = [
 		default: 'createStockMovement',
 		options: [
 			{
-				name: 'Crear',
+				name: 'Create',
 				value: 'createStockMovement',
 				action: 'Create stock movement',
 				description: 'Create a stock movement adjustment',
@@ -618,31 +618,31 @@ const operationGroups: OperationGroup[] = [
 		default: 'listSalesOrders',
 		options: [
 			{
-				name: 'Crear',
+				name: 'Create',
 				value: 'createSalesOrder',
 				action: 'Create sales order',
 				description: 'Create a sales order using the provided articles',
 			},
 			{
-				name: 'Por ID',
+				name: 'By ID',
 				value: 'getSalesOrderDetails',
 				action: 'Get sales order',
 				description: 'Get a sales order by its unique identifier',
 			},
 			{
-				name: 'Estados - Listar',
+				name: 'Statuses - List',
 				value: 'listSalesOrderStatuses',
 				action: 'List sales order statuses',
 				description: 'Get all available sales order statuses',
 			},
 			{
-				name: 'Listar',
+				name: 'List',
 				value: 'listSalesOrders',
 				action: 'List sales orders',
 				description: 'Get all sales orders using the selected filters',
 			},
 			{
-				name: 'Resumen',
+				name: 'Summary',
 				value: 'listFilteredSalesOrders',
 				action: 'List summarized sales orders',
 				description: 'Get sales orders with a lighter response body',
@@ -654,7 +654,7 @@ const operationGroups: OperationGroup[] = [
 		default: 'createSalesDeliveryNote',
 		options: [
 			{
-				name: 'Crear',
+				name: 'Create',
 				value: 'createSalesDeliveryNote',
 				action: 'Create sales delivery note',
 				description: 'Create a sales delivery note from the provided parameters',
@@ -669,12 +669,11 @@ const operationOptionsByResource = Object.fromEntries(
 
 export const CentumOperations: INodeProperties[] = [
 	{
-		displayName: 'Recurso',
+		displayName: 'Resource',
 		name: 'resource',
 		type: 'options',
 		noDataExpression: true,
 		options: [
-			{ name: 'Access Token', value: 'accessToken' },
 			{ name: 'Ajuste Movimiento Stock', value: 'ajustesMovimientosStock' },
 			{ name: 'Articulo', value: 'articulos' },
 			{ name: 'Bonificacion', value: 'bonificaciones' },
@@ -684,13 +683,13 @@ export const CentumOperations: INodeProperties[] = [
 			{ name: 'Cobro', value: 'cobros' },
 			{ name: 'Compra', value: 'compras' },
 			{ name: 'Concepto', value: 'conceptos' },
-			{ name: 'Country', value: 'paises' },
 			{ name: 'Departamento', value: 'departamentos' },
 			{ name: 'Frecuencia De Cliente', value: 'frecuenciaClientes' },
 			{ name: 'Lista Precio', value: 'listasPrecios' },
 			{ name: 'Marca', value: 'marcas' },
 			{ name: 'Operador Movil', value: 'operadoresMoviles' },
 			{ name: 'Orden Compra', value: 'ordenesCompra' },
+			{ name: 'País', value: 'paises' },
 			{ name: 'Pedido Venta', value: 'pedidosVenta' },
 			{ name: 'Promocion Comercial', value: 'promocionesComerciales' },
 			{ name: 'Proveedor', value: 'proveedores' },
@@ -702,6 +701,7 @@ export const CentumOperations: INodeProperties[] = [
 			{ name: 'SubRubro', value: 'subRubros' },
 			{ name: 'Sucursal Fisica', value: 'sucursalesFisicas' },
 			{ name: 'Tipo Comprobante', value: 'tiposComprobante' },
+			{ name: 'Token De Acceso', value: 'accessToken' },
 			{ name: 'Turno Entrega', value: 'turnosEntrega' },
 			{ name: 'Ubicacion Articulo', value: 'ubicacionesArticulos' },
 			{ name: 'Vendedor', value: 'vendedores' },
@@ -710,7 +710,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: 'articulos',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -719,7 +719,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -728,7 +728,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -737,7 +737,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -746,7 +746,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -755,7 +755,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -764,7 +764,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -773,7 +773,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -782,7 +782,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -791,7 +791,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -800,7 +800,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -809,7 +809,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -818,7 +818,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -827,7 +827,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -836,7 +836,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -845,7 +845,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -854,7 +854,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -863,7 +863,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -872,7 +872,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -881,7 +881,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -890,7 +890,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -899,7 +899,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -908,7 +908,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -917,7 +917,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -926,7 +926,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -935,7 +935,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -944,7 +944,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -953,7 +953,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -962,7 +962,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -971,7 +971,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -980,7 +980,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
@@ -989,7 +989,7 @@ export const CentumOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Operacion',
+		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
 		noDataExpression: true,
