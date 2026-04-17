@@ -1152,6 +1152,5 @@ export const salesHandlers: ResourceHandlerMap = {
 	listSalesInvoicesById: listSalesInvoicesById,
 	listSalesVouchers: listSalesVouchers,
 	listPrices: listPrices,
-	listPromotions: listPromotions,
 	getSalesRanking: getSalesRanking,
 };

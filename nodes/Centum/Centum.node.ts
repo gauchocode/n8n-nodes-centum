@@ -168,8 +168,7 @@ function simplifiedFieldKey(resource: string, operation: string): string {
 }
 
 const simplifiedOutputFields: Record<string, SimplifiedFieldSpec[]> = {
-	searchProducts: productFields,
-	GetDatosGenerales: productFields,
+	[simplifiedFieldKey('articulos', 'GetDatosGenerales')]: productFields,
 	[simplifiedFieldKey('articulos', 'GetOne')]: productFields,
 	[simplifiedFieldKey('articulos', 'GetVenta')]: productFields,
 	[simplifiedFieldKey('articulos', 'GetPrecios')]: [
@@ -180,10 +179,7 @@ const simplifiedOutputFields: Record<string, SimplifiedFieldSpec[]> = {
 	],
 	[simplifiedFieldKey('articulos', 'GetExistenciasIndicadores')]: branchStockFields,
 	[simplifiedFieldKey('articulos', 'GetExistencias')]: productFields,
-	getProductByCode: productFields,
-	listAvailableProducts: productFields,
-	listAllProducts: productFields,
-	getProductPrice: [...productFields, 'IdListaPrecio', 'NombreListaPrecio', 'Moneda'],
+	[simplifiedFieldKey('clientes', 'Get')]: customerFields,
 	[simplifiedFieldKey('clientes', 'GetSaldoCuentaCorriente')]: [
 		...customerFields,
 		'FechaVencimiento',
@@ -197,15 +193,6 @@ const simplifiedOutputFields: Record<string, SimplifiedFieldSpec[]> = {
 		'ImportePendiente',
 	],
 	[simplifiedFieldKey('clientes', 'GetOneContribuyente')]: customerFields,
-	listProductsByBranch: branchStockFields,
-	getProductInBranch: branchStockFields,
-	[simplifiedFieldKey('clientes', 'Get')]: customerFields,
-	listCustomers: customerFields,
-	searchCustomers: customerFields,
-	searchCustomerByCuit: customerFields,
-	searchTaxpayerCustomer: customerFields,
-	getCustomerBalance: [...customerFields, 'FechaVencimiento', 'Importe', 'ImportePendiente'],
-	getCustomerBalanceDetails: [...documentFields, 'FechaVencimiento', 'Importe', 'ImportePendiente'],
 	[simplifiedFieldKey('ventas', 'Get')]: documentFields,
 	[simplifiedFieldKey('ventas', 'GetConsulta')]: documentFields,
 	[simplifiedFieldKey('ventas', 'GetEstadisticas')]: [
@@ -242,38 +229,6 @@ const simplifiedOutputFields: Record<string, SimplifiedFieldSpec[]> = {
 	[simplifiedFieldKey('ordenesCompra', 'Get')]: documentFields,
 	[simplifiedFieldKey('ordenesCompra', 'GetOne')]: documentFields,
 	[simplifiedFieldKey('proveedores', 'Get')]: supplierFields,
-	listPaymentInvoices: documentFields,
-	listSalesInvoices: documentFields,
-	listSalesInvoicesById: documentFields,
-	listCustomerCommercialPromotions: [
-		'IdPromocionComercial',
-		'Codigo',
-		'Nombre',
-		'Descripcion',
-		'FechaDesde',
-		'FechaHasta',
-		'Activa',
-	],
-	listSalesVouchers: salesVoucherFields,
-	getSalesRanking: [
-		'IdCliente',
-		'IdArticulo',
-		'Codigo',
-		'Nombre',
-		'Cantidad',
-		'ImporteTotal',
-		'Total',
-		{ key: 'Cliente', fields: ['IdCliente', 'Codigo', 'RazonSocial'] },
-		{ key: 'Articulo', fields: ['IdArticulo', 'Codigo', 'Nombre'] },
-	],
-	listSalesOrders: documentFields,
-	listFilteredSalesOrders: documentFields,
-	listPayments: [...documentFields, 'FechaCobro', 'ImporteCobrado', 'ImporteAplicado'],
-	listPurchases: documentFields,
-	listPurchaseVouchers: purchaseVoucherFields,
-	listPurchaseOrders: documentFields,
-	getPurchaseOrderDetails: documentFields,
-	listSuppliers: supplierFields,
 };
 
 function pickSimplifiedValue(value: unknown, fields: SimplifiedFieldSpec[]): unknown {

@@ -362,13 +362,6 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Weekday number used to filter applied promotions (0 is Monday)',
 		displayOptions: { show: { resource: ['promocionesComerciales'], operation: ['Get'] } },
 	},
-	// {
-	// 	displayName: 'DNI',
-	// 	name: 'dni',
-	// 	type: 'string',
-	// 	default: '',
-	// 	displayOptions: { show: { operation: ['createCustomer'] } },
-	// },
 	{
 		displayName: 'Cash Sale',
 		name: 'isCashSale',

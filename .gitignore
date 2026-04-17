@@ -7,7 +7,6 @@ tmp
 .prettierrc
 settings.local*
 .env
-.claude/skills/centum-api-review
 
 
 npm-debug.log*

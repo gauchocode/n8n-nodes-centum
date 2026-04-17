@@ -149,82 +149,6 @@ const searchCustomers: ResourceHandler = async (context) => {
 	}
 };
 
-const searchCustomerByCuit: ResourceHandler = searchCustomers;
-
-const listCustomers: ResourceHandler = searchCustomers;
-
-const listCustomerCommercialPromotions: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
-	void itemIndex;
-	void centumUrl;
-	void headers;
-	void centumApiCredentials;
-	void consumerApiPublicId;
-
-	const clientIdParam = helperFns.getResourceLocatorValue(
-		helperFns.getNodeParameterOrThrow(executeFunctions, 'customerId', itemIndex),
-	);
-	const documentDate = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'documentDate',
-		itemIndex,
-	) as string;
-	const weekday = helperFns.getNodeParameterOrThrow(executeFunctions, 'weekday', itemIndex);
-	const clientId = Number(clientIdParam);
-
-	if (!documentDate) {
-		throw new NodeOperationError(executeFunctions.getNode(), 'documentDate is required.');
-	}
-
-	const formattedDocumentDate = String(documentDate).split('T')[0];
-
-	try {
-		const body = {
-			FechaDocumento: formattedDocumentDate,
-			IdsCliente: clientId,
-			DiaSemana: weekday || '',
-		};
-
-		const response = await helperFns.apiRequest<any>(
-			`${centumUrl}/PromocionesComerciales/FiltrosPromocionComercial`,
-			{
-				context: executeFunctions,
-				debugItemIndex: itemIndex,
-				method: 'POST',
-				headers,
-				body,
-			},
-		);
-
-		if (!response || typeof response !== 'object') {
-			throw new NodeOperationError(executeFunctions.getNode(), 'Invalid server response.');
-		}
-
-		if (response.Items && Array.isArray(response.Items)) {
-			return [executeFunctions.helpers.returnJsonArray(response.Items)];
-		}
-
-		return [executeFunctions.helpers.returnJsonArray(response)];
-	} catch (error) {
-		if (error instanceof NodeApiError) {
-			throw error;
-		}
-		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Unknown error';
-		throw new NodeOperationError(
-			executeFunctions.getNode(),
-			`Error getting promotions for customer ${clientId}:\n${errorMessage}`,
-		);
-	}
-};
-
 const createCustomer: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
@@ -643,14 +567,10 @@ const listCustomerFrequencies: ResourceHandler = async (context) => {
 export const customersHandlers: ResourceHandlerMap = {
 	Get: searchCustomers,
 	updateCustomer: updateCustomer,
-	searchCustomers: searchCustomers,
-	searchCustomerByCuit: searchCustomerByCuit,
-	listCustomers: listCustomers,
 	createCustomer: createCustomer,
 	searchTaxpayerCustomer: searchTaxpayerCustomer,
 	createTaxpayerCustomer: createTaxpayerCustomer,
 	getCustomerBalance: getCustomerBalance,
 	getCustomerBalanceDetails: getCustomerBalanceDetails,
-	listCustomerCommercialPromotions: listCustomerCommercialPromotions,
 	listCustomerFrequencies: listCustomerFrequencies,
 };

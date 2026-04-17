@@ -2,55 +2,6 @@ import { NodeApiError, NodeOperationError } from 'n8n-workflow';
 import * as helperFns from '../helpers/functions';
 import type { ResourceHandler, ResourceHandlerMap } from './types';
 
-const searchProducts: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
-	void itemIndex;
-	void centumUrl;
-	void headers;
-	void centumApiCredentials;
-	void consumerApiPublicId;
-
-	const articleName = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'articleName',
-		itemIndex,
-		'',
-	) as string;
-	const articleCode = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'articleCode',
-		itemIndex,
-		'',
-	) as string;
-
-	try {
-		const response = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
-			context: executeFunctions,
-			debugItemIndex: itemIndex,
-			method: 'POST',
-			headers,
-			body: { Nombre: articleName, Codigo: articleCode },
-		});
-
-		return [executeFunctions.helpers.returnJsonArray(response as any)];
-	} catch (error) {
-		if (error instanceof NodeApiError) {
-			throw error;
-		}
-		throw new NodeOperationError(
-			executeFunctions.getNode(),
-			`Error searching for article. Error: ${error}`,
-		);
-	}
-};
-
 const getProductByCode: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
@@ -661,64 +612,6 @@ const listProductsByBranch: ResourceHandler = async (context) => {
 	}
 };
 
-const getProductInBranch: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
-	void itemIndex;
-	void centumUrl;
-	void headers;
-	void centumApiCredentials;
-	void consumerApiPublicId;
-
-	const physicalBranchId = helperFns.getResourceLocatorValue(
-		helperFns.getNodeParameterOrThrow(executeFunctions, 'physicalBranchId', itemIndex),
-	);
-	const idArticulo = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'articleId',
-		itemIndex,
-	) as string;
-	const queryParams: {
-		IdSucursalFisica?: string;
-		idsArticulos: string;
-	} = {
-		IdSucursalFisica: physicalBranchId,
-		idsArticulos: idArticulo,
-	};
-
-	if (!physicalBranchId || !idArticulo) {
-		throw new NodeOperationError(
-			executeFunctions.getNode(),
-			'Physical branch ID and article ID are required.',
-		);
-	}
-	try {
-		const dataArticulosExistencias = await helperFns.apiRequest<any>(
-			`${centumUrl}/ArticulosSucursalesFisicas`,
-			{
-				context: executeFunctions,
-				debugItemIndex: itemIndex,
-				headers,
-				queryParams,
-			},
-		);
-		return [executeFunctions.helpers.returnJsonArray(dataArticulosExistencias.Items as any)];
-	} catch (error) {
-		if (error instanceof NodeApiError) {
-			throw error;
-		}
-		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Unknown error';
-		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
-	}
-};
-
 const listCategories: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
@@ -984,15 +877,11 @@ const convertProductsForWooCommerce: ResourceHandler = async (context) => {
 export const articlesHandlers: ResourceHandlerMap = {
 	GetDatosGenerales: listAllProducts,
 	GetExistenciasIndicadores: listProductsByBranch,
-	searchProducts: searchProducts,
 	getProductByCode: getProductByCode,
 	getStock: getStock,
 	listAvailableProducts: listAvailableProducts,
 	downloadProductImages: downloadProductImages,
-	listAllProducts: listAllProducts,
 	getProductPrice: getProductPrice,
-	listProductsByBranch: listProductsByBranch,
-	getProductInBranch: getProductInBranch,
 	listCategories: listCategories,
 	listBrands: listBrands,
 	listGroups: listGroups,
