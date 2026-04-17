@@ -163,13 +163,39 @@ const documentFields: SimplifiedFieldSpec[] = [
 	{ key: 'CanalVenta', fields: ['IdCanalVenta', 'Nombre'] },
 ];
 
+function simplifiedFieldKey(resource: string, operation: string): string {
+	return `${resource}:${operation}`;
+}
+
 const simplifiedOutputFields: Record<string, SimplifiedFieldSpec[]> = {
 	searchProducts: productFields,
 	GetDatosGenerales: productFields,
+	[simplifiedFieldKey('articulos', 'GetOne')]: productFields,
+	[simplifiedFieldKey('articulos', 'GetVenta')]: productFields,
+	[simplifiedFieldKey('articulos', 'GetPrecios')]: [
+		...productFields,
+		'IdListaPrecio',
+		'NombreListaPrecio',
+		'Moneda',
+	],
+	[simplifiedFieldKey('articulos', 'GetExistencias')]: productFields,
 	getProductByCode: productFields,
 	listAvailableProducts: productFields,
 	listAllProducts: productFields,
 	getProductPrice: [...productFields, 'IdListaPrecio', 'NombreListaPrecio', 'Moneda'],
+	[simplifiedFieldKey('clientes', 'GetSaldoCuentaCorriente')]: [
+		...customerFields,
+		'FechaVencimiento',
+		'Importe',
+		'ImportePendiente',
+	],
+	[simplifiedFieldKey('clientes', 'GetComposicionSaldoCuentaCorriente')]: [
+		...documentFields,
+		'FechaVencimiento',
+		'Importe',
+		'ImportePendiente',
+	],
+	[simplifiedFieldKey('clientes', 'GetOneContribuyente')]: customerFields,
 	listProductsByBranch: branchStockFields,
 	getProductInBranch: branchStockFields,
 	listCustomers: customerFields,
@@ -178,6 +204,32 @@ const simplifiedOutputFields: Record<string, SimplifiedFieldSpec[]> = {
 	searchTaxpayerCustomer: customerFields,
 	getCustomerBalance: [...customerFields, 'FechaVencimiento', 'Importe', 'ImportePendiente'],
 	getCustomerBalanceDetails: [...documentFields, 'FechaVencimiento', 'Importe', 'ImportePendiente'],
+	[simplifiedFieldKey('ventas', 'Get')]: documentFields,
+	[simplifiedFieldKey('ventas', 'GetEstadisticas')]: [
+		'IdCliente',
+		'IdArticulo',
+		'Codigo',
+		'Nombre',
+		'Cantidad',
+		'ImporteTotal',
+		'Total',
+		{ key: 'Cliente', fields: ['IdCliente', 'Codigo', 'RazonSocial'] },
+		{ key: 'Articulo', fields: ['IdArticulo', 'Codigo', 'Nombre'] },
+	],
+	[simplifiedFieldKey('pedidosVenta', 'Get')]: documentFields,
+	[simplifiedFieldKey('pedidosVenta', 'GetConsulta')]: documentFields,
+	[simplifiedFieldKey('cobros', 'Get')]: [
+		...documentFields,
+		'FechaCobro',
+		'ImporteCobrado',
+		'ImporteAplicado',
+	],
+	[simplifiedFieldKey('compras', 'Get')]: documentFields,
+	[simplifiedFieldKey('tiposComprobante', 'GetAllCompras')]: purchaseVoucherFields,
+	[simplifiedFieldKey('tiposComprobante', 'GetAllVentas')]: salesVoucherFields,
+	[simplifiedFieldKey('ordenesCompra', 'Get')]: documentFields,
+	[simplifiedFieldKey('ordenesCompra', 'GetOne')]: documentFields,
+	[simplifiedFieldKey('proveedores', 'Get')]: supplierFields,
 	listPaymentInvoices: documentFields,
 	listSalesInvoices: documentFields,
 	listSalesInvoicesById: documentFields,
@@ -319,8 +371,14 @@ function simplifyJsonPayload(
 	return json;
 }
 
-function simplifyOutputItem(item: INodeExecutionData, operation: string): INodeExecutionData {
-	const fields = simplifiedOutputFields[operation];
+function simplifyOutputItem(
+	item: INodeExecutionData,
+	resource: string,
+	operation: string,
+): INodeExecutionData {
+	const fields =
+		simplifiedOutputFields[simplifiedFieldKey(resource, operation)] ??
+		simplifiedOutputFields[operation];
 	if (!fields) {
 		return item;
 	}
@@ -642,7 +700,7 @@ export class Centum implements INodeType {
 					false,
 				) as boolean;
 				const outputItems = simplifiedOutput
-					? handlerResult[0].map((entry) => simplifyOutputItem(entry, operation))
+					? handlerResult[0].map((entry) => simplifyOutputItem(entry, resource, operation))
 					: handlerResult[0];
 
 				returnData.push(...linkOutputItems(outputItems, itemIndex));

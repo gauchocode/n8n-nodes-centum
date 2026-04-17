@@ -10,7 +10,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'boolean',
 		default: false,
 		displayOptions: {
-			show: { operation: ['createSupplier', 'listSuppliers'] },
+			show: { resource: ['proveedores'], operation: ['Create', 'Get'] },
 		},
 	},
 	{
@@ -21,7 +21,8 @@ const fieldDefinitions: INodeProperties[] = [
 		default: {},
 		displayOptions: {
 			show: {
-				operation: ['registerPayment', 'createSalesOrder', 'createPurchaseOrder'],
+				resource: ['cobros', 'pedidosVenta', 'ordenesCompra'],
+				operation: ['Create'],
 			},
 		},
 	},
@@ -34,7 +35,8 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Article object or array with ID or Codigo and Cantidad',
 		displayOptions: {
 			show: {
-				operation: ['createPurchaseDeliveryNote'],
+				resource: ['remitosCompra'],
+				operation: ['Create'],
 				useSinglePurchaseDeliveryArticle: [false],
 			},
 		},
@@ -46,7 +48,7 @@ const fieldDefinitions: INodeProperties[] = [
 		default: false,
 		description: 'Use individual ID, price, and quantity fields instead of article JSON',
 		displayOptions: {
-			show: { operation: ['createPurchaseDeliveryNote'] },
+			show: { resource: ['remitosCompra'], operation: ['Create'] },
 		},
 	},
 	{
@@ -58,7 +60,8 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Article ID for the purchase delivery note',
 		displayOptions: {
 			show: {
-				operation: ['createPurchaseDeliveryNote'],
+				resource: ['remitosCompra'],
+				operation: ['Create'],
 				useSinglePurchaseDeliveryArticle: [true],
 			},
 		},
@@ -72,7 +75,8 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Price to send in RemitoCompraArticulos',
 		displayOptions: {
 			show: {
-				operation: ['createPurchaseDeliveryNote'],
+				resource: ['remitosCompra'],
+				operation: ['Create'],
 				useSinglePurchaseDeliveryArticle: [true],
 			},
 		},
@@ -86,7 +90,8 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Quantity to send in RemitoCompraArticulos',
 		displayOptions: {
 			show: {
-				operation: ['createPurchaseDeliveryNote'],
+				resource: ['remitosCompra'],
+				operation: ['Create'],
 				useSinglePurchaseDeliveryArticle: [true],
 			},
 		},
@@ -100,7 +105,8 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'List of articles as a JSON array with ID or Code and Quantity',
 		displayOptions: {
 			show: {
-				operation: ['createPurchase', 'createSale'],
+				resource: ['compras', 'ventas'],
+				operation: ['Create'],
 			},
 		},
 	},
@@ -113,7 +119,8 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'List of articles as a JSON array with ID and Cantidad',
 		displayOptions: {
 			show: {
-				operation: ['createSalesDeliveryNote'],
+				resource: ['remitosVenta'],
+				operation: ['Create'],
 				useSingleSalesDeliveryArticle: [false],
 			},
 		},
@@ -125,7 +132,7 @@ const fieldDefinitions: INodeProperties[] = [
 		default: false,
 		description: 'Use individual ID, price, and quantity fields instead of articlesCollection',
 		displayOptions: {
-			show: { operation: ['createSalesDeliveryNote'] },
+			show: { resource: ['remitosVenta'], operation: ['Create'] },
 		},
 	},
 	{
@@ -137,7 +144,8 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Article ID for the sales delivery note',
 		displayOptions: {
 			show: {
-				operation: ['createSalesDeliveryNote'],
+				resource: ['remitosVenta'],
+				operation: ['Create'],
 				useSingleSalesDeliveryArticle: [true],
 			},
 		},
@@ -151,7 +159,8 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Price to send in RemitoVentaArticulos',
 		displayOptions: {
 			show: {
-				operation: ['createSalesDeliveryNote'],
+				resource: ['remitosVenta'],
+				operation: ['Create'],
 				useSingleSalesDeliveryArticle: [true],
 			},
 		},
@@ -165,7 +174,8 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Quantity to send in RemitoVentaArticulos',
 		displayOptions: {
 			show: {
-				operation: ['createSalesDeliveryNote'],
+				resource: ['remitosVenta'],
+				operation: ['Create'],
 				useSingleSalesDeliveryArticle: [true],
 			},
 		},
@@ -182,14 +192,14 @@ const fieldDefinitions: INodeProperties[] = [
 		name: 'incomeTaxCategoryId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { operation: ['createSupplier'] } },
+		displayOptions: { show: { resource: ['proveedores'], operation: ['Create'] } },
 	},
 	{
 		displayName: 'Supplier Class',
 		name: 'supplierClassId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { operation: ['createSupplier'] } },
+		displayOptions: { show: { resource: ['proveedores'], operation: ['Create'] } },
 	},
 	{
 		displayName: 'Customer',
@@ -198,7 +208,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'json',
 		default: {},
 		displayOptions: {
-			show: { operation: ['registerPayment'] },
+			show: { resource: ['cobros'], operation: ['Create'] },
 		},
 	},
 	{
@@ -207,7 +217,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'dateTime',
 		default: '',
 		displayOptions: {
-			show: { operation: ['listPurchaseOrders'] },
+			show: { resource: ['ordenesCompra'], operation: ['Get'] },
 		},
 	},
 	{
@@ -216,7 +226,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'dateTime',
 		default: '',
 		displayOptions: {
-			show: { operation: ['listPurchaseOrders'] },
+			show: { resource: ['ordenesCompra'], operation: ['Get'] },
 		},
 	},
 	{
@@ -229,23 +239,34 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Customer used by the selected operation',
 		displayOptions: {
 			show: {
+				resource: [
+					'compras',
+					'articulos',
+					'clientes',
+					'cobros',
+					'pedidosVenta',
+					'ordenesCompra',
+					'ventas',
+					'remitosVenta',
+					'remitosCompra',
+				],
 				operation: [
-					'createPurchase',
-					'listAvailableProducts',
-					'getCustomerBalance',
-					'getCustomerBalanceDetails',
+					'Create',
+					'GetVenta',
+					'GetSaldoCuentaCorriente',
+					'GetComposicionSaldoCuentaCorriente',
 					'listSalesInvoices',
 					'listPaymentInvoices',
 					'listCustomerCommercialPromotions',
-					'listSalesOrders',
-					'listPurchaseOrders',
+					'Get',
+					'Get',
 					'listPayments',
-					'listPurchases',
-					'createSale',
-					'listFilteredSalesOrders',
+					'Get',
+					'Create',
+					'GetConsulta',
 					// "getProductPrice",
-					'createSalesDeliveryNote',
-					'createPurchaseDeliveryNote',
+					'Create',
+					'Create',
 				],
 			},
 		},
@@ -259,7 +280,7 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Article code to search for. Separate multiple values with a comma.',
 		displayOptions: {
 			show: {
-				operation: ['getProductByCode', 'GetDatosGenerales'],
+				operation: ['GetOne', 'GetDatosGenerales'],
 			},
 		},
 	},
@@ -273,7 +294,8 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Customer code to search for',
 		displayOptions: {
 			show: {
-				operation: ['searchCustomers', 'createSalesOrder'],
+				resource: ['clientes', 'pedidosVenta'],
+				operation: ['Get', 'Create'],
 			},
 		},
 	},
@@ -284,28 +306,28 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		placeholder: 'Purchase code (FCC)',
 		description: 'Purchase voucher code',
-		displayOptions: { show: { operation: ['createPurchase'] } },
+		displayOptions: { show: { resource: ['compras'], operation: ['Create'] } },
 	},
 	{
 		displayName: 'Sales Condition',
 		name: 'salesConditionId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { operation: ['createSale', 'createCustomer'] } },
+		displayOptions: { show: { resource: ['ventas', 'clientes'], operation: ['Create'] } },
 	},
 	{
 		displayName: 'Payment Condition',
 		name: 'paymentConditionId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { operation: ['createSupplier'] } },
+		displayOptions: { show: { resource: ['proveedores'], operation: ['Create'] } },
 	},
 	{
 		displayName: 'VAT Condition ID',
 		name: 'vatConditionId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { operation: ['createSupplier', 'createCustomer'] } },
+		displayOptions: { show: { resource: ['proveedores', 'clientes'], operation: ['Create'] } },
 	},
 	{
 		displayName: 'Exchange Rate',
@@ -322,7 +344,8 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '{}',
 		displayOptions: {
 			show: {
-				operation: ['updateCustomer', 'createTaxpayerCustomer'],
+				resource: ['clientes'],
+				operation: ['Update', 'createTaxpayerCustomer'],
 			},
 		},
 		description: 'JSON object sent to the API to update a customer or create a taxpayer customer',
@@ -336,14 +359,15 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				operation: [
-					'createSupplier',
+					'Create',
 					'createCustomer',
-					'searchTaxpayerCustomer',
+					'GetOneContribuyente',
 					'createTaxpayerCustomer',
 					'searchCustomerByCuit',
 					'searchCustomers',
-					'listSuppliers',
+					'Get',
 				],
+				resource: ['proveedores', 'clientes'],
 			},
 		},
 	},
@@ -367,7 +391,7 @@ const fieldDefinitions: INodeProperties[] = [
 		name: 'isCashSale',
 		type: 'boolean',
 		default: false,
-		displayOptions: { show: { operation: ['createSale'] } },
+		displayOptions: { show: { resource: ['ventas'], operation: ['Create'] } },
 	},
 	{
 		displayName: 'Date From',
@@ -377,18 +401,18 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				operation: [
-					'createPurchase',
-					'listSalesInvoicesById',
+					'Create',
+					'Get',
 					'listSalesInvoices',
 					'listPaymentInvoices',
-					'listSalesOrders',
-					'listFilteredSalesOrders',
-					'listPurchaseOrders',
+					'Get',
+					'GetConsulta',
+					'Get',
 					'listPayments',
-					'listPurchases',
-					'createSale',
-					'listPurchaseOrders',
-					'getSalesRanking',
+					'Get',
+					'Create',
+					'Get',
+					'GetEstadisticas',
 				],
 			},
 		},
@@ -401,16 +425,16 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				operation: [
-					'listSalesInvoicesById',
+					'Get',
 					'listSalesInvoices',
 					'listPaymentInvoices',
-					'listSalesOrders',
-					'listFilteredSalesOrders',
-					'listPurchaseOrders',
+					'Get',
+					'GetConsulta',
+					'Get',
 					'listPayments',
-					'listPurchases',
-					'listPurchaseOrders',
-					'getSalesRanking',
+					'Get',
+					'Get',
+					'GetEstadisticas',
 				],
 			},
 		},
@@ -425,13 +449,13 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				operation: [
-					'createSalesDeliveryNote',
-					'listAvailableProducts',
-					'createPurchaseDeliveryNote',
+					'Create',
+					'GetVenta',
+					'Create',
 					'listCustomerCommercialPromotions',
-					'createPurchase',
-					'createSalesOrder',
-					'createPurchaseOrder',
+					'Create',
+					'Create',
+					'Create',
 					'listPromotions',
 				],
 			},
@@ -446,7 +470,8 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Document delivery date',
 		displayOptions: {
 			show: {
-				operation: ['createPurchaseOrder', 'createPurchaseDeliveryNote', 'createSalesOrder'],
+				resource: ['ordenesCompra', 'remitosCompra', 'pedidosVenta'],
+				operation: ['Create'],
 			},
 		},
 	},
@@ -458,7 +483,8 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Document delivery date',
 		displayOptions: {
 			show: {
-				operation: ['createSalesDeliveryNote'],
+				resource: ['remitosVenta'],
+				operation: ['Create'],
 			},
 		},
 	},
@@ -468,7 +494,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'dateTime',
 		default: '',
 		displayOptions: {
-			show: { operation: ['createSalesDeliveryNote'] },
+			show: { resource: ['remitosVenta'], operation: ['Create'] },
 		},
 	},
 	{
@@ -477,7 +503,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'dateTime',
 		default: '',
 		displayOptions: {
-			show: { operation: ['createSalesDeliveryNote'] },
+			show: { resource: ['remitosVenta'], operation: ['Create'] },
 		},
 	},
 	{
@@ -487,7 +513,7 @@ const fieldDefinitions: INodeProperties[] = [
 		required: true,
 		default: undefined,
 		displayOptions: {
-			show: { operation: ['createStockMovement'] },
+			show: { resource: ['ajustesMovimientosStock'], operation: ['Create'] },
 		},
 	},
 	{
@@ -497,7 +523,7 @@ const fieldDefinitions: INodeProperties[] = [
 		required: true,
 		default: undefined,
 		displayOptions: {
-			show: { operation: ['createPurchaseOrder', 'createPurchaseDeliveryNote'] },
+			show: { resource: ['ordenesCompra', 'remitosCompra'], operation: ['Create'] },
 		},
 	},
 	{
@@ -525,7 +551,7 @@ const fieldDefinitions: INodeProperties[] = [
 			},
 		],
 		displayOptions: {
-			show: { operation: ['getSalesRanking'] },
+			show: { resource: ['ventas'], operation: ['GetEstadisticas'] },
 		},
 	},
 	{
@@ -535,7 +561,7 @@ const fieldDefinitions: INodeProperties[] = [
 		default: false,
 		description: 'Whether to order the sales statistics in ascending mode',
 		displayOptions: {
-			show: { operation: ['getSalesRanking'] },
+			show: { resource: ['ventas'], operation: ['GetEstadisticas'] },
 		},
 	},
 
@@ -549,7 +575,8 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Seller used to create the sales order',
 		displayOptions: {
 			show: {
-				operation: ['createSalesOrder'],
+				resource: ['pedidosVenta'],
+				operation: ['Create'],
 			},
 		},
 	},
@@ -582,7 +609,7 @@ const fieldDefinitions: INodeProperties[] = [
 			},
 		],
 		displayOptions: {
-			show: { operation: ['getSalesRanking'] },
+			show: { resource: ['ventas'], operation: ['GetEstadisticas'] },
 		},
 	},
 	{
@@ -593,7 +620,7 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		placeholder: 'Enter discount ID',
 		displayOptions: {
-			show: { operation: ['createSalesOrder', 'createSale', 'createCustomer'] },
+			show: { resource: ['pedidosVenta', 'ventas', 'clientes'], operation: ['Create'] },
 		},
 	},
 	{
@@ -605,12 +632,8 @@ const fieldDefinitions: INodeProperties[] = [
 		placeholder: 'Enter delivery time slot ID',
 		displayOptions: {
 			show: {
-				operation: [
-					'createSalesOrder',
-					'createPurchaseOrder',
-					'createPurchaseDeliveryNote',
-					'createSalesDeliveryNote',
-				],
+				resource: ['pedidosVenta', 'ordenesCompra', 'remitosCompra', 'remitosVenta'],
+				operation: ['Create'],
 			},
 		},
 	},
@@ -619,14 +642,14 @@ const fieldDefinitions: INodeProperties[] = [
 		name: 'dateModified',
 		type: 'dateTime',
 		default: '',
-		displayOptions: { show: { operation: ['listAvailableProducts'] } },
+		displayOptions: { show: { resource: ['articulos'], operation: ['GetVenta'] } },
 	},
 	{
 		displayName: 'Image Modified Date From',
 		name: 'dateModifiedImage',
 		type: 'dateTime',
 		default: '',
-		displayOptions: { show: { operation: ['listAvailableProducts'] } },
+		displayOptions: { show: { resource: ['articulos'], operation: ['GetVenta'] } },
 		description: 'Filter articles whose images were modified from this date',
 	},
 	{
@@ -636,7 +659,7 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				operation: ['getCustomerBalance', 'getCustomerBalanceDetails', 'getProductPrice'],
+				operation: ['GetSaldoCuentaCorriente', 'GetComposicionSaldoCuentaCorriente', 'GetPrecios'],
 			},
 		},
 	},
@@ -646,7 +669,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'dateTime',
 		default: '',
 		displayOptions: {
-			show: { operation: ['getProductPrice'] },
+			show: { resource: ['articulos'], operation: ['GetPrecios'] },
 		},
 	},
 	{
@@ -654,7 +677,7 @@ const fieldDefinitions: INodeProperties[] = [
 		name: 'supplierPaymentMethodId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { operation: ['createSupplier'] } },
+		displayOptions: { show: { resource: ['proveedores'], operation: ['Create'] } },
 	},
 	{
 		displayName: 'Driver ID',
@@ -664,7 +687,7 @@ const fieldDefinitions: INodeProperties[] = [
 		placeholder: 'Enter driver ID',
 		description: 'Driver used for the delivery note',
 		displayOptions: {
-			show: { operation: ['createPurchaseDeliveryNote', 'createSalesDeliveryNote'] },
+			show: { resource: ['remitosCompra', 'remitosVenta'], operation: ['Create'] },
 		},
 	},
 	{
@@ -674,7 +697,7 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		description: 'Additional notes for the purchase delivery note',
 		displayOptions: {
-			show: { operation: ['createPurchaseDeliveryNote'] },
+			show: { resource: ['remitosCompra'], operation: ['Create'] },
 		},
 	},
 	{
@@ -686,7 +709,7 @@ const fieldDefinitions: INodeProperties[] = [
 		placeholder: 'Example: 27231',
 		description: 'Unique identifier used to make API requests',
 		displayOptions: {
-			show: { operation: ['getSalesOrderDetails', 'getSpecialTaxRegimeDetails'] },
+			show: { resource: ['pedidosVenta', 'regimenesEspeciales'], operation: ['GetOne'] },
 		},
 	},
 	{
@@ -698,13 +721,13 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				operation: [
-					'downloadProductImages',
+					'GetOneImagen',
 					'GetDatosGenerales',
-					'getProductByCode',
+					'GetOne',
 					'getProductInBranch',
-					'getProductPrice',
+					'GetPrecios',
 					'listProductsByBranch',
-					'createStockMovement',
+					'Create',
 				],
 			},
 		},
@@ -714,7 +737,7 @@ const fieldDefinitions: INodeProperties[] = [
 		name: 'saleDiscountId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { operation: ['createSale'] } },
+		displayOptions: { show: { resource: ['ventas'], operation: ['Create'] } },
 	},
 	{
 		displayName: 'Article Location',
@@ -722,7 +745,7 @@ const fieldDefinitions: INodeProperties[] = [
 		required: true,
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { operation: ['createStockMovement'] } },
+		displayOptions: { show: { resource: ['ajustesMovimientosStock'], operation: ['Create'] } },
 	},
 	{
 		displayName: 'Branch Section ID',
@@ -731,7 +754,10 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'number',
 		default: 0,
 		displayOptions: {
-			show: { operation: ['createStockMovement', 'getArticleLocationsBySection'] },
+			show: {
+				resource: ['ajustesMovimientosStock', 'ubicacionesArticulos'],
+				operation: ['Create', 'getArticleLocationsBySection'],
+			},
 		},
 	},
 	{
@@ -740,14 +766,16 @@ const fieldDefinitions: INodeProperties[] = [
 		required: true,
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { operation: ['listPayments'] } },
+		displayOptions: { show: { resource: ['cobros'], operation: ['listPayments'] } },
 	},
 	{
 		displayName: 'Purchase ID',
 		name: 'purchaseId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { operation: ['listPurchases', 'getPurchaseOrderDetails'] } },
+		displayOptions: {
+			show: { resource: ['compras', 'ordenesCompra'], operation: ['Get', 'GetOne'] },
+		},
 	},
 	{
 		displayName: 'Status ID',
@@ -758,12 +786,8 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Sales order status number',
 		displayOptions: {
 			show: {
-				operation: [
-					'listSalesOrders',
-					'listPurchaseOrders',
-					'listFilteredSalesOrders',
-					'listSalesOrders',
-				],
+				resource: ['pedidosVenta', 'ordenesCompra'],
+				operation: ['Get', 'GetConsulta'],
 			},
 		},
 	},
@@ -772,7 +796,7 @@ const fieldDefinitions: INodeProperties[] = [
 		name: 'purchaseOperatorId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { operation: ['createSupplier'] } },
+		displayOptions: { show: { resource: ['proveedores'], operation: ['Create'] } },
 	},
 	{
 		displayName: 'Supplier ID',
@@ -781,7 +805,7 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		placeholder: 'Enter supplier ID',
 		description: 'Supplier ID for the purchase',
-		displayOptions: { show: { operation: ['createPurchase'] } },
+		displayOptions: { show: { resource: ['compras'], operation: ['Create'] } },
 	},
 	{
 		displayName: 'Voucher Type ID',
@@ -790,7 +814,9 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		placeholder: 'Enter voucher type ID',
 		description: 'Invoice voucher type ID',
-		displayOptions: { show: { operation: ['createPurchase', 'listSalesInvoices', 'createSale'] } },
+		displayOptions: {
+			show: { resource: ['compras', 'ventas'], operation: ['Create', 'listSalesInvoices'] },
+		},
 	},
 	{
 		displayName: 'Current Account ID',
@@ -808,7 +834,7 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		placeholder: 'Enter seller ID',
 		displayOptions: {
-			show: { operation: ['createSale', 'listSalesInvoices', 'createSalesDeliveryNote'] },
+			show: { resource: ['ventas', 'remitosVenta'], operation: ['Create', 'listSalesInvoices'] },
 		},
 	},
 	{
@@ -818,7 +844,8 @@ const fieldDefinitions: INodeProperties[] = [
 		default: 0,
 		displayOptions: {
 			show: {
-				operation: ['listSalesInvoices', 'listSalesOrders', 'listSalesInvoicesById'],
+				resource: ['ventas', 'pedidosVenta'],
+				operation: ['listSalesInvoices', 'Get', 'Get'],
 			},
 		},
 	},
@@ -834,7 +861,9 @@ const fieldDefinitions: INodeProperties[] = [
 		name: 'includeCanceled',
 		type: 'boolean',
 		default: false,
-		displayOptions: { show: { operation: ['listSalesInvoices', 'listSalesOrders'] } },
+		displayOptions: {
+			show: { resource: ['ventas', 'pedidosVenta'], operation: ['listSalesInvoices', 'Get'] },
+		},
 	},
 	{
 		displayName: 'Sales Channel ID',
@@ -856,7 +885,9 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'number',
 		description: 'User ID that created the sales voucher',
 		default: 0,
-		displayOptions: { show: { operation: ['listSalesInvoices', 'listSalesOrders'] } },
+		displayOptions: {
+			show: { resource: ['ventas', 'pedidosVenta'], operation: ['listSalesInvoices', 'Get'] },
+		},
 	},
 	{
 		displayName: 'Transport ID',
@@ -864,7 +895,9 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'number',
 		description: 'Transport ID associated with the sales voucher',
 		default: 0,
-		displayOptions: { show: { operation: ['listSalesInvoices', 'listSalesOrders'] } },
+		displayOptions: {
+			show: { resource: ['ventas', 'pedidosVenta'], operation: ['listSalesInvoices', 'Get'] },
+		},
 	},
 	{
 		displayName: 'Country ID',
@@ -873,7 +906,9 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		placeholder: 'Enter country ID',
 		description: 'Country ID used to fetch provinces',
-		displayOptions: { show: { operation: ['listProvinces', 'createSupplier', 'createCustomer'] } },
+		displayOptions: {
+			show: { resource: ['provincias', 'proveedores', 'clientes'], operation: ['Get', 'Create'] },
+		},
 	},
 	{
 		displayName: 'Province ID',
@@ -883,7 +918,10 @@ const fieldDefinitions: INodeProperties[] = [
 		placeholder: 'Enter province ID',
 		description: 'Province ID used to fetch related information',
 		displayOptions: {
-			show: { operation: ['listMunicipalities', 'createSupplier', 'createCustomer'] },
+			show: {
+				resource: ['departamentos', 'proveedores', 'clientes'],
+				operation: ['Get', 'Create'],
+			},
 		},
 	},
 	{
@@ -896,16 +934,16 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				operation: [
-					'createStockMovement',
-					'createStockMovement',
-					'createSalesDeliveryNote',
-					'createPurchaseDeliveryNote',
+					'Create',
+					'Create',
+					'Create',
+					'Create',
 					'getProductInBranch',
-					'createPurchase',
-					'createPurchaseOrder',
+					'Create',
+					'Create',
 					'listProductsByBranch',
 					'listSalesInvoices',
-					'listSalesOrders',
+					'Get',
 				],
 			},
 		},
@@ -922,14 +960,14 @@ const fieldDefinitions: INodeProperties[] = [
 		name: 'zoneId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { operation: ['createSupplier', 'createCustomer'] } },
+		displayOptions: { show: { resource: ['proveedores', 'clientes'], operation: ['Create'] } },
 	},
 	{
 		displayName: 'Supplier Discount ID',
 		name: 'supplierDiscountId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { operation: ['createSupplier'] } },
+		displayOptions: { show: { resource: ['proveedores'], operation: ['Create'] } },
 	},
 	{
 		displayName: 'Amount',
@@ -945,7 +983,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'json',
 		default: {},
 		description: 'Shipping info from the order',
-		displayOptions: { show: { operation: ['registerPayment'] } },
+		displayOptions: { show: { resource: ['cobros'], operation: ['Create'] } },
 	},
 	{
 		displayName: 'Price List ID',
@@ -955,7 +993,10 @@ const fieldDefinitions: INodeProperties[] = [
 		placeholder: 'Enter price list ID',
 		description: 'Price list used to look up article prices',
 		displayOptions: {
-			show: { operation: ['getProductPrice', 'createSale', 'getSalesRanking'] },
+			show: {
+				resource: ['articulos', 'ventas'],
+				operation: ['GetPrecios', 'Create', 'GetEstadisticas'],
+			},
 		},
 	},
 	{
@@ -967,12 +1008,8 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Purchase invoice document letter',
 		displayOptions: {
 			show: {
-				operation: [
-					'createPurchase',
-					'createPurchaseOrder',
-					'createPurchaseDeliveryNote',
-					'createSalesDeliveryNote',
-				],
+				resource: ['compras', 'ordenesCompra', 'remitosCompra', 'remitosVenta'],
+				operation: ['Create'],
 			},
 		},
 	},
@@ -982,7 +1019,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'boolean',
 		default: false,
 		description: 'Whether to return only the first response without expanding group variants',
-		displayOptions: { show: { operation: ['listAvailableProducts'] } },
+		displayOptions: { show: { resource: ['articulos'], operation: ['GetVenta'] } },
 	},
 	{
 		displayName: 'Voucher Type Name',
@@ -991,7 +1028,7 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		placeholder: 'Purchase invoice',
 		description: 'Invoice voucher type name',
-		displayOptions: { show: { operation: ['createPurchase'] } },
+		displayOptions: { show: { resource: ['compras'], operation: ['Create'] } },
 	},
 	{
 		displayName: 'Article Name',
@@ -1011,12 +1048,8 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Purchase invoice document number',
 		displayOptions: {
 			show: {
-				operation: [
-					'createPurchase',
-					'createPurchaseOrder',
-					'createPurchaseDeliveryNote',
-					'createSalesDeliveryNote',
-				],
+				resource: ['compras', 'ordenesCompra', 'remitosCompra', 'remitosVenta'],
+				operation: ['Create'],
 			},
 		},
 	},
@@ -1037,12 +1070,8 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Supplier ID used to search inside the system',
 		displayOptions: {
 			show: {
-				operation: [
-					'createPurchaseOrder',
-					'searchSupplier',
-					'listPurchaseOrders',
-					'createPurchaseDeliveryNote',
-				],
+				resource: ['ordenesCompra', 'proveedores', 'remitosCompra'],
+				operation: ['Create', 'GetOne', 'Get'],
 			},
 		},
 	},
@@ -1055,13 +1084,8 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Document point-of-sale number',
 		displayOptions: {
 			show: {
-				operation: [
-					'createPurchaseOrder',
-					'createSale',
-					'createPurchase',
-					'createPurchaseDeliveryNote',
-					'createSalesDeliveryNote',
-				],
+				resource: ['ordenesCompra', 'ventas', 'compras', 'remitosCompra', 'remitosVenta'],
+				operation: ['Create'],
 			},
 		},
 	},
@@ -1074,14 +1098,15 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				operation: [
-					'searchTaxpayerCustomer',
+					'GetOneContribuyente',
 					'searchCustomers',
-					'createSupplier',
-					'createSalesOrder',
-					'listSuppliers',
-					'createPurchaseOrder',
+					'Create',
+					'Create',
+					'Get',
+					'Create',
 					'createCustomer',
 				],
+				resource: ['clientes', 'proveedores', 'pedidosVenta', 'ordenesCompra'],
 			},
 		},
 	},
@@ -1091,7 +1116,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'number',
 		default: 1,
 		displayOptions: {
-			show: { operation: ['getSalesRanking'] },
+			show: { resource: ['ventas'], operation: ['GetEstadisticas'] },
 		},
 	},
 	{
@@ -1102,7 +1127,8 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Group ID used to search for articles',
 		displayOptions: {
 			show: {
-				operation: ['getSalesRanking', 'listProductsByBranch', 'listSubgroups'],
+				operation: ['GetEstadisticas', 'listProductsByBranch', 'GetAll'],
+				resource: ['ventas', 'articulos', 'subRubros'],
 			},
 		},
 	},
@@ -1121,7 +1147,12 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		description: 'Subgroup IDs used to search for articles',
-		displayOptions: { show: { operation: ['listCategories', 'listProductsByBranch'] } },
+		displayOptions: {
+			show: {
+				resource: ['categoriasArticulo', 'articulos'],
+				operation: ['GetAll', 'listProductsByBranch'],
+			},
+		},
 	},
 	{
 		displayName: 'Physical Branches - ID List',
@@ -1130,7 +1161,7 @@ const fieldDefinitions: INodeProperties[] = [
 		required: true,
 		default: '7345',
 		description: 'Physical branch ID separated by comma',
-		displayOptions: { show: { operation: ['getStock'] } },
+		displayOptions: { show: { resource: ['articulos'], operation: ['GetExistencias'] } },
 	},
 	{
 		displayName: 'Username',
@@ -1138,7 +1169,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		displayOptions: {
-			show: { operation: ['verifyOperatorCredentials', 'listMobileOperators'] },
+			show: { resource: ['operadoresMoviles'], operation: ['GetCredenciales', 'Get'] },
 		},
 	},
 	{
@@ -1148,7 +1179,8 @@ const fieldDefinitions: INodeProperties[] = [
 		default: 0,
 		displayOptions: {
 			show: {
-				operation: ['createSupplier', 'listSuppliers'],
+				resource: ['proveedores'],
+				operation: ['Create', 'Get'],
 			},
 		},
 	},
@@ -1160,7 +1192,8 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				operation: ['listMobileOperators'],
+				resource: ['operadoresMoviles'],
+				operation: ['Get'],
 			},
 		},
 	},
@@ -1198,31 +1231,28 @@ const fieldDefinitions: INodeProperties[] = [
 			show: {
 				operation: [
 					'GetDatosGenerales',
-					'getProductByCode',
-					'listAvailableProducts',
-					'getProductPrice',
+					'GetOne',
+					'GetVenta',
+					'GetPrecios',
 					'listProductsByBranch',
 					'getProductInBranch',
 					'searchCustomers',
 					'searchCustomerByCuit',
 					'listCustomers',
-					'getCustomerBalance',
-					'getCustomerBalanceDetails',
+					'GetSaldoCuentaCorriente',
+					'GetComposicionSaldoCuentaCorriente',
 					'listPaymentInvoices',
 					'listSalesInvoices',
-					'listSalesInvoicesById',
+					'Get',
 					'listCustomerCommercialPromotions',
-					'searchTaxpayerCustomer',
-					'listSalesVouchers',
-					'listSalesOrders',
-					'listFilteredSalesOrders',
-					'getSalesRanking',
+					'GetOneContribuyente',
+					'GetAllVentas',
+					'GetConsulta',
+					'GetEstadisticas',
 					'listPayments',
-					'listPurchases',
-					'listPurchaseVouchers',
-					'listPurchaseOrders',
-					'getPurchaseOrderDetails',
-					'listSuppliers',
+					'Get',
+					'GetAllCompras',
+					'GetOne',
 				],
 			},
 		},
@@ -1307,7 +1337,7 @@ export const HttpOptions: INodeProperties[] = [
 		],
 		displayOptions: {
 			show: {
-				operation: ['listCustomers', 'GetDatosGenerales', 'listAvailableProducts'],
+				operation: ['listCustomers', 'GetDatosGenerales', 'GetVenta'],
 			},
 		},
 	},
