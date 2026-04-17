@@ -7,8 +7,6 @@ The `Centum` node simplifies interaction with the Centum API endpoints, allowing
 
 The node is built to be extensible, making it easy to add new operations for specific integration needs with Centum.
 
-> Breaking change: resource values now follow normalized identifiers derived from the CSV `Resource New` column. Existing workflows created with the previous resource values must be updated before reuse.
-
 ## Requires 3 parameters in the **Centum API** credential:
 
 | Field                               | Type         | Example                                                       | Required   |
