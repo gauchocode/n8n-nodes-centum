@@ -240,6 +240,25 @@ const listPurchases: ResourceHandler = async (context) => {
 	};
 
 	try {
+		if (purchaseId) {
+			const parsedPurchaseId = Number(purchaseId);
+			if (!Number.isInteger(parsedPurchaseId) || parsedPurchaseId <= 0) {
+				throw new NodeOperationError(
+					executeFunctions.getNode(),
+					'purchaseId must be a positive integer.',
+				);
+			}
+
+			const purchase = await helperFns.apiRequest<any>(`${centumUrl}/Compras/${parsedPurchaseId}`, {
+				context: executeFunctions,
+				debugItemIndex: itemIndex,
+				method: 'GET',
+				headers,
+			});
+
+			return [executeFunctions.helpers.returnJsonArray(purchase)];
+		}
+
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/Compras/FiltrosCompra`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,

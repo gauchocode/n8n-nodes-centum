@@ -837,10 +837,6 @@ const listSalesInvoicesById: ResourceHandler = async (context) => {
 	void consumerApiPublicId;
 
 	const saleIdParam = helperFns.getNodeParameterOrThrow(executeFunctions, 'saleId', itemIndex);
-	const fromDate = helperFns.getNodeParameterOrThrow(executeFunctions, 'startDate', itemIndex);
-	const toDate = helperFns.getNodeParameterOrThrow(executeFunctions, 'endDate', itemIndex);
-	const formattedFromDate = String(fromDate).split('T')[0];
-	const formattedToDate = String(toDate).split('T')[0];
 
 	// Parameter validation
 	const saleId = Number(saleIdParam);
@@ -848,35 +844,15 @@ const listSalesInvoicesById: ResourceHandler = async (context) => {
 		throw new NodeOperationError(executeFunctions.getNode(), 'saleId must be a positive number.');
 	}
 
-	if (!fromDate) {
-		throw new NodeOperationError(executeFunctions.getNode(), 'startDate is required.');
-	}
-
-	if (!toDate) {
-		throw new NodeOperationError(executeFunctions.getNode(), 'endDate is required.');
-	}
-
 	try {
-		const body = {
-			fechaDocumentoDesde: formattedFromDate,
-			fechaDocumentoHasta: formattedToDate,
-			idVenta: saleId,
-		};
-
-		const response = await helperFns.apiRequest<any>(`${centumUrl}/Ventas/FiltrosVenta`, {
+		const sale = await helperFns.apiRequest<any>(`${centumUrl}/Ventas/${saleId}`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: 'POST',
+			method: 'GET',
 			headers,
-			body,
 		});
 
-		// Validate the response
-		if (!response || typeof response !== 'object') {
-			throw new NodeOperationError(executeFunctions.getNode(), 'Invalid server response.');
-		}
-
-		return [executeFunctions.helpers.returnJsonArray(response)];
+		return [executeFunctions.helpers.returnJsonArray(sale)];
 	} catch (error) {
 		if (error instanceof NodeApiError) {
 			throw error;

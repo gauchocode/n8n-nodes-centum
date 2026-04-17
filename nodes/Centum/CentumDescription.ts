@@ -233,7 +233,6 @@ const fieldDefinitions: INodeProperties[] = [
 		displayName: 'Customer ID',
 		name: 'customerId',
 		type: 'string',
-		required: true,
 		default: '',
 		placeholder: 'Enter customer ID',
 		description: 'Customer used by the selected operation',
@@ -245,8 +244,6 @@ const fieldDefinitions: INodeProperties[] = [
 					'clientes',
 					'cobros',
 					'pedidosVenta',
-					'ordenesCompra',
-					'ventas',
 					'remitosVenta',
 					'remitosCompra',
 				],
@@ -258,6 +255,20 @@ const fieldDefinitions: INodeProperties[] = [
 					'GetConsulta',
 					'Get',
 				],
+			},
+		},
+	},
+	{
+		displayName: 'Customer ID',
+		name: 'customerId',
+		type: 'string',
+		default: '',
+		placeholder: 'Enter customer ID',
+		description: 'Customer used by the selected operation',
+		displayOptions: {
+			show: {
+				resource: ['ventas'],
+				operation: ['Create', 'GetConsulta'],
 			},
 		},
 	},
@@ -376,8 +387,20 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['ventas', 'cobros', 'compras', 'pedidosVenta', 'ordenesCompra'],
+				resource: ['cobros', 'compras', 'pedidosVenta', 'ordenesCompra'],
 				operation: ['Create', 'Get', 'GetConsulta', 'GetEstadisticas'],
+			},
+		},
+	},
+	{
+		displayName: 'Date From',
+		name: 'startDate',
+		type: 'dateTime',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ventas'],
+				operation: ['Create', 'GetConsulta', 'GetEstadisticas'],
 			},
 		},
 	},
@@ -388,8 +411,20 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['ventas', 'cobros', 'compras', 'pedidosVenta', 'ordenesCompra'],
+				resource: ['cobros', 'compras', 'pedidosVenta', 'ordenesCompra'],
 				operation: ['Get', 'GetConsulta', 'GetEstadisticas'],
+			},
+		},
+	},
+	{
+		displayName: 'Date To',
+		name: 'endDate',
+		type: 'dateTime',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ventas'],
+				operation: ['GetConsulta', 'GetEstadisticas'],
 			},
 		},
 	},
@@ -716,7 +751,6 @@ const fieldDefinitions: INodeProperties[] = [
 	{
 		displayName: 'Payment ID',
 		name: 'paymentId',
-		required: true,
 		type: 'number',
 		default: 0,
 		displayOptions: { show: { resource: ['cobros'], operation: ['Get'] } },
@@ -860,7 +894,18 @@ const fieldDefinitions: INodeProperties[] = [
 		placeholder: 'Enter country ID',
 		description: 'Country ID used to fetch provinces',
 		displayOptions: {
-			show: { resource: ['provincias', 'proveedores', 'clientes'], operation: ['Get', 'Create'] },
+			show: { resource: ['provincias'], operation: ['Get'] },
+		},
+	},
+	{
+		displayName: 'Country ID',
+		name: 'countryId',
+		type: 'string',
+		default: '',
+		placeholder: 'Enter country ID',
+		description: 'Country ID used to create the record',
+		displayOptions: {
+			show: { resource: ['proveedores', 'clientes'], operation: ['Create'] },
 		},
 	},
 	{
@@ -872,8 +917,22 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Province ID used to fetch related information',
 		displayOptions: {
 			show: {
-				resource: ['departamentos', 'proveedores', 'clientes'],
-				operation: ['Get', 'Create'],
+				resource: ['departamentos'],
+				operation: ['Get'],
+			},
+		},
+	},
+	{
+		displayName: 'Province ID',
+		name: 'provinceId',
+		type: 'string',
+		default: '',
+		placeholder: 'Enter province ID',
+		description: 'Province ID used to create the record',
+		displayOptions: {
+			show: {
+				resource: ['proveedores', 'clientes'],
+				operation: ['Create'],
 			},
 		},
 	},
@@ -1026,8 +1085,22 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Supplier ID used to search inside the system',
 		displayOptions: {
 			show: {
-				resource: ['ordenesCompra', 'proveedores', 'remitosCompra'],
-				operation: ['Create', 'GetOne', 'Get'],
+				resource: ['proveedores'],
+				operation: ['GetOne'],
+			},
+		},
+	},
+	{
+		displayName: 'Supplier ID',
+		name: 'supplierId',
+		type: 'string',
+		default: '',
+		placeholder: 'Enter supplier ID',
+		description: 'Supplier ID used to filter or create the record',
+		displayOptions: {
+			show: {
+				resource: ['ordenesCompra', 'remitosCompra'],
+				operation: ['Create', 'Get'],
 			},
 		},
 	},

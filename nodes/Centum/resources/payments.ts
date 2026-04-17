@@ -98,6 +98,25 @@ const listPayments: ResourceHandler = async (context) => {
 	};
 
 	try {
+		if (paymentId) {
+			const parsedPaymentId = Number(paymentId);
+			if (!Number.isInteger(parsedPaymentId) || parsedPaymentId <= 0) {
+				throw new NodeOperationError(
+					executeFunctions.getNode(),
+					'paymentId must be a positive integer.',
+				);
+			}
+
+			const payment = await helperFns.apiRequest<any>(`${centumUrl}/Cobros/${parsedPaymentId}`, {
+				context: executeFunctions,
+				debugItemIndex: itemIndex,
+				method: 'GET',
+				headers,
+			});
+
+			return [executeFunctions.helpers.returnJsonArray(payment)];
+		}
+
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/Cobros/FiltrosCobro`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
