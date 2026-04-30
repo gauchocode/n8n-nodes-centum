@@ -303,7 +303,7 @@ const listSalesOrderStatuses: ResourceHandler = async (context) => {
 	}
 };
 
-const listSalesOrders: ResourceHandler = async (context) => {
+const listFilteredSalesOrders: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
 		centumUrl,
@@ -376,80 +376,6 @@ const listSalesOrders: ResourceHandler = async (context) => {
 	try {
 		const response = await helperFns.apiRequest<any>(
 			`${centumUrl}/PedidosVenta/FiltrosPedidoVenta`,
-			{
-				context: executeFunctions,
-				debugItemIndex: itemIndex,
-				method: 'POST',
-				headers,
-				body,
-			},
-		);
-		return [executeFunctions.helpers.returnJsonArray(response)];
-	} catch (error) {
-		if (error instanceof NodeApiError) {
-			throw error;
-		}
-		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Unknown error';
-		throw new NodeOperationError(
-			executeFunctions.getNode(),
-			`Error getting sales orders for customer ${customerId}: ${errorMessage}`,
-		);
-	}
-};
-
-const listFilteredSalesOrders: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
-	void itemIndex;
-	void centumUrl;
-	void headers;
-	void centumApiCredentials;
-	void consumerApiPublicId;
-
-	const customerId = helperFns.getResourceLocatorValue(
-		helperFns.getNodeParameterOrThrow(executeFunctions, 'customerId', itemIndex),
-	);
-	const statusIds = helperFns.getResourceLocatorValue(
-		helperFns.getNodeParameterOrThrow(executeFunctions, 'statusId', itemIndex),
-	);
-	const fromDate = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'startDate',
-		itemIndex,
-		'',
-	) as string;
-	const toDate = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'endDate',
-		itemIndex,
-		'',
-	) as string;
-	const formattedFromDate = String(fromDate).split('T')[0];
-	const formattedToDate = String(toDate).split('T')[0];
-	if (!customerId && !statusIds && !formattedFromDate && !formattedToDate) {
-		throw new NodeOperationError(
-			executeFunctions.getNode(),
-			'Provide at least one filter before running the search.',
-		);
-	}
-
-	const body = {
-		idCliente: customerId,
-		fechaDocumentoDesde: formattedFromDate,
-		fechaDocumentoHasta: formattedToDate,
-		idsEstado: statusIds,
-	};
-
-	try {
-		const response = await helperFns.apiRequest<any>(
-			`${centumUrl}/PedidosVenta/FiltrosPedidoVentaConsulta`,
 			{
 				context: executeFunctions,
 				debugItemIndex: itemIndex,
@@ -1121,7 +1047,6 @@ export const salesHandlers: ResourceHandlerMap = {
 	createSalesOrder: createSalesOrder,
 	getSalesOrderDetails: getSalesOrderDetails,
 	listSalesOrderStatuses: listSalesOrderStatuses,
-	listSalesOrders: listSalesOrders,
 	listFilteredSalesOrders: listFilteredSalesOrders,
 	createSale: createSale,
 	listSalesInvoices: listSalesInvoices,

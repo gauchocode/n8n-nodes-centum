@@ -239,11 +239,9 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: [
-					'compras',
 					'articulos',
 					'clientes',
 					'cobros',
-					'pedidosVenta',
 					'remitosVenta',
 					'remitosCompra',
 				],
@@ -267,8 +265,36 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Customer used by the selected operation',
 		displayOptions: {
 			show: {
+				resource: ['pedidosVenta'],
+				operation: ['GetConsulta'],
+			},
+		},
+	},
+	{
+		displayName: 'Customer ID',
+		name: 'customerId',
+		type: 'string',
+		default: '',
+		placeholder: 'Enter customer ID',
+		description: 'Customer used by the selected operation',
+		displayOptions: {
+			show: {
 				resource: ['ventas'],
 				operation: ['Create', 'GetConsulta'],
+			},
+		},
+	},
+	{
+		displayName: 'Supplier ID',
+		name: 'supplierId',
+		type: 'string',
+		default: '',
+		placeholder: 'Enter supplier ID',
+		description: 'Supplier ID used to filter purchases',
+		displayOptions: {
+			show: {
+				resource: ['compras'],
+				operation: ['Get'],
 			},
 		},
 	},
@@ -347,10 +373,10 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['clientes'],
-				operation: ['Update', 'createTaxpayerCustomer'],
+				operation: ['Update'],
 			},
 		},
-		description: 'JSON object sent to the API to update a customer or create a taxpayer customer',
+		description: 'JSON object sent to the API to update a customer',
 	},
 	{
 		displayName: 'CUIT',
@@ -360,7 +386,7 @@ const fieldDefinitions: INodeProperties[] = [
 		placeholder: 'Enter the CUIT...',
 		displayOptions: {
 			show: {
-				operation: ['Create', 'GetOneContribuyente', 'createTaxpayerCustomer', 'Get'],
+				operation: ['Create', 'Get', 'GetOneContribuyente'],
 				resource: ['proveedores', 'clientes'],
 			},
 		},
@@ -385,10 +411,22 @@ const fieldDefinitions: INodeProperties[] = [
 		name: 'startDate',
 		type: 'dateTime',
 		default: '',
+			displayOptions: {
+				show: {
+					resource: ['cobros', 'compras', 'ordenesCompra', 'ordenesTraspaso'],
+					operation: ['Create', 'Get', 'GetConsulta', 'GetEstadisticas'],
+				},
+			},
+	},
+	{
+		displayName: 'Date From',
+		name: 'startDate',
+		type: 'dateTime',
+		default: '',
 		displayOptions: {
 			show: {
-				resource: ['cobros', 'compras', 'pedidosVenta', 'ordenesCompra'],
-				operation: ['Create', 'Get', 'GetConsulta', 'GetEstadisticas'],
+				resource: ['pedidosVenta'],
+				operation: ['GetConsulta'],
 			},
 		},
 	},
@@ -411,8 +449,20 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['cobros', 'compras', 'pedidosVenta', 'ordenesCompra'],
+				resource: ['cobros', 'compras', 'ordenesCompra', 'ordenesTraspaso'],
 				operation: ['Get', 'GetConsulta', 'GetEstadisticas'],
+			},
+		},
+	},
+	{
+		displayName: 'Date To',
+		name: 'endDate',
+		type: 'dateTime',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['pedidosVenta'],
+				operation: ['GetConsulta'],
 			},
 		},
 	},
@@ -438,6 +488,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: [
+					'articulos',
 					'pedidosVenta',
 					'ordenesCompra',
 					'remitosCompra',
@@ -445,6 +496,20 @@ const fieldDefinitions: INodeProperties[] = [
 					'promocionesComerciales',
 				],
 				operation: ['Create', 'GetVenta', 'Get'],
+			},
+		},
+	},
+	{
+		displayName: 'Transfer Document Date',
+		name: 'transferDocumentDate',
+		type: 'dateTime',
+		required: true,
+		default: undefined,
+		description: 'Document date for the transfer order',
+		displayOptions: {
+			show: {
+				resource: ['ordenesTraspaso'],
+				operation: ['Create'],
 			},
 		},
 	},
@@ -647,7 +712,12 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['clientes', 'articulos'],
-				operation: ['GetSaldoCuentaCorriente', 'GetComposicionSaldoCuentaCorriente', 'GetPrecios'],
+				operation: [
+					'GetSaldoCuentaCorriente',
+					'GetComposicionSaldoCuentaCorriente',
+					'GetPrecios',
+					'GetVenta',
+				],
 			},
 		},
 	},
@@ -675,7 +745,36 @@ const fieldDefinitions: INodeProperties[] = [
 		placeholder: 'Enter driver ID',
 		description: 'Driver used for the delivery note',
 		displayOptions: {
-			show: { resource: ['remitosCompra', 'remitosVenta'], operation: ['Create'] },
+			show: { resource: ['remitosCompra', 'remitosVenta', 'ordenesTraspaso'], operation: ['Create'] },
+		},
+	},
+	{
+		displayName: 'Transfer Order ID',
+		name: 'transferOrderId',
+		type: 'number',
+		default: 0,
+		placeholder: '10',
+		description: 'Unique transfer-order identifier used by the selected operation',
+		displayOptions: {
+			show: {
+				resource: ['ordenesTraspaso'],
+				operation: ['GetOne', 'Dispatch', 'Finalize', 'Get'],
+			},
+		},
+	},
+	{
+		displayName: 'Transfer Articles',
+		name: 'transferArticles',
+		required: true,
+		type: 'json',
+		default: [],
+		placeholder: '[{"IdArticulo": 13766, "Cantidad": 10}]',
+		description: 'List of transfer items as a JSON array with IdArticulo and Cantidad',
+		displayOptions: {
+			show: {
+				resource: ['ordenesTraspaso'],
+				operation: ['Create'],
+			},
 		},
 	},
 	{
@@ -708,7 +807,7 @@ const fieldDefinitions: INodeProperties[] = [
 		placeholder: '1467',
 		displayOptions: {
 			show: {
-				resource: ['articulos'],
+				resource: ['articulos', 'ajustesMovimientosStock'],
 				operation: [
 					'GetOneImagen',
 					'GetDatosGenerales',
@@ -749,6 +848,34 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'Origin Branch Section ID',
+		name: 'originBranchSectionId',
+		type: 'number',
+		default: 0,
+		placeholder: '6757',
+		description: 'Origin branch section ID for the transfer order',
+		displayOptions: {
+			show: {
+				resource: ['ordenesTraspaso'],
+				operation: ['Create', 'Get'],
+			},
+		},
+	},
+	{
+		displayName: 'Destination Branch Section ID',
+		name: 'destinationBranchSectionId',
+		type: 'number',
+		default: 0,
+		placeholder: '7656',
+		description: 'Destination branch section ID for the transfer order',
+		displayOptions: {
+			show: {
+				resource: ['ordenesTraspaso'],
+				operation: ['Create', 'Get'],
+			},
+		},
+	},
+	{
 		displayName: 'Payment ID',
 		name: 'paymentId',
 		type: 'number',
@@ -773,8 +900,64 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Sales order status number',
 		displayOptions: {
 			show: {
-				resource: ['pedidosVenta', 'ordenesCompra'],
+				resource: ['ordenesCompra'],
 				operation: ['Get', 'GetConsulta'],
+			},
+		},
+	},
+	{
+		displayName: 'Status ID',
+		name: 'statusId',
+		type: 'string',
+		default: '',
+		placeholder: 'Enter status ID',
+		description: 'Sales order status number',
+		displayOptions: {
+			show: {
+				resource: ['pedidosVenta'],
+				operation: ['GetConsulta'],
+			},
+		},
+	},
+	{
+		displayName: 'Transfer Status ID',
+		name: 'transferStatusId',
+		type: 'number',
+		default: 0,
+		placeholder: '6518',
+		description: 'Status ID used to filter transfer orders',
+		displayOptions: {
+			show: {
+				resource: ['ordenesTraspaso'],
+				operation: ['Get'],
+			},
+		},
+	},
+	{
+		displayName: 'Concept ID',
+		name: 'transferConceptId',
+		type: 'number',
+		default: 0,
+		placeholder: '31',
+		description: 'ConceptoVarios ID for the transfer order',
+		displayOptions: {
+			show: {
+				resource: ['ordenesTraspaso'],
+				operation: ['Create', 'Get'],
+			},
+		},
+	},
+	{
+		displayName: 'Transport ID',
+		name: 'transferTransportId',
+		type: 'number',
+		default: 0,
+		placeholder: '1',
+		description: 'Transport ID for the transfer order',
+		displayOptions: {
+			show: {
+				resource: ['ordenesTraspaso'],
+				operation: ['Create'],
 			},
 		},
 	},
@@ -831,8 +1014,20 @@ const fieldDefinitions: INodeProperties[] = [
 		default: 0,
 		displayOptions: {
 			show: {
-				resource: ['ventas', 'pedidosVenta'],
-				operation: ['GetConsulta', 'Get'],
+				resource: ['ventas'],
+				operation: ['GetConsulta', 'GetOne'],
+			},
+		},
+	},
+	{
+		displayName: 'Sale ID',
+		name: 'saleId',
+		type: 'number',
+		default: 0,
+		displayOptions: {
+			show: {
+				resource: ['pedidosVenta'],
+				operation: ['GetConsulta'],
 			},
 		},
 	},
@@ -848,8 +1043,15 @@ const fieldDefinitions: INodeProperties[] = [
 		name: 'includeCanceled',
 		type: 'boolean',
 		default: false,
+		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta', 'GetOne'] } },
+	},
+	{
+		displayName: 'Include Canceled Orders',
+		name: 'includeCanceled',
+		type: 'boolean',
+		default: false,
 		displayOptions: {
-			show: { resource: ['ventas', 'pedidosVenta'], operation: ['GetConsulta', 'Get'] },
+			show: { resource: ['pedidosVenta'], operation: ['GetConsulta'] },
 		},
 	},
 	{
@@ -872,8 +1074,16 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'number',
 		description: 'User ID that created the sales voucher',
 		default: 0,
+		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta', 'GetOne'] } },
+	},
+	{
+		displayName: 'Created By User ID',
+		name: 'createdByUserId',
+		type: 'number',
+		description: 'User ID that created the sales voucher',
+		default: 0,
 		displayOptions: {
-			show: { resource: ['ventas', 'pedidosVenta'], operation: ['GetConsulta', 'Get'] },
+			show: { resource: ['pedidosVenta'], operation: ['GetConsulta'] },
 		},
 	},
 	{
@@ -882,8 +1092,16 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'number',
 		description: 'Transport ID associated with the sales voucher',
 		default: 0,
+		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta', 'GetOne'] } },
+	},
+	{
+		displayName: 'Transport ID',
+		name: 'transportId',
+		type: 'number',
+		description: 'Transport ID associated with the sales voucher',
+		default: 0,
 		displayOptions: {
-			show: { resource: ['ventas', 'pedidosVenta'], operation: ['GetConsulta', 'Get'] },
+			show: { resource: ['pedidosVenta'], operation: ['GetConsulta'] },
 		},
 	},
 	{
@@ -959,6 +1177,34 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'Origin Physical Branch ID',
+		name: 'originPhysicalBranchId',
+		type: 'string',
+		default: '',
+		placeholder: '6084',
+		description: 'Origin branch ID for the transfer order',
+		displayOptions: {
+			show: {
+				resource: ['ordenesTraspaso'],
+				operation: ['Create', 'Get'],
+			},
+		},
+	},
+	{
+		displayName: 'Destination Physical Branch ID',
+		name: 'destinationPhysicalBranchId',
+		type: 'string',
+		default: '',
+		placeholder: '7655',
+		description: 'Destination branch ID for the transfer order',
+		displayOptions: {
+			show: {
+				resource: ['ordenesTraspaso'],
+				operation: ['Create', 'Get'],
+			},
+		},
+	},
+	{
 		displayName: 'Cash Value ID',
 		name: 'cashValueId',
 		type: 'number',
@@ -1024,6 +1270,20 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'Transfer Document Letter',
+		name: 'transferDocumentLetter',
+		type: 'string',
+		default: '',
+		placeholder: 'T',
+		description: 'Document letter for the transfer order',
+		displayOptions: {
+			show: {
+				resource: ['ordenesTraspaso'],
+				operation: ['Create'],
+			},
+		},
+	},
+	{
 		displayName: 'Full Migration',
 		name: 'fullMigration',
 		type: 'boolean',
@@ -1064,6 +1324,20 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['compras', 'ordenesCompra', 'remitosCompra', 'remitosVenta'],
+				operation: ['Create'],
+			},
+		},
+	},
+	{
+		displayName: 'Transfer Document Number',
+		name: 'transferDocumentNumber',
+		type: 'number',
+		default: 0,
+		placeholder: '1170',
+		description: 'Document number for the transfer order',
+		displayOptions: {
+			show: {
+				resource: ['ordenesTraspaso'],
 				operation: ['Create'],
 			},
 		},
@@ -1119,6 +1393,20 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'Transfer Point of Sale',
+		name: 'transferPointOfSale',
+		type: 'number',
+		default: 0,
+		placeholder: '1',
+		description: 'Point-of-sale number for the transfer order document',
+		displayOptions: {
+			show: {
+				resource: ['ordenesTraspaso'],
+				operation: ['Create'],
+			},
+		},
+	},
+	{
 		displayName: 'Business Name',
 		name: 'businessName',
 		type: 'string',
@@ -1126,7 +1414,7 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Customer business name to search for',
 		displayOptions: {
 			show: {
-				operation: ['GetOneContribuyente', 'Create', 'Get'],
+				operation: ['Create', 'Get'],
 				resource: ['clientes', 'proveedores', 'pedidosVenta', 'ordenesCompra'],
 			},
 		},
@@ -1148,7 +1436,7 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Group ID used to search for articles',
 		displayOptions: {
 			show: {
-				operation: ['GetEstadisticas', 'GetExistenciasIndicadores', 'GetAll'],
+				operation: ['GetEstadisticas', 'GetExistenciasIndicadores', 'GetAll', 'GetVenta'],
 				resource: ['ventas', 'articulos', 'subRubros'],
 			},
 		},
@@ -1171,7 +1459,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['categoriasArticulo', 'articulos'],
-				operation: ['GetAll', 'GetExistenciasIndicadores'],
+				operation: ['GetAll', 'GetExistenciasIndicadores', 'GetVenta'],
 			},
 		},
 	},
@@ -1250,16 +1538,17 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'boolean',
 		default: false,
 		description: 'Whether to return only the most useful top-level fields',
-		displayOptions: {
-			show: {
-				resource: [
-					'articulos',
-					'clientes',
-					'ventas',
-					'pedidosVenta',
-					'cobros',
-					'compras',
-					'tiposComprobante',
+			displayOptions: {
+				show: {
+					resource: [
+						'articulos',
+						'clientes',
+						'ventas',
+						'pedidosVenta',
+						'ordenesTraspaso',
+						'cobros',
+						'compras',
+						'tiposComprobante',
 					'ordenesCompra',
 					'proveedores',
 					'promocionesComerciales',
@@ -1271,13 +1560,15 @@ const fieldDefinitions: INodeProperties[] = [
 					'GetPrecios',
 					'GetExistenciasIndicadores',
 					'Get',
+					'GetOneContribuyente',
 					'GetSaldoCuentaCorriente',
 					'GetComposicionSaldoCuentaCorriente',
 					'GetConsulta',
-					'GetOneContribuyente',
 					'GetAllVentas',
 					'GetEstadisticas',
 					'GetAllCompras',
+					'Dispatch',
+					'Finalize',
 				],
 			},
 		},

@@ -62,10 +62,9 @@ The node interface shows resource and operation labels in Spanish. Saved resourc
 - `getCustomerBalanceDetails`: Get the detailed account balance composition for a customer.
 - `listCustomers`: List all registered customers.
 - `searchCustomers`: Search customers using filters.
+- `searchTaxpayerCustomer`: Search taxpayer data by CUIT.
 - `searchCustomerByCuit`: Search customers by CUIT.
 - `updateCustomer`: Update a customer and return the updated resource information.
-- `createTaxpayerCustomer`: Create a new taxpayer customer.
-- `searchTaxpayerCustomer`: Search taxpayer data by CUIT or business name.
 
 ### Cobros (`cobros`)
 

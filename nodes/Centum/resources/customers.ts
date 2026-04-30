@@ -287,47 +287,24 @@ const searchTaxpayerCustomer: ResourceHandler = async (context) => {
 	void consumerApiPublicId;
 
 	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, 'cuit', itemIndex, '') as string;
-	const businessName = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'businessName',
-		itemIndex,
-		'',
-	) as string;
 
-	if (!cuit && !businessName) {
+	if (!/^\d{11}$/.test(cuit)) {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			'Provide at least a CUIT or business name to search taxpayers.',
+			'CUIT must be a string with 11 numeric digits.',
 		);
 	}
 
-	let url = `${centumUrl}/Clientes/BuscarContribuyente`;
-	const queryParams: Record<string, string> = {};
-
-	if (cuit && !businessName) {
-		url += `/${cuit}`;
-	} else {
-		if (cuit) queryParams.Cuit = cuit;
-		if (businessName) queryParams.razonSocial = businessName;
-	}
-
-	const requestDetails = {
-		url,
-		headers,
-		queryParams,
-	};
-
 	try {
-		const response = await helperFns.apiRequest<any>(requestDetails.url, {
-			context: executeFunctions,
-			debugItemIndex: itemIndex,
-			method: 'GET',
-			headers: requestDetails.headers,
-			queryParams: requestDetails.queryParams,
-		});
-		if (response.CantidadTotalItems === 1) {
-			return [executeFunctions.helpers.returnJsonArray(response.Items as any)];
-		}
+		const response = await helperFns.apiRequest<any>(
+			`${centumUrl}/Clientes/BuscarContribuyente/${cuit}`,
+			{
+				context: executeFunctions,
+				debugItemIndex: itemIndex,
+				method: 'GET',
+				headers,
+			},
+		);
 
 		return [executeFunctions.helpers.returnJsonArray(response as any)];
 	} catch (error) {
@@ -337,68 +314,6 @@ const searchTaxpayerCustomer: ResourceHandler = async (context) => {
 		const errorMessage =
 			error?.response?.data?.Message || (error as any).message || 'Unknown error';
 		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
-	}
-};
-
-const createTaxpayerCustomer: ResourceHandler = async (context) => {
-	const {
-		executeFunctions,
-		centumUrl,
-		headers,
-		centumApiCredentials,
-		consumerApiPublicId,
-		itemIndex,
-	} = context;
-	void itemIndex;
-	void centumUrl;
-	void headers;
-	void centumApiCredentials;
-	void consumerApiPublicId;
-
-	const bodyJson = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'jsonBody',
-		itemIndex,
-	) as any;
-	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, 'cuit', itemIndex);
-
-	if (typeof cuit !== 'string' || !/^\d{11}$/.test(cuit)) {
-		throw new NodeOperationError(
-			executeFunctions.getNode(),
-			'CUIT must be a string with 11 numeric digits.',
-		);
-	}
-
-	const taxpayerCustomerJson = helperFns.createTaxpayerCustomerJson(bodyJson, cuit);
-
-	try {
-		const createdCustomer = await helperFns.apiRequest(`${centumUrl}/Clientes`, {
-			context: executeFunctions,
-			debugItemIndex: itemIndex,
-			method: 'POST',
-			body: taxpayerCustomerJson,
-			headers,
-		});
-
-		return [executeFunctions.helpers.returnJsonArray([createdCustomer as any])];
-	} catch (error) {
-		if (error instanceof NodeApiError) {
-			throw error;
-		}
-		const statusCode = error?.response?.status;
-		const responseData = error?.response?.data;
-		const errorMessage =
-			responseData?.Message ||
-			responseData?.message ||
-			(error as any)?.message ||
-			'Unknown error while creating the taxpayer customer.';
-
-		const fullMessage = statusCode ? `Error ${statusCode}: ${errorMessage}` : errorMessage;
-
-		throw new NodeOperationError(executeFunctions.getNode(), fullMessage, {
-			description:
-				responseData?.Detail || 'An unexpected error occurred while calling the Centum API.',
-		});
 	}
 };
 
@@ -569,7 +484,6 @@ export const customersHandlers: ResourceHandlerMap = {
 	updateCustomer: updateCustomer,
 	createCustomer: createCustomer,
 	searchTaxpayerCustomer: searchTaxpayerCustomer,
-	createTaxpayerCustomer: createTaxpayerCustomer,
 	getCustomerBalance: getCustomerBalance,
 	getCustomerBalanceDetails: getCustomerBalanceDetails,
 	listCustomerFrequencies: listCustomerFrequencies,

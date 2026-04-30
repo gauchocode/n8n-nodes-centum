@@ -2,11 +2,7 @@ import { randomUUID, createHash as cryptoCreateHash } from 'crypto';
 import { setTimeout as delay } from 'node:timers/promises';
 import {
 	provinceConstants,
-	wooToCentumProvinceMap,
 	zoneConstants,
-	vatConditions,
-	grossIncomeConditions,
-	grossIncomeCategories,
 } from '../constants';
 
 import {
@@ -27,10 +23,6 @@ import {
 	IWooArticle,
 	ShippingLine,
 	CobroId,
-	IContribuyenteBodyInput,
-	CondicionIIBBCodigo,
-	IProvincias,
-	CondicionIVANombre,
 } from '../interfaces';
 import {
 	NodeParameterValue,
@@ -212,191 +204,6 @@ export const createCustomerJson = (respWoo: IWoo, dni: string) => {
 	};
 
 	return customerObj;
-};
-
-function getCentumProvinceFromWoo(wooCode: string): IProvincias | null {
-	return wooToCentumProvinceMap[wooCode] ?? null;
-}
-
-export const createTaxpayerCustomerJson = (body: IContribuyenteBodyInput, cuit: string) => {
-	const centumProvince =
-		getCentumProvinceFromWoo(body.Provincia ?? '') ??
-		provinceConstants.find(
-			(prov) => prov.Nombre.toLowerCase() === (body.Provincia ?? '').toLowerCase(),
-		) ??
-		provinceConstants[5]; // fallback a Buenos Aires
-
-	const cuitStr = String(cuit);
-	const fullAddress = [body.Direccion || '', body.NroDireccion || '', body.PisoDepartamento || '']
-		.filter(Boolean)
-		.join(' ');
-
-	return {
-		IdCliente: -1,
-		CUIT: cuit,
-		Codigo: `web-${cuitStr.slice(2, 10)}`,
-		RazonSocial: body.RazonSocial,
-		Email: body.Email || '',
-		Telefono: body.Telefono || '',
-		CodigoPostal: body.CodigoPostal,
-		Localidad: body.Localidad,
-		Direccion: fullAddress,
-		Provincia: centumProvince,
-		Zona: zoneConstants[0],
-		Pais: {
-			Codigo: 'ARG',
-			IdPais: 4657,
-			Nombre: 'Argentina',
-		},
-		CondicionIVA: vatConditions.find(
-			(condicion) =>
-				condicion.Nombre.toLocaleLowerCase() === (body.CondicionIVA ?? '').toLocaleLowerCase(),
-		) || {
-			IdCondicionIVA: 1895,
-			Codigo: 'RI',
-			Nombre: 'Responsable Inscripto' as CondicionIVANombre,
-		},
-		CondicionIIBB: grossIncomeConditions.find(
-			(condicion) =>
-				condicion.Codigo.toLocaleLowerCase() === (body.CondicionIIBB ?? '').toLocaleLowerCase(),
-		) || {
-			IdCondicionIIBB: 6051,
-			Codigo: 'Exento' as CondicionIIBBCodigo,
-		},
-		CategoriaIIBB: grossIncomeCategories.find(
-			(categoria) =>
-				categoria.Codigo.toLowerCase() === (body.CategoriaIIBB ?? '').toLocaleLowerCase(),
-		),
-		// || {
-		//     IdCondicionIIBB: 6054,
-		//     Codigo: 'Cosas Muebles'
-		//   }
-		NumeroIIBB: body.NumeroIIBB,
-		DireccionEntrega: fullAddress,
-		CigarreraCliente: {
-			Codigo: 'MSP',
-			IdCigarreraCliente: 6972,
-			Nombre: 'Massalin Particulares',
-		},
-		Bonificacion: {
-			Calculada: 0,
-			Codigo: '01',
-			IdBonificacion: 6235,
-		},
-		ClaseCliente: {
-			IdClaseCliente: 6087,
-			Codigo: 'ClaseDefecto',
-			Nombre: 'Clase Defecto',
-		},
-		CadenaCliente: {
-			Codigo: '365',
-			IdCadenaCliente: 6920,
-			Nombre: '365',
-		},
-		CondicionVenta: {
-			Codigo: 'VTA1',
-			IdCondicionVenta: 1,
-			Nombre: 'Contado',
-		},
-		DiasAtencionCliente: {
-			Codigo: 'LD',
-			IdDiasAtencionCliente: 6969,
-			Nombre: 'Lunes a Domingo',
-		},
-		EdadesPromedioConsumidoresCliente: {
-			Codigo: '111',
-			IdEdadesPromedioConsumidoresCliente: 6951,
-			Nombre: 'Hay igual cantidad de consumidores',
-		},
-		FrecuenciaCliente: {
-			IdFrecuenciaCliente: 6891,
-			Nombre: 'Frecuencia Defecto',
-		},
-		GeneroPromedioConsumidoresCliente: {
-			Codigo: '11',
-			IdGeneroPromedioConsumidoresCliente: 6964,
-			Nombre: 'Hay igual cantidad de consumidores',
-		},
-		HorarioAtencionCliente: {
-			Codigo: 'D',
-			IdHorarioAtencionCliente: 6970,
-			Nombre: 'Diurno',
-		},
-		LimiteCredito: {
-			IdLimiteCredito: 46002,
-			Nombre: 'Límite Credito 1',
-			Valor: 1000000,
-		},
-		Transporte: {
-			Codigo: 'TRA1',
-			CodigoPostal: null,
-			CodigoPostalEntrega: null,
-			Direccion: null,
-			DireccionEntrega: null,
-			Email: null,
-			IdTransporte: 1,
-			Localidad: null,
-			LocalidadEntrega: null,
-			NumeroDocumento: '00000000',
-			Pais: {
-				Codigo: 'ARG',
-				IdPais: 4657,
-				Nombre: 'Argentina',
-			},
-			PaisEntrega: null,
-			Provincia: {
-				Codigo: 'BSAS',
-				IdProvincia: 4876,
-				Nombre: 'Buenos Aires',
-			},
-			ProvinciaEntrega: null,
-			RazonSocial: 'Transporte Defecto',
-			Telefono: '',
-			TipoDocumento: {
-				Codigo: 'DNI',
-				IdTipoDocumento: 6028,
-				Nombre: 'Documento Nacional de Identidad',
-			},
-			ZonaEntrega: null,
-		},
-		UbicacionCliente: {
-			Codigo: 'BAR',
-			IdUbicacionCliente: 6942,
-			Nombre: 'Zona de Bares y Boliches',
-		},
-		Vendedor: {
-			IdVendedor: 12,
-			Codigo: 'V11',
-			Nombre: 'EXITOWEB',
-			CUIT: null,
-			Direccion: null,
-			Localidad: null,
-			Telefono: null,
-			Mail: null,
-			EsSupervisor: false,
-		},
-		CanalCliente: {
-			Codigo: 'OTR',
-			IdCanalCliente: 6904,
-			Nombre: 'Otros',
-		},
-		ListaPrecio: {
-			Codigo: ListaPrecioCodigo.Exitoweb,
-			Descripcion: Descripcion.TiendaOnLineExito,
-			FechaDesde: null,
-			FechaHasta: null,
-			Habilitado: true,
-			IdListaPrecio: 3,
-			ListaPrecioAlternativa: null,
-			Moneda: {
-				Codigo: 'ARS',
-				Cotizacion: 1,
-				IdMoneda: 1,
-				Nombre: 'Peso Argentino',
-			},
-			PorcentajePrecioSugerido: 0,
-		},
-	};
 };
 
 export const createOrderSaleJson = (

@@ -61,23 +61,6 @@ interface Zona {
 	CostoEntrega: number;
 }
 
-export interface IContribuyenteBodyInput {
-	RazonSocial: string;
-	Email?: string;
-	Telefono?: string;
-	CodigoPostal: string;
-	CondicionIVA?: string;
-	CondicionIIBB?: string;
-	CategoriaIIBB?: string;
-	NumeroIIBB?: string;
-	Localidad: string;
-	Provincia: string;
-	Direccion: string;
-	NroDireccion: string;
-	PisoDepartamento?: string;
-	Zona: string;
-}
-
 // interface CategoriaIIBB {
 // 	IdCategoriaIIBB?: number,
 // 	Codigo?: string
