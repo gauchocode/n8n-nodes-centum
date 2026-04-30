@@ -7,6 +7,7 @@ import { paymentsHandlers } from './payments';
 import { purchasesHandlers } from './purchases';
 import { suppliersHandlers } from './suppliers';
 import { logisticsHandlers } from './logistics';
+import { transferHandlers } from './transfers';
 import { stockHandlers } from './stock';
 import { geographyHandlers } from './geography';
 import { extrasHandlers } from './extras';
@@ -43,16 +44,16 @@ export const resourceHandlerGroups: Record<string, ResourceHandlerMap> = {
 		GetSaldoCuentaCorriente: customersHandlers.getCustomerBalance,
 		GetComposicionSaldoCuentaCorriente: customersHandlers.getCustomerBalanceDetails,
 		GetOneContribuyente: customersHandlers.searchTaxpayerCustomer,
-		createTaxpayerCustomer: customersHandlers.createTaxpayerCustomer,
-		createCustomer: customersHandlers.createCustomer,
+		Create: customersHandlers.createCustomer,
 	},
 	cobros: {
 		Get: paymentsHandlers.Get,
-		registerPayment: paymentsHandlers.registerPayment,
+		Create: paymentsHandlers.registerPayment,
 	},
 	compras: {
 		Create: purchasesHandlers.createPurchase,
 		Get: purchasesHandlers.listPurchases,
+		GetOne: purchasesHandlers.getPurchaseDetails,
 	},
 	conceptos: {
 		GetAll: extrasHandlers.listConcepts,
@@ -78,6 +79,13 @@ export const resourceHandlerGroups: Record<string, ResourceHandlerMap> = {
 		GetOne: purchasesHandlers.getPurchaseOrderDetails,
 		Get: purchasesHandlers.listPurchaseOrders,
 	},
+	ordenesTraspaso: {
+		Create: transferHandlers.createTransferOrder,
+		Get: transferHandlers.listTransferOrders,
+		GetOne: transferHandlers.getTransferOrderDetails,
+		Dispatch: transferHandlers.dispatchTransferOrder,
+		Finalize: transferHandlers.finalizeTransferOrder,
+	},
 	paises: {
 		GetAll: geographyHandlers.listCountries,
 	},
@@ -85,7 +93,6 @@ export const resourceHandlerGroups: Record<string, ResourceHandlerMap> = {
 		Create: salesHandlers.createSalesOrder,
 		GetOne: salesHandlers.getSalesOrderDetails,
 		GetAllEstados: salesHandlers.listSalesOrderStatuses,
-		Get: salesHandlers.listSalesOrders,
 		GetConsulta: salesHandlers.listFilteredSalesOrders,
 	},
 	promocionesComerciales: {
@@ -134,7 +141,7 @@ export const resourceHandlerGroups: Record<string, ResourceHandlerMap> = {
 		GetAll: extrasHandlers.listSellers,
 	},
 	ventas: {
-		Get: salesHandlers.listSalesInvoicesById,
+		GetOne: salesHandlers.listSalesInvoicesById,
 		GetConsulta: salesHandlers.listSalesInvoices,
 		Create: salesHandlers.createSale,
 		GetEstadisticas: salesHandlers.getSalesRanking,

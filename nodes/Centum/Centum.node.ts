@@ -193,7 +193,7 @@ const simplifiedOutputFields: Record<string, SimplifiedFieldSpec[]> = {
 		'ImportePendiente',
 	],
 	[simplifiedFieldKey('clientes', 'GetOneContribuyente')]: customerFields,
-	[simplifiedFieldKey('ventas', 'Get')]: documentFields,
+	[simplifiedFieldKey('ventas', 'GetOne')]: documentFields,
 	[simplifiedFieldKey('ventas', 'GetConsulta')]: documentFields,
 	[simplifiedFieldKey('ventas', 'GetEstadisticas')]: [
 		'IdCliente',
@@ -206,7 +206,6 @@ const simplifiedOutputFields: Record<string, SimplifiedFieldSpec[]> = {
 		{ key: 'Cliente', fields: ['IdCliente', 'Codigo', 'RazonSocial'] },
 		{ key: 'Articulo', fields: ['IdArticulo', 'Codigo', 'Nombre'] },
 	],
-	[simplifiedFieldKey('pedidosVenta', 'Get')]: documentFields,
 	[simplifiedFieldKey('pedidosVenta', 'GetConsulta')]: documentFields,
 	[simplifiedFieldKey('cobros', 'Get')]: [
 		...documentFields,
@@ -224,10 +223,31 @@ const simplifiedOutputFields: Record<string, SimplifiedFieldSpec[]> = {
 		'Activa',
 	],
 	[simplifiedFieldKey('compras', 'Get')]: documentFields,
+	[simplifiedFieldKey('compras', 'GetOne')]: documentFields,
 	[simplifiedFieldKey('tiposComprobante', 'GetAllCompras')]: purchaseVoucherFields,
 	[simplifiedFieldKey('tiposComprobante', 'GetAllVentas')]: salesVoucherFields,
 	[simplifiedFieldKey('ordenesCompra', 'Get')]: documentFields,
 	[simplifiedFieldKey('ordenesCompra', 'GetOne')]: documentFields,
+	[simplifiedFieldKey('ordenesTraspaso', 'Get')]: [
+		'IdOrdenTraspaso',
+		'FechaDocumento',
+		'FechaEntrega',
+		'Estado',
+		'NumeroDocumento',
+		{ key: 'EstadoOrdenTraspaso', fields: ['IdEstadoOrdenTraspaso', 'Nombre', 'Codigo'] },
+		{ key: 'SucursalFisicaDesde', fields: ['IdSucursalFisica', 'Codigo', 'Nombre'] },
+		{ key: 'SucursalFisicaHacia', fields: ['IdSucursalFisica', 'Codigo', 'Nombre'] },
+	],
+	[simplifiedFieldKey('ordenesTraspaso', 'GetOne')]: [
+		'IdOrdenTraspaso',
+		'FechaDocumento',
+		'FechaEntrega',
+		'Estado',
+		'NumeroDocumento',
+		{ key: 'EstadoOrdenTraspaso', fields: ['IdEstadoOrdenTraspaso', 'Nombre', 'Codigo'] },
+		{ key: 'SucursalFisicaDesde', fields: ['IdSucursalFisica', 'Codigo', 'Nombre'] },
+		{ key: 'SucursalFisicaHacia', fields: ['IdSucursalFisica', 'Codigo', 'Nombre'] },
+	],
 	[simplifiedFieldKey('proveedores', 'Get')]: supplierFields,
 };
 

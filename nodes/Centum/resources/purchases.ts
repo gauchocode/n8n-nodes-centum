@@ -207,8 +207,8 @@ const listPurchases: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const customerId = helperFns.getResourceLocatorValue(
-		helperFns.getNodeParameterOrThrow(executeFunctions, 'customerId', itemIndex),
+	const supplierId = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'supplierId', itemIndex),
 	);
 	const purchaseId = helperFns.getNodeParameterOrThrow(executeFunctions, 'purchaseId', itemIndex);
 	const fromDate = helperFns.getNodeParameterOrThrow(
@@ -225,15 +225,22 @@ const listPurchases: ResourceHandler = async (context) => {
 	) as string;
 	const formattedFromDate = String(fromDate).split('T')[0];
 	const formattedToDate = String(toDate).split('T')[0];
-	if (!customerId && !formattedFromDate && !formattedToDate && !purchaseId) {
+	if (!supplierId && !formattedFromDate && !formattedToDate && !purchaseId) {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
 			'Provide at least one filter before running the search.',
 		);
 	}
 
+	if (!purchaseId && (!fromDate || !toDate)) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'Both fechaDocumentoDesde and fechaDocumentoHasta are required for Compras/FiltrosCompra.',
+		);
+	}
+
 	const body = {
-		idCliente: customerId,
+		idProveedor: supplierId,
 		fechaDocumentoDesde: formattedFromDate,
 		fechaDocumentoHasta: formattedToDate,
 		idCompra: purchaseId,
@@ -241,22 +248,7 @@ const listPurchases: ResourceHandler = async (context) => {
 
 	try {
 		if (purchaseId) {
-			const parsedPurchaseId = Number(purchaseId);
-			if (!Number.isInteger(parsedPurchaseId) || parsedPurchaseId <= 0) {
-				throw new NodeOperationError(
-					executeFunctions.getNode(),
-					'purchaseId must be a positive integer.',
-				);
-			}
-
-			const purchase = await helperFns.apiRequest<any>(`${centumUrl}/Compras/${parsedPurchaseId}`, {
-				context: executeFunctions,
-				debugItemIndex: itemIndex,
-				method: 'GET',
-				headers,
-			});
-
-			return [executeFunctions.helpers.returnJsonArray(purchase)];
+			return await getPurchaseDetails(context);
 		}
 
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/Compras/FiltrosCompra`, {
@@ -275,7 +267,54 @@ const listPurchases: ResourceHandler = async (context) => {
 			error?.response?.data?.Message || (error as any).message || 'Unknown error';
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			`Error getting payments for customer ${customerId}: ${errorMessage}`,
+			`Error getting purchases for supplier ${supplierId}: ${errorMessage}`,
+		);
+	}
+};
+
+const getPurchaseDetails: ResourceHandler = async (context) => {
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
+	void itemIndex;
+	void centumUrl;
+	void headers;
+	void centumApiCredentials;
+	void consumerApiPublicId;
+
+	const purchaseId = helperFns.getNodeParameterOrThrow(executeFunctions, 'purchaseId', itemIndex);
+	if (!purchaseId) {
+		throw new NodeOperationError(executeFunctions.getNode(), 'Purchase ID is required.');
+	}
+
+	const parsedPurchaseId = Number(purchaseId);
+	if (!Number.isInteger(parsedPurchaseId) || parsedPurchaseId <= 0) {
+		throw new NodeOperationError(executeFunctions.getNode(), 'purchaseId must be a positive integer.');
+	}
+
+	try {
+		const purchase = await helperFns.apiRequest<any>(`${centumUrl}/Compras/${parsedPurchaseId}`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
+			method: 'GET',
+			headers,
+		});
+
+		return [executeFunctions.helpers.returnJsonArray(purchase)];
+	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			`Error getting purchase with ID ${parsedPurchaseId}: ${errorMessage}`,
 		);
 	}
 };
@@ -721,6 +760,7 @@ const listPurchaseOrders: ResourceHandler = async (context) => {
 export const purchasesHandlers: ResourceHandlerMap = {
 	createPurchase: createPurchase,
 	listPurchases: listPurchases,
+	getPurchaseDetails: getPurchaseDetails,
 	listPurchaseVouchers: listPurchaseVouchers,
 	createPurchaseOrder: createPurchaseOrder,
 	getPurchaseOrderDetails: getPurchaseOrderDetails,

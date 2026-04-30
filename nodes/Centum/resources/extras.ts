@@ -64,7 +64,7 @@ const listDiscounts: ResourceHandler = async (context) => {
 			responseData?.Message ||
 			responseData?.message ||
 			(error as any)?.message ||
-			'Unknown error while creating the taxpayer customer.';
+			'Unknown error while listing discounts.';
 		const fullMessage = statusCode ? `Error ${statusCode}: ${errorMessage}` : errorMessage;
 		throw new NodeOperationError(executeFunctions.getNode(), fullMessage, {
 			description:
