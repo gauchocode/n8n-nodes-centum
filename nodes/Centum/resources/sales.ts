@@ -330,10 +330,8 @@ const listFilteredSalesOrders: ResourceHandler = async (context) => {
 		'includeCanceled',
 		itemIndex,
 	);
-	const createdByUserId = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'createdByUserId',
-		itemIndex,
+	const sellerId = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'sellerId', itemIndex),
 	);
 	const transportId = helperFns.getNodeParameterOrThrow(executeFunctions, 'transportId', itemIndex);
 	const statusIds = helperFns.getResourceLocatorValue(
@@ -369,7 +367,7 @@ const listFilteredSalesOrders: ResourceHandler = async (context) => {
 		idPedidoDeVenta: salesOrderId,
 		idSucursal: branchId,
 		incluirAnulados: includeCanceled,
-		idUsuarioCreador: createdByUserId,
+		idVendedor: sellerId,
 		idTransporte: transportId,
 	};
 

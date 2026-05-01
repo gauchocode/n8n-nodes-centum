@@ -1074,11 +1074,12 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['ventas'], operation: ['GetOne'] } },
 	},
 	{
-		displayName: 'Created By User ID',
-		name: 'createdByUserId',
-		type: 'number',
-		description: 'User ID that created the sales voucher',
-		default: 0,
+		displayName: 'Seller ID',
+		name: 'sellerId',
+		type: 'string',
+		default: '',
+		placeholder: 'Enter seller ID',
+		description: 'Seller ID used to filter sales orders',
 		displayOptions: {
 			show: { resource: ['pedidosVenta'], operation: ['GetConsulta'] },
 		},
