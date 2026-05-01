@@ -665,7 +665,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Discount ID',
+		displayName: 'Customer Discount ID',
 		name: 'discountId',
 		type: 'string',
 		required: true,
@@ -820,7 +820,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Discount ID',
+		displayName: 'Sale Discount ID',
 		name: 'saleDiscountId',
 		type: 'number',
 		default: 0,
@@ -888,7 +888,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'number',
 		default: 0,
 		displayOptions: {
-			show: { resource: ['compras', 'ordenesCompra'], operation: ['Get', 'GetOne'] },
+			show: { resource: ['compras', 'ordenesCompra'], operation: ['GetOne'] },
 		},
 	},
 	{
@@ -899,10 +899,7 @@ const fieldDefinitions: INodeProperties[] = [
 		placeholder: 'Enter status ID',
 		description: 'Sales order status number',
 		displayOptions: {
-			show: {
-				resource: ['ordenesCompra'],
-				operation: ['Get', 'GetConsulta'],
-			},
+			show: { operation: [] },
 		},
 	},
 	{
@@ -985,7 +982,7 @@ const fieldDefinitions: INodeProperties[] = [
 		placeholder: 'Enter voucher type ID',
 		description: 'Invoice voucher type ID',
 		displayOptions: {
-			show: { resource: ['compras', 'ventas'], operation: ['Create', 'GetConsulta'] },
+			show: { resource: ['compras', 'ventas'], operation: ['Create'] },
 		},
 	},
 	{
@@ -995,7 +992,7 @@ const fieldDefinitions: INodeProperties[] = [
 		default: 0,
 		placeholder: '1',
 		description: 'Current-account customer ID for the sales voucher',
-		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta'] } },
+		displayOptions: { show: { operation: [] } },
 	},
 	{
 		displayName: 'Seller ID',
@@ -1043,7 +1040,7 @@ const fieldDefinitions: INodeProperties[] = [
 		name: 'includeCanceled',
 		type: 'boolean',
 		default: false,
-		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta', 'GetOne'] } },
+		displayOptions: { show: { resource: ['ventas'], operation: ['GetOne'] } },
 	},
 	{
 		displayName: 'Include Canceled Orders',
@@ -1059,14 +1056,14 @@ const fieldDefinitions: INodeProperties[] = [
 		name: 'salesChannelId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta'] } },
+		displayOptions: { show: { operation: [] } },
 	},
 	{
 		displayName: 'Business Division ID',
 		name: 'businessDivisionId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta'] } },
+		displayOptions: { show: { operation: [] } },
 	},
 	{
 		displayName: 'Created By User ID',
@@ -1074,7 +1071,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'number',
 		description: 'User ID that created the sales voucher',
 		default: 0,
-		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta', 'GetOne'] } },
+		displayOptions: { show: { resource: ['ventas'], operation: ['GetOne'] } },
 	},
 	{
 		displayName: 'Created By User ID',
@@ -1092,7 +1089,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'number',
 		description: 'Transport ID associated with the sales voucher',
 		default: 0,
-		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta', 'GetOne'] } },
+		displayOptions: { show: { resource: ['ventas'], operation: ['GetOne'] } },
 	},
 	{
 		displayName: 'Transport ID',
@@ -1161,7 +1158,7 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		placeholder: 'Enter branch ID',
 		description: 'The ID of the physical branch to filter stock (optional)',
-		displayOptions: {
+			displayOptions: {
 			show: {
 				resource: [
 					'remitosCompra',
@@ -1172,7 +1169,7 @@ const fieldDefinitions: INodeProperties[] = [
 					'articulos',
 					'ajustesMovimientosStock',
 				],
-				operation: ['Create', 'GetExistenciasIndicadores', 'GetConsulta', 'Get'],
+				operation: ['Create', 'GetExistenciasIndicadores', 'GetConsulta'],
 			},
 		},
 	},

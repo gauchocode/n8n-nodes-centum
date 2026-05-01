@@ -718,6 +718,14 @@ const listPurchaseOrders: ResourceHandler = async (context) => {
 		throw new NodeOperationError(executeFunctions.getNode(), 'endDate is required.');
 	}
 
+	if (!deliveryDateFrom) {
+		throw new NodeOperationError(executeFunctions.getNode(), 'fromDeliveryDate is required.');
+	}
+
+	if (!deliveryDateTo) {
+		throw new NodeOperationError(executeFunctions.getNode(), 'sinceDeliveryDate is required.');
+	}
+
 	try {
 		const body = {
 			fechaDocumentoDesde: formattedFromDate,

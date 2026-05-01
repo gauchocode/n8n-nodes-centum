@@ -531,11 +531,14 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 		Vendedor: {
 			IdVendedor: sellerId,
 		},
-		IdChofer: Number(driverId || '1'),
 		PorcentajeDescuento: 0.0,
 		Observaciones: 'Remito creado desde n8n.',
 		RemitoVentaArticulos: purchaseItemsWithQuantity,
 	};
+
+	if (driverId) {
+		salesDeliveryNoteBody.IdChofer = Number(driverId);
+	}
 
 	if (formattedShipmentDate) {
 		salesDeliveryNoteBody.FechaEmbarque = formattedShipmentDate;
