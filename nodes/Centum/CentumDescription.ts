@@ -252,6 +252,7 @@ const fieldDefinitions: INodeProperties[] = [
 					'GetComposicionSaldoCuentaCorriente',
 					'GetConsulta',
 					'Get',
+					'Update',
 				],
 			},
 		},
@@ -341,7 +342,7 @@ const fieldDefinitions: INodeProperties[] = [
 		name: 'salesConditionId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { resource: ['ventas', 'clientes'], operation: ['Create'] } },
+		displayOptions: { show: { resource: ['ventas', 'clientes'], operation: ['Create', 'Update'] } },
 	},
 	{
 		displayName: 'Payment Condition',
@@ -355,7 +356,7 @@ const fieldDefinitions: INodeProperties[] = [
 		name: 'vatConditionId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { resource: ['proveedores', 'clientes'], operation: ['Create'] } },
+		displayOptions: { show: { resource: ['proveedores', 'clientes'], operation: ['Create', 'Update'] } },
 	},
 	{
 		displayName: 'Exchange Rate',
@@ -372,8 +373,7 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '{}',
 		displayOptions: {
 			show: {
-				resource: ['clientes'],
-				operation: ['Update'],
+				operation: [],
 			},
 		},
 		description: 'JSON object sent to the API to update a customer',
@@ -386,7 +386,7 @@ const fieldDefinitions: INodeProperties[] = [
 		placeholder: 'Enter the CUIT...',
 		displayOptions: {
 			show: {
-				operation: ['Create', 'Get', 'GetOneContribuyente'],
+				operation: ['Create', 'Update', 'Get', 'GetOneContribuyente'],
 				resource: ['proveedores', 'clientes'],
 			},
 		},
@@ -1123,7 +1123,7 @@ const fieldDefinitions: INodeProperties[] = [
 		placeholder: 'Enter country ID',
 		description: 'Country ID used to create the record',
 		displayOptions: {
-			show: { resource: ['proveedores', 'clientes'], operation: ['Create'] },
+			show: { resource: ['proveedores', 'clientes'], operation: ['Create', 'Update'] },
 		},
 	},
 	{
@@ -1150,7 +1150,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['proveedores', 'clientes'],
-				operation: ['Create'],
+				operation: ['Create', 'Update'],
 			},
 		},
 	},
@@ -1216,7 +1216,7 @@ const fieldDefinitions: INodeProperties[] = [
 		name: 'zoneId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { resource: ['proveedores', 'clientes'], operation: ['Create'] } },
+		displayOptions: { show: { resource: ['proveedores', 'clientes'], operation: ['Create', 'Update'] } },
 	},
 	{
 		displayName: 'Supplier Discount ID',
@@ -1414,7 +1414,7 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Customer business name to search for',
 		displayOptions: {
 			show: {
-				operation: ['Create', 'Get'],
+				operation: ['Create', 'Update'],
 				resource: ['clientes', 'proveedores', 'pedidosVenta', 'ordenesCompra'],
 			},
 		},

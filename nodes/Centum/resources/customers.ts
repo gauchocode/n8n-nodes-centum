@@ -17,13 +17,86 @@ const updateCustomer: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const newData = helperFns.getNodeParameterOrThrow(executeFunctions, 'jsonBody', itemIndex);
+	const customerIdParam = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'customerId', itemIndex),
+	);
+	const businessName = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'businessName',
+		itemIndex,
+		'',
+	) as string;
+	const cuit = helperFns.getNodeParameterOrThrow(executeFunctions, 'cuit', itemIndex, '') as string;
+	const provinceId = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'provinceId', itemIndex, ''),
+	);
+	const countryId = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'countryId', itemIndex, ''),
+	);
+	const zoneId = helperFns.getNodeParameterOrThrow(executeFunctions, 'zoneId', itemIndex, 0);
+	const vatConditionId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'vatConditionId',
+		itemIndex,
+		0,
+	);
+	const salesConditionId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'salesConditionId',
+		itemIndex,
+		0,
+	);
+	const discountId = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'discountId', itemIndex, ''),
+	);
+
+	const customerId = Number(customerIdParam);
+	if (!Number.isInteger(customerId) || customerId <= 0) {
+		throw new NodeOperationError(executeFunctions.getNode(), 'customerId must be a positive integer.');
+	}
+
+	const body: Record<string, unknown> = {
+		IdCliente: customerId,
+	};
+
+	if (businessName) {
+		body.RazonSocial = businessName;
+	}
+
+	if (cuit) {
+		body.CUIT = cuit;
+	}
+
+	if (provinceId) {
+		body.Provincia = { IdProvincia: provinceId };
+	}
+
+	if (countryId) {
+		body.Pais = { IdPais: countryId };
+	}
+
+	if (Number(zoneId) > 0) {
+		body.Zona = { IdZona: zoneId };
+	}
+
+	if (Number(vatConditionId) > 0) {
+		body.CondicionIVA = { IdCondicionIVA: vatConditionId };
+	}
+
+	if (Number(salesConditionId) > 0) {
+		body.CondicionVenta = { IdCondicionVenta: salesConditionId };
+	}
+
+	if (discountId) {
+		body.Bonificacion = { IdBonificacion: discountId };
+	}
+
 	try {
 		const updateCustomer = await helperFns.apiRequest<any>(`${centumUrl}/Clientes/Actualizar`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
 			method: 'POST',
-			body: newData,
+			body,
 			headers,
 		});
 
@@ -216,7 +289,7 @@ const createCustomer: ResourceHandler = async (context) => {
 					IdCondicionVenta: salesConditionId,
 				},
 				Vendedor: {
-					IdVendedor: 2, // Replace this with the full seller payload
+					IdVendedor: 2,
 				},
 				Transporte: {
 					IdTransporte: 1,
