@@ -263,74 +263,156 @@ const createCustomer: ResourceHandler = async (context) => {
 	const discountId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'discountId', itemIndex),
 	);
+	const sellerId = helperFns.getNodeParameterOrThrow(executeFunctions, 'customerSellerId', itemIndex);
+	const transportId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'customerTransportId',
+		itemIndex,
+	);
+	const creditLimitId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'creditLimitId',
+		itemIndex,
+	);
+	const customerClassId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'customerClassId',
+		itemIndex,
+	);
+	const customerFrequencyId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'customerFrequencyId',
+		itemIndex,
+	);
+	const customerChannelId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'customerChannelId',
+		itemIndex,
+	);
+	const customerChainId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'customerChainId',
+		itemIndex,
+	);
+	const customerLocationId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'customerLocationId',
+		itemIndex,
+	);
+	const averageConsumerAgeId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'averageConsumerAgeId',
+		itemIndex,
+	);
+	const averageConsumerGenderId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'averageConsumerGenderId',
+		itemIndex,
+	);
+	const customerServiceDaysId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'customerServiceDaysId',
+		itemIndex,
+	);
+	const customerServiceScheduleId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'customerServiceScheduleId',
+		itemIndex,
+	);
+	const customerTobaccoCompanyId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'customerTobaccoCompanyId',
+		itemIndex,
+	);
 
 	try {
+		const body: Record<string, unknown> = {
+			RazonSocial: businessName,
+			CUIT: cuit,
+			Provincia: {
+				IdProvincia: provinceId,
+			},
+			Pais: {
+				IdPais: countryId,
+			},
+			Zona: {
+				IdZona: zoneId,
+			},
+			CondicionIVA: {
+				IdCondicionIVA: vatConditionId,
+			},
+			CondicionVenta: {
+				IdCondicionVenta: salesConditionId,
+			},
+			Bonificacion: {
+				IdBonificacion: discountId,
+			},
+		};
+
+		if (sellerId) {
+			body.Vendedor = { IdVendedor: sellerId };
+		}
+
+		if (transportId) {
+			body.Transporte = { IdTransporte: transportId };
+		}
+
+		if (creditLimitId) {
+			body.LimiteCredito = { IdLimiteCredito: creditLimitId };
+		}
+
+		if (customerClassId) {
+			body.ClaseCliente = { IdClaseCliente: customerClassId };
+		}
+
+		if (customerFrequencyId) {
+			body.FrecuenciaCliente = { IdFrecuenciaCliente: customerFrequencyId };
+		}
+
+		if (customerChannelId) {
+			body.CanalCliente = { IdCanalCliente: customerChannelId };
+		}
+
+		if (customerChainId) {
+			body.CadenaCliente = { IdCadenaCliente: customerChainId };
+		}
+
+		if (customerLocationId) {
+			body.UbicacionCliente = { IdUbicacionCliente: customerLocationId };
+		}
+
+		if (averageConsumerAgeId) {
+			body.EdadesPromedioConsumidoresCliente = {
+				IdEdadesPromedioConsumidoresCliente: averageConsumerAgeId,
+			};
+		}
+
+		if (averageConsumerGenderId) {
+			body.GeneroPromedioConsumidoresCliente = {
+				IdGeneroPromedioConsumidoresCliente: averageConsumerGenderId,
+			};
+		}
+
+		if (customerServiceDaysId) {
+			body.DiasAtencionCliente = { IdDiasAtencionCliente: customerServiceDaysId };
+		}
+
+		if (customerServiceScheduleId) {
+			body.HorarioAtencionCliente = {
+				IdHorarioAtencionCliente: customerServiceScheduleId,
+			};
+		}
+
+		if (customerTobaccoCompanyId) {
+			body.CigarreraCliente = { IdCigarreraCliente: customerTobaccoCompanyId };
+		}
+
 		const createdCustomer = await helperFns.apiRequest<any>(`${centumUrl}/Clientes`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
 			method: 'POST',
 			headers,
-			body: {
-				RazonSocial: businessName,
-				CUIT: cuit,
-				Provincia: {
-					IdProvincia: provinceId,
-				},
-				Pais: {
-					IdPais: countryId,
-				},
-				Zona: {
-					IdZona: zoneId,
-				},
-				CondicionIVA: {
-					IdCondicionIVA: vatConditionId,
-				},
-				CondicionVenta: {
-					IdCondicionVenta: salesConditionId,
-				},
-				Vendedor: {
-					IdVendedor: 2,
-				},
-				Transporte: {
-					IdTransporte: 1,
-				},
-				Bonificacion: {
-					IdBonificacion: discountId,
-				},
-				LimiteCredito: {
-					IdLimiteCredito: 46002,
-				},
-				ClaseCliente: {
-					IdClaseCliente: 6087,
-				},
-				FrecuenciaCliente: {
-					IdFrecuenciaCliente: 6891,
-				},
-				CanalCliente: {
-					IdCanalCliente: 6904,
-				},
-				CadenaCliente: {
-					IdCadenaCliente: 6920,
-				},
-				UbicacionCliente: {
-					IdUbicacionCliente: 6942,
-				},
-				EdadesPromedioConsumidoresCliente: {
-					IdEdadesPromedioConsumidoresCliente: 6951,
-				},
-				GeneroPromedioConsumidoresCliente: {
-					IdGeneroPromedioConsumidoresCliente: 6964,
-				},
-				DiasAtencionCliente: {
-					IdDiasAtencionCliente: 6969,
-				},
-				HorarioAtencionCliente: {
-					IdHorarioAtencionCliente: 6970,
-				},
-				CigarreraCliente: {
-					IdCigarreraCliente: 6972,
-				},
-			},
+			body,
 		});
 		return [executeFunctions.helpers.returnJsonArray(createdCustomer)];
 	} catch (error) {
