@@ -679,33 +679,43 @@ const listSalesInvoices: ResourceHandler = async (context) => {
 		executeFunctions,
 		'businessDivisionId',
 		itemIndex,
+		0,
 	);
 	const includeCanceled = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'includeCanceled',
 		itemIndex,
+		false,
 	);
 	const createdByUserId = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'createdByUserId',
 		itemIndex,
+		0,
 	);
-	const transportId = helperFns.getNodeParameterOrThrow(executeFunctions, 'transportId', itemIndex);
+	const transportId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'transportId',
+		itemIndex,
+		0,
+	);
 	const voucherTypeId = helperFns.getResourceLocatorValue(
-		helperFns.getNodeParameterOrThrow(executeFunctions, 'voucherTypeId', itemIndex),
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'voucherTypeId', itemIndex, ''),
 	);
 	const currentAccountCustomerId = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'currentAccountId',
 		itemIndex,
+		0,
 	);
 	const sellerId = helperFns.getResourceLocatorValue(
-		helperFns.getNodeParameterOrThrow(executeFunctions, 'sellerId', itemIndex),
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'sellerId', itemIndex, ''),
 	);
 	const salesChannelId = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'salesChannelId',
 		itemIndex,
+		0,
 	);
 	const fromDate = helperFns.getNodeParameterOrThrow(executeFunctions, 'startDate', itemIndex);
 	const toDate = helperFns.getNodeParameterOrThrow(executeFunctions, 'endDate', itemIndex);
