@@ -1516,7 +1516,7 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Customer business name to search for',
 		displayOptions: {
 			show: {
-				operation: ['Create', 'Update'],
+				operation: ['Create', 'Update', 'Get'],
 				resource: ['clientes', 'proveedores', 'pedidosVenta', 'ordenesCompra'],
 			},
 		},

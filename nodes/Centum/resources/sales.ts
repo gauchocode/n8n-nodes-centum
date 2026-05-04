@@ -629,7 +629,7 @@ const createSale: ResourceHandler = async (context) => {
 
 	// 4) Final POST request
 	try {
-		const url = `${centumUrl}/Ventas?verificaLimiteCreditoCliente=false&verificaStockNegativo=false&verificaCuotificador=false`;
+		const url = `${centumUrl}/Ventas`;
 
 		const response = await helperFns.apiRequest<any>(url, {
 			context: executeFunctions,
