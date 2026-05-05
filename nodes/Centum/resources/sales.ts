@@ -451,26 +451,44 @@ const createSale: ResourceHandler = async (context) => {
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'priceListId', itemIndex),
 	);
 
-	// === articlesCollection como STRING, luego parse ===
+	type SaleArticleInput = {
+		ID?: string | number;
+		Codigo?: string;
+		Cantidad: number;
+	};
+
 	const articlesCollectionRaw = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'articlesCollection',
 		itemIndex,
-		'',
-	) as string;
-	let articlesArray: Array<{ ID: string; Cantidad: number }> = [];
-	try {
-		articlesArray = JSON.parse(articlesCollectionRaw);
-		if (!Array.isArray(articlesArray)) {
+		[],
+	);
+	let articlesArray: SaleArticleInput[] = [];
+
+	if (typeof articlesCollectionRaw === 'string') {
+		try {
+			const parsed = JSON.parse(articlesCollectionRaw);
+			if (!Array.isArray(parsed)) {
+				throw new NodeOperationError(
+					executeFunctions.getNode(),
+					'The articlesCollection field must be a valid JSON array.',
+				);
+			}
+			articlesArray = parsed as SaleArticleInput[];
+		} catch (err) {
 			throw new NodeOperationError(
 				executeFunctions.getNode(),
-				'The articlesCollection field must be a valid JSON array.',
+				`The articlesCollection field must be a valid JSON string. Example:[{"ID":"1450","Cantidad":2},{"ID":"1451","Cantidad":5}] Error: ${(err as any)?.message ?? String(err)}`,
 			);
 		}
-	} catch (err) {
+	} else if (Array.isArray(articlesCollectionRaw)) {
+		articlesArray = articlesCollectionRaw as SaleArticleInput[];
+	} else if (typeof articlesCollectionRaw === 'object' && articlesCollectionRaw !== null) {
+		articlesArray = [articlesCollectionRaw as SaleArticleInput];
+	} else {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			`The articlesCollection field must be a valid JSON string. Example:[{"ID":"1450","Cantidad":2},{"ID":"1451","Cantidad":5}] Error: ${(err as any)?.message ?? String(err)}`,
+			`Unexpected data type: ${typeof articlesCollectionRaw}`,
 		);
 	}
 
@@ -529,6 +547,15 @@ const createSale: ResourceHandler = async (context) => {
 			'Provide at least one article in articlesCollection.',
 		);
 
+	for (const article of articlesArray) {
+		if (!article.ID && !article.Codigo) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				'Each article must include either an ID or a Code.',
+			);
+		}
+	}
+
 	// When the sale is cash-based, validate the required fields
 	if (isCashSale === true) {
 		if (cashValueId == null)
@@ -543,51 +570,50 @@ const createSale: ResourceHandler = async (context) => {
 			);
 	}
 
-	// Build article IDs and quantity map using the same approach as purchases
-	const ids = articlesArray.map((a) => a.ID);
-	const qtyById: Record<string, number> = Object.fromEntries(
-		articlesArray.map((a) => [a.ID, a.Cantidad]),
-	);
-
 	// 1) Fetch article information for the sale
-	let saleItemsWithQuantity: any[] = [];
-	try {
-		const salesArticlesBody = {
-			IdCliente: customerId,
-			FechaDocumento: formattedFromDate,
-			Ids: ids,
-		};
+	const saleItemsWithQuantity: any[] = [];
+	for (const articleInput of articlesArray) {
+		try {
+			const articleBody: any = {
+				IdCliente: customerId,
+				FechaDocumento: formattedFromDate,
+			};
 
-		let salesArticlesResponse = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
-			context: executeFunctions,
-			debugItemIndex: itemIndex,
-			headers,
-			method: 'POST',
-			body: salesArticlesBody,
-		});
-		const salesPayload =
-			typeof salesArticlesResponse === 'string'
-				? JSON.parse(salesArticlesResponse)
-				: salesArticlesResponse;
+			if (articleInput.ID) {
+				articleBody.Ids = [articleInput.ID];
+			} else if (articleInput.Codigo) {
+				articleBody.Codigo = articleInput.Codigo;
+			}
 
-		const responseItems: any[] =
-			salesPayload?.Articulos?.Items ?? salesPayload?.VentaArticulos ?? salesPayload?.Items ?? [];
+			const articleData = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
+				context: executeFunctions,
+				debugItemIndex: itemIndex,
+				headers,
+				method: 'POST',
+				body: articleBody,
+			});
 
-		// Attach the original quantity using IdArticulo as the lookup key
-		saleItemsWithQuantity = responseItems.map((art: any) => ({
-			...art,
-			Cantidad: qtyById[String(art.IdArticulo)] ?? 0,
-		}));
-	} catch (error) {
-		if (error instanceof NodeApiError) {
-			throw error;
+			const items =
+				articleData?.Articulos?.Items ?? articleData?.VentaArticulos ?? articleData?.Items ?? [];
+			if (items.length > 0) {
+				const itemsConCantidad = items.map((item: any) => ({
+					...item,
+					Cantidad: articleInput.Cantidad,
+				}));
+
+				saleItemsWithQuantity.push(...itemsConCantidad);
+			}
+		} catch (error) {
+			if (error instanceof NodeApiError) {
+				throw error;
+			}
+			const errorMessage =
+				(error as any)?.response?.data?.Message || (error as any).message || 'Unknown error';
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`Error getting sale article ${articleInput.ID ?? articleInput.Codigo}.\n${errorMessage}`,
+			);
 		}
-		const errorMessage =
-			(error as any)?.response?.data?.Message || (error as any).message || 'Unknown error';
-		throw new NodeOperationError(
-			executeFunctions.getNode(),
-			`Error getting sale articles.\n${errorMessage}`,
-		);
 	}
 
 	// 2) Build the sale request body
