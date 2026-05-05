@@ -2,6 +2,67 @@ import { NodeApiError, NodeOperationError } from 'n8n-workflow';
 import * as helperFns from '../helpers/functions';
 import type { ResourceHandler, ResourceHandlerMap } from './types';
 
+const extractCalculatedSaleTotal = (sale: any): number | null => {
+	const candidates = [sale?.Total, sale?.Venta?.Total, sale?.data?.Total, sale?.data?.Venta?.Total];
+
+	for (const candidate of candidates) {
+		const numericValue = Number(candidate);
+		if (Number.isFinite(numericValue) && numericValue > 0) {
+			return numericValue;
+		}
+	}
+
+	const saleArticles = Array.isArray(sale?.VentaArticulos) ? sale.VentaArticulos : [];
+	const saleConcepts = Array.isArray(sale?.VentaConceptos) ? sale.VentaConceptos : [];
+	const specialRegimes = Array.isArray(sale?.VentaRegimenesEspeciales)
+		? sale.VentaRegimenesEspeciales
+		: [];
+	const promotionDiscounts = Array.isArray(sale?.VentaDescuentosPorPromocion)
+		? sale.VentaDescuentosPorPromocion
+		: [];
+
+	const sumWithFallback = (
+		items: any[],
+		totalKey: string,
+		priceKey: string,
+		quantityKey: string,
+	): number =>
+		items.reduce((sum, item) => {
+			const explicitTotal = Number(item?.[totalKey]);
+			if (Number.isFinite(explicitTotal)) {
+				return sum + explicitTotal;
+			}
+
+			const price = Number(item?.[priceKey]);
+			const quantity = Number(item?.[quantityKey] ?? 1);
+			if (Number.isFinite(price) && Number.isFinite(quantity)) {
+				return sum + price * quantity;
+			}
+
+			return sum;
+		}, 0);
+
+	const articlesTotal = sumWithFallback(saleArticles, 'Total', 'Precio', 'Cantidad');
+	const conceptsTotal = sumWithFallback(saleConcepts, 'Total', 'Precio', 'Cantidad');
+	const regimesTotal = specialRegimes.reduce((sum: number, regime: any) => {
+		const regimeAmount = Number(regime?.Precio ?? regime?.Total ?? 0);
+		return Number.isFinite(regimeAmount) ? sum + regimeAmount : sum;
+	}, 0);
+	const discountsTotal = promotionDiscounts.reduce((sum: number, discount: any) => {
+		const discountAmount = Number(
+			discount?.Importe ?? discount?.Precio ?? discount?.Total ?? discount?.Valor ?? 0,
+		);
+		return Number.isFinite(discountAmount) ? sum + discountAmount : sum;
+	}, 0);
+
+	const derivedTotal = articlesTotal + conceptsTotal + regimesTotal - discountsTotal;
+	if (Number.isFinite(derivedTotal) && derivedTotal > 0) {
+		return derivedTotal;
+	}
+
+	return null;
+};
+
 const createSalesOrder: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
@@ -513,12 +574,6 @@ const createSale: ResourceHandler = async (context) => {
 		itemIndex,
 		null,
 	) as number | null;
-	const cashAmountValue = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'cashValueAmount',
-		itemIndex,
-		null,
-	) as number | null;
 	const cashValueNotes = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'cashValueNotes',
@@ -562,11 +617,6 @@ const createSale: ResourceHandler = async (context) => {
 			throw new NodeOperationError(
 				executeFunctions.getNode(),
 				'Cash value ID is required when Cash Sale is true.',
-			);
-		if (cashAmountValue == null)
-			throw new NodeOperationError(
-				executeFunctions.getNode(),
-				'Cash amount is required when Cash Sale is true.',
 			);
 	}
 
@@ -635,18 +685,82 @@ const createSale: ResourceHandler = async (context) => {
 		bodyVenta.Bonificacion = { IdBonificacion: discount };
 	}
 
-	// 3) Add VentaValoresEfectivos only when it applies and values are valid
+	// 3) Calculate the sale total in CENTUM before assigning cash values
 	if (isCashSale === true) {
 		const exchangeRate =
-			!cashExchangeRateValue || cashExchangeRateValue <= 0 ? 0 : Number(cashExchangeRateValue);
+			!cashExchangeRateValue || cashExchangeRateValue <= 0 ? 1 : Number(cashExchangeRateValue);
 		const installmentCount =
 			!cashInstallmentCount || cashInstallmentCount <= 0 ? 0 : Number(cashInstallmentCount);
+		const bodyVentaCalculada = await helperFns.apiRequest<any>(
+			`${centumUrl}/Ventas/RegimenesEspeciales`,
+			{
+				context: executeFunctions,
+				debugItemIndex: itemIndex,
+				headers,
+				method: 'POST',
+				body: bodyVenta,
+			},
+		);
+
+		const bodyVentaConPromociones = await helperFns.apiRequest<any>(
+			`${centumUrl}/Ventas/DescuentosPorPromocion`,
+			{
+				context: executeFunctions,
+				debugItemIndex: itemIndex,
+				headers,
+				method: 'POST',
+				body: bodyVentaCalculada,
+			},
+		);
+
+		const saleTotal = extractCalculatedSaleTotal(bodyVentaConPromociones);
+		if (saleTotal == null) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				'Could not determine the calculated total for the cash sale.',
+			);
+		}
+
+		let effectiveCashAmount = saleTotal;
+		if (installmentCount > 0) {
+			const totalWithSurcharge = await helperFns.apiRequest<any>(
+				`${centumUrl}/Ventas/TotalVentaValoresEfectivosConRecargo`,
+				{
+					context: executeFunctions,
+					debugItemIndex: itemIndex,
+					headers,
+					method: 'POST',
+					body: {
+						...bodyVentaConPromociones,
+						VentaValoresEfectivos: [
+							{
+								IdValor: Number(cashValueId),
+								Cotizacion: exchangeRate,
+								Importe: saleTotal,
+								Observaciones: cashValueNotes || '',
+								CantidadCuotas: installmentCount,
+							},
+						],
+					},
+				},
+			);
+
+			const numericTotalWithSurcharge = Number(totalWithSurcharge);
+			if (!Number.isFinite(numericTotalWithSurcharge) || numericTotalWithSurcharge <= 0) {
+				throw new NodeOperationError(
+					executeFunctions.getNode(),
+					'Could not determine the calculated total with surcharge for the cash sale.',
+				);
+			}
+
+			effectiveCashAmount = numericTotalWithSurcharge;
+		}
 
 		bodyVenta.VentaValoresEfectivos = [
 			{
 				IdValor: Number(cashValueId),
 				Cotizacion: exchangeRate,
-				Importe: Number(cashAmountValue),
+				Importe: effectiveCashAmount,
 				Observaciones: cashValueNotes || '',
 				CantidadCuotas: installmentCount,
 			},

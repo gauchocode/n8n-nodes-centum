@@ -1328,13 +1328,6 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['proveedores'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Amount',
-		name: 'cashValueAmount',
-		type: 'number',
-		default: 0,
-		displayOptions: { show: { isCashSale: [true] } },
-	},
-	{
 		displayName: 'Shipping Information',
 		name: 'shippingInfo',
 		required: true,
