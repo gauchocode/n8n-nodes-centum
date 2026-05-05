@@ -309,7 +309,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['articulos'],
-				operation: ['GetOne', 'GetDatosGenerales'],
+				operation: ['GetDatosGenerales'],
 			},
 		},
 	},

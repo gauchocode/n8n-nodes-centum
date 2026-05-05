@@ -38,6 +38,9 @@ export const resourceHandlerGroups: Record<string, ResourceHandlerMap> = {
 	choferesGuiaLogistica: {
 		GetAll: logisticsHandlers.listDrivers,
 	},
+	condicionesVenta: {
+		GetAll: salesHandlers.listSalesConditions,
+	},
 	clientes: {
 		Get: customersHandlers.Get,
 		Update: customersHandlers.updateCustomer,

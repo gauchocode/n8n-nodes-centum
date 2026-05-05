@@ -898,6 +898,42 @@ const listPrices: ResourceHandler = async (context) => {
 	}
 };
 
+const listSalesConditions: ResourceHandler = async (context) => {
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
+	void itemIndex;
+	void centumUrl;
+	void headers;
+	void centumApiCredentials;
+	void consumerApiPublicId;
+
+	try {
+		const response = await helperFns.apiRequest<any>(`${centumUrl}/CondicionesVenta`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
+			method: 'GET',
+			headers,
+		});
+		return [executeFunctions.helpers.returnJsonArray(response)];
+	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			`Error getting sales conditions.\n${errorMessage}`,
+		);
+	}
+};
+
 const listPromotions: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
@@ -1087,5 +1123,6 @@ export const salesHandlers: ResourceHandlerMap = {
 	listSalesInvoicesById: listSalesInvoicesById,
 	listSalesVouchers: listSalesVouchers,
 	listPrices: listPrices,
+	listSalesConditions: listSalesConditions,
 	getSalesRanking: getSalesRanking,
 };

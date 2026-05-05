@@ -140,6 +140,18 @@ const operationGroups: OperationGroup[] = [
 		],
 	},
 	{
+		resource: 'condicionesVenta',
+		default: 'GetAll',
+		options: [
+			{
+				name: 'GetAll',
+				value: 'GetAll',
+				action: 'GetAll',
+				description: 'Devuelve la lista completa de condiciones de venta.',
+			},
+		],
+	},
+	{
 		resource: 'rubros',
 		default: 'GetAll',
 		options: [
@@ -689,6 +701,7 @@ export const CentumOperations: INodeProperties[] = [
 			{ name: 'Categorías Articulo', value: 'categoriasArticulo' },
 			{ name: 'Choferes Guía Logística', value: 'choferesGuiaLogistica' },
 			{ name: 'Clientes', value: 'clientes' },
+			{ name: 'Condiciones Venta', value: 'condicionesVenta' },
 			{ name: 'Cobros', value: 'cobros' },
 			{ name: 'Compras', value: 'compras' },
 			{ name: 'Conceptos', value: 'conceptos' },
@@ -752,6 +765,15 @@ export const CentumOperations: INodeProperties[] = [
 		noDataExpression: true,
 		displayOptions: { show: { resource: ['bonificaciones'] } },
 		options: operationOptionsByResource.bonificaciones,
+		default: '',
+	},
+	{
+		displayName: 'Operation',
+		name: 'operation',
+		type: 'options',
+		noDataExpression: true,
+		displayOptions: { show: { resource: ['condicionesVenta'] } },
+		options: operationOptionsByResource.condicionesVenta,
 		default: '',
 	},
 	{

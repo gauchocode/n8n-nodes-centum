@@ -2,7 +2,7 @@ import { NodeApiError, NodeOperationError } from 'n8n-workflow';
 import * as helperFns from '../helpers/functions';
 import type { ResourceHandler, ResourceHandlerMap } from './types';
 
-const getProductByCode: ResourceHandler = async (context) => {
+const getProductById: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
 		centumUrl,
@@ -17,63 +17,38 @@ const getProductByCode: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const codeRaw = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'articleCode',
-		itemIndex,
-	) as string;
-	const articleIdRaw = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'articleId',
-		itemIndex,
-	) as string;
-
-	const code = codeRaw.trim();
-	const ids = articleIdRaw
+	const articleIdRaw = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(
+			executeFunctions,
+			'articleId',
+			itemIndex,
+			'',
+		),
+	);
+	const ids = String(articleIdRaw)
 		.split(',')
 		.map((s) => s.trim())
 		.filter(Boolean);
 
-	if (!code && ids.length === 0) {
-		throw new NodeOperationError(executeFunctions.getNode(), 'Article ID or code is required.');
+	if (ids.length === 0) {
+		throw new NodeOperationError(executeFunctions.getNode(), 'Article ID is required.');
+	}
+
+	if (ids.length > 1) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'GetOne accepts a single Article ID only.',
+		);
 	}
 
 	try {
-		let articleResponse: any;
-
-		// 1) Priority: search by IDs
-		if (ids.length > 0) {
-			articleResponse = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
-				context: executeFunctions,
-				debugItemIndex: itemIndex,
-				method: 'POST',
-				headers,
-				body: { Ids: ids },
-			});
-
-			const empty =
-				!articleResponse || (Array.isArray(articleResponse) && articleResponse.length === 0);
-
-			// 2) Fallback: if no item is found, search by code
-			if (empty && code) {
-				articleResponse = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
-					context: executeFunctions,
-					debugItemIndex: itemIndex,
-					method: 'POST',
-					headers,
-					body: { CodigoExacto: code },
-				});
-			}
-		} else {
-			// Search by code only
-			articleResponse = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
-				context: executeFunctions,
-				debugItemIndex: itemIndex,
-				method: 'POST',
-				headers,
-				body: { CodigoExacto: code },
-			});
-		}
+		const articleResponse = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
+			method: 'POST',
+			headers,
+			body: { Ids: ids },
+		});
 
 		return [executeFunctions.helpers.returnJsonArray(articleResponse)];
 	} catch (error) {
@@ -877,7 +852,7 @@ const convertProductsForWooCommerce: ResourceHandler = async (context) => {
 export const articlesHandlers: ResourceHandlerMap = {
 	GetDatosGenerales: listAllProducts,
 	GetExistenciasIndicadores: listProductsByBranch,
-	getProductByCode: getProductByCode,
+	getProductByCode: getProductById,
 	getStock: getStock,
 	listAvailableProducts: listAvailableProducts,
 	downloadProductImages: downloadProductImages,

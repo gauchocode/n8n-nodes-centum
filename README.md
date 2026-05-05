@@ -66,6 +66,10 @@ The node interface shows resource and operation labels in Spanish. Saved resourc
 - `searchCustomerByCuit`: Search customers by CUIT.
 - `updateCustomer`: Update a customer and return the updated resource information.
 
+### Condiciones Venta (`condicionesVenta`)
+
+- `listSalesConditions`: List available sales conditions.
+
 ### Cobros (`cobros`)
 
 - `listPaymentInvoices`: Get all payment invoices for a customer.
