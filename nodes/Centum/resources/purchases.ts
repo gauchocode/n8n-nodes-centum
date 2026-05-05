@@ -210,7 +210,6 @@ const listPurchases: ResourceHandler = async (context) => {
 	const supplierId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'supplierId', itemIndex),
 	);
-	const purchaseId = helperFns.getNodeParameterOrThrow(executeFunctions, 'purchaseId', itemIndex);
 	const fromDate = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'startDate',
@@ -225,14 +224,14 @@ const listPurchases: ResourceHandler = async (context) => {
 	) as string;
 	const formattedFromDate = String(fromDate).split('T')[0];
 	const formattedToDate = String(toDate).split('T')[0];
-	if (!supplierId && !formattedFromDate && !formattedToDate && !purchaseId) {
+	if (!supplierId && !formattedFromDate && !formattedToDate) {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
 			'Provide at least one filter before running the search.',
 		);
 	}
 
-	if (!purchaseId && (!fromDate || !toDate)) {
+	if ((!fromDate || !toDate)) {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
 			'Both fechaDocumentoDesde and fechaDocumentoHasta are required for Compras/FiltrosCompra.',
@@ -243,13 +242,9 @@ const listPurchases: ResourceHandler = async (context) => {
 		idProveedor: supplierId,
 		fechaDocumentoDesde: formattedFromDate,
 		fechaDocumentoHasta: formattedToDate,
-		idCompra: purchaseId,
 	};
 
 	try {
-		if (purchaseId) {
-			return await getPurchaseDetails(context);
-		}
 
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/Compras/FiltrosCompra`, {
 			context: executeFunctions,
