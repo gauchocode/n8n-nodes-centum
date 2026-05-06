@@ -42,6 +42,7 @@ export const resourceDisplayNames: Record<string, string> = {
 	rubros: 'Rubros',
 	subRubros: 'SubRubros',
 	sucursalesFisicas: 'Sucursales Físicas',
+	transportes: 'Transportes',
 	tiposComprobante: 'Tipos Comprobante',
 	turnosEntrega: 'Turnos Entrega',
 	ubicacionesArticulos: 'Ubicaciones Artículos',
@@ -429,6 +430,18 @@ const operationGroups: OperationGroup[] = [
 		],
 	},
 	{
+		resource: 'transportes',
+		default: 'GetAll',
+		options: [
+			{
+				name: 'GetAll',
+				value: 'GetAll',
+				action: 'GetAll',
+				description: 'Devuelve la lista completa de transportes.',
+			},
+		],
+	},
+	{
 		resource: 'tiposComprobante',
 		default: 'GetAll',
 		options: [
@@ -723,6 +736,7 @@ export const CentumOperations: INodeProperties[] = [
 			{ name: 'Rubros', value: 'rubros' },
 			{ name: 'SubRubros', value: 'subRubros' },
 			{ name: 'Sucursales Físicas', value: 'sucursalesFisicas' },
+			{ name: 'Transportes', value: 'transportes' },
 			{ name: 'Tipos Comprobante', value: 'tiposComprobante' },
 			{ name: 'Turnos Entrega', value: 'turnosEntrega' },
 			{ name: 'Ubicaciones Artículos', value: 'ubicacionesArticulos' },
@@ -730,6 +744,15 @@ export const CentumOperations: INodeProperties[] = [
 			{ name: 'Ventas', value: 'ventas' },
 		],
 		default: 'articulos',
+	},
+	{
+		displayName: 'Operation',
+		name: 'operation',
+		type: 'options',
+		noDataExpression: true,
+		displayOptions: { show: { resource: ['transportes'] } },
+		options: operationOptionsByResource.transportes,
+		default: '',
 	},
 	{
 		displayName: 'Operation',

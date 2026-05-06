@@ -1087,6 +1087,18 @@ const fieldDefinitions: INodeProperties[] = [
 	{
 		displayName: 'Transport ID',
 		name: 'transportId',
+		type: 'string',
+		required: true,
+		default: '',
+		placeholder: 'Enter transport ID',
+		description: 'Transport ID required to create the sales delivery note',
+		displayOptions: {
+			show: { resource: ['remitosVenta'], operation: ['Create'] },
+		},
+	},
+	{
+		displayName: 'Transport ID',
+		name: 'transportId',
 		type: 'number',
 		description: 'Transport ID associated with the sales voucher',
 		default: 0,

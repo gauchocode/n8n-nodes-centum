@@ -164,6 +164,10 @@ The node interface shows resource and operation labels in Spanish. Saved resourc
 
 - `listPhysicalBranches`: List physical branches.
 
+### Transportes (`transportes`)
+
+- `listTransports`: List transports.
+
 ### Tipos Comprobante (`tiposComprobante`)
 
 - `listVoucherTypes`: List generic voucher types.

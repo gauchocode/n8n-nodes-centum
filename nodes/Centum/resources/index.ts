@@ -128,6 +128,9 @@ export const resourceHandlerGroups: Record<string, ResourceHandlerMap> = {
 	sucursalesFisicas: {
 		GetAll: logisticsHandlers.listPhysicalBranches,
 	},
+	transportes: {
+		GetAll: logisticsHandlers.listTransports,
+	},
 	tiposComprobante: {
 		GetAll: extrasHandlers.listVoucherTypes,
 		GetAllCompras: purchasesHandlers.listPurchaseVouchers,

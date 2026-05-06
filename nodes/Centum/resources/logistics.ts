@@ -377,6 +377,17 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 	const sellerId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'sellerId', itemIndex),
 	);
+	const transportId = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'transportId', itemIndex),
+	);
+
+	if (!transportId) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'transportId is required to create a sales delivery note.',
+		);
+	}
+
 	const driverId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'driverId', itemIndex, ''),
 	);
@@ -531,6 +542,9 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 		Vendedor: {
 			IdVendedor: sellerId,
 		},
+		Transporte: {
+			IdTransporte: Number(transportId),
+		},
 		PorcentajeDescuento: 0.0,
 		Observaciones: 'Remito creado desde n8n.',
 		RemitoVentaArticulos: purchaseItemsWithQuantity,
@@ -674,10 +688,45 @@ const listPhysicalBranches: ResourceHandler = async (context) => {
 	}
 };
 
+const listTransports: ResourceHandler = async (context) => {
+	const {
+		executeFunctions,
+		centumUrl,
+		headers,
+		centumApiCredentials,
+		consumerApiPublicId,
+		itemIndex,
+	} = context;
+	void itemIndex;
+	void centumUrl;
+	void headers;
+	void centumApiCredentials;
+	void consumerApiPublicId;
+
+	try {
+		const transports = await helperFns.apiRequest<any>(`${centumUrl}/Transportes`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
+			method: 'GET',
+			headers,
+		});
+
+		return [executeFunctions.helpers.returnJsonArray(transports)];
+	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
+		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
+	}
+};
+
 export const logisticsHandlers: ResourceHandlerMap = {
 	createPurchaseDeliveryNote: createPurchaseDeliveryNote,
 	createSalesDeliveryNote: createSalesDeliveryNote,
 	listDrivers: listDrivers,
 	listDeliveryTimeSlots: listDeliveryTimeSlots,
 	listPhysicalBranches: listPhysicalBranches,
+	listTransports: listTransports,
 };
