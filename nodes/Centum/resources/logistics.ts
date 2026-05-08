@@ -24,9 +24,30 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		Precio?: number;
 	};
 
-	const customerId = helperFns.getResourceLocatorValue(
-		helperFns.getNodeParameterOrThrow(executeFunctions, 'customerId', itemIndex),
-	);
+	type ResolvedPurchaseArticle = {
+		IdArticulo: number;
+		Codigo: string;
+		Nombre: string;
+		CategoriaImpuestoIVA: {
+			IdCategoriaImpuestoIVA: number;
+			Codigo?: string;
+			Nombre?: string;
+			Tasa?: number;
+		};
+	};
+
+	type CentumArticleLookup = {
+		IdArticulo?: number;
+		Codigo?: string;
+		Nombre?: string;
+		CategoriaImpuestoIVA?: {
+			IdCategoriaImpuestoIVA?: number;
+			Codigo?: string;
+			Nombre?: string;
+			Tasa?: number;
+		};
+	};
+
 	const documentLetter =
 		(helperFns.getNodeParameterOrThrow(executeFunctions, 'documentLetter', itemIndex) as string) ??
 		'';
@@ -69,6 +90,9 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 	const driverId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'driverId', itemIndex, ''),
 	);
+	const transportId = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'transportId', itemIndex),
+	);
 	const branchId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'physicalBranchId', itemIndex),
 	);
@@ -81,6 +105,13 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 
 	if (!supplierId) {
 		throw new NodeOperationError(executeFunctions.getNode(), 'idProveedor must be specified.');
+	}
+
+	if (!transportId) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'transportId is required to create a purchase delivery note.',
+		);
 	}
 
 	// Parse articles safely
@@ -152,10 +183,6 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		}
 	}
 
-	if (!customerId) {
-		throw new NodeOperationError(executeFunctions.getNode(), 'Customer ID is required.');
-	}
-
 	if (!articles.length) {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
@@ -163,66 +190,111 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		);
 	}
 
-	try {
-		const dataCliente = await helperFns.apiRequest<any>(`${centumUrl}/Clientes/${customerId}`, {
+	const resolvedArticleCache = new Map<number, ResolvedPurchaseArticle>();
+
+	const resolvePurchaseArticle = async (articleId: number): Promise<ResolvedPurchaseArticle> => {
+		const cachedArticle = resolvedArticleCache.get(articleId);
+		if (cachedArticle) {
+			return cachedArticle;
+		}
+
+		const response = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
-			method: 'GET',
+			method: 'POST',
 			headers,
+			body: {
+				Ids: [articleId],
+			},
 		});
 
-		const customer = dataCliente;
-		if (!customer) throw new NodeOperationError(executeFunctions.getNode(), 'Customer not found.');
-	} catch (error) {
-		if (error instanceof NodeApiError) {
-			throw error;
+		const responseItems: CentumArticleLookup[] = Array.isArray(response)
+			? response
+			: Array.isArray(response?.Articulos?.Items)
+				? response.Articulos.Items
+				: [];
+		const resolvedRaw = responseItems.find(
+			(item: CentumArticleLookup) => Number(item.IdArticulo) === articleId,
+		);
+
+		if (!resolvedRaw) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`Article ${articleId} was not found in Centum.`,
+			);
 		}
-		const msg =
-			error?.response?.data?.Message || (error as any)?.message || 'Error getting customer';
-		throw new NodeOperationError(executeFunctions.getNode(), msg);
-	}
 
-	// 2) Keep the article payload as-is and only add quantity
-	const purchaseDeliveryNoteArticles: any[] = [];
+		const resolvedArticle: ResolvedPurchaseArticle = {
+			IdArticulo: Number(resolvedRaw.IdArticulo),
+			Codigo: String(resolvedRaw.Codigo ?? '').trim(),
+			Nombre: String(resolvedRaw.Nombre ?? '').trim(),
+			CategoriaImpuestoIVA: {
+				IdCategoriaImpuestoIVA: Number(resolvedRaw.CategoriaImpuestoIVA?.IdCategoriaImpuestoIVA),
+				Codigo:
+					typeof resolvedRaw.CategoriaImpuestoIVA?.Codigo === 'string'
+						? resolvedRaw.CategoriaImpuestoIVA.Codigo
+						: undefined,
+				Nombre:
+					typeof resolvedRaw.CategoriaImpuestoIVA?.Nombre === 'string'
+						? resolvedRaw.CategoriaImpuestoIVA.Nombre
+						: undefined,
+				Tasa:
+					typeof resolvedRaw.CategoriaImpuestoIVA?.Tasa === 'number'
+						? resolvedRaw.CategoriaImpuestoIVA.Tasa
+						: undefined,
+			},
+		};
 
-	for (const articleInput of articles) {
-		try {
-			const articleBody: any = {
-				IdCliente: customerId,
-				FechaDocumento: formattedDocumentDate,
-			};
-
-			if (articleInput.ID) articleBody.Ids = [articleInput.ID];
-			else articleBody.Codigo = articleInput.Codigo;
-
-			const articleData = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
-				context: executeFunctions,
-				debugItemIndex: itemIndex,
-				method: 'POST',
-				headers,
-				body: articleBody,
-			});
-
-			const items = articleData?.Articulos?.Items ?? [];
-			if (!Array.isArray(items) || items.length === 0)
-				throw new NodeOperationError(executeFunctions.getNode(), 'Article not found.');
-
-			for (const item of items) {
-				purchaseDeliveryNoteArticles.push({
-					...item,
-					Cantidad: articleInput.Cantidad,
-					Precio: articleInput.Precio ?? item.Precio,
-				});
-			}
-		} catch (error) {
-			if (error instanceof NodeApiError) {
-				throw error;
-			}
-			const msg =
-				error?.response?.data?.Message || (error as any)?.message || 'Error resolving article';
-			throw new NodeOperationError(executeFunctions.getNode(), msg);
+		if (!resolvedArticle.Codigo) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`Article ${articleId} does not include a valid Codigo in Centum.`,
+			);
 		}
-	}
+
+		if (!resolvedArticle.Nombre) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`Article ${articleId} does not include a valid Nombre in Centum.`,
+			);
+		}
+
+		if (!Number.isFinite(resolvedArticle.CategoriaImpuestoIVA.IdCategoriaImpuestoIVA)) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`Article ${articleId} does not include CategoriaImpuestoIVA in Centum.`,
+			);
+		}
+
+		resolvedArticleCache.set(articleId, resolvedArticle);
+		return resolvedArticle;
+	};
+
+	// RemitosCompra expects purchase-side article payloads and does not use a customer context.
+	const purchaseDeliveryNoteArticles = await Promise.all(articles.map(async (articleInput) => {
+		if (articleInput.ID === undefined) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				'RemitosCompra requires each article to include an ID.',
+			);
+		}
+
+		const resolvedArticle = await resolvePurchaseArticle(articleInput.ID);
+
+		const article: Record<string, number | string | Record<string, number | string>> = {
+			Cantidad: articleInput.Cantidad,
+			IdArticulo: resolvedArticle.IdArticulo,
+			Codigo: resolvedArticle.Codigo,
+			Nombre: resolvedArticle.Nombre,
+			CategoriaImpuestoIVA: resolvedArticle.CategoriaImpuestoIVA,
+		};
+
+		if (articleInput.Precio !== undefined) {
+			article.Precio = articleInput.Precio;
+		}
+
+		return article;
+	}));
 
 	// 3) Resolve the supplier as a full entity
 	let supplierInfo: any;
@@ -275,6 +347,9 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 			Codigo: '1',
 			Nombre: 'Operador de Compras Defecto',
 			EsSupervisor: false,
+		},
+		Transporte: {
+			IdTransporte: Number(transportId),
 		},
 		IdChofer: Number(driverId),
 	};
