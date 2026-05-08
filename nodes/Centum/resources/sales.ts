@@ -1,6 +1,6 @@
 import { NodeApiError, NodeOperationError } from 'n8n-workflow';
 import * as helperFns from '../helpers/functions';
-import type { ResourceHandler, ResourceHandlerMap } from './types';
+import type { CentumHeaders, ResourceHandler, ResourceHandlerMap } from './types';
 
 const extractCalculatedSaleTotal = (sale: any): number | null => {
 	const candidates = [sale?.Total, sale?.Venta?.Total, sale?.data?.Total, sale?.data?.Venta?.Total];
@@ -63,6 +63,41 @@ const extractCalculatedSaleTotal = (sale: any): number | null => {
 	return null;
 };
 
+const resolveDiscountPercentage = async (
+	executeFunctions: any,
+	centumUrl: string,
+	headers: CentumHeaders,
+	itemIndex: number,
+	discountId: string | number | null | undefined,
+): Promise<number> => {
+	if (!discountId) {
+		return 0;
+	}
+
+	const discountsResponse = await helperFns.apiRequest<any>(`${centumUrl}/Bonificaciones`, {
+		context: executeFunctions,
+		debugItemIndex: itemIndex,
+		method: 'GET',
+		headers,
+	});
+
+	const discounts = Array.isArray(discountsResponse)
+		? discountsResponse
+		: Array.isArray(discountsResponse?.Items)
+			? discountsResponse.Items
+			: Array.isArray(discountsResponse?.Bonificaciones)
+				? discountsResponse.Bonificaciones
+				: [];
+
+	const matchingDiscount = discounts.find((discount: any) => {
+		const currentId = discount?.IdBonificacion ?? discount?.ID ?? discount?.Id;
+		return String(currentId) === String(discountId);
+	});
+
+	const calculatedValue = Number(matchingDiscount?.Calculada);
+	return Number.isFinite(calculatedValue) ? calculatedValue : 0;
+};
+
 const createSalesOrder: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
@@ -117,6 +152,13 @@ const createSalesOrder: ResourceHandler = async (context) => {
 		itemIndex,
 	);
 	const sellerIdValue = helperFns.getResourceLocatorValue(sellerId);
+	const discountPercentage = await resolveDiscountPercentage(
+		executeFunctions,
+		centumUrl,
+		headers,
+		itemIndex,
+		discountId,
+	);
 
 	let articles: ArticuloInput[];
 
@@ -259,6 +301,7 @@ const createSalesOrder: ResourceHandler = async (context) => {
 		Bonificacion: {
 			IdBonificacion: discountId,
 		},
+		PorcentajeDescuento: discountPercentage,
 		PedidoVentaArticulos: results,
 		Cliente: {
 			IdCliente: clientId,
@@ -677,12 +720,18 @@ const createSale: ResourceHandler = async (context) => {
 		Vendedor: { IdVendedor: Number(sellerId) },
 		ListaPrecio: { IdListaPrecio: Number(priceListId) },
 		VentaArticulos: saleItemsWithQuantity,
-		PorcentajeDescuento: 0,
 	};
 
 	// Optional discount
 	if (discount) {
 		bodyVenta.Bonificacion = { IdBonificacion: discount };
+		bodyVenta.PorcentajeDescuento = await resolveDiscountPercentage(
+			executeFunctions,
+			centumUrl,
+			headers,
+			itemIndex,
+			discount,
+		);
 	}
 
 	// 3) Calculate the sale total in CENTUM before assigning cash values
