@@ -236,22 +236,22 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		placeholder: 'Enter customer ID',
 		description: 'Customer used by the selected operation',
-		displayOptions: {
-			show: {
-				resource: [
-					'articulos',
-					'clientes',
-					'cobros',
-					'remitosVenta',
-					'remitosCompra',
-				],
-				operation: [
-					'Create',
-					'GetVenta',
-					'GetSaldoCuentaCorriente',
-					'GetComposicionSaldoCuentaCorriente',
-					'GetConsulta',
-					'Get',
+			displayOptions: {
+				show: {
+					resource: [
+						'articulos',
+						'clientes',
+						'cobros',
+						'remitosVenta',
+						'remitosCompra',
+					],
+					operation: [
+						'Create',
+						'GetVenta',
+						'GetSaldoCuentaCorriente',
+						'GetComposicionSaldoCuentaCorriente',
+						'GetConsulta',
+						'Get',
 					'Update',
 				],
 			},
@@ -324,7 +324,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['clientes', 'pedidosVenta'],
-				operation: ['Get', 'Create'],
+				operation: ['Get'],
 			},
 		},
 	},
@@ -672,7 +672,7 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		placeholder: 'Enter discount ID',
 		displayOptions: {
-			show: { resource: ['pedidosVenta', 'ventas', 'clientes'], operation: ['Create'] },
+			show: { resource: ['pedidosVenta', 'clientes'], operation: ['Create'] },
 		},
 	},
 	{
@@ -1091,9 +1091,9 @@ const fieldDefinitions: INodeProperties[] = [
 		required: true,
 		default: '',
 		placeholder: 'Enter transport ID',
-		description: 'Transport ID required to create the sales delivery note',
+		description: 'Transport ID required to create the delivery note',
 		displayOptions: {
-			show: { resource: ['remitosVenta'], operation: ['Create'] },
+			show: { resource: ['remitosVenta', 'remitosCompra'], operation: ['Create'] },
 		},
 	},
 	{
