@@ -479,7 +479,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Document Date',
+			displayName: 'Document Date',
 		name: 'documentDate',
 		type: 'dateTime',
 		required: true,
@@ -963,7 +963,7 @@ const fieldDefinitions: INodeProperties[] = [
 		name: 'purchaseOperatorId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { resource: ['proveedores'], operation: ['Create'] } },
+		displayOptions: { show: { resource: ['proveedores', 'remitosCompra'], operation: ['Create'] } },
 	},
 	{
 		displayName: 'Supplier ID',
@@ -1475,6 +1475,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayName: 'Supplier ID',
 		name: 'supplierId',
 		type: 'string',
+		required: true,
 		default: '',
 		placeholder: 'Enter supplier ID',
 		description: 'Supplier ID used to filter or create the record',

@@ -1,6 +1,69 @@
 import { NodeApiError, NodeOperationError } from 'n8n-workflow';
 import * as helperFns from '../helpers/functions';
+import type { INewCobro } from '../interfaces';
 import type { ResourceHandler, ResourceHandlerMap } from './types';
+
+const buildCobroPayload = ({
+	customer,
+	amount,
+	advanceConceptId,
+	paymentValueId,
+	documentDate,
+	postingDate,
+	paymentObservation,
+	effectiveDetail,
+	physicalBranchId,
+	divisionCompanyGroupId,
+}: {
+	customer: any;
+	amount: number;
+	advanceConceptId: number;
+	paymentValueId: number;
+	documentDate: string;
+	postingDate: string;
+	paymentObservation: string;
+	effectiveDetail: string;
+	physicalBranchId: number;
+	divisionCompanyGroupId: number;
+}): INewCobro => ({
+	Cliente: {
+		IdCliente: customer.IdCliente,
+	},
+	Observacion: paymentObservation,
+	CobroAnticipos: [
+		{
+			ConceptoVarios: {
+				IdConceptoVarios: advanceConceptId,
+			},
+			Cotizacion: 1,
+			Detalle: '',
+			Importe: amount,
+		},
+	],
+	CobroEfectivos: [
+		{
+			Valor: {
+				IdValor: paymentValueId,
+			},
+			Detalle: effectiveDetail,
+			Importe: amount,
+			Cotizacion: 1,
+			CotizacionMonedaRespectoMonedaCliente: 1,
+			FechaAcreditacion: postingDate,
+		},
+	],
+	SucursalFisica: {
+		IdSucursalFisica: physicalBranchId,
+	},
+	FechaDocumento: documentDate,
+	FechaImputacion: postingDate,
+	Anulado: false,
+	Nota: '',
+	Cotizacion: 1,
+	DivisionEmpresaGrupoEconomico: {
+		IdDivisionEmpresaGrupoEconomico: divisionCompanyGroupId,
+	},
+});
 
 const registerPayment: ResourceHandler = async (context) => {
 	const {
@@ -17,18 +80,142 @@ const registerPayment: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const customerOrder = helperFns.getNodeParameterOrThrow(executeFunctions, 'customer', itemIndex);
-	const articleOrder = helperFns.getNodeParameterOrThrow(executeFunctions, 'article', itemIndex);
-	const shippingOrder = helperFns.getNodeParameterOrThrow(
+	const customerId = Number(
+		helperFns.getResourceLocatorValue(
+			helperFns.getNodeParameterOrThrow(executeFunctions, 'customerId', itemIndex),
+		),
+	);
+	const paymentAmount = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
-		'shippingInfo',
+		'paymentAmount',
 		itemIndex,
+	) as number;
+	const advanceConceptId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'advanceConceptId',
+		itemIndex,
+	) as number;
+	const paymentValueId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'paymentValueId',
+		itemIndex,
+	) as number;
+	const documentDate = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'documentDate',
+		itemIndex,
+	) as string;
+	const postingDate = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'postingDate',
+		itemIndex,
+	) as string;
+	const paymentObservation = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'paymentObservation',
+		itemIndex,
+		'',
+	) as string;
+	const effectiveDetail = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'effectiveDetail',
+		itemIndex,
+		'',
+	) as string;
+	const physicalBranchIdRaw = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'physicalBranchId',
+		itemIndex,
+		'',
 	);
-	const bodyCharge = helperFns.createChargeJson(
-		customerOrder as any,
-		articleOrder as any[],
-		shippingOrder as any[],
+	const divisionCompanyGroupIdRaw = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'divisionCompanyGroupId',
+		itemIndex,
+		'',
 	);
+
+	if (!Number.isFinite(paymentAmount) || paymentAmount <= 0) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'paymentAmount must be a number greater than 0.',
+		);
+	}
+
+	if (!Number.isInteger(customerId) || customerId <= 0) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'customerId must be a positive integer.',
+		);
+	}
+
+	if (!Number.isInteger(advanceConceptId) || advanceConceptId <= 0) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'advanceConceptId must be a positive integer.',
+		);
+	}
+
+	if (!Number.isInteger(paymentValueId) || paymentValueId <= 0) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'paymentValueId must be a positive integer.',
+		);
+	}
+
+	const formattedDocumentDate = String(documentDate);
+	const formattedPostingDate = String(postingDate);
+	const physicalBranchId = Number(physicalBranchIdRaw);
+	const divisionCompanyGroupId = Number(divisionCompanyGroupIdRaw);
+
+	if (!Number.isInteger(physicalBranchId) || physicalBranchId <= 0) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'physicalBranchId must be a positive integer.',
+		);
+	}
+
+	if (!Number.isInteger(divisionCompanyGroupId) || divisionCompanyGroupId <= 0) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'divisionCompanyGroupId must be a positive integer.',
+		);
+	}
+
+	let resolvedCustomer: any;
+
+	try {
+		resolvedCustomer = await helperFns.apiRequest<any>(`${centumUrl}/Clientes/${customerId}`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
+			method: 'GET',
+			headers,
+		});
+
+		if (!resolvedCustomer?.IdCliente) {
+			throw new NodeOperationError(executeFunctions.getNode(), 'Customer not found.');
+		}
+	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Error getting customer.';
+		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
+	}
+
+	const bodyCharge = buildCobroPayload({
+		customer: resolvedCustomer,
+		amount: paymentAmount,
+		advanceConceptId,
+		paymentValueId,
+		documentDate: formattedDocumentDate,
+		postingDate: formattedPostingDate,
+		paymentObservation,
+		effectiveDetail,
+		physicalBranchId,
+		divisionCompanyGroupId,
+	});
 
 	try {
 		const dataCobros = await helperFns.apiRequest<any>(`${centumUrl}/Cobros`, {
