@@ -21,7 +21,7 @@ const fieldDefinitions: INodeProperties[] = [
 		default: {},
 		displayOptions: {
 			show: {
-				resource: ['cobros', 'pedidosVenta', 'ordenesCompra'],
+				resource: ['pedidosVenta', 'ordenesCompra'],
 				operation: ['Create'],
 			},
 		},
@@ -202,16 +202,6 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['proveedores'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Customer',
-		name: 'customer',
-		required: true,
-		type: 'json',
-		default: {},
-		displayOptions: {
-			show: { resource: ['cobros'], operation: ['Create'] },
-		},
-	},
-	{
 		displayName: 'Delivery Date From',
 		name: 'fromDeliveryDate',
 		type: 'dateTime',
@@ -243,7 +233,6 @@ const fieldDefinitions: INodeProperties[] = [
 						'clientes',
 						'cobros',
 						'remitosVenta',
-						'remitosCompra',
 					],
 					operation: [
 						'Create',
@@ -489,6 +478,7 @@ const fieldDefinitions: INodeProperties[] = [
 			show: {
 				resource: [
 					'articulos',
+					'cobros',
 					'pedidosVenta',
 					'ordenesCompra',
 					'remitosCompra',
@@ -496,6 +486,20 @@ const fieldDefinitions: INodeProperties[] = [
 					'promocionesComerciales',
 				],
 				operation: ['Create', 'GetVenta', 'Get'],
+			},
+		},
+	},
+	{
+		displayName: 'Posting Date',
+		name: 'postingDate',
+		type: 'dateTime',
+		required: true,
+		default: undefined,
+		description: 'Posting date used as FechaImputacion in Cobros.',
+		displayOptions: {
+			show: {
+				resource: ['cobros'],
+				operation: ['Create'],
 			},
 		},
 	},
@@ -1187,6 +1191,20 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'Division Company Group ID',
+		name: 'divisionCompanyGroupId',
+		type: 'string',
+		default: '',
+		placeholder: 'Enter division ID',
+		description: 'Optional division company group ID for the payment.',
+		displayOptions: {
+			show: {
+				resource: ['cobros'],
+				operation: ['Create'],
+			},
+		},
+	},
+	{
 		displayName: 'Origin Physical Branch ID',
 		name: 'originPhysicalBranchId',
 		type: 'string',
@@ -1340,12 +1358,49 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['proveedores'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Shipping Information',
-		name: 'shippingInfo',
+		displayName: 'Amount',
+		name: 'paymentAmount',
+		type: 'number',
 		required: true,
-		type: 'json',
-		default: {},
-		description: 'Shipping info from the order',
+		default: 0,
+		description: 'Amount to register for both the advance and the effective value.',
+		displayOptions: { show: { resource: ['cobros'], operation: ['Create'] } },
+	},
+	{
+		displayName: 'Advance Concept ID',
+		name: 'advanceConceptId',
+		type: 'number',
+		required: true,
+		default: 2,
+		description: 'IdConceptoVarios used in CobroAnticipos.',
+		displayOptions: { show: { resource: ['cobros'], operation: ['Create'] } },
+	},
+	{
+		displayName: 'Value ID',
+		name: 'paymentValueId',
+		type: 'number',
+		required: true,
+		default: 1,
+		description: 'IdValor used in CobroEfectivos.',
+		displayOptions: { show: { resource: ['cobros'], operation: ['Create'] } },
+	},
+	{
+		displayName: 'Observation',
+		name: 'paymentObservation',
+		type: 'string',
+		default: '',
+		description: 'Optional payment observation sent to Cobros.',
+		typeOptions: {
+			rows: 2,
+		},
+		displayOptions: { show: { resource: ['cobros'], operation: ['Create'] } },
+	},
+	{
+		displayName: 'Effective Detail',
+		name: 'effectiveDetail',
+		type: 'string',
+		default: '',
+		description: 'Optional detail for CobroEfectivos.',
 		displayOptions: { show: { resource: ['cobros'], operation: ['Create'] } },
 	},
 	{
@@ -1523,7 +1578,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				operation: ['Create', 'Update', 'Get'],
-				resource: ['clientes', 'proveedores', 'pedidosVenta', 'ordenesCompra'],
+				resource: ['clientes', 'proveedores', 'pedidosVenta'],
 			},
 		},
 	},

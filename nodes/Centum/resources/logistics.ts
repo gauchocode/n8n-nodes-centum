@@ -96,6 +96,9 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 	const branchId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'physicalBranchId', itemIndex),
 	);
+	const purchaseOperatorId = Number(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'purchaseOperatorId', itemIndex),
+	);
 	const notes = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'notes',
@@ -111,6 +114,13 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
 			'transportId is required to create a purchase delivery note.',
+		);
+	}
+
+	if (!Number.isInteger(purchaseOperatorId) || purchaseOperatorId <= 0) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'purchaseOperatorId must be a positive integer.',
 		);
 	}
 
@@ -342,11 +352,7 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		FechaVencimiento: formattedDueDate,
 		Observaciones: notes,
 		OperadorCompra: {
-			// Required
-			IdOperadorCompra: 1,
-			Codigo: '1',
-			Nombre: 'Operador de Compras Defecto',
-			EsSupervisor: false,
+			IdOperadorCompra: purchaseOperatorId,
 		},
 		Transporte: {
 			IdTransporte: Number(transportId),
