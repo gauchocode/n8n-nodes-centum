@@ -5,8 +5,11 @@ import type { ResourceHandler, ResourceHandlerMap } from './types';
 
 const buildCobroPayload = ({
 	customer,
-	amount,
+	paymentMode,
+	advanceAmount,
 	advanceConceptId,
+	advanceDetail,
+	cashAmount,
 	paymentValueId,
 	documentDate,
 	postingDate,
@@ -16,8 +19,11 @@ const buildCobroPayload = ({
 	divisionCompanyGroupId,
 }: {
 	customer: any;
-	amount: number;
+	paymentMode: 'advanceOnly' | 'cashOnly' | 'advanceAndCash';
+	advanceAmount: number;
 	advanceConceptId: number;
+	advanceDetail: string;
+	cashAmount: number;
 	paymentValueId: number;
 	documentDate: string;
 	postingDate: string;
@@ -30,28 +36,34 @@ const buildCobroPayload = ({
 		IdCliente: customer.IdCliente,
 	},
 	Observacion: paymentObservation,
-	CobroAnticipos: [
-		{
-			ConceptoVarios: {
-				IdConceptoVarios: advanceConceptId,
-			},
-			Cotizacion: 1,
-			Detalle: '',
-			Importe: amount,
-		},
-	],
-	CobroEfectivos: [
-		{
-			Valor: {
-				IdValor: paymentValueId,
-			},
-			Detalle: effectiveDetail,
-			Importe: amount,
-			Cotizacion: 1,
-			CotizacionMonedaRespectoMonedaCliente: 1,
-			FechaAcreditacion: postingDate,
-		},
-	],
+	CobroAnticipos:
+		paymentMode === 'advanceOnly' || paymentMode === 'advanceAndCash'
+			? [
+					{
+						ConceptoVarios: {
+							IdConceptoVarios: advanceConceptId,
+						},
+						Cotizacion: 1,
+						Detalle: advanceDetail,
+						Importe: advanceAmount,
+					},
+				]
+			: [],
+	CobroEfectivos:
+		paymentMode === 'cashOnly' || paymentMode === 'advanceAndCash'
+			? [
+					{
+						Valor: {
+							IdValor: paymentValueId,
+						},
+						Detalle: effectiveDetail,
+						Importe: cashAmount,
+						Cotizacion: 1,
+						CotizacionMonedaRespectoMonedaCliente: 1,
+						FechaAcreditacion: postingDate,
+					},
+				]
+			: [],
 	SucursalFisica: {
 		IdSucursalFisica: physicalBranchId,
 	},
@@ -85,14 +97,31 @@ const registerPayment: ResourceHandler = async (context) => {
 			helperFns.getNodeParameterOrThrow(executeFunctions, 'customerId', itemIndex),
 		),
 	);
-	const paymentAmount = helperFns.getNodeParameterOrThrow(
+	const paymentMode = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
-		'paymentAmount',
+		'paymentMode',
+		itemIndex,
+		'advanceAndCash',
+	) as 'advanceOnly' | 'cashOnly' | 'advanceAndCash';
+	const advanceAmount = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'advanceAmount',
 		itemIndex,
 	) as number;
 	const advanceConceptId = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'advanceConceptId',
+		itemIndex,
+	) as number;
+	const advanceDetail = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'advanceDetail',
+		itemIndex,
+		'',
+	) as string;
+	const cashAmount = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'cashAmount',
 		itemIndex,
 	) as number;
 	const paymentValueId = helperFns.getNodeParameterOrThrow(
@@ -135,10 +164,17 @@ const registerPayment: ResourceHandler = async (context) => {
 		'',
 	);
 
-	if (!Number.isFinite(paymentAmount) || paymentAmount <= 0) {
+	if (!['advanceOnly', 'cashOnly', 'advanceAndCash'].includes(paymentMode)) {
+		throw new NodeOperationError(executeFunctions.getNode(), 'Invalid paymentMode value.');
+	}
+
+	if (
+		(paymentMode === 'advanceOnly' || paymentMode === 'advanceAndCash') &&
+		(!Number.isFinite(advanceAmount) || advanceAmount <= 0)
+	) {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			'paymentAmount must be a number greater than 0.',
+			'advanceAmount must be a number greater than 0.',
 		);
 	}
 
@@ -149,14 +185,30 @@ const registerPayment: ResourceHandler = async (context) => {
 		);
 	}
 
-	if (!Number.isInteger(advanceConceptId) || advanceConceptId <= 0) {
+	if (
+		(paymentMode === 'advanceOnly' || paymentMode === 'advanceAndCash') &&
+		(!Number.isInteger(advanceConceptId) || advanceConceptId <= 0)
+	) {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
 			'advanceConceptId must be a positive integer.',
 		);
 	}
 
-	if (!Number.isInteger(paymentValueId) || paymentValueId <= 0) {
+	if (
+		(paymentMode === 'cashOnly' || paymentMode === 'advanceAndCash') &&
+		(!Number.isFinite(cashAmount) || cashAmount <= 0)
+	) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'cashAmount must be a number greater than 0.',
+		);
+	}
+
+	if (
+		(paymentMode === 'cashOnly' || paymentMode === 'advanceAndCash') &&
+		(!Number.isInteger(paymentValueId) || paymentValueId <= 0)
+	) {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
 			'paymentValueId must be a positive integer.',
@@ -206,8 +258,11 @@ const registerPayment: ResourceHandler = async (context) => {
 
 	const bodyCharge = buildCobroPayload({
 		customer: resolvedCustomer,
-		amount: paymentAmount,
+		paymentMode,
+		advanceAmount,
 		advanceConceptId,
+		advanceDetail,
+		cashAmount,
 		paymentValueId,
 		documentDate: formattedDocumentDate,
 		postingDate: formattedPostingDate,

@@ -1178,6 +1178,7 @@ const fieldDefinitions: INodeProperties[] = [
 			displayOptions: {
 			show: {
 				resource: [
+					'cobros',
 					'remitosCompra',
 					'remitosVenta',
 					'ordenesCompra',
@@ -1358,13 +1359,32 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['proveedores'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Amount',
-		name: 'paymentAmount',
+		displayName: 'Payment Mode',
+		name: 'paymentMode',
+		type: 'options',
+		default: 'advanceAndCash',
+		options: [
+			{ name: 'Advance Only', value: 'advanceOnly' },
+			{ name: 'Cash Only', value: 'cashOnly' },
+			{ name: 'Advance and Cash', value: 'advanceAndCash' },
+		],
+		description: 'Choose which Cobros components should be included in the request.',
+		displayOptions: { show: { resource: ['cobros'], operation: ['Create'] } },
+	},
+	{
+		displayName: 'Advance Amount',
+		name: 'advanceAmount',
 		type: 'number',
 		required: true,
 		default: 0,
-		description: 'Amount to register for both the advance and the effective value.',
-		displayOptions: { show: { resource: ['cobros'], operation: ['Create'] } },
+		description: 'Amount to register in CobroAnticipos.',
+		displayOptions: {
+			show: {
+				resource: ['cobros'],
+				operation: ['Create'],
+				paymentMode: ['advanceOnly', 'advanceAndCash'],
+			},
+		},
 	},
 	{
 		displayName: 'Advance Concept ID',
@@ -1373,7 +1393,45 @@ const fieldDefinitions: INodeProperties[] = [
 		required: true,
 		default: 2,
 		description: 'IdConceptoVarios used in CobroAnticipos.',
-		displayOptions: { show: { resource: ['cobros'], operation: ['Create'] } },
+		displayOptions: {
+			show: {
+				resource: ['cobros'],
+				operation: ['Create'],
+				paymentMode: ['advanceOnly', 'advanceAndCash'],
+			},
+		},
+	},
+	{
+		displayName: 'Advance Detail',
+		name: 'advanceDetail',
+		type: 'string',
+		default: '',
+		description: 'Optional detail for CobroAnticipos.',
+		typeOptions: {
+			rows: 2,
+		},
+		displayOptions: {
+			show: {
+				resource: ['cobros'],
+				operation: ['Create'],
+				paymentMode: ['advanceOnly', 'advanceAndCash'],
+			},
+		},
+	},
+	{
+		displayName: 'Cash Amount',
+		name: 'cashAmount',
+		type: 'number',
+		required: true,
+		default: 0,
+		description: 'Amount to register in CobroEfectivos.',
+		displayOptions: {
+			show: {
+				resource: ['cobros'],
+				operation: ['Create'],
+				paymentMode: ['cashOnly', 'advanceAndCash'],
+			},
+		},
 	},
 	{
 		displayName: 'Value ID',
@@ -1382,7 +1440,13 @@ const fieldDefinitions: INodeProperties[] = [
 		required: true,
 		default: 1,
 		description: 'IdValor used in CobroEfectivos.',
-		displayOptions: { show: { resource: ['cobros'], operation: ['Create'] } },
+		displayOptions: {
+			show: {
+				resource: ['cobros'],
+				operation: ['Create'],
+				paymentMode: ['cashOnly', 'advanceAndCash'],
+			},
+		},
 	},
 	{
 		displayName: 'Observation',
@@ -1393,7 +1457,13 @@ const fieldDefinitions: INodeProperties[] = [
 		typeOptions: {
 			rows: 2,
 		},
-		displayOptions: { show: { resource: ['cobros'], operation: ['Create'] } },
+		displayOptions: {
+			show: {
+				resource: ['cobros'],
+				operation: ['Create'],
+				paymentMode: ['cashOnly', 'advanceAndCash'],
+			},
+		},
 	},
 	{
 		displayName: 'Effective Detail',
