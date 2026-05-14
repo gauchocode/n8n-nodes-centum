@@ -118,17 +118,10 @@ const createSalesOrder: ResourceHandler = async (context) => {
 		Codigo?: string;
 		Cantidad: number;
 	};
-	const businessName = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'businessName',
-		itemIndex,
-	) as string;
 	const articlesRaw = helperFns.getNodeParameterOrThrow(executeFunctions, 'article', itemIndex);
-	const customerCode = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'customerCode',
-		itemIndex,
-	) as string;
+	const customerId = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'customerId', itemIndex),
+	);
 	const documentDate = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'documentDate',
@@ -193,13 +186,10 @@ const createSalesOrder: ResourceHandler = async (context) => {
 		);
 	}
 
-	let clientId: number;
-	let queryParams = '';
-
-	if (!businessName.trim() && !customerCode.trim()) {
+	if (!customerId) {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			'Customer code or business name is required.',
+			'Customer ID is required.',
 		);
 	}
 
@@ -224,40 +214,14 @@ const createSalesOrder: ResourceHandler = async (context) => {
 		throw new NodeOperationError(executeFunctions.getNode(), 'Seller is required.');
 	}
 
-	if (customerCode) queryParams = `codigo=${encodeURIComponent(customerCode)}`;
-	if (businessName) queryParams = `razonSocial=${encodeURIComponent(businessName)}`;
-
-	/* 1st Request to get Client ID */
-	try {
-		const dataCliente = await helperFns.apiRequest<any>(`${centumUrl}/Clientes?${queryParams}`, {
-			context: executeFunctions,
-			debugItemIndex: itemIndex,
-			method: 'GET',
-			headers,
-		});
-
-		const customer = dataCliente?.Items?.[0];
-		if (!customer?.IdCliente) {
-			throw new NodeOperationError(executeFunctions.getNode(), 'Customer not found.');
-		}
-		clientId = customer.IdCliente;
-	} catch (error) {
-		if (error instanceof NodeApiError) {
-			throw error;
-		}
-		const errorMessage =
-			error?.response?.data?.Message || (error as any).message || 'Error getting customer.';
-		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
-	}
-
-	/* 2nd request to get article data */
+	/* Get article data using the provided customer ID */
 	const results: any[] = [];
 
 	for (const articleInput of articles) {
 		try {
 			// Build the request body dynamically depending on whether an ID or code is present
 			const articleBody: any = {
-				IdCliente: clientId,
+				IdCliente: Number(customerId),
 				FechaDocumento: formattedDocumentDate,
 			};
 
@@ -304,7 +268,7 @@ const createSalesOrder: ResourceHandler = async (context) => {
 		PorcentajeDescuento: discountPercentage,
 		PedidoVentaArticulos: results,
 		Cliente: {
-			IdCliente: clientId,
+			IdCliente: Number(customerId),
 		},
 		Vendedor: {
 			IdVendedor: Number(sellerIdValue),

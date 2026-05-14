@@ -256,7 +256,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['pedidosVenta'],
-				operation: ['GetConsulta'],
+				operation: ['Create', 'GetConsulta'],
 			},
 		},
 	},
@@ -1678,7 +1678,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				operation: ['Create', 'Update', 'Get'],
-				resource: ['clientes', 'proveedores', 'pedidosVenta'],
+				resource: ['clientes', 'proveedores'],
 			},
 		},
 	},
