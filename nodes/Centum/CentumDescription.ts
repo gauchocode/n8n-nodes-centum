@@ -207,7 +207,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'dateTime',
 		default: '',
 		displayOptions: {
-			show: { resource: ['ordenesCompra'], operation: ['Get'] },
+			show: { resource: ['ordenesCompra'], operation: ['Get', 'GetPendientes'] },
 		},
 	},
 	{
@@ -216,7 +216,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'dateTime',
 		default: '',
 		displayOptions: {
-			show: { resource: ['ordenesCompra'], operation: ['Get'] },
+			show: { resource: ['ordenesCompra'], operation: ['Get', 'GetPendientes'] },
 		},
 	},
 	{
@@ -403,7 +403,7 @@ const fieldDefinitions: INodeProperties[] = [
 			displayOptions: {
 				show: {
 					resource: ['cobros', 'compras', 'ordenesCompra', 'ordenesTraspaso'],
-					operation: ['Create', 'Get', 'GetConsulta', 'GetEstadisticas'],
+					operation: ['Create', 'Get', 'GetConsulta', 'GetEstadisticas', 'GetPendientes'],
 				},
 			},
 	},
@@ -439,7 +439,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['cobros', 'compras', 'ordenesCompra', 'ordenesTraspaso'],
-				operation: ['Get', 'GetConsulta', 'GetEstadisticas'],
+				operation: ['Get', 'GetConsulta', 'GetEstadisticas', 'GetPendientes'],
 			},
 		},
 	},
@@ -1608,6 +1608,36 @@ const fieldDefinitions: INodeProperties[] = [
 			show: {
 				resource: ['ordenesCompra', 'remitosCompra'],
 				operation: ['Create', 'Get'],
+			},
+		},
+	},
+	{
+		displayName: 'Article IDs',
+		name: 'articleIds',
+		type: 'string',
+		default: '',
+		placeholder: '1,2,3',
+		description:
+			'Article IDs to filter pending purchase order items. Separate multiple values with a comma.',
+		displayOptions: {
+			show: {
+				resource: ['ordenesCompra'],
+				operation: ['GetPendientes'],
+			},
+		},
+	},
+	{
+		displayName: 'Supplier IDs',
+		name: 'supplierIds',
+		type: 'string',
+		default: '',
+		placeholder: '10,25,30',
+		description:
+			'Supplier IDs to filter pending purchase order items. Separate multiple values with a comma.',
+		displayOptions: {
+			show: {
+				resource: ['ordenesCompra'],
+				operation: ['GetPendientes'],
 			},
 		},
 	},

@@ -819,6 +819,100 @@ const listPurchaseOrders: ResourceHandler = async (context) => {
 	}
 };
 
+const listPendingPurchaseOrderArticles: ResourceHandler = async (context) => {
+	const { executeFunctions, centumUrl, headers, itemIndex } = context;
+
+	const startDate = helperFns.getNodeParameterOrThrow(executeFunctions, 'startDate', itemIndex);
+	const endDate = helperFns.getNodeParameterOrThrow(executeFunctions, 'endDate', itemIndex);
+	const fromDeliveryDate = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'fromDeliveryDate',
+		itemIndex,
+	);
+	const sinceDeliveryDate = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'sinceDeliveryDate',
+		itemIndex,
+	);
+	const articleIdsRaw = helperFns.getNodeParameterOrThrow(executeFunctions, 'articleIds', itemIndex);
+	const supplierIdsRaw = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'supplierIds',
+		itemIndex,
+	);
+
+	const articleIds = String(articleIdsRaw ?? '')
+		.split(',')
+		.map((value) => value.trim())
+		.filter(Boolean)
+		.map((value) => Number(value))
+		.filter((value) => Number.isFinite(value));
+
+	const supplierIds = String(supplierIdsRaw ?? '')
+		.split(',')
+		.map((value) => value.trim())
+		.filter(Boolean)
+		.map((value) => Number(value))
+		.filter((value) => Number.isFinite(value));
+
+	const body: Record<string, string | number[] | boolean> = {};
+
+	if (startDate) {
+		body.FechaDocumentoDesde = String(startDate);
+	}
+
+	if (endDate) {
+		body.FechaDocumentoHasta = String(endDate);
+	}
+
+	if (fromDeliveryDate) {
+		body.FechaEntregaDesde = String(fromDeliveryDate);
+	}
+
+	if (sinceDeliveryDate) {
+		body.FechaEntregaHasta = String(sinceDeliveryDate);
+	}
+
+	if (articleIds.length > 0) {
+		body.IdsArticulos = articleIds;
+	}
+
+	if (supplierIds.length > 0) {
+		body.IdsProveedores = supplierIds;
+	}
+
+	try {
+		const response = await helperFns.apiRequest<any>(
+			`${centumUrl}/OrdenesCompra/ArticulosPendientes`,
+			{
+				context: executeFunctions,
+				debugItemIndex: itemIndex,
+				method: 'POST',
+				headers,
+				body,
+			},
+		);
+
+		if (!response || typeof response !== 'object') {
+			throw new NodeOperationError(executeFunctions.getNode(), 'Invalid server response.');
+		}
+
+		return [executeFunctions.helpers.returnJsonArray(response)];
+	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
+
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
+
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			`Error getting pending purchase order articles: ${errorMessage}`,
+		);
+	}
+};
+
 export const purchasesHandlers: ResourceHandlerMap = {
 	createPurchase: createPurchase,
 	listPurchases: listPurchases,
@@ -827,4 +921,5 @@ export const purchasesHandlers: ResourceHandlerMap = {
 	createPurchaseOrder: createPurchaseOrder,
 	getPurchaseOrderDetails: getPurchaseOrderDetails,
 	listPurchaseOrders: listPurchaseOrders,
+	listPendingPurchaseOrderArticles: listPendingPurchaseOrderArticles,
 };

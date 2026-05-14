@@ -81,6 +81,7 @@ export const resourceHandlerGroups: Record<string, ResourceHandlerMap> = {
 		Create: purchasesHandlers.createPurchaseOrder,
 		GetOne: purchasesHandlers.getPurchaseOrderDetails,
 		Get: purchasesHandlers.listPurchaseOrders,
+		GetPendientes: purchasesHandlers.listPendingPurchaseOrderArticles,
 	},
 	ordenesTraspaso: {
 		Create: transferHandlers.createTransferOrder,

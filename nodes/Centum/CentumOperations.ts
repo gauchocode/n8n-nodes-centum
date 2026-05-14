@@ -390,6 +390,13 @@ const operationGroups: OperationGroup[] = [
 				action: 'Get',
 				description: 'Devuelve los datos de ordenes de compra en función de filtros varios.',
 			},
+			{
+				name: 'GetPendientes',
+				value: 'GetPendientes',
+				action: 'GetPendientes',
+				description:
+					'Devuelve los datos de ordenes de compra y el detalle de artículos que aún se encuentran pendientes por parte del proveedor en función de filtros varios.',
+			},
 		],
 	},
 	{
