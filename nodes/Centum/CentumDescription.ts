@@ -824,13 +824,6 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Sale Discount ID',
-		name: 'saleDiscountId',
-		type: 'number',
-		default: 0,
-		displayOptions: { show: { resource: ['ventas'], operation: ['Create'] } },
-	},
-	{
 		displayName: 'Article Location',
 		name: 'articleLocationId',
 		required: true,
@@ -1095,9 +1088,20 @@ const fieldDefinitions: INodeProperties[] = [
 		required: true,
 		default: '',
 		placeholder: 'Enter transport ID',
-		description: 'Transport ID required to create the delivery note',
+		description: 'Transport ID associated with the delivery note',
 		displayOptions: {
-			show: { resource: ['remitosVenta', 'remitosCompra'], operation: ['Create'] },
+			show: { resource: ['remitosVenta'], operation: ['Create'] },
+		},
+	},
+	{
+		displayName: 'Transport ID',
+		name: 'transportId',
+		type: 'string',
+		default: '',
+		placeholder: 'Enter transport ID',
+		description: 'Transport ID associated with the delivery note',
+		displayOptions: {
+			show: { resource: ['remitosCompra'], operation: ['Create'] },
 		},
 	},
 	{

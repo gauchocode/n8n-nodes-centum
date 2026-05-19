@@ -24,30 +24,6 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		Precio?: number;
 	};
 
-	type ResolvedPurchaseArticle = {
-		IdArticulo: number;
-		Codigo: string;
-		Nombre: string;
-		CategoriaImpuestoIVA: {
-			IdCategoriaImpuestoIVA: number;
-			Codigo?: string;
-			Nombre?: string;
-			Tasa?: number;
-		};
-	};
-
-	type CentumArticleLookup = {
-		IdArticulo?: number;
-		Codigo?: string;
-		Nombre?: string;
-		CategoriaImpuestoIVA?: {
-			IdCategoriaImpuestoIVA?: number;
-			Codigo?: string;
-			Nombre?: string;
-			Tasa?: number;
-		};
-	};
-
 	const documentLetter =
 		(helperFns.getNodeParameterOrThrow(executeFunctions, 'documentLetter', itemIndex) as string) ??
 		'';
@@ -108,13 +84,6 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 
 	if (!supplierId) {
 		throw new NodeOperationError(executeFunctions.getNode(), 'idProveedor must be specified.');
-	}
-
-	if (!transportId) {
-		throw new NodeOperationError(
-			executeFunctions.getNode(),
-			'transportId is required to create a purchase delivery note.',
-		);
 	}
 
 	if (!Number.isInteger(purchaseOperatorId) || purchaseOperatorId <= 0) {
@@ -200,85 +169,15 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		);
 	}
 
-	const resolvedArticleCache = new Map<number, ResolvedPurchaseArticle>();
-
-	const resolvePurchaseArticle = async (articleId: number): Promise<ResolvedPurchaseArticle> => {
-		const cachedArticle = resolvedArticleCache.get(articleId);
-		if (cachedArticle) {
-			return cachedArticle;
-		}
-
-		const response = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
-			context: executeFunctions,
-			debugItemIndex: itemIndex,
-			method: 'POST',
-			headers,
-			body: {
-				Ids: [articleId],
-			},
-		});
-
-		const responseItems: CentumArticleLookup[] = Array.isArray(response)
-			? response
-			: Array.isArray(response?.Articulos?.Items)
-				? response.Articulos.Items
-				: [];
-		const resolvedRaw = responseItems.find(
-			(item: CentumArticleLookup) => Number(item.IdArticulo) === articleId,
-		);
-
-		if (!resolvedRaw) {
-			throw new NodeOperationError(
-				executeFunctions.getNode(),
-				`Article ${articleId} was not found in Centum.`,
-			);
-		}
-
-		const resolvedArticle: ResolvedPurchaseArticle = {
-			IdArticulo: Number(resolvedRaw.IdArticulo),
-			Codigo: String(resolvedRaw.Codigo ?? '').trim(),
-			Nombre: String(resolvedRaw.Nombre ?? '').trim(),
-			CategoriaImpuestoIVA: {
-				IdCategoriaImpuestoIVA: Number(resolvedRaw.CategoriaImpuestoIVA?.IdCategoriaImpuestoIVA),
-				Codigo:
-					typeof resolvedRaw.CategoriaImpuestoIVA?.Codigo === 'string'
-						? resolvedRaw.CategoriaImpuestoIVA.Codigo
-						: undefined,
-				Nombre:
-					typeof resolvedRaw.CategoriaImpuestoIVA?.Nombre === 'string'
-						? resolvedRaw.CategoriaImpuestoIVA.Nombre
-						: undefined,
-				Tasa:
-					typeof resolvedRaw.CategoriaImpuestoIVA?.Tasa === 'number'
-						? resolvedRaw.CategoriaImpuestoIVA.Tasa
-						: undefined,
-			},
-		};
-
-		if (!resolvedArticle.Codigo) {
-			throw new NodeOperationError(
-				executeFunctions.getNode(),
-				`Article ${articleId} does not include a valid Codigo in Centum.`,
-			);
-		}
-
-		if (!resolvedArticle.Nombre) {
-			throw new NodeOperationError(
-				executeFunctions.getNode(),
-				`Article ${articleId} does not include a valid Nombre in Centum.`,
-			);
-		}
-
-		if (!Number.isFinite(resolvedArticle.CategoriaImpuestoIVA.IdCategoriaImpuestoIVA)) {
-			throw new NodeOperationError(
-				executeFunctions.getNode(),
-				`Article ${articleId} does not include CategoriaImpuestoIVA in Centum.`,
-			);
-		}
-
-		resolvedArticleCache.set(articleId, resolvedArticle);
-		return resolvedArticle;
-	};
+	const resolvedArticles = await helperFns.resolvePurchaseArticles(
+		executeFunctions,
+		centumUrl,
+		headers,
+		itemIndex,
+		articles
+			.map((articleInput) => articleInput.ID)
+			.filter((articleId): articleId is number => articleId !== undefined),
+	);
 
 	// RemitosCompra expects purchase-side article payloads and does not use a customer context.
 	const purchaseDeliveryNoteArticles = await Promise.all(articles.map(async (articleInput) => {
@@ -289,7 +188,13 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 			);
 		}
 
-		const resolvedArticle = await resolvePurchaseArticle(articleInput.ID);
+		const resolvedArticle = resolvedArticles.get(articleInput.ID);
+		if (!resolvedArticle) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`Article ${articleInput.ID} was not found in Centum.`,
+			);
+		}
 
 		const article: Record<string, number | string | Record<string, number | string>> = {
 			Cantidad: articleInput.Cantidad,
@@ -297,6 +202,10 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 			Codigo: resolvedArticle.Codigo,
 			Nombre: resolvedArticle.Nombre,
 			CategoriaImpuestoIVA: resolvedArticle.CategoriaImpuestoIVA,
+			Precio: resolvedArticle.Precio,
+			PorcentajeDescuento1: resolvedArticle.PorcentajeDescuento1,
+			PorcentajeDescuento2: resolvedArticle.PorcentajeDescuento2,
+			PorcentajeDescuento3: resolvedArticle.PorcentajeDescuento3,
 		};
 
 		if (articleInput.Precio !== undefined) {
@@ -333,7 +242,7 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 	}
 
 	// 4) Build the final request body
-	const bodyRemitoCompra = {
+	const bodyRemitoCompra: Record<string, unknown> = {
 		SucursalFisica: {
 			IdSucursalFisica: branchId,
 		},
@@ -354,11 +263,14 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		OperadorCompra: {
 			IdOperadorCompra: purchaseOperatorId,
 		},
-		Transporte: {
-			IdTransporte: Number(transportId),
-		},
 		IdChofer: Number(driverId),
 	};
+
+	if (transportId) {
+		bodyRemitoCompra.Transporte = {
+			IdTransporte: Number(transportId),
+		};
+	}
 
 	// 5) Send the final POST request
 	try {
@@ -623,12 +535,12 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 		Vendedor: {
 			IdVendedor: sellerId,
 		},
-		Transporte: {
-			IdTransporte: Number(transportId),
-		},
 		PorcentajeDescuento: 0.0,
 		Observaciones: 'Remito creado desde n8n.',
 		RemitoVentaArticulos: purchaseItemsWithQuantity,
+		Transporte: {
+			IdTransporte: Number(transportId),
+		},
 	};
 
 	if (driverId) {
