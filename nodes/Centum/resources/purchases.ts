@@ -76,19 +76,14 @@ const createPurchase: ResourceHandler = async (context) => {
 	const productDate = helperFns.getNodeParameterOrThrow(executeFunctions, 'startDate', itemIndex);
 	const formattedProductDate = String(productDate).split('T')[0];
 
-	// Only the IDs are sent to the /Articulos/Venta request
-	const ids = articlesArray.map((a) => a.ID);
-	// Map article ID to quantity
+	const ids = articlesArray.map((a) => Number(a.ID));
 	const qtyById: Record<string, number> = Object.fromEntries(
 		articlesArray.map((a) => [a.ID, a.Cantidad]),
 	);
 
 	let supplierBody: Record<string, unknown>;
-	const purchaseArticlesBody = {
-		IdCliente: customerId,
-		FechaDocumento: formattedProductDate,
-		Ids: ids,
-	};
+	void customerId;
+	void formattedProductDate;
 
 	try {
 		const supplierResponse = await helperFns.apiRequest<any>(
@@ -113,14 +108,28 @@ const createPurchase: ResourceHandler = async (context) => {
 		);
 	}
 
-	let salesArticlesResponse: any;
+	let purchaseArticles: helperFns.ResolvedPurchaseArticle[];
 	try {
-		salesArticlesResponse = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
-			context: executeFunctions,
-			debugItemIndex: itemIndex,
-			method: 'POST',
-			body: purchaseArticlesBody,
+		const resolvedArticles = await helperFns.resolvePurchaseArticles(
+			executeFunctions,
+			centumUrl,
 			headers,
+			itemIndex,
+			ids,
+		);
+		purchaseArticles = ids.map((articleId) => {
+			const resolvedArticle = resolvedArticles.get(articleId);
+			if (!resolvedArticle) {
+				throw new NodeOperationError(
+					executeFunctions.getNode(),
+					`Article ${articleId} was not found in Centum.`,
+				);
+			}
+
+			return {
+				...resolvedArticle,
+				Cantidad: qtyById[String(articleId)] ?? 0,
+			};
 		});
 	} catch (error) {
 		if (error instanceof NodeApiError) {
@@ -133,23 +142,6 @@ const createPurchase: ResourceHandler = async (context) => {
 			`Error getting article information ${errorMessage}`,
 		);
 	}
-
-	const purchasePayload =
-		typeof salesArticlesResponse === 'string'
-			? JSON.parse(salesArticlesResponse)
-			: salesArticlesResponse;
-
-	const responseItems: any[] =
-		purchasePayload?.Articulos?.Items ??
-		purchasePayload?.CompraArticulos ??
-		purchasePayload?.Items ??
-		[];
-
-	// Attach the original quantity from the source array
-	const purchaseItemsWithQuantity = responseItems.map((art: any) => ({
-		...art,
-		Cantidad: qtyById[String(art.IdArticulo)] ?? 0,
-	}));
 
 	const finalBody = {
 		TipoComprobanteCompra: {
@@ -167,7 +159,7 @@ const createPurchase: ResourceHandler = async (context) => {
 		},
 		FechaDocumento: documentDate,
 		Proveedor: supplierBody,
-		CompraArticulos: purchaseItemsWithQuantity,
+		CompraArticulos: purchaseArticles,
 	};
 
 	try {
@@ -372,30 +364,6 @@ const createPurchaseOrder: ResourceHandler = async (context) => {
 		Precio?: number;
 	};
 
-	type ResolvedPurchaseOrderArticle = {
-		IdArticulo: number;
-		Codigo: string;
-		Nombre: string;
-		CategoriaImpuestoIVA: {
-			IdCategoriaImpuestoIVA: number;
-			Codigo?: string;
-			Nombre?: string;
-			Tasa?: number;
-		};
-	};
-
-	type CentumArticleLookup = {
-		IdArticulo?: number;
-		Codigo?: string;
-		Nombre?: string;
-		CategoriaImpuestoIVA?: {
-			IdCategoriaImpuestoIVA?: number;
-			Codigo?: string;
-			Nombre?: string;
-			Tasa?: number;
-		};
-	};
-
 	const documentLetter =
 		(helperFns.getNodeParameterOrThrow(executeFunctions, 'documentLetter', itemIndex) as string) ??
 		'';
@@ -494,87 +462,15 @@ const createPurchaseOrder: ResourceHandler = async (context) => {
 		);
 	}
 
-	const resolvedArticleCache = new Map<number, ResolvedPurchaseOrderArticle>();
-
-	const resolvePurchaseOrderArticle = async (
-		articleId: number,
-	): Promise<ResolvedPurchaseOrderArticle> => {
-		const cachedArticle = resolvedArticleCache.get(articleId);
-		if (cachedArticle) {
-			return cachedArticle;
-		}
-
-		const response = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
-			context: executeFunctions,
-			debugItemIndex: itemIndex,
-			method: 'POST',
-			headers,
-			body: {
-				Ids: [articleId],
-			},
-		});
-
-		const responseItems: CentumArticleLookup[] = Array.isArray(response)
-			? response
-			: Array.isArray(response?.Articulos?.Items)
-				? response.Articulos.Items
-				: [];
-		const resolvedRaw = responseItems.find(
-			(item: CentumArticleLookup) => Number(item.IdArticulo) === articleId,
-		);
-
-		if (!resolvedRaw) {
-			throw new NodeOperationError(
-				executeFunctions.getNode(),
-				`Article ${articleId} was not found in Centum.`,
-			);
-		}
-
-		const resolvedArticle: ResolvedPurchaseOrderArticle = {
-			IdArticulo: Number(resolvedRaw.IdArticulo),
-			Codigo: String(resolvedRaw.Codigo ?? '').trim(),
-			Nombre: String(resolvedRaw.Nombre ?? '').trim(),
-			CategoriaImpuestoIVA: {
-				IdCategoriaImpuestoIVA: Number(resolvedRaw.CategoriaImpuestoIVA?.IdCategoriaImpuestoIVA),
-				Codigo:
-					typeof resolvedRaw.CategoriaImpuestoIVA?.Codigo === 'string'
-						? resolvedRaw.CategoriaImpuestoIVA.Codigo
-						: undefined,
-				Nombre:
-					typeof resolvedRaw.CategoriaImpuestoIVA?.Nombre === 'string'
-						? resolvedRaw.CategoriaImpuestoIVA.Nombre
-						: undefined,
-				Tasa:
-					typeof resolvedRaw.CategoriaImpuestoIVA?.Tasa === 'number'
-						? resolvedRaw.CategoriaImpuestoIVA.Tasa
-						: undefined,
-			},
-		};
-
-		if (!resolvedArticle.Codigo) {
-			throw new NodeOperationError(
-				executeFunctions.getNode(),
-				`Article ${articleId} does not include a valid Codigo in Centum.`,
-			);
-		}
-
-		if (!resolvedArticle.Nombre) {
-			throw new NodeOperationError(
-				executeFunctions.getNode(),
-				`Article ${articleId} does not include a valid Nombre in Centum.`,
-			);
-		}
-
-		if (!Number.isFinite(resolvedArticle.CategoriaImpuestoIVA.IdCategoriaImpuestoIVA)) {
-			throw new NodeOperationError(
-				executeFunctions.getNode(),
-				`Article ${articleId} does not include CategoriaImpuestoIVA in Centum.`,
-			);
-		}
-
-		resolvedArticleCache.set(articleId, resolvedArticle);
-		return resolvedArticle;
-	};
+	const resolvedArticles = await helperFns.resolvePurchaseArticles(
+		executeFunctions,
+		centumUrl,
+		headers,
+		itemIndex,
+		articles
+			.map((articleInput) => articleInput.ID)
+			.filter((articleId): articleId is number => articleId !== undefined),
+	);
 
 	const purchaseOrderArticles = await Promise.all(
 		articles.map(async (articleInput) => {
@@ -585,7 +481,13 @@ const createPurchaseOrder: ResourceHandler = async (context) => {
 				);
 			}
 
-			const resolvedArticle = await resolvePurchaseOrderArticle(articleInput.ID);
+			const resolvedArticle = resolvedArticles.get(articleInput.ID);
+			if (!resolvedArticle) {
+				throw new NodeOperationError(
+					executeFunctions.getNode(),
+					`Article ${articleInput.ID} was not found in Centum.`,
+				);
+			}
 
 			const article: Record<string, number | string | Record<string, number | string>> = {
 				Cantidad: articleInput.Cantidad,
@@ -593,6 +495,10 @@ const createPurchaseOrder: ResourceHandler = async (context) => {
 				Codigo: resolvedArticle.Codigo,
 				Nombre: resolvedArticle.Nombre,
 				CategoriaImpuestoIVA: resolvedArticle.CategoriaImpuestoIVA,
+				Precio: resolvedArticle.Precio,
+				PorcentajeDescuento1: resolvedArticle.PorcentajeDescuento1,
+				PorcentajeDescuento2: resolvedArticle.PorcentajeDescuento2,
+				PorcentajeDescuento3: resolvedArticle.PorcentajeDescuento3,
 			};
 
 			if (articleInput.Precio !== undefined) {

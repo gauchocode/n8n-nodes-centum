@@ -29,6 +29,38 @@ import {
 } from 'n8n-workflow';
 import type { CentumHeaders } from '../resources/types';
 
+type PurchaseArticleLookup = {
+	IdArticulo?: number;
+	Codigo?: string;
+	Nombre?: string;
+	CategoriaImpuestoIVA?: {
+		IdCategoriaImpuestoIVA?: number;
+		Codigo?: string;
+		Nombre?: string;
+		Tasa?: number;
+	};
+	PrecioListaCompra?: number;
+	DescuentoItem1?: number;
+	DescuentoItem2?: number;
+	DescuentoItem3?: number;
+};
+
+export type ResolvedPurchaseArticle = {
+	IdArticulo: number;
+	Codigo: string;
+	Nombre: string;
+	CategoriaImpuestoIVA: {
+		IdCategoriaImpuestoIVA: number;
+		Codigo?: string;
+		Nombre?: string;
+		Tasa?: number;
+	};
+	Precio: number;
+	PorcentajeDescuento1: number;
+	PorcentajeDescuento2: number;
+	PorcentajeDescuento3: number;
+};
+
 export const createHash = (publicAccessKey: string): string => {
 	const uuid = randomUUID().replace(/-/gi, '');
 	//yyyy-MM-ddTHH:mm:ss
@@ -39,6 +71,104 @@ export const createHash = (publicAccessKey: string): string => {
 	const hashedResult = hash.digest('hex');
 
 	return `${currentDateFormatted} ${uuid} ${hashedResult}`;
+};
+
+export const resolvePurchaseArticles = async (
+	context: IExecuteFunctions,
+	centumUrl: string,
+	headers: CentumHeaders,
+	itemIndex: number,
+	articleIds: number[],
+): Promise<Map<number, ResolvedPurchaseArticle>> => {
+	const uniqueIds = [...new Set(articleIds.filter((articleId) => Number.isFinite(articleId)))];
+
+	if (uniqueIds.length === 0) {
+		return new Map();
+	}
+
+	const response = await apiRequest<any>(`${centumUrl}/Articulos/DatosGenerales`, {
+		context,
+		debugItemIndex: itemIndex,
+		method: 'POST',
+		headers,
+		body: {
+			Ids: uniqueIds,
+		},
+	});
+
+	const responseItems: PurchaseArticleLookup[] = Array.isArray(response)
+		? response
+		: Array.isArray(response?.Articulos?.Items)
+			? response.Articulos.Items
+			: [];
+	const articlesById = new Map<number, ResolvedPurchaseArticle>();
+
+	for (const articleId of uniqueIds) {
+		const resolvedRaw = responseItems.find(
+			(item: PurchaseArticleLookup) => Number(item.IdArticulo) === articleId,
+		);
+
+		if (!resolvedRaw) {
+			throw new NodeOperationError(
+				context.getNode(),
+				`Article ${articleId} was not found in Centum.`,
+				{ itemIndex },
+			);
+		}
+
+		const resolvedArticle: ResolvedPurchaseArticle = {
+			IdArticulo: Number(resolvedRaw.IdArticulo),
+			Codigo: String(resolvedRaw.Codigo ?? '').trim(),
+			Nombre: String(resolvedRaw.Nombre ?? '').trim(),
+			CategoriaImpuestoIVA: {
+				IdCategoriaImpuestoIVA: Number(resolvedRaw.CategoriaImpuestoIVA?.IdCategoriaImpuestoIVA),
+				Codigo:
+					typeof resolvedRaw.CategoriaImpuestoIVA?.Codigo === 'string'
+						? resolvedRaw.CategoriaImpuestoIVA.Codigo
+						: undefined,
+				Nombre:
+					typeof resolvedRaw.CategoriaImpuestoIVA?.Nombre === 'string'
+						? resolvedRaw.CategoriaImpuestoIVA.Nombre
+						: undefined,
+				Tasa:
+					typeof resolvedRaw.CategoriaImpuestoIVA?.Tasa === 'number'
+						? resolvedRaw.CategoriaImpuestoIVA.Tasa
+						: undefined,
+			},
+			Precio: Number(resolvedRaw.PrecioListaCompra ?? 0),
+			PorcentajeDescuento1: Number(resolvedRaw.DescuentoItem1 ?? 0),
+			PorcentajeDescuento2: Number(resolvedRaw.DescuentoItem2 ?? 0),
+			PorcentajeDescuento3: Number(resolvedRaw.DescuentoItem3 ?? 0),
+		};
+
+		if (!resolvedArticle.Codigo) {
+			throw new NodeOperationError(
+				context.getNode(),
+				`Article ${articleId} does not include a valid Codigo in Centum.`,
+				{ itemIndex },
+			);
+		}
+
+		if (!resolvedArticle.Nombre) {
+			throw new NodeOperationError(
+				context.getNode(),
+				`Article ${articleId} does not include a valid Nombre in Centum.`,
+				{ itemIndex },
+			);
+		}
+
+		if (!Number.isFinite(resolvedArticle.CategoriaImpuestoIVA.IdCategoriaImpuestoIVA)) {
+			throw new NodeOperationError(
+				context.getNode(),
+				`Article ${articleId} does not include CategoriaImpuestoIVA in Centum.`,
+				{ itemIndex },
+			);
+		}
+
+		articlesById.set(articleId, resolvedArticle);
+	}
+
+	return articlesById;
 };
 
 export const createCustomerJson = (respWoo: IWoo, dni: string) => {

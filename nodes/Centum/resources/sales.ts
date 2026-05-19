@@ -484,12 +484,6 @@ const createSale: ResourceHandler = async (context) => {
 		'pointOfSale',
 		itemIndex,
 	) as number;
-	const discount = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'saleDiscountId',
-		itemIndex,
-		'',
-	) as string;
 	const isCashSale = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'isCashSale',
@@ -517,6 +511,9 @@ const createSale: ResourceHandler = async (context) => {
 	);
 	const priceListId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'priceListId', itemIndex),
+	);
+	const discountId = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'discountId', itemIndex),
 	);
 
 	type SaleArticleInput = {
@@ -687,14 +684,14 @@ const createSale: ResourceHandler = async (context) => {
 	};
 
 	// Optional discount
-	if (discount) {
-		bodyVenta.Bonificacion = { IdBonificacion: discount };
+	if (discountId) {
+		bodyVenta.Bonificacion = { IdBonificacion: discountId };
 		bodyVenta.PorcentajeDescuento = await resolveDiscountPercentage(
 			executeFunctions,
 			centumUrl,
 			headers,
 			itemIndex,
-			discount,
+			discountId,
 		);
 	}
 
