@@ -418,12 +418,24 @@ const createPurchaseOrder: ResourceHandler = async (context) => {
 	const parseInvalidMsg =
 		'Article format is invalid. Example: {"ID": 1271, "Cantidad": 10}, {"Codigo": "ABC123", "Cantidad": 10}, or arrays of these objects.';
 
-	const toArticuloInput = (x: any): ArticuloInput => ({
-		ID: typeof x?.ID === 'number' ? x.ID : undefined,
-		Codigo: typeof x?.Codigo === 'string' ? x.Codigo : undefined,
-		Cantidad: Number(x?.Cantidad),
-		Precio: x?.Precio !== undefined ? Number(x.Precio) : undefined,
-	});
+	const toArticuloInput = (x: any): ArticuloInput => {
+		const rawPrice = x?.Precio;
+		const parsedPrice = Number(rawPrice);
+		const normalizedPrice =
+			rawPrice === null ||
+			rawPrice === undefined ||
+			!Number.isFinite(parsedPrice) ||
+			parsedPrice <= 0
+				? undefined
+				: parsedPrice;
+
+		return {
+			ID: typeof x?.ID === 'number' ? x.ID : undefined,
+			Codigo: typeof x?.Codigo === 'string' ? x.Codigo : undefined,
+			Cantidad: Number(x?.Cantidad),
+			Precio: normalizedPrice,
+		};
+	};
 
 	const isArticuloInput = (x: any): x is ArticuloInput => {
 		if (!x || typeof x !== 'object') return false;
