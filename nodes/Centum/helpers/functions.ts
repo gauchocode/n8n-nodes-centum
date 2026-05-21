@@ -738,6 +738,7 @@ export interface HttpSettings {
 interface DebugSettings {
 	enableDebugLogging?: boolean;
 	debugEndpointContains?: string;
+	includeRequestBody?: boolean;
 }
 
 export function buildCentumHeaders(
@@ -1146,12 +1147,14 @@ export async function apiPostRequest<T = any>(
 	};
 
 	if (shouldDebug) {
+		const debugSettings = context ? getDebugSettings.call(context, options.debugItemIndex ?? 0) : {};
 		logDebugMessage(context, '[Centum debug] Request', {
 			url: finalUrl,
 			method: 'POST',
 			headers: redactHeaders(fetchOptions.headers as Record<string, unknown>),
 			hasBody: true,
 			bodyLength: String(fetchOptions.body).length,
+			...(debugSettings.includeRequestBody ? { body } : {}),
 		});
 	}
 
@@ -1243,12 +1246,14 @@ export async function apiPostRequestPaginated<T = any>(
 			body: JSON.stringify(body),
 		};
 		if (shouldDebug) {
+			const debugSettings = context ? getDebugSettings.call(context, options.debugItemIndex ?? 0) : {};
 			logDebugMessage(context, '[Centum debug] Request', {
 				url: finalUrl,
 				method: 'POST',
 				headers: redactHeaders(fetchOptions.headers as Record<string, unknown>),
 				hasBody: true,
 				bodyLength: String(fetchOptions.body).length,
+				...(debugSettings.includeRequestBody ? { body } : {}),
 			});
 		}
 		const response = await fetch(finalUrl, fetchOptions);
@@ -1388,12 +1393,16 @@ export async function apiRequest<T>(
 	}
 
 	if (shouldDebug) {
+		const debugSettings = effectiveContext
+			? getDebugSettings.call(effectiveContext, options.debugItemIndex ?? 0)
+			: {};
 		logDebugMessage(effectiveContext, '[Centum debug] Request', {
 			url: finalUrl,
 			method,
 			headers: redactHeaders((fetchOptions.headers ?? {}) as Record<string, unknown>),
 			hasBody: Boolean(fetchOptions.body),
 			bodyLength: fetchOptions.body ? String(fetchOptions.body).length : 0,
+			...(debugSettings.includeRequestBody && body !== undefined ? { body } : {}),
 		});
 	}
 

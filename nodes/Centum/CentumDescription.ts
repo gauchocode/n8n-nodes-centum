@@ -1952,6 +1952,18 @@ export const HttpOptions: INodeProperties[] = [
 					},
 				},
 			},
+			{
+				displayName: 'Include Request Body',
+				name: 'includeRequestBody',
+				type: 'boolean',
+				default: false,
+				description: 'Whether to include the JSON body sent in request debug logs',
+				displayOptions: {
+					show: {
+						enableDebugLogging: [true],
+					},
+				},
+			},
 		],
 	},
 ];
