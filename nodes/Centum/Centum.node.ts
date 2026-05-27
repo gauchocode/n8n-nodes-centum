@@ -512,15 +512,15 @@ async function fetchLoadOptionData(
 
 export class Centum implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Centum',
-		name: 'centum',
+		displayName: 'Centum v2',
+		name: 'centumV2',
 		icon: 'file:centum.svg',
 		group: ['transform'],
 		version: 1,
 		subtitle: resourceSubtitleExpression,
 		description: 'Consumes Centum API',
 		defaults: {
-			name: 'Centum',
+			name: 'Centum v2',
 		},
 		usableAsTool: true,
 		inputs: ['main'] as [NodeConnectionType],
