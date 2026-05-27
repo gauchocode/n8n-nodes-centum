@@ -25,6 +25,7 @@ export const resourceDisplayNames: Record<string, string> = {
 	compras: 'Compras',
 	conceptos: 'Conceptos',
 	departamentos: 'Departamentos',
+	divisionesEmpresasGrupoEconomico: 'Divisiones Empresa Grupo Economico',
 	frecuenciaClientes: 'Frecuencia Clientes',
 	listasPrecios: 'Listas Precios',
 	marcas: 'Marcas',
@@ -313,6 +314,25 @@ const operationGroups: OperationGroup[] = [
 				value: 'Get',
 				action: 'Get',
 				description: 'Devuelve los datos de cobranzas realizadas en funcion de filtros varios.',
+			},
+		],
+	},
+	{
+		resource: 'divisionesEmpresasGrupoEconomico',
+		default: 'GetAll',
+		options: [
+			{
+				name: 'GetAll',
+				value: 'GetAll',
+				action: 'Get all divisions',
+				description: 'Devuelve todas las divisiones empresa grupo económico de la implementación.',
+			},
+			{
+				name: 'GetUsuarioLogueado',
+				value: 'GetUsuarioLogueado',
+				action: 'Get user divisions',
+				description:
+					'Devuelve las divisiones empresa grupo económico habilitadas para el consumidor autenticado.',
 			},
 		],
 	},
@@ -726,6 +746,7 @@ export const CentumOperations: INodeProperties[] = [
 			{ name: 'Conceptos', value: 'conceptos' },
 			{ name: 'Condiciones Venta', value: 'condicionesVenta' },
 			{ name: 'Departamentos', value: 'departamentos' },
+			{ name: 'Divisiones Empresa Grupo Economico', value: 'divisionesEmpresasGrupoEconomico' },
 			{ name: 'Frecuencia Clientes', value: 'frecuenciaClientes' },
 			{ name: 'Listas Precios', value: 'listasPrecios' },
 			{ name: 'Marcas', value: 'marcas' },
@@ -751,6 +772,15 @@ export const CentumOperations: INodeProperties[] = [
 			{ name: 'Ventas', value: 'ventas' },
 		],
 		default: 'articulos',
+	},
+	{
+		displayName: 'Operation',
+		name: 'operation',
+		type: 'options',
+		noDataExpression: true,
+		displayOptions: { show: { resource: ['divisionesEmpresasGrupoEconomico'] } },
+		options: operationOptionsByResource.divisionesEmpresasGrupoEconomico,
+		default: '',
 	},
 	{
 		displayName: 'Operation',

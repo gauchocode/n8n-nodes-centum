@@ -217,6 +217,55 @@ const listVoucherTypes: ResourceHandler = async (context) => {
 	}
 };
 
+const listBusinessGroupDivisions: ResourceHandler = async (context) => {
+	const { executeFunctions, centumUrl, headers, itemIndex } = context;
+
+	try {
+		const response = await helperFns.apiRequest<any>(`${centumUrl}/DivisionesEmpresasGrupoEconomico`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
+			method: 'GET',
+			headers,
+		});
+		return [executeFunctions.helpers.returnJsonArray(response)];
+	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
+		const errorMessage =
+			error?.response?.data?.Message ||
+			(error as any).message ||
+			'Unknown error while listing business group divisions.';
+		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
+	}
+};
+
+const listLoggedUserBusinessGroupDivisions: ResourceHandler = async (context) => {
+	const { executeFunctions, centumUrl, headers, itemIndex } = context;
+
+	try {
+		const response = await helperFns.apiRequest<any>(
+			`${centumUrl}/DivisionesEmpresasGrupoEconomico/UsuarioLogueado`,
+			{
+				context: executeFunctions,
+				debugItemIndex: itemIndex,
+				method: 'GET',
+				headers,
+			},
+		);
+		return [executeFunctions.helpers.returnJsonArray(response)];
+	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
+		const errorMessage =
+			error?.response?.data?.Message ||
+			(error as any).message ||
+			'Unknown error while listing logged user business group divisions.';
+		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
+	}
+};
+
 const listSellers: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
@@ -347,6 +396,8 @@ export const extrasHandlers: ResourceHandlerMap = {
 	generateSecurityToken: generateSecurityToken,
 	listDiscounts: listDiscounts,
 	listConcepts: listConcepts,
+	listBusinessGroupDivisions: listBusinessGroupDivisions,
+	listLoggedUserBusinessGroupDivisions: listLoggedUserBusinessGroupDivisions,
 	listSpecialTaxRegimes: listSpecialTaxRegimes,
 	getSpecialTaxRegimeDetails: getSpecialTaxRegimeDetails,
 	listVoucherTypes: listVoucherTypes,

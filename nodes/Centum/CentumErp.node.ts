@@ -641,6 +641,20 @@ export class CentumErp implements INodeType {
 					'Status',
 				);
 			},
+			async getLoggedUserBusinessGroupDivisions(
+				this: ILoadOptionsFunctions,
+			): Promise<INodePropertyOptions[]> {
+				const response = await fetchLoadOptionData(
+					this,
+					'/DivisionesEmpresasGrupoEconomico/UsuarioLogueado',
+				);
+				return toOptions(
+					response,
+					['IdDivisionEmpresaGrupoEconomico', 'ID', 'Id'],
+					['RazonSocialEmpresaGrupoEconomico', 'NombreDivisionEmpresa', 'Codigo'],
+					'Business Division',
+				);
+			},
 		},
 	};
 

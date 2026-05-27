@@ -64,6 +64,10 @@ export const resourceHandlerGroups: Record<string, ResourceHandlerMap> = {
 	departamentos: {
 		Get: geographyHandlers.listMunicipalities,
 	},
+	divisionesEmpresasGrupoEconomico: {
+		GetAll: extrasHandlers.listBusinessGroupDivisions,
+		GetUsuarioLogueado: extrasHandlers.listLoggedUserBusinessGroupDivisions,
+	},
 	frecuenciaClientes: {
 		GetAll: customersHandlers.listCustomerFrequencies,
 	},

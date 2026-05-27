@@ -72,6 +72,12 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 	const branchId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'physicalBranchId', itemIndex),
 	);
+	const divisionCompanyGroupIdRaw = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'deliveryNoteDivisionCompanyGroupId',
+		itemIndex,
+		'',
+	);
 	const purchaseOperatorId = Number(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'purchaseOperatorId', itemIndex),
 	);
@@ -81,6 +87,8 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		itemIndex,
 		'',
 	) as string;
+	const divisionCompanyGroupId =
+		String(divisionCompanyGroupIdRaw).trim() === '' ? undefined : Number(divisionCompanyGroupIdRaw);
 
 	if (!supplierId) {
 		throw new NodeOperationError(executeFunctions.getNode(), 'idProveedor must be specified.');
@@ -90,6 +98,16 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
 			'purchaseOperatorId must be a positive integer.',
+		);
+	}
+
+	if (
+		divisionCompanyGroupId !== undefined &&
+		(!Number.isInteger(divisionCompanyGroupId) || divisionCompanyGroupId <= 0)
+	) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'divisionCompanyGroupId must be a positive integer.',
 		);
 	}
 
@@ -272,6 +290,12 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		};
 	}
 
+	if (divisionCompanyGroupId !== undefined) {
+		bodyRemitoCompra.DivisionEmpresaGrupoEconomico = {
+			IdDivisionEmpresaGrupoEconomico: divisionCompanyGroupId,
+		};
+	}
+
 	// 5) Send the final POST request
 	try {
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/RemitosCompra`, {
@@ -310,6 +334,12 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 	const physicalBranchId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'physicalBranchId', itemIndex),
 	);
+	const divisionCompanyGroupIdRaw = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'deliveryNoteDivisionCompanyGroupId',
+		itemIndex,
+		'',
+	);
 	const pointOfSale = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'pointOfSale',
@@ -341,9 +371,21 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 		return String(value).replace(/\..+/, '');
 	};
 	const formattedDocumentDate = normalizeDateTime(documentDate);
+	const divisionCompanyGroupId =
+		String(divisionCompanyGroupIdRaw).trim() === '' ? undefined : Number(divisionCompanyGroupIdRaw);
 
 	if (!formattedDocumentDate) {
 		throw new NodeOperationError(executeFunctions.getNode(), 'documentDate is required.');
+	}
+
+	if (
+		divisionCompanyGroupId !== undefined &&
+		(!Number.isInteger(divisionCompanyGroupId) || divisionCompanyGroupId <= 0)
+	) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'divisionCompanyGroupId must be a positive integer.',
+		);
 	}
 
 	const shipmentDate = helperFns.getNodeParameterOrThrow(
@@ -557,6 +599,12 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 
 	if (formattedDeliveryDate) {
 		salesDeliveryNoteBody.FechaEntrega = formattedDeliveryDate;
+	}
+
+	if (divisionCompanyGroupId !== undefined) {
+		salesDeliveryNoteBody.DivisionEmpresaGrupoEconomico = {
+			IdDivisionEmpresaGrupoEconomico: divisionCompanyGroupId,
+		};
 	}
 
 	try {

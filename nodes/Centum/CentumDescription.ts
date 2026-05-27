@@ -1213,6 +1213,23 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'Division Company Group ID',
+		name: 'deliveryNoteDivisionCompanyGroupId',
+		type: 'options',
+		default: '',
+		description: 'Optional division company group ID for the delivery note.',
+		typeOptions: {
+			loadOptionsMethod: 'getLoggedUserBusinessGroupDivisions',
+		},
+		options: [],
+		displayOptions: {
+			show: {
+				resource: ['remitosCompra', 'remitosVenta'],
+				operation: ['Create'],
+			},
+		},
+	},
+	{
 		displayName: 'Origin Physical Branch ID',
 		name: 'originPhysicalBranchId',
 		type: 'string',
