@@ -21,7 +21,7 @@
 	"engines": {
 		"node": ">=20.15"
 	},
-	"main": "dist/nodes/Centum/Centum.node.js",
+	"main": "dist/nodes/Centum/CentumErp.node.js",
 	"scripts": {
 		"clean": "rm -rf dist",
 		"build": "npm run clean && tsc && gulp build:icons",
@@ -42,7 +42,7 @@
 			"dist/credentials/CentumApi.credentials.js"
 		],
 		"nodes": [
-			"dist/nodes/Centum/Centum.node.js"
+			"dist/nodes/Centum/CentumErp.node.js"
 		]
 	},
 	"devDependencies": {

@@ -67,7 +67,7 @@ docker compose run publish
 **Verify published code matches source:**
 ```bash
 # Check if a function in published package matches local source
-curl -s https://registry.npmjs.org/n8n-nodes-centum/VERSION | jq '.dist.tarball' -r | xargs curl -s | tar -xzf - -O package/dist/nodes/Centum/Centum.node.js | grep -A 10 "FUNCTION_NAME"
+curl -s https://registry.npmjs.org/n8n-nodes-centum/VERSION | jq '.dist.tarball' -r | xargs curl -s | tar -xzf - -O package/dist/nodes/Centum/CentumErp.node.js | grep -A 10 "FUNCTION_NAME"
 ```
 
 ### 3. GIT COMMIT CONVENTIONS
@@ -114,7 +114,7 @@ n8n-nodes-centum/
 ├── docker-compose.yml     # Docker compose for builds
 ├── nodes/
 │   └── Centum/
-│       ├── Centum.node.ts         # Main node implementation
+│       ├── CentumErp.node.ts      # Main node implementation
 │       ├── CentumDescription.ts   # Node property definitions
 │       ├── centum.svg             # Node icon
 │       ├── helpers/
@@ -163,8 +163,8 @@ This is the **only supported way** to build in this environment.
 dist/
 ├── nodes/
 │   └── Centum/
-│       ├── Centum.node.js         # Compiled node
-│       ├── Centum.node.d.ts       # Type declarations
+│       ├── CentumErp.node.js      # Compiled node
+│       ├── CentumErp.node.d.ts    # Type declarations
 │       ├── CentumDescription.js
 │       └── centum.svg             # Icon
 └── credentials/
@@ -191,7 +191,7 @@ dist/
 
 | File | Purpose |
 |------|---------|
-| `Centum.node.ts` | Main node with execute logic and method registration |
+| `CentumErp.node.ts` | Main node with execute logic and method registration |
 | `CentumDescription.ts` | All property/operation definitions |
 | `CentumApi.credentials.ts` | API credential definition |
 | `helpers/functions.ts` | API request helpers |
@@ -265,7 +265,7 @@ docs(readme): update installation instructions
 1. Add to `RESOURCES` constant in `CentumDescription.ts`
 2. Add operation selector with `displayOptions.show.resource`
 3. Add all field definitions for the resource
-4. Add `else if (resource === RESOURCES.NEW_RESOURCE)` block in `execute()` in `Centum.node.ts`
+4. Add `else if (resource === RESOURCES.NEW_RESOURCE)` block in `execute()` in `CentumErp.node.ts`
 5. Implement all operations
 6. Add interfaces to `interfaces/` if needed
 7. Update README.md
@@ -275,7 +275,7 @@ docs(readme): update installation instructions
 1. Add to `OPERATIONS` constant (if new)
 2. Add operation selector option in `CentumDescription.ts`
 3. Add field definitions with proper `displayOptions`
-4. Implement in `execute()` method in `Centum.node.ts`
+4. Implement in `execute()` method in `CentumErp.node.ts`
 
 ### Testing
 
@@ -319,7 +319,7 @@ docker compose run publish
 ### Add a New Field
 
 1. Add property definition in `CentumDescription.ts`
-2. Add parameter retrieval in `Centum.node.ts` `execute()`:
+2. Add parameter retrieval in `CentumErp.node.ts` `execute()`:
    ```typescript
    const newField = this.getNodeParameter('newField', i, 'default') as string;
    ```
@@ -331,7 +331,7 @@ Add an `options` array directly in the property definition in `CentumDescription
 
 ### Add Dropdown Options (Dynamic)
 
-1. Create load options helper in `Centum.node.ts` methods:
+1. Create load options helper in `CentumErp.node.ts` methods:
    ```typescript
    async getOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
      // fetch from API
@@ -384,7 +384,7 @@ Add an `options` array directly in the property definition in `CentumDescription
       "dist/credentials/CentumApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/Centum/Centum.node.js"
+      "dist/nodes/Centum/CentumErp.node.js"
     ]
   }
 }
@@ -392,7 +392,7 @@ Add an `options` array directly in the property definition in `CentumDescription
 
 ### Important Notes
 
-- **Main entry**: `dist/nodes/Centum/Centum.node.js`
+- **Main entry**: `dist/nodes/Centum/CentumErp.node.js`
 - **Files included**: Only `dist/` directory
 - **Node version**: 1 (n8n API version)
 - **Node.js requirement**: >=20.15

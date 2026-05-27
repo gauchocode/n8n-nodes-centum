@@ -510,10 +510,10 @@ async function fetchLoadOptionData(
 	return rawText.trim() ? (JSON.parse(rawText) as unknown) : [];
 }
 
-export class Centum implements INodeType {
+export class CentumErp implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Centum v2',
-		name: 'centumV2',
+		name: 'centumErp',
 		icon: 'file:centum.svg',
 		group: ['transform'],
 		version: 1,
