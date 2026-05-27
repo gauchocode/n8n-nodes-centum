@@ -1213,11 +1213,12 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Division Company Group ID',
+		displayName: 'Business Group Division Name or ID',
 		name: 'deliveryNoteDivisionCompanyGroupId',
 		type: 'options',
 		default: '',
-		description: 'Optional division company group ID for the delivery note.',
+		description:
+			'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 		typeOptions: {
 			loadOptionsMethod: 'getLoggedUserBusinessGroupDivisions',
 		},
