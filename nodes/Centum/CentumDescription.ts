@@ -979,7 +979,7 @@ const fieldDefinitions: INodeProperties[] = [
 		placeholder: 'Enter voucher type ID',
 		description: 'Invoice voucher type ID',
 		displayOptions: {
-			show: { resource: ['compras', 'ventas'], operation: ['Create'] },
+			show: { resource: ['compras', 'ventas'], operation: ['Create', 'GetConsulta'] },
 		},
 	},
 	{
@@ -988,8 +988,8 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'number',
 		default: 0,
 		placeholder: '1',
-		description: 'Current-account customer ID for the sales voucher',
-		displayOptions: { show: { operation: [] } },
+		description: 'Current-account customer ID used to filter sales vouchers',
+		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta'] } },
 	},
 	{
 		displayName: 'Seller ID',
@@ -1033,11 +1033,12 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { operation: [] } },
 	},
 	{
-		displayName: 'Include Canceled Orders',
+		displayName: 'Include Canceled Sales Vouchers',
 		name: 'includeCanceled',
 		type: 'boolean',
 		default: false,
-		displayOptions: { show: { resource: ['ventas'], operation: ['GetOne'] } },
+		description: 'Whether to include canceled sales vouchers in the results',
+		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta', 'GetOne'] } },
 	},
 	{
 		displayName: 'Include Canceled Orders',
@@ -1053,14 +1054,16 @@ const fieldDefinitions: INodeProperties[] = [
 		name: 'salesChannelId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { operation: [] } },
+		description: 'Sales channel ID used to filter sales vouchers',
+		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta'] } },
 	},
 	{
 		displayName: 'Business Division ID',
 		name: 'businessDivisionId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { operation: [] } },
+		description: 'Business division ID used to filter sales vouchers',
+		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta'] } },
 	},
 	{
 		displayName: 'Created By User ID',
@@ -1068,7 +1071,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'number',
 		description: 'User ID that created the sales voucher',
 		default: 0,
-		displayOptions: { show: { resource: ['ventas'], operation: ['GetOne'] } },
+		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta', 'GetOne'] } },
 	},
 	{
 		displayName: 'Seller ID',
@@ -1110,7 +1113,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'number',
 		description: 'Transport ID associated with the sales voucher',
 		default: 0,
-		displayOptions: { show: { resource: ['ventas'], operation: ['GetOne'] } },
+		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta', 'GetOne'] } },
 	},
 	{
 		displayName: 'Transport ID',
