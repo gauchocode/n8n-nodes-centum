@@ -415,6 +415,12 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 	const transportId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'transportId', itemIndex),
 	);
+	const notes = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'notes',
+		itemIndex,
+		'',
+	) as string;
 
 	if (!transportId) {
 		throw new NodeOperationError(
@@ -578,7 +584,7 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 			IdVendedor: sellerId,
 		},
 		PorcentajeDescuento: 0.0,
-		Observaciones: 'Remito creado desde n8n.',
+		Observaciones: notes,
 		RemitoVentaArticulos: purchaseItemsWithQuantity,
 		Transporte: {
 			IdTransporte: Number(transportId),

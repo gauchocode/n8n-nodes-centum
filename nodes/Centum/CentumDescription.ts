@@ -792,6 +792,16 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'Notes',
+		name: 'notes',
+		type: 'string',
+		default: '',
+		description: 'Additional notes for the sales delivery note',
+		displayOptions: {
+			show: { resource: ['remitosVenta'], operation: ['Create'] },
+		},
+	},
+	{
 		displayName: 'ID',
 		name: 'id',
 		required: true,
