@@ -17,6 +17,22 @@ const createPurchase: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
+	const parseCommaSeparatedList = (value: string, fieldLabel: string): string[] => {
+		if (!value.trim()) {
+			throw new NodeOperationError(executeFunctions.getNode(), `${fieldLabel} is required.`);
+		}
+
+		const values = value.split(',').map((item) => item.trim());
+		if (values.some((item) => item.length === 0)) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`${fieldLabel} contains an empty value. Use commas only between valid integers.`,
+			);
+		}
+
+		return values;
+	};
+
 	/* Voucher information */
 	const voucherTypeName = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
@@ -58,14 +74,12 @@ const createPurchase: ResourceHandler = async (context) => {
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'physicalBranchId', itemIndex),
 	);
 
-	const articlesArray = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'articlesCollection',
-		itemIndex,
-	) as Array<{
-		ID: string;
-		Cantidad: number;
-	}>;
+	const articleIdsRaw = String(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'articleIds', itemIndex, ''),
+	);
+	const articleQuantitiesRaw = String(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'articleQuantities', itemIndex, ''),
+	);
 
 	const customerId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'customerId', itemIndex),
@@ -76,9 +90,43 @@ const createPurchase: ResourceHandler = async (context) => {
 	const productDate = helperFns.getNodeParameterOrThrow(executeFunctions, 'startDate', itemIndex);
 	const formattedProductDate = String(productDate).split('T')[0];
 
-	const ids = articlesArray.map((a) => Number(a.ID));
+	const articleIds = parseCommaSeparatedList(articleIdsRaw, 'Article IDs');
+	const articleQuantities = parseCommaSeparatedList(articleQuantitiesRaw, 'Article Quantities');
+
+	if (articleIds.length !== articleQuantities.length) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'Article IDs and quantities must contain the same number of values.',
+		);
+	}
+
+	const articles = articleIds.map((rawId, index) => {
+		const articleLabel = `Article at position ${index + 1}`;
+		const normalizedId = Number(rawId);
+		if (!Number.isInteger(normalizedId) || normalizedId <= 0) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`${articleLabel} must have a positive integer ID.`,
+			);
+		}
+
+		const normalizedQuantity = Number(articleQuantities[index]);
+		if (!Number.isInteger(normalizedQuantity) || normalizedQuantity <= 0) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`${articleLabel} must have a positive integer quantity.`,
+			);
+		}
+
+		return {
+			ID: normalizedId,
+			Cantidad: normalizedQuantity,
+		};
+	});
+
+	const ids = articles.map((article) => article.ID);
 	const qtyById: Record<string, number> = Object.fromEntries(
-		articlesArray.map((a) => [a.ID, a.Cantidad]),
+		articles.map((article) => [String(article.ID), article.Cantidad]),
 	);
 
 	let supplierBody: Record<string, unknown>;
@@ -357,11 +405,20 @@ const createPurchaseOrder: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	type ArticuloInput = {
-		ID?: number;
-		Codigo?: string;
-		Cantidad: number;
-		Precio?: number;
+	const parseCommaSeparatedList = (value: string, fieldLabel: string): string[] => {
+		if (!value.trim()) {
+			throw new NodeOperationError(executeFunctions.getNode(), `${fieldLabel} is required.`);
+		}
+
+		const values = value.split(',').map((item) => item.trim());
+		if (values.some((item) => item.length === 0)) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`${fieldLabel} contains an empty value. Use commas only between valid integers.`,
+			);
+		}
+
+		return values;
 	};
 
 	const documentLetter =
@@ -372,7 +429,12 @@ const createPurchaseOrder: ResourceHandler = async (context) => {
 	const numero =
 		(helperFns.getNodeParameterOrThrow(executeFunctions, 'documentNumber', itemIndex) as string) ??
 		'';
-	const articlesRaw = helperFns.getNodeParameterOrThrow(executeFunctions, 'article', itemIndex);
+	const articleIdsRaw = String(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'articleIds', itemIndex, ''),
+	);
+	const articleQuantitiesRaw = String(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'articleQuantities', itemIndex, ''),
+	);
 	const documentDate = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'documentDate',
@@ -412,87 +474,50 @@ const createPurchaseOrder: ResourceHandler = async (context) => {
 		throw new NodeOperationError(executeFunctions.getNode(), 'supplierId must be specified.');
 	}
 
-	// Parse articles safely
-	let articles: ArticuloInput[] = [];
+	const articleIds = parseCommaSeparatedList(articleIdsRaw, 'Article IDs');
+	const articleQuantities = parseCommaSeparatedList(articleQuantitiesRaw, 'Article Quantities');
 
-	const parseInvalidMsg =
-		'Article format is invalid. Example: {"ID": 1271, "Cantidad": 10}, {"Codigo": "ABC123", "Cantidad": 10}, or arrays of these objects.';
+	if (articleIds.length !== articleQuantities.length) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'Article IDs and quantities must contain the same number of values.',
+		);
+	}
 
-	const toArticuloInput = (x: any): ArticuloInput => {
-		const rawPrice = x?.Precio;
-		const parsedPrice = Number(rawPrice);
-		const normalizedPrice =
-			rawPrice === null ||
-			rawPrice === undefined ||
-			!Number.isFinite(parsedPrice) ||
-			parsedPrice <= 0
-				? undefined
-				: parsedPrice;
+	const articles = articleIds.map((rawId, index) => {
+		const articleLabel = `Article at position ${index + 1}`;
+		const normalizedId = Number(rawId);
+		if (!Number.isInteger(normalizedId) || normalizedId <= 0) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`${articleLabel} must have a positive integer ID.`,
+			);
+		}
+
+		const normalizedQuantity = Number(articleQuantities[index]);
+		if (!Number.isInteger(normalizedQuantity) || normalizedQuantity <= 0) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`${articleLabel} must have a positive integer quantity.`,
+			);
+		}
 
 		return {
-			ID: typeof x?.ID === 'number' ? x.ID : undefined,
-			Codigo: typeof x?.Codigo === 'string' ? x.Codigo : undefined,
-			Cantidad: Number(x?.Cantidad),
-			Precio: normalizedPrice,
+			ID: normalizedId,
+			Cantidad: normalizedQuantity,
 		};
-	};
-
-	const isArticuloInput = (x: any): x is ArticuloInput => {
-		if (!x || typeof x !== 'object') return false;
-		const hasIdOrCodigo =
-			typeof x.ID === 'number' || (typeof x.Codigo === 'string' && x.Codigo.trim().length > 0);
-		const cant = x.Cantidad;
-		const cantOk = typeof cant === 'number' && Number.isFinite(cant) && cant > 0;
-		return hasIdOrCodigo && cantOk;
-	};
-
-	if (typeof articlesRaw === 'string') {
-		try {
-			const parsed = JSON.parse(articlesRaw);
-			const arr = Array.isArray(parsed) ? parsed : [parsed];
-			articles = arr.map(toArticuloInput).filter(isArticuloInput);
-		} catch {
-			throw new NodeOperationError(executeFunctions.getNode(), parseInvalidMsg);
-		}
-	} else if (Array.isArray(articlesRaw)) {
-		// Avoid TS2322 by normalizing and filtering instead of assigning directly
-		articles = (articlesRaw as any[]).map(toArticuloInput).filter(isArticuloInput);
-	} else if (typeof articlesRaw === 'object' && articlesRaw !== null) {
-		const one = toArticuloInput(articlesRaw as any);
-		articles = isArticuloInput(one) ? [one] : [];
-	} else {
-		throw new NodeOperationError(
-			executeFunctions.getNode(),
-			`Unexpected data type: ${typeof articlesRaw}`,
-		);
-	}
-
-	if (!articles.length) {
-		throw new NodeOperationError(
-			executeFunctions.getNode(),
-			'Provide at least one valid article with Quantity > 0.',
-		);
-	}
+	});
 
 	const resolvedArticles = await helperFns.resolvePurchaseArticles(
 		executeFunctions,
 		centumUrl,
 		headers,
 		itemIndex,
-		articles
-			.map((articleInput) => articleInput.ID)
-			.filter((articleId): articleId is number => articleId !== undefined),
+		articles.map((articleInput) => articleInput.ID),
 	);
 
 	const purchaseOrderArticles = await Promise.all(
 		articles.map(async (articleInput) => {
-			if (articleInput.ID === undefined) {
-				throw new NodeOperationError(
-					executeFunctions.getNode(),
-					'OrdenesCompra requires each article to include an ID.',
-				);
-			}
-
 			const resolvedArticle = resolvedArticles.get(articleInput.ID);
 			if (!resolvedArticle) {
 				throw new NodeOperationError(
@@ -512,10 +537,6 @@ const createPurchaseOrder: ResourceHandler = async (context) => {
 				PorcentajeDescuento2: resolvedArticle.PorcentajeDescuento2,
 				PorcentajeDescuento3: resolvedArticle.PorcentajeDescuento3,
 			};
-
-			if (articleInput.Precio !== undefined) {
-				article.Precio = articleInput.Precio;
-			}
 
 			return article;
 		}),

@@ -114,11 +114,30 @@ const createSalesOrder: ResourceHandler = async (context) => {
 	void consumerApiPublicId;
 
 	type ArticuloInput = {
-		ID?: number;
-		Codigo?: string;
+		ID: number;
 		Cantidad: number;
 	};
-	const articlesRaw = helperFns.getNodeParameterOrThrow(executeFunctions, 'article', itemIndex);
+	const parseCommaSeparatedList = (value: string, fieldLabel: string): string[] => {
+		if (!value.trim()) {
+			throw new NodeOperationError(executeFunctions.getNode(), `${fieldLabel} is required.`);
+		}
+
+		const values = value.split(',').map((item) => item.trim());
+		if (values.some((item) => item.length === 0)) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`${fieldLabel} contains an empty value. Use commas only between valid integers.`,
+			);
+		}
+
+		return values;
+	};
+	const articleIdsRaw = String(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'articleIds', itemIndex, ''),
+	);
+	const articleQuantitiesRaw = String(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'articleQuantities', itemIndex, ''),
+	);
 	const customerId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'customerId', itemIndex),
 	);
@@ -153,38 +172,39 @@ const createSalesOrder: ResourceHandler = async (context) => {
 		discountId,
 	);
 
-	let articles: ArticuloInput[];
+	const articleIds = parseCommaSeparatedList(articleIdsRaw, 'Article IDs');
+	const articleQuantities = parseCommaSeparatedList(articleQuantitiesRaw, 'Article Quantities');
 
-	if (typeof articlesRaw === 'string') {
-		try {
-			const parsed = JSON.parse(articlesRaw);
-
-			if (typeof parsed === 'object' && !Array.isArray(parsed)) {
-				articles = [parsed] as ArticuloInput[];
-			} else if (Array.isArray(parsed)) {
-				articles = parsed as ArticuloInput[];
-			} else {
-				throw new NodeOperationError(executeFunctions.getNode(), 'Invalid format');
-			}
-		} catch (error) {
-			if (error instanceof NodeApiError) {
-				throw error;
-			}
-			throw new NodeOperationError(
-				executeFunctions.getNode(),
-				'Article format is invalid. Valid examples: {"ID": 1271, "Cantidad": 10}, {"Codigo": "ABC123", "Cantidad": 10}, or arrays of those objects.',
-			);
-		}
-	} else if (Array.isArray(articlesRaw)) {
-		articles = articlesRaw as ArticuloInput[];
-	} else if (typeof articlesRaw === 'object' && articlesRaw !== null) {
-		articles = [articlesRaw as ArticuloInput];
-	} else {
+	if (articleIds.length !== articleQuantities.length) {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			`Unexpected data type: ${typeof articlesRaw}`,
+			'Article IDs and quantities must contain the same number of values.',
 		);
 	}
+
+	const articles: ArticuloInput[] = articleIds.map((rawId, index) => {
+		const articleLabel = `Article at position ${index + 1}`;
+		const normalizedId = Number(rawId);
+		if (!Number.isInteger(normalizedId) || normalizedId <= 0) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`${articleLabel} must have a positive integer ID.`,
+			);
+		}
+
+		const normalizedQuantity = Number(articleQuantities[index]);
+		if (!Number.isInteger(normalizedQuantity) || normalizedQuantity <= 0) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`${articleLabel} must have a positive integer quantity.`,
+			);
+		}
+
+		return {
+			ID: normalizedId,
+			Cantidad: normalizedQuantity,
+		};
+	});
 
 	if (!customerId) {
 		throw new NodeOperationError(
@@ -196,18 +216,8 @@ const createSalesOrder: ResourceHandler = async (context) => {
 	if (!Array.isArray(articles) || articles.length === 0) {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			'Provide at least one article with its quantity.',
+			'Article IDs is required.',
 		);
-	}
-
-	// Validate that each article includes either an ID or a code
-	for (const art of articles) {
-		if (!art.ID && !art.Codigo) {
-			throw new NodeOperationError(
-				executeFunctions.getNode(),
-				'Each article must include either an ID or a Code.',
-			);
-		}
 	}
 
 	if (!sellerIdValue) {
@@ -219,18 +229,11 @@ const createSalesOrder: ResourceHandler = async (context) => {
 
 	for (const articleInput of articles) {
 		try {
-			// Build the request body dynamically depending on whether an ID or code is present
 			const articleBody: any = {
 				IdCliente: Number(customerId),
 				FechaDocumento: formattedDocumentDate,
+				Ids: [articleInput.ID],
 			};
-
-			// Use Ids (plural) when an ID is present, or Codigo (singular) when a code is present
-			if (articleInput.ID) {
-				articleBody.Ids = [articleInput.ID];
-			} else if (articleInput.Codigo) {
-				articleBody.Codigo = articleInput.Codigo;
-			}
 
 			const articleData = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
 				context: executeFunctions,
@@ -255,7 +258,6 @@ const createSalesOrder: ResourceHandler = async (context) => {
 			}
 			results.push({
 				id: articleInput.ID,
-				codigo: articleInput.Codigo,
 				error: (error as any).message || 'Unknown error',
 			});
 		}
@@ -517,45 +519,65 @@ const createSale: ResourceHandler = async (context) => {
 	);
 
 	type SaleArticleInput = {
-		ID?: string | number;
-		Codigo?: string;
+		ID: number;
 		Cantidad: number;
 	};
 
-	const articlesCollectionRaw = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'articlesCollection',
-		itemIndex,
-		[],
-	);
-	let articlesArray: SaleArticleInput[] = [];
+	const parseCommaSeparatedList = (value: string, fieldLabel: string): string[] => {
+		if (!value.trim()) {
+			throw new NodeOperationError(executeFunctions.getNode(), `${fieldLabel} is required.`);
+		}
 
-	if (typeof articlesCollectionRaw === 'string') {
-		try {
-			const parsed = JSON.parse(articlesCollectionRaw);
-			if (!Array.isArray(parsed)) {
-				throw new NodeOperationError(
-					executeFunctions.getNode(),
-					'The articlesCollection field must be a valid JSON array.',
-				);
-			}
-			articlesArray = parsed as SaleArticleInput[];
-		} catch (err) {
+		const values = value.split(',').map((item) => item.trim());
+		if (values.some((item) => item.length === 0)) {
 			throw new NodeOperationError(
 				executeFunctions.getNode(),
-				`The articlesCollection field must be a valid JSON string. Example:[{"ID":"1450","Cantidad":2},{"ID":"1451","Cantidad":5}] Error: ${(err as any)?.message ?? String(err)}`,
+				`${fieldLabel} contains an empty value. Use commas only between valid integers.`,
 			);
 		}
-	} else if (Array.isArray(articlesCollectionRaw)) {
-		articlesArray = articlesCollectionRaw as SaleArticleInput[];
-	} else if (typeof articlesCollectionRaw === 'object' && articlesCollectionRaw !== null) {
-		articlesArray = [articlesCollectionRaw as SaleArticleInput];
-	} else {
+
+		return values;
+	};
+
+	const articleIdsRaw = String(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'articleIds', itemIndex, ''),
+	);
+	const articleQuantitiesRaw = String(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'articleQuantities', itemIndex, ''),
+	);
+	const articleIds = parseCommaSeparatedList(articleIdsRaw, 'Article IDs');
+	const articleQuantities = parseCommaSeparatedList(articleQuantitiesRaw, 'Article Quantities');
+
+	if (articleIds.length !== articleQuantities.length) {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			`Unexpected data type: ${typeof articlesCollectionRaw}`,
+			'Article IDs and quantities must contain the same number of values.',
 		);
 	}
+
+	const articlesArray: SaleArticleInput[] = articleIds.map((rawId, index) => {
+		const articleLabel = `Article at position ${index + 1}`;
+		const normalizedId = Number(rawId);
+		if (!Number.isInteger(normalizedId) || normalizedId <= 0) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`${articleLabel} must have a positive integer ID.`,
+			);
+		}
+
+		const normalizedQuantity = Number(articleQuantities[index]);
+		if (!Number.isInteger(normalizedQuantity) || normalizedQuantity <= 0) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`${articleLabel} must have a positive integer quantity.`,
+			);
+		}
+
+		return {
+			ID: normalizedId,
+			Cantidad: normalizedQuantity,
+		};
+	});
 
 	const fromDate = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
@@ -601,19 +623,7 @@ const createSale: ResourceHandler = async (context) => {
 	if (!priceListId)
 		throw new NodeOperationError(executeFunctions.getNode(), 'Price list ID is required.');
 	if (!articlesArray?.length)
-		throw new NodeOperationError(
-			executeFunctions.getNode(),
-			'Provide at least one article in articlesCollection.',
-		);
-
-	for (const article of articlesArray) {
-		if (!article.ID && !article.Codigo) {
-			throw new NodeOperationError(
-				executeFunctions.getNode(),
-				'Each article must include either an ID or a Code.',
-			);
-		}
-	}
+		throw new NodeOperationError(executeFunctions.getNode(), 'Article IDs is required.');
 
 	// When the sale is cash-based, validate the required fields
 	if (isCashSale === true) {
@@ -633,11 +643,7 @@ const createSale: ResourceHandler = async (context) => {
 				FechaDocumento: formattedFromDate,
 			};
 
-			if (articleInput.ID) {
-				articleBody.Ids = [articleInput.ID];
-			} else if (articleInput.Codigo) {
-				articleBody.Codigo = articleInput.Codigo;
-			}
+			articleBody.Ids = [articleInput.ID];
 
 			const articleData = await helperFns.apiRequest<any>(`${centumUrl}/Articulos/Venta`, {
 				context: executeFunctions,
@@ -665,7 +671,7 @@ const createSale: ResourceHandler = async (context) => {
 				(error as any)?.response?.data?.Message || (error as any).message || 'Unknown error';
 			throw new NodeOperationError(
 				executeFunctions.getNode(),
-				`Error getting sale article ${articleInput.ID ?? articleInput.Codigo}.\n${errorMessage}`,
+				`Error getting sale article ${articleInput.ID}.\n${errorMessage}`,
 			);
 		}
 	}
