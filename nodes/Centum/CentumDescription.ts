@@ -112,7 +112,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayName: 'Article IDs',
 		name: 'articleIds',
 		type: 'string',
-		default: [],
+		default: '',
 		placeholder: '1271,1450,2003',
 		description: 'Comma-separated article IDs. Spaces are ignored. Only positive integers are allowed.',
 		displayOptions: {
