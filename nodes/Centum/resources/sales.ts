@@ -514,9 +514,6 @@ const createSale: ResourceHandler = async (context) => {
 	const priceListId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'priceListId', itemIndex),
 	);
-	const discountId = helperFns.getResourceLocatorValue(
-		helperFns.getNodeParameterOrThrow(executeFunctions, 'discountId', itemIndex),
-	);
 
 	type SaleArticleInput = {
 		ID: number;
@@ -688,18 +685,6 @@ const createSale: ResourceHandler = async (context) => {
 		ListaPrecio: { IdListaPrecio: Number(priceListId) },
 		VentaArticulos: saleItemsWithQuantity,
 	};
-
-	// Optional discount
-	if (discountId) {
-		bodyVenta.Bonificacion = { IdBonificacion: discountId };
-		bodyVenta.PorcentajeDescuento = await resolveDiscountPercentage(
-			executeFunctions,
-			centumUrl,
-			headers,
-			itemIndex,
-			discountId,
-		);
-	}
 
 	// 3) Calculate the sale total in CENTUM before assigning cash values
 	if (isCashSale === true) {
