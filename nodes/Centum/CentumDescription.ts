@@ -816,7 +816,7 @@ const fieldDefinitions: INodeProperties[] = [
 		default: 0,
 		displayOptions: {
 			show: {
-				resource: ['ajustesMovimientosStock', 'ubicacionesArticulos'],
+				resource: ['ajustesMovimientosStock', 'ubicacionesArticulos', 'remitosCompra', 'remitosVenta'],
 				operation: ['Create', 'getArticleLocationsBySection'],
 			},
 		},

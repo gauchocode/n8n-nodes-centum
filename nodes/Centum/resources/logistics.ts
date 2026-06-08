@@ -94,6 +94,9 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 	const branchId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'physicalBranchId', itemIndex),
 	);
+	const branchSectionId = Number(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'branchSectionId', itemIndex, 0),
+	);
 	const divisionCompanyGroupIdRaw = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'deliveryNoteDivisionCompanyGroupId',
@@ -130,6 +133,13 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
 			'divisionCompanyGroupId must be a positive integer.',
+		);
+	}
+
+	if (branchSectionId < 0 || !Number.isInteger(branchSectionId)) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'branchSectionId must be zero or a positive integer.',
 		);
 	}
 
@@ -272,6 +282,10 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		IdChofer: Number(driverId),
 	};
 
+	if (branchSectionId > 0) {
+		bodyRemitoCompra.IdSeccionSucursal = branchSectionId;
+	}
+
 	if (transportId) {
 		bodyRemitoCompra.Transporte = {
 			IdTransporte: Number(transportId),
@@ -321,6 +335,9 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 
 	const physicalBranchId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'physicalBranchId', itemIndex),
+	);
+	const branchSectionId = Number(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'branchSectionId', itemIndex, 0),
 	);
 	const divisionCompanyGroupIdRaw = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
@@ -373,6 +390,13 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
 			'divisionCompanyGroupId must be a positive integer.',
+		);
+	}
+
+	if (branchSectionId < 0 || !Number.isInteger(branchSectionId)) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'branchSectionId must be zero or a positive integer.',
 		);
 	}
 
@@ -603,6 +627,10 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 			IdTransporte: Number(transportId),
 		},
 	};
+
+	if (branchSectionId > 0) {
+		salesDeliveryNoteBody.IdSeccionSucursal = branchSectionId;
+	}
 
 	if (driverId) {
 		salesDeliveryNoteBody.IdChofer = Number(driverId);
