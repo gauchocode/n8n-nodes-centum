@@ -65,19 +65,26 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		'documentDate',
 		itemIndex,
 	) as string;
-	const formattedDocumentDate = String(documentDate).split('T')[0];
+	const normalizeDateTime = (value: unknown): string | undefined => {
+		if (value === null || value === undefined || value === '') {
+			return undefined;
+		}
+
+		return String(value).replace(/\..+/, '');
+	};
+	const formattedDocumentDate = normalizeDateTime(documentDate);
 	const deliveryDate = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'deliveryDate',
 		itemIndex,
 	) as string;
-	const formattedDeliveryDate = String(deliveryDate).split('T')[0];
+	const formattedDeliveryDate = normalizeDateTime(deliveryDate);
 	const dueDate = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'dueDate',
 		itemIndex,
 	) as string;
-	const formattedDueDate = String(dueDate).split('T')[0];
+	const formattedDueDate = normalizeDateTime(dueDate);
 	const supplierIdRaw = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'supplierId', itemIndex),
 	);
@@ -117,6 +124,18 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 
 	if (!supplierId) {
 		throw new NodeOperationError(executeFunctions.getNode(), 'idProveedor must be specified.');
+	}
+
+	if (!formattedDocumentDate) {
+		throw new NodeOperationError(executeFunctions.getNode(), 'documentDate is required.');
+	}
+
+	if (!formattedDeliveryDate) {
+		throw new NodeOperationError(executeFunctions.getNode(), 'deliveryDate is required.');
+	}
+
+	if (!formattedDueDate) {
+		throw new NodeOperationError(executeFunctions.getNode(), 'dueDate is required.');
 	}
 
 	if (!Number.isInteger(purchaseOperatorId) || purchaseOperatorId <= 0) {
@@ -283,7 +302,9 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 	};
 
 	if (branchSectionId > 0) {
-		bodyRemitoCompra.IdSeccionSucursal = branchSectionId;
+		bodyRemitoCompra.SeccionSucursal = {
+			IdSeccionSucursal: branchSectionId,
+		};
 	}
 
 	if (transportId) {
@@ -629,7 +650,9 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 	};
 
 	if (branchSectionId > 0) {
-		salesDeliveryNoteBody.IdSeccionSucursal = branchSectionId;
+		salesDeliveryNoteBody.SeccionSucursal = {
+			IdSeccionSucursal: branchSectionId,
+		};
 	}
 
 	if (driverId) {
