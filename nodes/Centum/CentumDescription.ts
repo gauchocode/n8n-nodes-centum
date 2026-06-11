@@ -457,6 +457,19 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'HoraDocumento',
+		name: 'documentTime',
+		type: 'string',
+		default: '',
+		description: 'Document time (HH:mm) sent in the request body',
+		displayOptions: {
+			show: {
+				resource: ['remitosCompra', 'remitosVenta'],
+				operation: ['Create'],
+			},
+		},
+	},
+	{
 		displayName: 'Posting Date',
 		name: 'postingDate',
 		type: 'dateTime',
