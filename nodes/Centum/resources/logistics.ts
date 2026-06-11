@@ -73,6 +73,9 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		return String(value).replace(/\..+/, '');
 	};
 	const formattedDocumentDate = normalizeDateTime(documentDate);
+	const documentTime =
+		(helperFns.getNodeParameterOrThrow(executeFunctions, 'documentTime', itemIndex, '') as string) ??
+		'';
 	const deliveryDate = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'deliveryDate',
@@ -301,6 +304,10 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		IdChofer: Number(driverId),
 	};
 
+	if (documentTime) {
+		bodyRemitoCompra.HoraDocumento = documentTime;
+	}
+
 	if (branchSectionId > 0) {
 		bodyRemitoCompra.SeccionSucursal = {
 			IdSeccionSucursal: branchSectionId,
@@ -397,6 +404,9 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 		return String(value).replace(/\..+/, '');
 	};
 	const formattedDocumentDate = normalizeDateTime(documentDate);
+	const documentTime =
+		(helperFns.getNodeParameterOrThrow(executeFunctions, 'documentTime', itemIndex, '') as string) ??
+		'';
 	const divisionCompanyGroupId =
 		String(divisionCompanyGroupIdRaw).trim() === '' ? undefined : Number(divisionCompanyGroupIdRaw);
 
@@ -648,6 +658,10 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 			IdTransporte: Number(transportId),
 		},
 	};
+
+	if (documentTime) {
+		salesDeliveryNoteBody.HoraDocumento = documentTime;
+	}
 
 	if (branchSectionId > 0) {
 		salesDeliveryNoteBody.SeccionSucursal = {
