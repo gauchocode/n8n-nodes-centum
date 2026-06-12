@@ -125,9 +125,12 @@ const createTransferOrder: ResourceHandler = async (context) => {
 	);
 
 	const formattedDocumentDate = String(documentDate).replace(/\..+/, '');
+	const documentTime =
+		(helperFns.getNodeParameterOrThrow(executeFunctions, 'transferDocumentTime', itemIndex, '') as string) ??
+		'';
 	const transferArticles = normalizeTransferArticles(executeFunctions, itemIndex, rawArticles);
 
-	const body = {
+	const body: Record<string, unknown> = {
 		FechaDocumento: formattedDocumentDate,
 		SucursalFisicaDesde: {
 			IdSucursalFisica: originPhysicalBranchId,
@@ -157,6 +160,10 @@ const createTransferOrder: ResourceHandler = async (context) => {
 		},
 		OrdenTraspasoItems: transferArticles,
 	};
+
+	if (documentTime) {
+		body.HoraDocumento = documentTime;
+	}
 
 	try {
 		const response = await helperFns.apiRequest<any>(`${centumUrl}/OrdenesTraspaso`, {

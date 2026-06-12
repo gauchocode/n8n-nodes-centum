@@ -484,6 +484,19 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'HoraDocumento',
+		name: 'transferDocumentTime',
+		type: 'string',
+		default: '',
+		description: 'Document time (HH:mm) sent in the request body',
+		displayOptions: {
+			show: {
+				resource: ['ordenesTraspaso'],
+				operation: ['Create'],
+			},
+		},
+	},
+	{
 		displayName: 'Transfer Document Date',
 		name: 'transferDocumentDate',
 		type: 'dateTime',
