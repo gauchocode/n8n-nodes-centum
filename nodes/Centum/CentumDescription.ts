@@ -117,7 +117,7 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Comma-separated article IDs. Spaces are ignored. Only positive integers are allowed.',
 		displayOptions: {
 			show: {
-				resource: ['compras', 'ventas'],
+				resource: ['compras', 'ventas', 'remitosVenta'],
 				operation: ['Create'],
 			},
 		},
