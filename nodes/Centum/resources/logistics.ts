@@ -133,14 +133,6 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		throw new NodeOperationError(executeFunctions.getNode(), 'documentDate is required.');
 	}
 
-	if (!formattedDeliveryDate) {
-		throw new NodeOperationError(executeFunctions.getNode(), 'deliveryDate is required.');
-	}
-
-	if (!formattedDueDate) {
-		throw new NodeOperationError(executeFunctions.getNode(), 'dueDate is required.');
-	}
-
 	if (!Number.isInteger(purchaseOperatorId) || purchaseOperatorId <= 0) {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
@@ -293,10 +285,8 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 			IdTurnoEntrega: deliveryTimeSlotId,
 		},
 		FechaDocumento: formattedDocumentDate,
-		FechaEntrega: formattedDeliveryDate,
 		Proveedor: supplierInfo,
 		RemitoCompraArticulos: purchaseDeliveryNoteArticles,
-		FechaVencimiento: formattedDueDate,
 		Observaciones: notes,
 		OperadorCompra: {
 			IdOperadorCompra: purchaseOperatorId,
@@ -306,6 +296,14 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 
 	if (documentTime) {
 		bodyRemitoCompra.HoraDocumento = documentTime;
+	}
+
+	if (formattedDeliveryDate) {
+		bodyRemitoCompra.FechaEntrega = formattedDeliveryDate;
+	}
+
+	if (formattedDueDate) {
+		bodyRemitoCompra.FechaVencimiento = formattedDueDate;
 	}
 
 	if (branchSectionId > 0) {

@@ -519,7 +519,7 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Document delivery date',
 		displayOptions: {
 			show: {
-				resource: ['ordenesCompra', 'remitosCompra', 'pedidosVenta'],
+				resource: ['ordenesCompra', 'pedidosVenta'],
 				operation: ['Create'],
 			},
 		},
@@ -532,7 +532,7 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Document delivery date',
 		displayOptions: {
 			show: {
-				resource: ['remitosVenta'],
+				resource: ['remitosVenta', 'remitosCompra'],
 				operation: ['Create'],
 			},
 		},
@@ -572,7 +572,17 @@ const fieldDefinitions: INodeProperties[] = [
 		required: true,
 		default: undefined,
 		displayOptions: {
-			show: { resource: ['ordenesCompra', 'remitosCompra'], operation: ['Create'] },
+			show: { resource: ['ordenesCompra'], operation: ['Create'] },
+		},
+	},
+	{
+		displayName: 'Due Date',
+		name: 'dueDate',
+		type: 'dateTime',
+		default: '',
+		description: 'Document due date',
+		displayOptions: {
+			show: { resource: ['remitosCompra'], operation: ['Create'] },
 		},
 	},
 	{
