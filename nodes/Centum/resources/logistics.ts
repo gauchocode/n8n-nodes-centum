@@ -186,10 +186,10 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		}
 
 		const normalizedQuantity = Number(articleQuantities[index]);
-		if (!Number.isInteger(normalizedQuantity) || normalizedQuantity <= 0) {
+		if (!Number.isFinite(normalizedQuantity) || normalizedQuantity <= 0) {
 			throw new NodeOperationError(
 				executeFunctions.getNode(),
-				`${articleLabel} must have a positive integer quantity.`,
+				`${articleLabel} must have a positive quantity.`,
 			);
 		}
 
@@ -536,10 +536,10 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 		}
 
 		const normalizedQuantity = Number(articleQuantities[index]);
-		if (!Number.isInteger(normalizedQuantity) || normalizedQuantity <= 0) {
+		if (!Number.isFinite(normalizedQuantity) || normalizedQuantity <= 0) {
 			throw new NodeOperationError(
 				executeFunctions.getNode(),
-				`${articleLabel} must have a positive integer quantity.`,
+				`${articleLabel} must have a positive quantity.`,
 			);
 		}
 
