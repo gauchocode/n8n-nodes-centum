@@ -249,6 +249,46 @@ const simplifiedOutputFields: Record<string, SimplifiedFieldSpec[]> = {
 		{ key: 'SucursalFisicaHacia', fields: ['IdSucursalFisica', 'Codigo', 'Nombre'] },
 	],
 	[simplifiedFieldKey('proveedores', 'Get')]: supplierFields,
+	[simplifiedFieldKey('ajustesMovimientosStock', 'GetOne')]: [
+		'IdAjusteMovimientoStock',
+		'FechaImputacion',
+		{ key: 'Usuario', fields: ['IdUsuario', 'Nombre'] },
+		{ key: 'ConceptoVarios', fields: ['IdConceptoVarios', 'Nombre'] },
+		{ key: 'SucursalFisica', fields: ['IdSucursalFisica', 'Codigo', 'Nombre'] },
+		{ key: 'SeccionSucursal', fields: ['IdSeccionSucursal', 'Codigo', 'Nombre'] },
+		{
+			key: 'AjusteMovimientoStockItems',
+			fields: [
+				'IdAjusteMovimientoStockItem',
+				'Cantidad',
+				'Existencias',
+				'CostoReposicion',
+				'NumeroLote',
+				'FechaVencimiento',
+				'Observacion',
+				{ key: 'Articulo', fields: ['IdArticulo', 'Codigo', 'Nombre'] },
+				{ key: 'UbicacionArticulo', fields: ['IdUbicacionArticulo', 'Clave', 'Nombre'] },
+			],
+		},
+	],
+	[simplifiedFieldKey('ajustesMovimientosStock', 'Get')]: [
+		'IdAjusteMovimientoStock',
+		'FechaImputacion',
+		{ key: 'Usuario', fields: ['IdUsuario', 'Nombre'] },
+		{ key: 'ConceptoVarios', fields: ['IdConceptoVarios', 'Nombre'] },
+		{ key: 'SucursalFisica', fields: ['IdSucursalFisica', 'Codigo', 'Nombre'] },
+		{ key: 'SeccionSucursal', fields: ['IdSeccionSucursal', 'Codigo', 'Nombre'] },
+		{
+			key: 'AjusteMovimientoStockItems',
+			fields: [
+				'IdAjusteMovimientoStockItem',
+				'Cantidad',
+				'Existencias',
+				{ key: 'Articulo', fields: ['IdArticulo', 'Codigo', 'Nombre'] },
+				{ key: 'UbicacionArticulo', fields: ['IdUbicacionArticulo', 'Clave', 'Nombre'] },
+			],
+		},
+	],
 };
 
 function pickSimplifiedValue(value: unknown, fields: SimplifiedFieldSpec[]): unknown {

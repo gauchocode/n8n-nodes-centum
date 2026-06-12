@@ -367,12 +367,12 @@ const fieldDefinitions: INodeProperties[] = [
 		name: 'startDate',
 		type: 'dateTime',
 		default: '',
-			displayOptions: {
-				show: {
-					resource: ['cobros', 'compras', 'ordenesCompra', 'ordenesTraspaso'],
-					operation: ['Create', 'Get', 'GetConsulta', 'GetEstadisticas', 'GetPendientes'],
-				},
+		displayOptions: {
+			show: {
+				resource: ['ajustesMovimientosStock', 'cobros', 'compras', 'ordenesCompra', 'ordenesTraspaso'],
+				operation: ['Create', 'Get', 'GetConsulta', 'GetEstadisticas', 'GetPendientes'],
 			},
+		},
 	},
 	{
 		displayName: 'Date From',
@@ -405,7 +405,7 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['cobros', 'compras', 'ordenesCompra', 'ordenesTraspaso'],
+				resource: ['ajustesMovimientosStock', 'cobros', 'compras', 'ordenesCompra', 'ordenesTraspaso'],
 				operation: ['Get', 'GetConsulta', 'GetEstadisticas', 'GetPendientes'],
 			},
 		},
@@ -563,6 +563,48 @@ const fieldDefinitions: INodeProperties[] = [
 		default: undefined,
 		displayOptions: {
 			show: { resource: ['ajustesMovimientosStock'], operation: ['Create'] },
+		},
+	},
+	{
+		displayName: 'Cantidad',
+		name: 'stockAdjustmentQuantity',
+		type: 'number',
+		required: true,
+		default: 0,
+		description: 'Cantidad a ajustar en el stock del artículo',
+		displayOptions: {
+			show: { resource: ['ajustesMovimientosStock'], operation: ['Create'] },
+		},
+	},
+	{
+		displayName: 'Adjust to Zero First',
+		name: 'adjustToZeroFirst',
+		type: 'boolean',
+		default: false,
+		description:
+			'Si es true, primero se generarán ajustes para llevar a 0 los artículos. Si es false, solo se ajustará por la cantidad enviada.',
+		displayOptions: {
+			show: { resource: ['ajustesMovimientosStock'], operation: ['Create'] },
+		},
+	},
+	{
+		displayName: 'ConceptoVarios ID',
+		name: 'conceptoVariosId',
+		type: 'number',
+		default: 1,
+		description: 'ID del concepto varios para el ajuste de stock',
+		displayOptions: {
+			show: { resource: ['ajustesMovimientosStock'], operation: ['Create'] },
+		},
+	},
+	{
+		displayName: 'Adjustment ID',
+		name: 'adjustmentId',
+		type: 'number',
+		default: 0,
+		description: 'ID único del ajuste de movimiento de stock',
+		displayOptions: {
+			show: { resource: ['ajustesMovimientosStock'], operation: ['GetOne'] },
 		},
 	},
 	{
@@ -839,17 +881,17 @@ const fieldDefinitions: INodeProperties[] = [
 	{
 		displayName: 'Article Location',
 		name: 'articleLocationId',
-		required: true,
 		type: 'number',
 		default: 0,
+		description: 'Ubicación del artículo (opcional, se usa la ubicación por defecto si no se envía)',
 		displayOptions: { show: { resource: ['ajustesMovimientosStock'], operation: ['Create'] } },
 	},
 	{
 		displayName: 'Branch Section ID',
 		name: 'branchSectionId',
-		required: true,
 		type: 'number',
 		default: 0,
+		description: 'Sección de sucursal (opcional para ajustes de stock)',
 		displayOptions: {
 			show: {
 				resource: ['ajustesMovimientosStock', 'ubicacionesArticulos', 'remitosCompra', 'remitosVenta'],

@@ -18,6 +18,8 @@ export const resourceHandlerGroups: Record<string, ResourceHandlerMap> = {
 	},
 	ajustesMovimientosStock: {
 		Create: stockHandlers.createStockMovement,
+		GetOne: stockHandlers.getStockMovementById,
+		Get: stockHandlers.getStockMovementsByFilters,
 	},
 	articulos: {
 		GetDatosGenerales: articlesHandlers.GetDatosGenerales,

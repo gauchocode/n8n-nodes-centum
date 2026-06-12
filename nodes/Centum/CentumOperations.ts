@@ -675,6 +675,20 @@ const operationGroups: OperationGroup[] = [
 				action: 'Create',
 				description: 'Crea un ajuste de stock de artículos.',
 			},
+			{
+				name: 'GetOne',
+				value: 'GetOne',
+				action: 'GetOne',
+				description:
+					'Devuelve los datos de un ajuste de stock en función de su ID único.',
+			},
+			{
+				name: 'Get',
+				value: 'Get',
+				action: 'Get',
+				description:
+					'Devuelve ajustes de stock en función de filtros de fecha de imputación.',
+			},
 		],
 	},
 	{
