@@ -14,7 +14,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Article IDs',
+		displayName: 'IdsArticulos',
 		name: 'articleIds',
 		type: 'string',
 		default: '',
@@ -28,7 +28,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Article Quantities',
+		displayName: 'Articulo.Cantidad',
 		name: 'articleQuantities',
 		type: 'string',
 		default: '',
@@ -42,7 +42,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Article IDs',
+		displayName: 'IdsArticulos',
 		name: 'articleIds',
 		type: 'string',
 		default: '',
@@ -56,7 +56,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Article Quantities',
+		displayName: 'Articulo.Cantidad',
 		name: 'articleQuantities',
 		type: 'string',
 		default: '',
@@ -70,7 +70,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Article IDs',
+		displayName: 'IdsArticulos',
 		name: 'articleIds',
 		type: 'string',
 		default: '',
@@ -84,7 +84,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Article Quantities',
+		displayName: 'Articulo.Cantidad',
 		name: 'articleQuantities',
 		type: 'string',
 		default: '',
@@ -95,7 +95,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Article Prices',
+		displayName: 'Articulo.Precio',
 		name: 'articlePrices',
 		type: 'string',
 		default: '',
@@ -109,7 +109,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Article IDs',
+		displayName: 'IdsArticulos',
 		name: 'articleIds',
 		type: 'string',
 		default: '',
@@ -123,7 +123,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Article Quantities',
+		displayName: 'Articulo.Cantidad',
 		name: 'articleQuantities',
 		type: 'string',
 		default: '',
@@ -137,7 +137,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Article Prices',
+		displayName: 'Articulo.Precio',
 		name: 'articlePrices',
 		type: 'string',
 		default: '',
@@ -148,28 +148,28 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Cash Installment Count',
+		displayName: 'VentaValoresEfectivos.CantidadCuotas',
 		name: 'cashValueInstallmentCount',
 		type: 'number',
 		default: 0,
 		displayOptions: { show: { isCashSale: [true] } },
 	},
 	{
-		displayName: 'Income Tax Category',
+		displayName: 'CategoriaImpuestoGanancias.IdCategoriaImpuestoGanancia',
 		name: 'incomeTaxCategoryId',
 		type: 'number',
 		default: 0,
 		displayOptions: { show: { resource: ['proveedores'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Supplier Class',
+		displayName: 'ClaseProveedor.IdClaseProveedor',
 		name: 'supplierClassId',
 		type: 'number',
 		default: 0,
 		displayOptions: { show: { resource: ['proveedores'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Delivery Date From',
+		displayName: 'FechaEntregaDesde',
 		name: 'fromDeliveryDate',
 		type: 'dateTime',
 		default: '',
@@ -178,7 +178,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Delivery Date To',
+		displayName: 'FechaEntregaHasta',
 		name: 'sinceDeliveryDate',
 		type: 'dateTime',
 		default: '',
@@ -187,7 +187,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Customer ID',
+		displayName: 'Cliente.IdCliente',
 		name: 'customerId',
 		type: 'string',
 		default: '',
@@ -214,7 +214,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Customer ID',
+		displayName: 'Cliente.IdCliente',
 		name: 'customerId',
 		type: 'string',
 		default: '',
@@ -228,7 +228,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Customer ID',
+		displayName: 'Cliente.IdCliente',
 		name: 'customerId',
 		type: 'string',
 		default: '',
@@ -242,7 +242,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Supplier ID',
+		displayName: 'Proveedor.IdProveedor',
 		name: 'supplierId',
 		type: 'string',
 		default: '',
@@ -256,7 +256,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Article Code',
+		displayName: 'Codigo',
 		name: 'articleCode',
 		type: 'string',
 		default: '',
@@ -270,7 +270,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Customer Code',
+		displayName: 'codigo',
 		name: 'customerCode',
 		type: 'string',
 		default: '',
@@ -285,7 +285,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Voucher Code',
+		displayName: 'TipoComprobanteCompra.Codigo',
 		name: 'voucherCode',
 		type: 'string',
 		default: '',
@@ -294,46 +294,34 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['compras'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Sales Condition',
+		displayName: 'CondicionVenta.IdCondicionVenta',
 		name: 'salesConditionId',
 		type: 'number',
 		default: 0,
 		displayOptions: { show: { resource: ['ventas', 'clientes'], operation: ['Create', 'Update'] } },
 	},
 	{
-		displayName: 'Payment Condition',
+		displayName: 'CondicionPago.IdCondicionPago',
 		name: 'paymentConditionId',
 		type: 'number',
 		default: 0,
 		displayOptions: { show: { resource: ['proveedores'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'VAT Condition ID',
+		displayName: 'CondicionIVA.IdCondicionIVA',
 		name: 'vatConditionId',
 		type: 'number',
 		default: 0,
 		displayOptions: { show: { resource: ['proveedores', 'clientes'], operation: ['Create', 'Update'] } },
 	},
 	{
-		displayName: 'Exchange Rate',
+		displayName: 'VentaValoresEfectivos.Cotizacion',
 		name: 'cashValueExchangeRate',
 		type: 'number',
 		default: 0,
 		displayOptions: { show: { isCashSale: [true] } },
 	},
-	{
-		displayName: 'JSON Body',
-		name: 'jsonBody',
-		type: 'json',
-		required: true,
-		default: '{}',
-		displayOptions: {
-			show: {
-				operation: [],
-			},
-		},
-		description: 'JSON object sent to the API to update a customer',
-	},
+
 	{
 		displayName: 'CUIT',
 		name: 'cuit',
@@ -348,7 +336,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Day of Week',
+		displayName: 'DiaSemana',
 		name: 'weekday',
 		type: 'number',
 		default: 0,
@@ -356,14 +344,14 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['promocionesComerciales'], operation: ['Get'] } },
 	},
 	{
-		displayName: 'Cash Sale',
+		displayName: 'EsContado',
 		name: 'isCashSale',
 		type: 'boolean',
 		default: false,
 		displayOptions: { show: { resource: ['ventas'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Date From',
+		displayName: 'fechaDocumentoDesde',
 		name: 'startDate',
 		type: 'dateTime',
 		default: '',
@@ -375,7 +363,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Date From',
+		displayName: 'fechaDocumentoDesde',
 		name: 'startDate',
 		type: 'dateTime',
 		default: '',
@@ -387,7 +375,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Date From',
+		displayName: 'fechaDocumentoDesde',
 		name: 'startDate',
 		type: 'dateTime',
 		default: '',
@@ -399,7 +387,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Date To',
+		displayName: 'fechaDocumentoHasta',
 		name: 'endDate',
 		type: 'dateTime',
 		default: '',
@@ -411,7 +399,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Date To',
+		displayName: 'fechaDocumentoHasta',
 		name: 'endDate',
 		type: 'dateTime',
 		default: '',
@@ -423,7 +411,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Date To',
+		displayName: 'fechaDocumentoHasta',
 		name: 'endDate',
 		type: 'dateTime',
 		default: '',
@@ -435,7 +423,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-			displayName: 'Document Date',
+			displayName: 'FechaDocumento',
 		name: 'documentDate',
 		type: 'dateTime',
 		required: true,
@@ -470,7 +458,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Posting Date',
+		displayName: 'FechaImputacion',
 		name: 'postingDate',
 		type: 'dateTime',
 		required: true,
@@ -479,6 +467,20 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['cobros'],
+				operation: ['Create'],
+			},
+		},
+	},
+	{
+		displayName: 'FechaDocumento',
+		name: 'transferDocumentDate',
+		type: 'dateTime',
+		required: true,
+		default: undefined,
+		description: 'Document date for the transfer order',
+		displayOptions: {
+			show: {
+				resource: ['ordenesTraspaso'],
 				operation: ['Create'],
 			},
 		},
@@ -497,21 +499,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Transfer Document Date',
-		name: 'transferDocumentDate',
-		type: 'dateTime',
-		required: true,
-		default: undefined,
-		description: 'Document date for the transfer order',
-		displayOptions: {
-			show: {
-				resource: ['ordenesTraspaso'],
-				operation: ['Create'],
-			},
-		},
-	},
-	{
-		displayName: 'Delivery Date',
+		displayName: 'FechaEntrega',
 		name: 'deliveryDate',
 		type: 'dateTime',
 		required: true,
@@ -525,7 +513,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Delivery Date',
+		displayName: 'FechaEntrega',
 		name: 'deliveryDate',
 		type: 'dateTime',
 		default: '',
@@ -538,7 +526,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Shipment Date',
+		displayName: 'FechaEmbarque',
 		name: 'shipmentDate',
 		type: 'dateTime',
 		default: '',
@@ -547,7 +535,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Posting Date',
+		displayName: 'FechaImputacion',
 		name: 'indictmentDate',
 		type: 'dateTime',
 		default: '',
@@ -556,7 +544,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Posting Date',
+		displayName: 'FechaImputacion',
 		name: 'indictmentDate',
 		type: 'dateTime',
 		required: true,
@@ -577,7 +565,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Adjust to Zero First',
+		displayName: 'bAjustePrevioACero',
 		name: 'adjustToZeroFirst',
 		type: 'boolean',
 		default: false,
@@ -588,7 +576,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'ConceptoVarios ID',
+		displayName: 'ConceptoVarios.IdConceptoVarios',
 		name: 'conceptoVariosId',
 		type: 'number',
 		default: 1,
@@ -598,7 +586,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Adjustment ID',
+		displayName: 'IdAjusteMovimientoStock',
 		name: 'adjustmentId',
 		type: 'number',
 		default: 0,
@@ -608,7 +596,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Due Date',
+		displayName: 'FechaVencimiento',
 		name: 'dueDate',
 		type: 'dateTime',
 		required: true,
@@ -618,7 +606,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Due Date',
+		displayName: 'FechaVencimiento',
 		name: 'dueDate',
 		type: 'dateTime',
 		default: '',
@@ -656,7 +644,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Sort Ascending',
+		displayName: 'ordenEstadisticaVentaRankingAscendente',
 		name: 'orderAsc',
 		type: 'boolean',
 		default: false,
@@ -667,7 +655,7 @@ const fieldDefinitions: INodeProperties[] = [
 	},
 
 	{
-		displayName: 'Seller ID',
+		displayName: 'Vendedor.IdVendedor',
 		name: 'salesOrderSellerId',
 		type: 'string',
 		required: true,
@@ -682,7 +670,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Sort Type',
+		displayName: 'tipoOrdenEstadisticaVentaRanking',
 		name: 'salesRankingOrderBy',
 		type: 'options',
 		default: 'quantityUnitLevel0',
@@ -714,7 +702,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Customer Discount ID',
+		displayName: 'Bonificacion.IdBonificacion',
 		name: 'discountId',
 		type: 'string',
 		required: true,
@@ -725,7 +713,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Delivery Time Slot ID',
+		displayName: 'TurnoEntrega.IdTurnoEntrega',
 		name: 'deliveryTimeSlotId',
 		type: 'string',
 		required: true,
@@ -739,14 +727,14 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Modified Date From',
+		displayName: 'fechaModificacionDesde',
 		name: 'dateModified',
 		type: 'dateTime',
 		default: '',
 		displayOptions: { show: { resource: ['articulos'], operation: ['GetVenta'] } },
 	},
 	{
-		displayName: 'Image Modified Date From',
+		displayName: 'fechaModificacionImagenesDesde',
 		name: 'dateModifiedImage',
 		type: 'dateTime',
 		default: '',
@@ -754,7 +742,7 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Filter articles whose images were modified from this date',
 	},
 	{
-		displayName: 'Price Updated Date To',
+		displayName: 'FechaPrecioActualizadoHasta',
 		name: 'priceDateModifiedTo',
 		type: 'dateTime',
 		default: '',
@@ -771,7 +759,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Price Updated Date From',
+		displayName: 'FechaPrecioActualizadoDesde',
 		name: 'priceDateModifiedFrom',
 		type: 'dateTime',
 		default: '',
@@ -780,14 +768,14 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Supplier Payment Method',
+		displayName: 'FormaPagoProveedor.IdFormaPagoProveedor',
 		name: 'supplierPaymentMethodId',
 		type: 'number',
 		default: 0,
 		displayOptions: { show: { resource: ['proveedores'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Driver ID',
+		displayName: 'Chofer.IdChofer',
 		name: 'driverId',
 		type: 'string',
 		default: '',
@@ -798,7 +786,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Transfer Order ID',
+		displayName: 'OrdenTraspaso.IdOrdenTraspaso',
 		name: 'transferOrderId',
 		type: 'number',
 		default: 0,
@@ -812,7 +800,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Transfer Articles',
+		displayName: 'OrdenTraspasoItems',
 		name: 'transferArticles',
 		required: true,
 		type: 'json',
@@ -827,7 +815,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Notes',
+		displayName: 'Observaciones',
 		name: 'notes',
 		type: 'string',
 		default: '',
@@ -837,7 +825,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Notes',
+		displayName: 'Observaciones',
 		name: 'notes',
 		type: 'string',
 		default: '',
@@ -847,7 +835,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'ID',
+		displayName: 'PedidoVenta.IdPedidoVenta',
 		name: 'id',
 		required: true,
 		type: 'string',
@@ -859,7 +847,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Article IDs',
+		displayName: 'Articulo.IdArticulo',
 		name: 'articleId',
 		type: 'string',
 		default: '',
@@ -879,7 +867,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Article Location',
+		displayName: 'UbicacionArticulo.IdUbicacionArticulo',
 		name: 'articleLocationId',
 		type: 'number',
 		default: 0,
@@ -887,7 +875,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['ajustesMovimientosStock'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Branch Section ID',
+		displayName: 'SeccionSucursal.IdSeccionSucursal',
 		name: 'branchSectionId',
 		type: 'number',
 		default: 0,
@@ -900,7 +888,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Origin Branch Section ID',
+		displayName: 'SeccionSucursalDesde.IdSeccionSucursal',
 		name: 'originBranchSectionId',
 		type: 'number',
 		default: 0,
@@ -914,7 +902,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Destination Branch Section ID',
+		displayName: 'SeccionSucursalHacia.IdSeccionSucursal',
 		name: 'destinationBranchSectionId',
 		type: 'number',
 		default: 0,
@@ -928,14 +916,14 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Payment ID',
+		displayName: 'idCobro',
 		name: 'paymentId',
 		type: 'number',
 		default: 0,
 		displayOptions: { show: { resource: ['cobros'], operation: ['Get'] } },
 	},
 	{
-		displayName: 'Purchase ID',
+		displayName: 'Compra.IdCompra',
 		name: 'purchaseId',
 		type: 'number',
 		default: 0,
@@ -943,19 +931,9 @@ const fieldDefinitions: INodeProperties[] = [
 			show: { resource: ['compras', 'ordenesCompra'], operation: ['GetOne'] },
 		},
 	},
+
 	{
-		displayName: 'Status ID',
-		name: 'statusId',
-		type: 'string',
-		default: '',
-		placeholder: 'Enter status ID',
-		description: 'Sales order status number',
-		displayOptions: {
-			show: { operation: [] },
-		},
-	},
-	{
-		displayName: 'Status ID',
+		displayName: 'idsEstado',
 		name: 'statusId',
 		type: 'string',
 		default: '',
@@ -969,7 +947,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Transfer Status ID',
+		displayName: 'idEstadoOrdenTraspado',
 		name: 'transferStatusId',
 		type: 'number',
 		default: 0,
@@ -983,7 +961,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Concept ID',
+		displayName: 'ConceptoVarios.IdConceptoVarios',
 		name: 'transferConceptId',
 		type: 'number',
 		default: 0,
@@ -997,7 +975,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Transport ID',
+		displayName: 'Transporte.IdTransporte',
 		name: 'transferTransportId',
 		type: 'number',
 		default: 0,
@@ -1011,14 +989,14 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Purchase Operator ID',
+		displayName: 'OperadorCompra.IdOperadorCompra',
 		name: 'purchaseOperatorId',
 		type: 'number',
 		default: 0,
 		displayOptions: { show: { resource: ['proveedores', 'remitosCompra'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Supplier ID',
+		displayName: 'IdProveedor',
 		name: 'purchaseSupplierId',
 		type: 'string',
 		default: '',
@@ -1027,7 +1005,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['compras'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Voucher Type ID',
+		displayName: 'TipoComprobante.IdTipoComprobante',
 		name: 'voucherTypeId',
 		type: 'string',
 		default: '',
@@ -1038,7 +1016,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Current Account ID',
+		displayName: 'idClienteCuentaCorriente',
 		name: 'currentAccountId',
 		type: 'number',
 		default: 0,
@@ -1047,7 +1025,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta'] } },
 	},
 	{
-		displayName: 'Seller ID',
+		displayName: 'Vendedor.IdVendedor',
 		name: 'sellerId',
 		type: 'string',
 		default: '',
@@ -1057,7 +1035,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Sale ID',
+		displayName: 'Venta.IdVenta',
 		name: 'saleId',
 		type: 'number',
 		default: 0,
@@ -1069,7 +1047,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Sale ID',
+		displayName: 'Venta.IdVenta',
 		name: 'saleId',
 		type: 'number',
 		default: 0,
@@ -1080,15 +1058,9 @@ const fieldDefinitions: INodeProperties[] = [
 			},
 		},
 	},
+
 	{
-		displayName: 'Branch ID',
-		name: 'branchId',
-		type: 'number',
-		default: 0,
-		displayOptions: { show: { operation: [] } },
-	},
-	{
-		displayName: 'Include Canceled Sales Vouchers',
+		displayName: 'incluirAnulados',
 		name: 'includeCanceled',
 		type: 'boolean',
 		default: false,
@@ -1096,7 +1068,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta', 'GetOne'] } },
 	},
 	{
-		displayName: 'Include Canceled Orders',
+		displayName: 'incluirAnulados',
 		name: 'includeCanceled',
 		type: 'boolean',
 		default: false,
@@ -1105,7 +1077,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Sales Channel ID',
+		displayName: 'idCanalVenta',
 		name: 'salesChannelId',
 		type: 'number',
 		default: 0,
@@ -1113,7 +1085,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta'] } },
 	},
 	{
-		displayName: 'Business Division ID',
+		displayName: 'idDivisionEmpresa',
 		name: 'businessDivisionId',
 		type: 'number',
 		default: 0,
@@ -1121,7 +1093,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta'] } },
 	},
 	{
-		displayName: 'Created By User ID',
+		displayName: 'idUsuarioCreador',
 		name: 'createdByUserId',
 		type: 'number',
 		description: 'User ID that created the sales voucher',
@@ -1129,7 +1101,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta', 'GetOne'] } },
 	},
 	{
-		displayName: 'Seller ID',
+		displayName: 'Vendedor.IdVendedor',
 		name: 'sellerId',
 		type: 'string',
 		default: '',
@@ -1140,7 +1112,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Transport ID',
+		displayName: 'Transporte.IdTransporte',
 		name: 'transportId',
 		type: 'string',
 		required: true,
@@ -1152,7 +1124,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Transport ID',
+		displayName: 'Transporte.IdTransporte',
 		name: 'transportId',
 		type: 'string',
 		default: '',
@@ -1163,7 +1135,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Transport ID',
+		displayName: 'Transporte.IdTransporte',
 		name: 'transportId',
 		type: 'number',
 		description: 'Transport ID associated with the sales voucher',
@@ -1171,7 +1143,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta', 'GetOne'] } },
 	},
 	{
-		displayName: 'Transport ID',
+		displayName: 'Transporte.IdTransporte',
 		name: 'transportId',
 		type: 'number',
 		description: 'Transport ID associated with the sales voucher',
@@ -1181,7 +1153,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Country ID',
+		displayName: 'Pais.IdPais',
 		name: 'countryId',
 		type: 'string',
 		default: '',
@@ -1192,7 +1164,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Country ID',
+		displayName: 'Pais.IdPais',
 		name: 'countryId',
 		type: 'string',
 		default: '',
@@ -1203,7 +1175,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Province ID',
+		displayName: 'Provincia.IdProvincia',
 		name: 'provinceId',
 		type: 'string',
 		default: '',
@@ -1217,7 +1189,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Province ID',
+		displayName: 'Provincia.IdProvincia',
 		name: 'provinceId',
 		type: 'string',
 		default: '',
@@ -1231,7 +1203,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Physical Branch ID',
+		displayName: 'SucursalFisica.IdSucursalFisica',
 		name: 'physicalBranchId',
 		type: 'string',
 		default: '',
@@ -1254,7 +1226,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Division Company Group ID',
+		displayName: 'DivisionEmpresaGrupoEconomico.IdDivisionEmpresaGrupoEconomico',
 		name: 'divisionCompanyGroupId',
 		type: 'string',
 		default: '',
@@ -1268,7 +1240,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Business Group Division Name or ID',
+		displayName: 'DivisionEmpresaGrupoEconomico.IdDivisionEmpresaGrupoEconomico',
 		name: 'deliveryNoteDivisionCompanyGroupId',
 		type: 'options',
 		default: '',
@@ -1286,7 +1258,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Origin Physical Branch ID',
+		displayName: 'SucursalFisicaDesde.IdSucursalFisica',
 		name: 'originPhysicalBranchId',
 		type: 'string',
 		default: '',
@@ -1300,7 +1272,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Destination Physical Branch ID',
+		displayName: 'SucursalFisicaHacia.IdSucursalFisica',
 		name: 'destinationPhysicalBranchId',
 		type: 'string',
 		default: '',
@@ -1314,21 +1286,21 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Cash Value ID',
+		displayName: 'VentaValoresEfectivos.IdValor',
 		name: 'cashValueId',
 		type: 'number',
 		default: 0,
 		displayOptions: { show: { isCashSale: [true] } },
 	},
 	{
-		displayName: 'Zone ID',
+		displayName: 'Zona.IdZona',
 		name: 'zoneId',
 		type: 'number',
 		default: 0,
 		displayOptions: { show: { resource: ['proveedores', 'clientes'], operation: ['Create', 'Update'] } },
 	},
 	{
-		displayName: 'Customer Seller ID',
+		displayName: 'Vendedor.IdVendedor',
 		name: 'customerSellerId',
 		type: 'number',
 		default: 0,
@@ -1336,7 +1308,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['clientes'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Customer Transport ID',
+		displayName: 'Transporte.IdTransporte',
 		name: 'customerTransportId',
 		type: 'number',
 		default: 0,
@@ -1344,7 +1316,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['clientes'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Credit Limit ID',
+		displayName: 'LimiteCredito.IdLimiteCredito',
 		name: 'creditLimitId',
 		type: 'number',
 		default: 0,
@@ -1352,7 +1324,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['clientes'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Customer Class ID',
+		displayName: 'ClaseCliente.IdClaseCliente',
 		name: 'customerClassId',
 		type: 'number',
 		default: 0,
@@ -1360,7 +1332,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['clientes'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Customer Frequency ID',
+		displayName: 'FrecuenciaCliente.IdFrecuenciaCliente',
 		name: 'customerFrequencyId',
 		type: 'number',
 		default: 0,
@@ -1368,7 +1340,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['clientes'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Customer Channel ID',
+		displayName: 'CanalCliente.IdCanalCliente',
 		name: 'customerChannelId',
 		type: 'number',
 		default: 0,
@@ -1376,7 +1348,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['clientes'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Customer Chain ID',
+		displayName: 'CadenaCliente.IdCadenaCliente',
 		name: 'customerChainId',
 		type: 'number',
 		default: 0,
@@ -1384,7 +1356,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['clientes'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Customer Location ID',
+		displayName: 'UbicacionCliente.IdUbicacionCliente',
 		name: 'customerLocationId',
 		type: 'number',
 		default: 0,
@@ -1392,7 +1364,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['clientes'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Average Consumer Age ID',
+		displayName: 'EdadesPromedioConsumidoresCliente.IdEdadesPromedioConsumidoresCliente',
 		name: 'averageConsumerAgeId',
 		type: 'number',
 		default: 0,
@@ -1400,7 +1372,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['clientes'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Average Consumer Gender ID',
+		displayName: 'GeneroPromedioConsumidoresCliente.IdGeneroPromedioConsumidoresCliente',
 		name: 'averageConsumerGenderId',
 		type: 'number',
 		default: 0,
@@ -1408,7 +1380,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['clientes'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Customer Service Days ID',
+		displayName: 'DiasAtencionCliente.IdDiasAtencionCliente',
 		name: 'customerServiceDaysId',
 		type: 'number',
 		default: 0,
@@ -1416,7 +1388,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['clientes'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Customer Service Schedule ID',
+		displayName: 'HorarioAtencionCliente.IdHorarioAtencionCliente',
 		name: 'customerServiceScheduleId',
 		type: 'number',
 		default: 0,
@@ -1424,7 +1396,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['clientes'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Customer Tobacco Company ID',
+		displayName: 'CigarreraCliente.IdCigarreraCliente',
 		name: 'customerTobaccoCompanyId',
 		type: 'number',
 		default: 0,
@@ -1432,7 +1404,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['clientes'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Supplier Discount ID',
+		displayName: 'DescuentoProveedor.IdDescuentoProveedor',
 		name: 'supplierDiscountId',
 		type: 'number',
 		default: 0,
@@ -1452,7 +1424,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['cobros'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Advance Amount',
+		displayName: 'CobroAnticipos.Importe',
 		name: 'advanceAmount',
 		type: 'number',
 		required: true,
@@ -1467,7 +1439,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Advance Concept ID',
+		displayName: 'CobroAnticipos.ConceptoVarios.IdConceptoVarios',
 		name: 'advanceConceptId',
 		type: 'number',
 		required: true,
@@ -1482,7 +1454,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Advance Detail',
+		displayName: 'CobroAnticipos.Detalle',
 		name: 'advanceDetail',
 		type: 'string',
 		default: '',
@@ -1499,7 +1471,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Cash Amount',
+		displayName: 'CobroEfectivos.Importe',
 		name: 'cashAmount',
 		type: 'number',
 		required: true,
@@ -1514,7 +1486,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Value ID',
+		displayName: 'CobroEfectivos.Valor.IdValor',
 		name: 'paymentValueId',
 		type: 'number',
 		required: true,
@@ -1529,7 +1501,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Observation',
+		displayName: 'Observacion',
 		name: 'paymentObservation',
 		type: 'string',
 		default: '',
@@ -1546,7 +1518,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Effective Detail',
+		displayName: 'CobroEfectivos.Detalle',
 		name: 'effectiveDetail',
 		type: 'string',
 		default: '',
@@ -1554,7 +1526,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['cobros'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Price List ID',
+		displayName: 'ListaPrecio.IdListaPrecio',
 		name: 'priceListId',
 		type: 'string',
 		default: '',
@@ -1568,7 +1540,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Purchase Document Letter',
+		displayName: 'NumeroDocumento.LetraDocumento',
 		name: 'documentLetter',
 		type: 'string',
 		default: '',
@@ -1582,7 +1554,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Transfer Document Letter',
+		displayName: 'NumeroDocumento.LetraDocumento',
 		name: 'transferDocumentLetter',
 		type: 'string',
 		default: '',
@@ -1604,7 +1576,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['articulos'], operation: ['GetVenta'] } },
 	},
 	{
-		displayName: 'Voucher Type Name',
+		displayName: 'TipoComprobanteCompra.Nombre',
 		name: 'voucherTypeName',
 		type: 'string',
 		default: '',
@@ -1613,7 +1585,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['compras'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'Article Name',
+		displayName: 'Articulo.Nombre',
 		name: 'articleName',
 		type: 'string',
 		default: '',
@@ -1627,7 +1599,7 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Name of the product to search for',
 	},
 	{
-		displayName: 'Purchase Document Number',
+		displayName: 'NumeroDocumento.Numero',
 		name: 'documentNumber',
 		type: 'number',
 		default: 0,
@@ -1641,7 +1613,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Transfer Document Number',
+		displayName: 'NumeroDocumento.Numero',
 		name: 'transferDocumentNumber',
 		type: 'number',
 		default: 0,
@@ -1655,14 +1627,14 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Notes',
+		displayName: 'VentaValoresEfectivos.Observaciones',
 		name: 'cashValueNotes',
 		type: 'string',
 		default: '',
 		displayOptions: { show: { isCashSale: [true] } },
 	},
 	{
-		displayName: 'Supplier ID',
+		displayName: 'Proveedor.IdProveedor',
 		name: 'supplierId',
 		type: 'string',
 		required: true,
@@ -1677,7 +1649,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Supplier ID',
+		displayName: 'Proveedor.IdProveedor',
 		name: 'supplierId',
 		type: 'string',
 		required: true,
@@ -1692,7 +1664,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Article IDs',
+		displayName: 'IdsArticulos',
 		name: 'articleIds',
 		type: 'string',
 		default: '',
@@ -1707,7 +1679,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Supplier IDs',
+		displayName: 'IdsProveedores',
 		name: 'supplierIds',
 		type: 'string',
 		default: '',
@@ -1722,7 +1694,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Point of Sale',
+		displayName: 'NumeroDocumento.PuntoVenta',
 		name: 'pointOfSale',
 		type: 'number',
 		default: 0,
@@ -1736,7 +1708,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Transfer Point of Sale',
+		displayName: 'NumeroDocumento.PuntoVenta',
 		name: 'transferPointOfSale',
 		type: 'number',
 		default: 0,
@@ -1750,7 +1722,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Business Name',
+		displayName: 'RazonSocial',
 		name: 'businessName',
 		type: 'string',
 		default: '',
@@ -1763,7 +1735,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Item Count',
+		displayName: 'EstadisticaVentaRanking',
 		name: 'itemCount',
 		type: 'number',
 		default: 1,
@@ -1772,7 +1744,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Group ID',
+		displayName: 'Rubro.IdRubro',
 		name: 'groupId',
 		type: 'string',
 		default: '',
@@ -1794,7 +1766,7 @@ const fieldDefinitions: INodeProperties[] = [
 	// 	displayOptions: { show: { operation: ["getProductByCode"] } },
 	// },
 	{
-		displayName: 'Subgroup IDs',
+		displayName: 'SubRubro.IdsSubRubro',
 		name: 'subgroupIds',
 		type: 'string',
 		default: '',
@@ -1807,7 +1779,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Physical Branches - ID List',
+		displayName: 'idsSucursalesFisicas',
 		name: 'branchOfficeIds',
 		type: 'string',
 		required: true,
@@ -1816,7 +1788,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['articulos'], operation: ['GetExistencias'] } },
 	},
 	{
-		displayName: 'Username',
+		displayName: 'Usuario',
 		name: 'username',
 		type: 'string',
 		default: '',
@@ -1825,7 +1797,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Supplier Code',
+		displayName: 'Codigo',
 		name: 'supplierCode',
 		type: 'number',
 		default: 0,
@@ -1850,7 +1822,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Article Brand ID',
+		displayName: 'idMarcaArticulo',
 		name: 'articleBrandId',
 		type: 'string',
 		placeholder: '3',
@@ -1863,7 +1835,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Article Category ID',
+		displayName: 'idCategoriaArticulo',
 		name: 'articleCategoryId',
 		type: 'string',
 		placeholder: '3',
