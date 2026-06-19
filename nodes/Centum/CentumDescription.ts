@@ -270,7 +270,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'codigo',
+		displayName: 'Codigo',
 		name: 'customerCode',
 		type: 'string',
 		default: '',
@@ -1240,7 +1240,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'DivisionEmpresaGrupoEconomico.IdDivisionEmpresaGrupoEconomico',
+		displayName: 'DivisionEmpresaGrupoEconomico.Name or ID',
 		name: 'deliveryNoteDivisionCompanyGroupId',
 		type: 'options',
 		default: '',
