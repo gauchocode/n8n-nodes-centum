@@ -332,8 +332,15 @@ const getPurchaseDetails: ResourceHandler = async (context) => {
 		throw new NodeOperationError(executeFunctions.getNode(), 'purchaseId must be a positive integer.');
 	}
 
+	const divisionId = executeFunctions.getNodeParameter('divisionEmpresaGrupoEconomicoId', itemIndex, 0) as number;
+
 	try {
-		const purchase = await helperFns.apiRequest<any>(`${centumUrl}/Compras/${parsedPurchaseId}`, {
+		let url = `${centumUrl}/Compras/${parsedPurchaseId}`;
+		if (divisionId && divisionId > 0) {
+			url += `/${divisionId}`;
+		}
+
+		const purchase = await helperFns.apiRequest<any>(url, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
 			method: 'GET',

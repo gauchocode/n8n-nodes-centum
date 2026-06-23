@@ -122,6 +122,12 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		itemIndex,
 		'',
 	) as string;
+	const qualityAnalysisNumber = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'qualityAnalysisNumber',
+		itemIndex,
+		'',
+	) as string;
 	const divisionCompanyGroupId =
 		String(divisionCompanyGroupIdRaw).trim() === '' ? undefined : Number(divisionCompanyGroupIdRaw);
 
@@ -306,6 +312,10 @@ const createPurchaseDeliveryNote: ResourceHandler = async (context) => {
 		bodyRemitoCompra.FechaVencimiento = formattedDueDate;
 	}
 
+	if (qualityAnalysisNumber.trim()) {
+		bodyRemitoCompra.NumeroAnalisisCalidad = qualityAnalysisNumber.trim();
+	}
+
 	if (branchSectionId > 0) {
 		bodyRemitoCompra.SeccionSucursal = {
 			IdSeccionSucursal: branchSectionId,
@@ -459,6 +469,12 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 	const notes = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'notes',
+		itemIndex,
+		'',
+	) as string;
+	const qualityAnalysisNumber = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'qualityAnalysisNumber',
 		itemIndex,
 		'',
 	) as string;
@@ -681,6 +697,10 @@ const createSalesDeliveryNote: ResourceHandler = async (context) => {
 
 	if (formattedDeliveryDate) {
 		salesDeliveryNoteBody.FechaEntrega = formattedDeliveryDate;
+	}
+
+	if (qualityAnalysisNumber.trim()) {
+		salesDeliveryNoteBody.NumeroAnalisisCalidad = qualityAnalysisNumber.trim();
 	}
 
 	if (divisionCompanyGroupId !== undefined) {

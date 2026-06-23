@@ -123,6 +123,12 @@ const createTransferOrder: ResourceHandler = async (context) => {
 		'transferArticles',
 		itemIndex,
 	);
+	const qualityAnalysisNumber = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'qualityAnalysisNumber',
+		itemIndex,
+		'',
+	) as string;
 
 	const formattedDocumentDate = String(documentDate).replace(/\..+/, '');
 	const documentTime =
@@ -163,6 +169,10 @@ const createTransferOrder: ResourceHandler = async (context) => {
 
 	if (documentTime) {
 		body.HoraDocumento = documentTime;
+	}
+
+	if (qualityAnalysisNumber.trim()) {
+		body.NumeroAnalisisCalidad = qualityAnalysisNumber.trim();
 	}
 
 	try {

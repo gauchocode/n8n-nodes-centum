@@ -508,8 +508,18 @@ const getCustomerBalance: ResourceHandler = async (context) => {
 
 	try {
 		let url = `${centumUrl}/SaldosCuentasCorrientes/${clientId}`;
+		const queryParams: string[] = [];
 		if (dueDateUntil) {
-			url += `?fechaVencimientoHasta=${dueDateUntil}`;
+			queryParams.push(`fechaVencimientoHasta=${dueDateUntil}`);
+		}
+
+		const divisionIds = executeFunctions.getNodeParameter('idsDivisionesEmpresasGrupoEconomico', itemIndex, '') as string;
+		if (divisionIds && divisionIds.trim()) {
+			queryParams.push(`idsDivisionesEmpresasGrupoEconomico=${divisionIds.trim()}`);
+		}
+
+		if (queryParams.length > 0) {
+			url += `?${queryParams.join('&')}`;
 		}
 
 		const response = await helperFns.apiRequest<any>(url, {

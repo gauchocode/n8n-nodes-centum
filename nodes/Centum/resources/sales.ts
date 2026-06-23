@@ -316,9 +316,15 @@ const getSalesOrderDetails: ResourceHandler = async (context) => {
 	void consumerApiPublicId;
 
 	const salesOrderId = helperFns.getNodeParameterOrThrow(executeFunctions, 'id', itemIndex);
+	const divisionId = executeFunctions.getNodeParameter('divisionEmpresaGrupoEconomicoId', itemIndex, 0) as number;
 	try {
+		let url = `${centumUrl}/PedidosVenta/${salesOrderId}`;
+		if (divisionId && divisionId > 0) {
+			url += `/${divisionId}`;
+		}
+
 		const dataActividad = await helperFns.apiRequest<any>(
-			`${centumUrl}/PedidosVenta/${salesOrderId}`,
+			url,
 			{
 				context: executeFunctions,
 				debugItemIndex: itemIndex,
@@ -919,8 +925,15 @@ const listSalesInvoicesById: ResourceHandler = async (context) => {
 		throw new NodeOperationError(executeFunctions.getNode(), 'saleId must be a positive number.');
 	}
 
+	const divisionId = executeFunctions.getNodeParameter('divisionEmpresaGrupoEconomicoId', itemIndex, 0) as number;
+
 	try {
-		const sale = await helperFns.apiRequest<any>(`${centumUrl}/Ventas/${saleId}`, {
+		let url = `${centumUrl}/Ventas/${saleId}`;
+		if (divisionId && divisionId > 0) {
+			url += `/${divisionId}`;
+		}
+
+		const sale = await helperFns.apiRequest<any>(url, {
 			context: executeFunctions,
 			debugItemIndex: itemIndex,
 			method: 'GET',

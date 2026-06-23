@@ -759,6 +759,20 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'idsDivisionesEmpresasGrupoEconomico',
+		name: 'idsDivisionesEmpresasGrupoEconomico',
+		type: 'string',
+		default: '',
+		placeholder: 'Ej: 1,2,3',
+		description: 'Lista de IDs de Divisiones Empresas Grupo Económico separados por coma. Si se omite, toma la división del usuario logueado.',
+		displayOptions: {
+			show: {
+				resource: ['clientes'],
+				operation: ['GetSaldoCuentaCorriente'],
+			},
+		},
+	},
+	{
 		displayName: 'FechaPrecioActualizadoDesde',
 		name: 'priceDateModifiedFrom',
 		type: 'dateTime',
@@ -822,6 +836,16 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Additional notes for the purchase delivery note',
 		displayOptions: {
 			show: { resource: ['remitosCompra'], operation: ['Create'] },
+		},
+	},
+	{
+		displayName: 'NumeroAnalisisCalidad',
+		name: 'qualityAnalysisNumber',
+		type: 'string',
+		default: '',
+		description: 'Quality analysis number for the document',
+		displayOptions: {
+			show: { resource: ['remitosCompra', 'ordenesTraspaso', 'remitosVenta'], operation: ['Create'] },
 		},
 	},
 	{
@@ -1043,6 +1067,19 @@ const fieldDefinitions: INodeProperties[] = [
 			show: {
 				resource: ['ventas'],
 				operation: ['GetConsulta', 'GetOne'],
+			},
+		},
+	},
+	{
+		displayName: 'idDivisionEmpresaGrupoEconomico',
+		name: 'divisionEmpresaGrupoEconomicoId',
+		type: 'number',
+		default: 0,
+		description: 'ID de la división empresa grupo económico. Si se omite (0), usa la división por defecto del usuario API.',
+		displayOptions: {
+			show: {
+				resource: ['ventas', 'pedidosVenta', 'compras'],
+				operation: ['GetOne'],
 			},
 		},
 	},
