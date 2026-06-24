@@ -761,6 +761,84 @@ const listDrivers: ResourceHandler = async (context) => {
 	}
 };
 
+const listChoferes: ResourceHandler = async (context) => {
+	const { executeFunctions, centumUrl, headers, itemIndex } = context;
+
+	try {
+		const response = await helperFns.apiRequest<any>(`${centumUrl}/Choferes`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
+			method: 'GET',
+			headers,
+		});
+		return [executeFunctions.helpers.returnJsonArray(response)];
+	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
+		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
+	}
+};
+
+const listBranchSections: ResourceHandler = async (context) => {
+	const { executeFunctions, centumUrl, headers, itemIndex } = context;
+
+	try {
+		const response = await helperFns.apiRequest<any>(`${centumUrl}/SeccionesSucursales`, {
+			context: executeFunctions,
+			debugItemIndex: itemIndex,
+			method: 'GET',
+			headers,
+		});
+		return [executeFunctions.helpers.returnJsonArray(response)];
+	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
+		throw new NodeOperationError(executeFunctions.getNode(), errorMessage);
+	}
+};
+
+const getBranchSection: ResourceHandler = async (context) => {
+	const { executeFunctions, centumUrl, headers, itemIndex } = context;
+
+	const branchSectionId = Number(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'branchSectionId', itemIndex, 0),
+	);
+
+	if (!Number.isInteger(branchSectionId) || branchSectionId <= 0) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'branchSectionId must be a positive integer.',
+			{ itemIndex },
+		);
+	}
+
+	try {
+		const response = await helperFns.apiRequest<any>(
+			`${centumUrl}/SeccionesSucursales/${encodeURIComponent(String(branchSectionId))}`,
+			{
+				context: executeFunctions,
+				debugItemIndex: itemIndex,
+				method: 'GET',
+				headers,
+			},
+		);
+		return [executeFunctions.helpers.returnJsonArray(response)];
+	} catch (error) {
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
+		const errorMessage =
+			error?.response?.data?.Message || (error as any).message || 'Unknown error';
+		throw new NodeOperationError(executeFunctions.getNode(), errorMessage, { itemIndex });
+	}
+};
+
 const listDeliveryTimeSlots: ResourceHandler = async (context) => {
 	const {
 		executeFunctions,
@@ -869,6 +947,9 @@ export const logisticsHandlers: ResourceHandlerMap = {
 	createPurchaseDeliveryNote: createPurchaseDeliveryNote,
 	createSalesDeliveryNote: createSalesDeliveryNote,
 	listDrivers: listDrivers,
+	listChoferes: listChoferes,
+	listBranchSections: listBranchSections,
+	getBranchSection: getBranchSection,
 	listDeliveryTimeSlots: listDeliveryTimeSlots,
 	listPhysicalBranches: listPhysicalBranches,
 	listTransports: listTransports,

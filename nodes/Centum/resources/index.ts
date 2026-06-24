@@ -37,6 +37,9 @@ export const resourceHandlerGroups: Record<string, ResourceHandlerMap> = {
 	categoriasArticulo: {
 		GetAll: articlesHandlers.listCategories,
 	},
+	choferes: {
+		GetAll: logisticsHandlers.listChoferes,
+	},
 	choferesGuiaLogistica: {
 		GetAll: logisticsHandlers.listDrivers,
 	},
@@ -128,6 +131,10 @@ export const resourceHandlerGroups: Record<string, ResourceHandlerMap> = {
 	},
 	rubros: {
 		GetAll: articlesHandlers.listGroups,
+	},
+	seccionesSucursales: {
+		GetAll: logisticsHandlers.listBranchSections,
+		GetOne: logisticsHandlers.getBranchSection,
 	},
 	subRubros: {
 		GetAll: articlesHandlers.listSubgroups,

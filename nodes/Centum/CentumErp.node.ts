@@ -163,6 +163,30 @@ const documentFields: SimplifiedFieldSpec[] = [
 	{ key: 'CanalVenta', fields: ['IdCanalVenta', 'Nombre'] },
 ];
 
+const branchSectionFields: SimplifiedFieldSpec[] = [
+	'IdSeccionSucursal',
+	'ID',
+	'Id',
+	'Codigo',
+	'Nombre',
+	'Descripcion',
+	'Activo',
+	'Activa',
+	{ key: 'SucursalFisica', fields: ['IdSucursalFisica', 'Codigo', 'Nombre'] },
+];
+
+const driverFields: SimplifiedFieldSpec[] = [
+	'IdChofer',
+	'ID',
+	'Id',
+	'Codigo',
+	'Nombre',
+	'Apellido',
+	'Documento',
+	'NumeroDocumento',
+	'Activo',
+];
+
 function simplifiedFieldKey(resource: string, operation: string): string {
 	return `${resource}:${operation}`;
 }
@@ -228,6 +252,9 @@ const simplifiedOutputFields: Record<string, SimplifiedFieldSpec[]> = {
 	[simplifiedFieldKey('tiposComprobante', 'GetAllVentas')]: salesVoucherFields,
 	[simplifiedFieldKey('ordenesCompra', 'Get')]: documentFields,
 	[simplifiedFieldKey('ordenesCompra', 'GetOne')]: documentFields,
+	[simplifiedFieldKey('choferes', 'GetAll')]: driverFields,
+	[simplifiedFieldKey('seccionesSucursales', 'GetAll')]: branchSectionFields,
+	[simplifiedFieldKey('seccionesSucursales', 'GetOne')]: branchSectionFields,
 	[simplifiedFieldKey('ordenesTraspaso', 'Get')]: [
 		'IdOrdenTraspaso',
 		'FechaDocumento',

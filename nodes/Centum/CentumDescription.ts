@@ -906,8 +906,14 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Sección de sucursal (opcional para ajustes de stock)',
 		displayOptions: {
 			show: {
-				resource: ['ajustesMovimientosStock', 'ubicacionesArticulos', 'remitosCompra', 'remitosVenta'],
-				operation: ['Create', 'getArticleLocationsBySection'],
+				resource: [
+					'ajustesMovimientosStock',
+					'ubicacionesArticulos',
+					'remitosCompra',
+					'remitosVenta',
+					'seccionesSucursales',
+				],
+				operation: ['Create', 'getArticleLocationsBySection', 'GetOne'],
 			},
 		},
 	},
@@ -1894,6 +1900,7 @@ const fieldDefinitions: INodeProperties[] = [
 				show: {
 					resource: [
 						'articulos',
+						'choferes',
 						'clientes',
 						'ventas',
 						'pedidosVenta',
@@ -1904,8 +1911,10 @@ const fieldDefinitions: INodeProperties[] = [
 					'ordenesCompra',
 					'proveedores',
 					'promocionesComerciales',
+					'seccionesSucursales',
 				],
 				operation: [
+					'GetAll',
 					'GetDatosGenerales',
 					'GetOne',
 					'GetVenta',
