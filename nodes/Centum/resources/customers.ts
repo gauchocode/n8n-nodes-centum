@@ -490,12 +490,18 @@ const getCustomerBalance: ResourceHandler = async (context) => {
 	const clientIdParam = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'customerId', itemIndex),
 	);
-	const balanceFromDate = helperFns.getNodeParameterOrThrow(
+	const balanceDueDateUntil = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'priceDateModifiedTo',
 		itemIndex,
 	);
-	const dueDateUntil = String(balanceFromDate).split('T')[0];
+	const realComposition = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'realComposition',
+		itemIndex,
+		false,
+	) as boolean;
+	const dueDateUntil = String(balanceDueDateUntil).split('T')[0];
 
 	// Parameter validation
 	const clientId = Number(clientIdParam);
@@ -511,6 +517,10 @@ const getCustomerBalance: ResourceHandler = async (context) => {
 		const queryParams: string[] = [];
 		if (dueDateUntil) {
 			queryParams.push(`fechaVencimientoHasta=${dueDateUntil}`);
+		}
+
+		if (realComposition) {
+			queryParams.push('composicionReal=true');
 		}
 
 		const divisionIds = executeFunctions.getNodeParameter('idsDivisionesEmpresasGrupoEconomico', itemIndex, '') as string;
@@ -561,12 +571,18 @@ const getCustomerBalanceDetails: ResourceHandler = async (context) => {
 	const clientIdParam = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'customerId', itemIndex),
 	);
-	const balanceDateUntil = helperFns.getNodeParameterOrThrow(
+	const balanceDueDateUntil = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'priceDateModifiedTo',
 		itemIndex,
 	);
-	const formattedBalanceDateUntil = String(balanceDateUntil).split('T')[0];
+	const realComposition = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'realComposition',
+		itemIndex,
+		false,
+	) as boolean;
+	const formattedBalanceDateUntil = String(balanceDueDateUntil).split('T')[0];
 
 	// Parameter validation
 	const clientId = Number(clientIdParam);
@@ -579,8 +595,18 @@ const getCustomerBalanceDetails: ResourceHandler = async (context) => {
 
 	try {
 		let url = `${centumUrl}/SaldosCuentasCorrientes/Composicion/${clientId}`;
+		const queryParams: string[] = [];
+
 		if (formattedBalanceDateUntil) {
-			url += `?fechaVencimientoHasta=${formattedBalanceDateUntil}`;
+			queryParams.push(`fechaVencimientoHasta=${formattedBalanceDateUntil}`);
+		}
+
+		if (realComposition) {
+			queryParams.push('composicionReal=true');
+		}
+
+		if (queryParams.length > 0) {
+			url += `?${queryParams.join('&')}`;
 		}
 
 		const response = await helperFns.apiRequest<any>(url, {

@@ -742,19 +742,40 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Filter articles whose images were modified from this date',
 	},
 	{
+		displayName: 'fechaVencimientoHasta',
+		name: 'priceDateModifiedTo',
+		type: 'dateTime',
+		default: '',
+		description: 'Se envia como `fechaVencimientoHasta` en la URL.',
+		displayOptions: {
+			show: {
+				resource: ['clientes'],
+				operation: ['GetSaldoCuentaCorriente', 'GetComposicionSaldoCuentaCorriente'],
+			},
+		},
+	},
+	{
+		displayName: 'composicionReal',
+		name: 'realComposition',
+		type: 'boolean',
+		default: false,
+		description: 'Se envia como `composicionReal` en la URL cuando esta activado.',
+		displayOptions: {
+			show: {
+				resource: ['clientes'],
+				operation: ['GetSaldoCuentaCorriente', 'GetComposicionSaldoCuentaCorriente'],
+			},
+		},
+	},
+	{
 		displayName: 'FechaPrecioActualizadoHasta',
 		name: 'priceDateModifiedTo',
 		type: 'dateTime',
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['clientes', 'articulos'],
-				operation: [
-					'GetSaldoCuentaCorriente',
-					'GetComposicionSaldoCuentaCorriente',
-					'GetPrecios',
-					'GetVenta',
-				],
+				resource: ['articulos'],
+				operation: ['GetPrecios', 'GetVenta'],
 			},
 		},
 	},
