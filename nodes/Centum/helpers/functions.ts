@@ -936,16 +936,18 @@ export function safeThrowApi(
 	itemIndex?: number,
 ): never {
 	if (context) {
+		const fallbackDescription = description ?? message;
+
 		throw new NodeApiError(
 			context.getNode(),
 			{
-				message,
-				description,
+				message: fallbackDescription,
+				description: message,
 				httpCode,
 			} as never,
 			{
 				message,
-				description,
+				description: message,
 				...(itemIndex === undefined ? {} : { itemIndex }),
 			},
 		);
@@ -1419,8 +1421,8 @@ export async function apiRequest<T>(
 
 				safeThrowApi(
 					effectiveContext,
-					`Request failed with status ${response.status}`,
-					errorText || response.statusText,
+					errorText || response.statusText || `Request failed with status ${response.status}`,
+					'Centum API request failed',
 					response.status,
 					options.debugItemIndex,
 				);
@@ -1461,18 +1463,13 @@ export async function apiRequest<T>(
 
 			const messageText =
 				typeof errorData === 'object'
-					? errorData.message || errorData.Message || 'No message in response body'
-					: rawText || 'Empty response body';
-
-			const descriptionText =
-				typeof errorData === 'object'
-					? errorData.detail || errorData.Detail || 'No additional details'
-					: 'Plain text response without JSON';
+					? errorData.message || errorData.Message || errorData.detail || errorData.Detail
+					: rawText;
 
 			safeThrowApi(
 				effectiveContext,
-				`Request failed with status ${status}: ${messageText}`,
-				descriptionText,
+				messageText || `Request failed with status ${status}`,
+				'Centum API request failed',
 				status,
 				options.debugItemIndex,
 			);
@@ -1488,10 +1485,14 @@ export async function apiRequest<T>(
 			effectiveContext.logger?.error?.('API request failed', { error });
 		}
 
+		if (error instanceof NodeApiError) {
+			throw error;
+		}
+
 		safeThrowApi(
 			effectiveContext,
-			'Centum API request failed',
 			getErrorMessage(error, 'Unknown fetch error'),
+			'Centum API request failed',
 			undefined,
 			options.debugItemIndex,
 		);
