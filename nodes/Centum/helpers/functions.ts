@@ -59,6 +59,11 @@ export type ResolvedPurchaseArticle = {
 	PorcentajeDescuento1: number;
 	PorcentajeDescuento2: number;
 	PorcentajeDescuento3: number;
+	DiscountPresence?: {
+		PorcentajeDescuento1: boolean;
+		PorcentajeDescuento2: boolean;
+		PorcentajeDescuento3: boolean;
+	};
 };
 
 export const createHash = (publicAccessKey: string): string => {
@@ -79,6 +84,7 @@ export const resolvePurchaseArticles = async (
 	headers: CentumHeaders,
 	itemIndex: number,
 	articleIds: number[],
+	options: { preserveDiscountPresence?: boolean } = {},
 ): Promise<Map<number, ResolvedPurchaseArticle>> => {
 	const uniqueIds = [...new Set(articleIds.filter((articleId) => Number.isFinite(articleId)))];
 
@@ -116,6 +122,15 @@ export const resolvePurchaseArticles = async (
 			);
 		}
 
+		const discountPresence = {
+			PorcentajeDescuento1:
+				resolvedRaw.DescuentoItem1 !== undefined && resolvedRaw.DescuentoItem1 !== null,
+			PorcentajeDescuento2:
+				resolvedRaw.DescuentoItem2 !== undefined && resolvedRaw.DescuentoItem2 !== null,
+			PorcentajeDescuento3:
+				resolvedRaw.DescuentoItem3 !== undefined && resolvedRaw.DescuentoItem3 !== null,
+		};
+
 		const resolvedArticle: ResolvedPurchaseArticle = {
 			IdArticulo: Number(resolvedRaw.IdArticulo),
 			Codigo: String(resolvedRaw.Codigo ?? '').trim(),
@@ -140,6 +155,10 @@ export const resolvePurchaseArticles = async (
 			PorcentajeDescuento2: Number(resolvedRaw.DescuentoItem2 ?? 0),
 			PorcentajeDescuento3: Number(resolvedRaw.DescuentoItem3 ?? 0),
 		};
+
+		if (options.preserveDiscountPresence) {
+			resolvedArticle.DiscountPresence = discountPresence;
+		}
 
 		if (!resolvedArticle.Codigo) {
 			throw new NodeOperationError(

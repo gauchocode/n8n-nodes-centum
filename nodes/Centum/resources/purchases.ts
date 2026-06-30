@@ -412,8 +412,26 @@ const createPurchaseOrder: ResourceHandler = async (context) => {
 	void centumApiCredentials;
 	void consumerApiPublicId;
 
-	const parseCommaSeparatedList = (value: string, fieldLabel: string): string[] => {
+	type PurchaseOrderArticleInput = {
+		ID: number;
+		Cantidad: number;
+		Precio?: number;
+		PorcentajeDescuento1?: number;
+		PorcentajeDescuento2?: number;
+		PorcentajeDescuento3?: number;
+	};
+
+	const parseCommaSeparatedList = (
+		value: string,
+		fieldLabel: string,
+		valueKind: 'integer' | 'number',
+		options: { required?: boolean } = {},
+	): string[] => {
 		if (!value.trim()) {
+			if (options.required === false) {
+				return [];
+			}
+
 			throw new NodeOperationError(executeFunctions.getNode(), `${fieldLabel} is required.`);
 		}
 
@@ -421,7 +439,7 @@ const createPurchaseOrder: ResourceHandler = async (context) => {
 		if (values.some((item) => item.length === 0)) {
 			throw new NodeOperationError(
 				executeFunctions.getNode(),
-				`${fieldLabel} contains an empty value. Use commas only between valid integers.`,
+				`${fieldLabel} contains an empty value. Use commas only between valid ${valueKind === 'integer' ? 'integers' : 'numbers'}.`,
 			);
 		}
 
@@ -431,16 +449,29 @@ const createPurchaseOrder: ResourceHandler = async (context) => {
 	const documentLetter =
 		(helperFns.getNodeParameterOrThrow(executeFunctions, 'documentLetter', itemIndex) as string) ??
 		'';
-	const pointOfSale =
-		(helperFns.getNodeParameterOrThrow(executeFunctions, 'pointOfSale', itemIndex) as string) ?? '';
-	const numero =
-		(helperFns.getNodeParameterOrThrow(executeFunctions, 'documentNumber', itemIndex) as string) ??
-		'';
+	const pointOfSale = Number(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'pointOfSale', itemIndex, 0),
+	);
+	const numero = Number(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'documentNumber', itemIndex, 0),
+	);
 	const articleIdsRaw = String(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'articleIds', itemIndex, ''),
 	);
 	const articleQuantitiesRaw = String(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'articleQuantities', itemIndex, ''),
+	);
+	const articlePricesRaw = String(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'articlePrices', itemIndex, ''),
+	);
+	const articleDiscounts1Raw = String(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'articleDiscounts1', itemIndex, ''),
+	);
+	const articleDiscounts2Raw = String(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'articleDiscounts2', itemIndex, ''),
+	);
+	const articleDiscounts3Raw = String(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'articleDiscounts3', itemIndex, ''),
 	);
 	const documentDate = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
@@ -460,38 +491,95 @@ const createPurchaseOrder: ResourceHandler = async (context) => {
 		itemIndex,
 	) as string;
 	const formattedDueDate = String(dueDate).split('T')[0];
-	const supplierIdRaw = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'supplierId',
-		itemIndex,
+	const supplierIdRaw = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'supplierId', itemIndex),
 	);
 	const supplierId = String(supplierIdRaw ?? '').trim();
-	const deliveryTimeSlotId = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'deliveryTimeSlotId',
-		itemIndex,
-	) as string;
-	const branchId = helperFns.getNodeParameterOrThrow(
-		executeFunctions,
-		'physicalBranchId',
-		itemIndex,
+	const deliveryTimeSlotId = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'deliveryTimeSlotId', itemIndex, ''),
 	);
+	const branchId = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'physicalBranchId', itemIndex, ''),
+	);
+	const rawPurchaseOperatorId = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'purchaseOperatorId',
+		itemIndex,
+		0,
+	);
+	const purchaseOperatorId = Number(rawPurchaseOperatorId);
 
 	if (!supplierId) {
 		throw new NodeOperationError(executeFunctions.getNode(), 'supplierId must be specified.');
 	}
 
-	const articleIds = parseCommaSeparatedList(articleIdsRaw, 'Article IDs');
-	const articleQuantities = parseCommaSeparatedList(articleQuantitiesRaw, 'Article Quantities');
-
-	if (articleIds.length !== articleQuantities.length) {
+	if (purchaseOperatorId !== 0 && (!Number.isInteger(purchaseOperatorId) || purchaseOperatorId <= 0)) {
 		throw new NodeOperationError(
 			executeFunctions.getNode(),
-			'Article IDs and quantities must contain the same number of values.',
+			'purchaseOperatorId must be a positive integer.',
 		);
 	}
 
-	const articles = articleIds.map((rawId, index) => {
+	if (!Number.isFinite(pointOfSale) || pointOfSale < 0 || !Number.isInteger(pointOfSale)) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'pointOfSale must be zero or a positive integer.',
+		);
+	}
+
+	if (!Number.isFinite(numero) || numero < 0 || !Number.isInteger(numero)) {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'documentNumber must be zero or a positive integer.',
+		);
+	}
+
+	const articleIds = parseCommaSeparatedList(articleIdsRaw, 'Article IDs', 'integer');
+	const articleQuantities = parseCommaSeparatedList(
+		articleQuantitiesRaw,
+		'Article Quantities',
+		'number',
+	);
+	const articlePrices = parseCommaSeparatedList(articlePricesRaw, 'Article Prices', 'number', {
+		required: false,
+	});
+	const articleDiscounts1 = parseCommaSeparatedList(
+		articleDiscounts1Raw,
+		'Article Discount 1',
+		'number',
+		{ required: false },
+	);
+	const articleDiscounts2 = parseCommaSeparatedList(
+		articleDiscounts2Raw,
+		'Article Discount 2',
+		'number',
+		{ required: false },
+	);
+	const articleDiscounts3 = parseCommaSeparatedList(
+		articleDiscounts3Raw,
+		'Article Discount 3',
+		'number',
+		{ required: false },
+	);
+
+	if (
+		articleIds.length !== articleQuantities.length ||
+		(articlePrices.length > 0 && articleIds.length !== articlePrices.length) ||
+		(articleDiscounts1.length > 0 && articleIds.length !== articleDiscounts1.length) ||
+		(articleDiscounts2.length > 0 && articleIds.length !== articleDiscounts2.length) ||
+		(articleDiscounts3.length > 0 && articleIds.length !== articleDiscounts3.length)
+	) {
+		const hasManualDiscounts =
+			articleDiscounts1.length > 0 || articleDiscounts2.length > 0 || articleDiscounts3.length > 0;
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			articlePrices.length > 0 || hasManualDiscounts
+				? 'Article IDs, quantities, prices, and manual discounts must contain the same number of values when provided.'
+				: 'Article IDs and quantities must contain the same number of values.',
+		);
+	}
+
+	const articles: PurchaseOrderArticleInput[] = articleIds.map((rawId, index) => {
 		const articleLabel = `Article at position ${index + 1}`;
 		const normalizedId = Number(rawId);
 		if (!Number.isInteger(normalizedId) || normalizedId <= 0) {
@@ -502,18 +590,72 @@ const createPurchaseOrder: ResourceHandler = async (context) => {
 		}
 
 		const normalizedQuantity = Number(articleQuantities[index]);
-		if (!Number.isInteger(normalizedQuantity) || normalizedQuantity <= 0) {
+		if (!Number.isFinite(normalizedQuantity) || normalizedQuantity <= 0) {
 			throw new NodeOperationError(
 				executeFunctions.getNode(),
-				`${articleLabel} must have a positive integer quantity.`,
+				`${articleLabel} must have a positive quantity.`,
+			);
+		}
+
+		const normalizedPrice =
+			articlePrices.length > 0 ? Number(articlePrices[index]) : undefined;
+		if (
+			normalizedPrice !== undefined &&
+			(!Number.isFinite(normalizedPrice) || normalizedPrice <= 0)
+		) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`${articleLabel} must have a positive price.`,
+			);
+		}
+
+		const normalizedDiscount1 =
+			articleDiscounts1.length > 0 ? Number(articleDiscounts1[index]) : undefined;
+		if (
+			normalizedDiscount1 !== undefined &&
+			(!Number.isFinite(normalizedDiscount1) || normalizedDiscount1 < 0 || normalizedDiscount1 > 100)
+		) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`${articleLabel} must have a discount 1 between 0 and 100.`,
+			);
+		}
+
+		const normalizedDiscount2 =
+			articleDiscounts2.length > 0 ? Number(articleDiscounts2[index]) : undefined;
+		if (
+			normalizedDiscount2 !== undefined &&
+			(!Number.isFinite(normalizedDiscount2) || normalizedDiscount2 < 0 || normalizedDiscount2 > 100)
+		) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`${articleLabel} must have a discount 2 between 0 and 100.`,
+			);
+		}
+
+		const normalizedDiscount3 =
+			articleDiscounts3.length > 0 ? Number(articleDiscounts3[index]) : undefined;
+		if (
+			normalizedDiscount3 !== undefined &&
+			(!Number.isFinite(normalizedDiscount3) || normalizedDiscount3 < 0 || normalizedDiscount3 > 100)
+		) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				`${articleLabel} must have a discount 3 between 0 and 100.`,
 			);
 		}
 
 		return {
 			ID: normalizedId,
 			Cantidad: normalizedQuantity,
+			Precio: normalizedPrice,
+			PorcentajeDescuento1: normalizedDiscount1,
+			PorcentajeDescuento2: normalizedDiscount2,
+			PorcentajeDescuento3: normalizedDiscount3,
 		};
 	});
+
+	const effectivePurchaseOperatorId = purchaseOperatorId > 0 ? purchaseOperatorId : 1;
 
 	const resolvedArticles = await helperFns.resolvePurchaseArticles(
 		executeFunctions,
@@ -521,15 +663,25 @@ const createPurchaseOrder: ResourceHandler = async (context) => {
 		headers,
 		itemIndex,
 		articles.map((articleInput) => articleInput.ID),
+		{ preserveDiscountPresence: true },
 	);
 
 	const purchaseOrderArticles = await Promise.all(
-		articles.map(async (articleInput) => {
+		articles.map(async (articleInput, index) => {
+			const articleLabel = `Article at position ${index + 1}`;
 			const resolvedArticle = resolvedArticles.get(articleInput.ID);
 			if (!resolvedArticle) {
 				throw new NodeOperationError(
 					executeFunctions.getNode(),
 					`Article ${articleInput.ID} was not found in Centum.`,
+				);
+			}
+
+			const finalPrice = articleInput.Precio ?? resolvedArticle.Precio;
+			if (!Number.isFinite(finalPrice) || finalPrice <= 0) {
+				throw new NodeOperationError(
+					executeFunctions.getNode(),
+					`${articleLabel} must have a positive price. Provide articlePrices or configure PrecioListaCompra in Centum.`,
 				);
 			}
 
@@ -539,11 +691,32 @@ const createPurchaseOrder: ResourceHandler = async (context) => {
 				Codigo: resolvedArticle.Codigo,
 				Nombre: resolvedArticle.Nombre,
 				CategoriaImpuestoIVA: resolvedArticle.CategoriaImpuestoIVA,
-				Precio: resolvedArticle.Precio,
-				PorcentajeDescuento1: resolvedArticle.PorcentajeDescuento1,
-				PorcentajeDescuento2: resolvedArticle.PorcentajeDescuento2,
-				PorcentajeDescuento3: resolvedArticle.PorcentajeDescuento3,
+				Precio: finalPrice,
 			};
+
+			if (resolvedArticle.DiscountPresence?.PorcentajeDescuento1) {
+				article.PorcentajeDescuento1 = resolvedArticle.PorcentajeDescuento1;
+			}
+
+			if (articleInput.PorcentajeDescuento1 !== undefined) {
+				article.PorcentajeDescuento1 = articleInput.PorcentajeDescuento1;
+			}
+
+			if (resolvedArticle.DiscountPresence?.PorcentajeDescuento2) {
+				article.PorcentajeDescuento2 = resolvedArticle.PorcentajeDescuento2;
+			}
+
+			if (articleInput.PorcentajeDescuento2 !== undefined) {
+				article.PorcentajeDescuento2 = articleInput.PorcentajeDescuento2;
+			}
+
+			if (resolvedArticle.DiscountPresence?.PorcentajeDescuento3) {
+				article.PorcentajeDescuento3 = resolvedArticle.PorcentajeDescuento3;
+			}
+
+			if (articleInput.PorcentajeDescuento3 !== undefined) {
+				article.PorcentajeDescuento3 = articleInput.PorcentajeDescuento3;
+			}
 
 			return article;
 		}),
@@ -576,30 +749,40 @@ const createPurchaseOrder: ResourceHandler = async (context) => {
 	}
 
 	// 4) Build the final request body
-	const bodyOrdenCompra = {
-		SucursalFisica: {
-			IdSucursalFisica: branchId,
-		},
-		NumeroDocumento: {
-			LetraDocumento: documentLetter,
-			PuntoVenta: pointOfSale,
-			Numero: numero,
-		},
-		TurnoEntrega: {
-			IdTurnoEntrega: deliveryTimeSlotId,
-		},
+	const bodyOrdenCompra: Record<string, unknown> = {
 		FechaDocumento: `${formattedDocumentDate}T00:00:00`,
 		FechaEntrega: `${formattedDeliveryDate}T00:00:00`,
 		Proveedor: supplierInfo,
 		OrdenCompraArticulos: purchaseOrderArticles,
 		FechaVencimiento: `${formattedDueDate}T00:00:00`,
 		OperadorCompra: {
-			IdOperadorCompra: 1,
-			Codigo: '1',
-			Nombre: 'Operador de Compras Defecto',
-			EsSupervisor: false,
+			IdOperadorCompra: effectivePurchaseOperatorId,
 		},
 	};
+
+	if (branchId.trim()) {
+		bodyOrdenCompra.SucursalFisica = {
+			IdSucursalFisica: branchId,
+		};
+	}
+
+	if (deliveryTimeSlotId.trim()) {
+		bodyOrdenCompra.TurnoEntrega = {
+			IdTurnoEntrega: deliveryTimeSlotId,
+		};
+	}
+
+	const numeroDocumento: Record<string, string | number> = {};
+	if (documentLetter.trim()) {
+		numeroDocumento.LetraDocumento = documentLetter.trim();
+	}
+	if (pointOfSale > 0) {
+		numeroDocumento.PuntoVenta = pointOfSale;
+	}
+	if (numero > 0) {
+		numeroDocumento.Numero = numero;
+		bodyOrdenCompra.NumeroDocumento = numeroDocumento;
+	}
 
 	// 5) Send the final POST request
 	try {

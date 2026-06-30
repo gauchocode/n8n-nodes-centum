@@ -61,7 +61,7 @@ const fieldDefinitions: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		placeholder: '10,2,7',
-		description: 'Comma-separated article quantities. Spaces are ignored. Only positive integers are allowed.',
+		description: 'Comma-separated article quantities. Spaces are ignored. Only positive numbers are allowed.',
 		displayOptions: {
 			show: {
 				resource: ['ordenesCompra'],
@@ -103,7 +103,52 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Comma-separated article prices. Spaces are ignored. Only positive numbers are allowed.',
 		displayOptions: {
 			show: {
-				resource: ['remitosCompra'],
+				resource: ['ordenesCompra', 'remitosCompra'],
+				operation: ['Create'],
+			},
+		},
+	},
+	{
+		displayName: 'Articulo.PorcentajeDescuento1',
+		name: 'articleDiscounts1',
+		type: 'string',
+		default: '',
+		placeholder: '10,0,5.5',
+		description:
+			'Comma-separated article discount percentages. Spaces are ignored. Values must be between 0 and 100.',
+		displayOptions: {
+			show: {
+				resource: ['ordenesCompra'],
+				operation: ['Create'],
+			},
+		},
+	},
+	{
+		displayName: 'Articulo.PorcentajeDescuento2',
+		name: 'articleDiscounts2',
+		type: 'string',
+		default: '',
+		placeholder: '0,0,2',
+		description:
+			'Comma-separated article discount percentages. Spaces are ignored. Values must be between 0 and 100.',
+		displayOptions: {
+			show: {
+				resource: ['ordenesCompra'],
+				operation: ['Create'],
+			},
+		},
+	},
+	{
+		displayName: 'Articulo.PorcentajeDescuento3',
+		name: 'articleDiscounts3',
+		type: 'string',
+		default: '',
+		placeholder: '0,0,0',
+		description:
+			'Comma-separated article discount percentages. Spaces are ignored. Values must be between 0 and 100.',
+		displayOptions: {
+			show: {
+				resource: ['ordenesCompra'],
 				operation: ['Create'],
 			},
 		},
@@ -1044,7 +1089,9 @@ const fieldDefinitions: INodeProperties[] = [
 		name: 'purchaseOperatorId',
 		type: 'number',
 		default: 0,
-		displayOptions: { show: { resource: ['proveedores', 'remitosCompra'], operation: ['Create'] } },
+		displayOptions: {
+			show: { resource: ['proveedores', 'ordenesCompra', 'remitosCompra'], operation: ['Create'] },
+		},
 	},
 	{
 		displayName: 'IdProveedor',
