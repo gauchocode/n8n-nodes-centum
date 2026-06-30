@@ -351,7 +351,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['ventas'], operation: ['Create'] } },
 	},
 	{
-		displayName: 'fechaDocumentoDesde',
+		displayName: 'FechaDocumentoDesde',
 		name: 'startDate',
 		type: 'dateTime',
 		default: '',
@@ -363,7 +363,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'fechaDocumentoDesde',
+		displayName: 'FechaDocumentoDesde',
 		name: 'startDate',
 		type: 'dateTime',
 		default: '',
@@ -375,7 +375,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'fechaDocumentoDesde',
+		displayName: 'FechaDocumentoDesde',
 		name: 'startDate',
 		type: 'dateTime',
 		default: '',
@@ -387,7 +387,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'fechaDocumentoHasta',
+		displayName: 'FechaDocumentoHasta',
 		name: 'endDate',
 		type: 'dateTime',
 		default: '',
@@ -399,7 +399,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'fechaDocumentoHasta',
+		displayName: 'FechaDocumentoHasta',
 		name: 'endDate',
 		type: 'dateTime',
 		default: '',
@@ -411,7 +411,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'fechaDocumentoHasta',
+		displayName: 'FechaDocumentoHasta',
 		name: 'endDate',
 		type: 'dateTime',
 		default: '',
@@ -565,7 +565,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'bAjustePrevioACero',
+		displayName: 'BAjustePrevioACero',
 		name: 'adjustToZeroFirst',
 		type: 'boolean',
 		default: false,
@@ -644,7 +644,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'ordenEstadisticaVentaRankingAscendente',
+		displayName: 'OrdenEstadisticaVentaRankingAscendente',
 		name: 'orderAsc',
 		type: 'boolean',
 		default: false,
@@ -670,7 +670,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'tipoOrdenEstadisticaVentaRanking',
+		displayName: 'TipoOrdenEstadisticaVentaRanking',
 		name: 'salesRankingOrderBy',
 		type: 'options',
 		default: 'quantityUnitLevel0',
@@ -727,14 +727,14 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'fechaModificacionDesde',
+		displayName: 'FechaModificacionDesde',
 		name: 'dateModified',
 		type: 'dateTime',
 		default: '',
 		displayOptions: { show: { resource: ['articulos'], operation: ['GetVenta'] } },
 	},
 	{
-		displayName: 'fechaModificacionImagenesDesde',
+		displayName: 'FechaModificacionImagenesDesde',
 		name: 'dateModifiedImage',
 		type: 'dateTime',
 		default: '',
@@ -742,7 +742,7 @@ const fieldDefinitions: INodeProperties[] = [
 		description: 'Filter articles whose images were modified from this date',
 	},
 	{
-		displayName: 'fechaVencimientoHasta',
+		displayName: 'FechaVencimientoHasta',
 		name: 'priceDateModifiedTo',
 		type: 'dateTime',
 		default: '',
@@ -755,7 +755,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'composicionReal',
+		displayName: 'ComposicionReal',
 		name: 'realComposition',
 		type: 'boolean',
 		default: false,
@@ -780,7 +780,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'idsDivisionesEmpresasGrupoEconomico',
+		displayName: 'IdsDivisionesEmpresasGrupoEconomico',
 		name: 'idsDivisionesEmpresasGrupoEconomico',
 		type: 'string',
 		default: '',
@@ -967,7 +967,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'idCobro',
+		displayName: 'IdCobro',
 		name: 'paymentId',
 		type: 'number',
 		default: 0,
@@ -984,7 +984,7 @@ const fieldDefinitions: INodeProperties[] = [
 	},
 
 	{
-		displayName: 'idsEstado',
+		displayName: 'IdsEstado',
 		name: 'statusId',
 		type: 'string',
 		default: '',
@@ -998,7 +998,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'idEstadoOrdenTraspado',
+		displayName: 'IdEstadoOrdenTraspado',
 		name: 'transferStatusId',
 		type: 'number',
 		default: 0,
@@ -1067,7 +1067,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'idClienteCuentaCorriente',
+		displayName: 'IdClienteCuentaCorriente',
 		name: 'currentAccountId',
 		type: 'number',
 		default: 0,
@@ -1098,7 +1098,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'idDivisionEmpresaGrupoEconomico',
+		displayName: 'IdDivisionEmpresaGrupoEconomico',
 		name: 'divisionEmpresaGrupoEconomicoId',
 		type: 'number',
 		default: 0,
@@ -1124,7 +1124,7 @@ const fieldDefinitions: INodeProperties[] = [
 	},
 
 	{
-		displayName: 'incluirAnulados',
+		displayName: 'IncluirAnulados',
 		name: 'includeCanceled',
 		type: 'boolean',
 		default: false,
@@ -1132,7 +1132,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta', 'GetOne'] } },
 	},
 	{
-		displayName: 'incluirAnulados',
+		displayName: 'IncluirAnulados',
 		name: 'includeCanceled',
 		type: 'boolean',
 		default: false,
@@ -1141,7 +1141,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'idCanalVenta',
+		displayName: 'IdCanalVenta',
 		name: 'salesChannelId',
 		type: 'number',
 		default: 0,
@@ -1149,7 +1149,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta'] } },
 	},
 	{
-		displayName: 'idDivisionEmpresa',
+		displayName: 'IdDivisionEmpresa',
 		name: 'businessDivisionId',
 		type: 'number',
 		default: 0,
@@ -1157,7 +1157,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['ventas'], operation: ['GetConsulta'] } },
 	},
 	{
-		displayName: 'idUsuarioCreador',
+		displayName: 'IdUsuarioCreador',
 		name: 'createdByUserId',
 		type: 'number',
 		description: 'User ID that created the sales voucher',
@@ -1843,7 +1843,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'idsSucursalesFisicas',
+		displayName: 'IdsSucursalesFisicas',
 		name: 'branchOfficeIds',
 		type: 'string',
 		required: true,
@@ -1886,7 +1886,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'idMarcaArticulo',
+		displayName: 'IdMarcaArticulo',
 		name: 'articleBrandId',
 		type: 'string',
 		placeholder: '3',
@@ -1899,7 +1899,7 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'idCategoriaArticulo',
+		displayName: 'IdCategoriaArticulo',
 		name: 'articleCategoryId',
 		type: 'string',
 		placeholder: '3',
