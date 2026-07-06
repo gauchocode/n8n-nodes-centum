@@ -750,11 +750,11 @@ const fieldDefinitions: INodeProperties[] = [
 		displayName: 'Bonificacion.IdBonificacion',
 		name: 'discountId',
 		type: 'string',
-		required: true,
 		default: '',
 		placeholder: 'Enter discount ID',
+		description: 'Optional discount ID applied to the created record',
 		displayOptions: {
-			show: { resource: ['pedidosVenta', 'clientes'], operation: ['Create'] },
+			show: { resource: ['pedidosVenta', 'clientes', 'ventas'], operation: ['Create'] },
 		},
 	},
 	{

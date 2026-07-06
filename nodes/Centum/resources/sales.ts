@@ -63,6 +63,16 @@ const extractCalculatedSaleTotal = (sale: any): number | null => {
 	return null;
 };
 
+const normalizeDiscountPercentage = (value: unknown): number => {
+	const numericValue = Number(value);
+
+	if (!Number.isFinite(numericValue) || numericValue < 0) {
+		return 0;
+	}
+
+	return numericValue > 0 && numericValue < 1 ? numericValue * 100 : numericValue;
+};
+
 const resolveDiscountPercentage = async (
 	executeFunctions: any,
 	centumUrl: string,
@@ -94,8 +104,63 @@ const resolveDiscountPercentage = async (
 		return String(currentId) === String(discountId);
 	});
 
-	const calculatedValue = Number(matchingDiscount?.Calculada);
-	return Number.isFinite(calculatedValue) ? calculatedValue : 0;
+	return normalizeDiscountPercentage(matchingDiscount?.Calculada);
+};
+
+const resolveRequiredDiscount = async (
+	executeFunctions: any,
+	centumUrl: string,
+	headers: CentumHeaders,
+	itemIndex: number,
+	customerId: string | number,
+	discountId: string | number | null | undefined,
+): Promise<{ discountId: string; percentage: number }> => {
+	if (discountId) {
+		return {
+			discountId: String(discountId),
+			percentage: await resolveDiscountPercentage(
+				executeFunctions,
+				centumUrl,
+				headers,
+				itemIndex,
+				discountId,
+			),
+		};
+	}
+
+	const customer = await helperFns.apiRequest<any>(`${centumUrl}/Clientes/${customerId}`, {
+		context: executeFunctions,
+		debugItemIndex: itemIndex,
+		method: 'GET',
+		headers,
+	});
+	const customerDiscount = customer?.Bonificacion ?? customer?.Cliente?.Bonificacion;
+	const customerDiscountId =
+		customerDiscount?.IdBonificacion ?? customerDiscount?.ID ?? customerDiscount?.Id;
+
+	if (customerDiscountId === undefined || customerDiscountId === null || customerDiscountId === '') {
+		throw new NodeOperationError(
+			executeFunctions.getNode(),
+			'Customer does not include a Bonificacion required by Centum.',
+			{ itemIndex },
+		);
+	}
+
+	const calculatedValue = Number(customerDiscount?.Calculada);
+	const percentage = Number.isFinite(calculatedValue)
+		? normalizeDiscountPercentage(calculatedValue)
+		: await resolveDiscountPercentage(
+				executeFunctions,
+				centumUrl,
+				headers,
+				itemIndex,
+				customerDiscountId,
+			);
+
+	return {
+		discountId: String(customerDiscountId),
+		percentage,
+	};
 };
 
 const createSalesOrder: ResourceHandler = async (context) => {
@@ -148,7 +213,7 @@ const createSalesOrder: ResourceHandler = async (context) => {
 	) as string;
 	const formattedDocumentDate = String(documentDate).split('T')[0];
 	const discountId = helperFns.getResourceLocatorValue(
-		helperFns.getNodeParameterOrThrow(executeFunctions, 'discountId', itemIndex),
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'discountId', itemIndex, ''),
 	);
 	const deliveryTimeSlotId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'deliveryTimeSlotId', itemIndex),
@@ -164,13 +229,6 @@ const createSalesOrder: ResourceHandler = async (context) => {
 		itemIndex,
 	);
 	const sellerIdValue = helperFns.getResourceLocatorValue(sellerId);
-	const discountPercentage = await resolveDiscountPercentage(
-		executeFunctions,
-		centumUrl,
-		headers,
-		itemIndex,
-		discountId,
-	);
 
 	const articleIds = parseCommaSeparatedList(articleIdsRaw, 'Article IDs');
 	const articleQuantities = parseCommaSeparatedList(articleQuantitiesRaw, 'Article Quantities');
@@ -224,6 +282,15 @@ const createSalesOrder: ResourceHandler = async (context) => {
 		throw new NodeOperationError(executeFunctions.getNode(), 'Seller is required.');
 	}
 
+	const resolvedDiscount = await resolveRequiredDiscount(
+		executeFunctions,
+		centumUrl,
+		headers,
+		itemIndex,
+		customerId,
+		discountId,
+	);
+
 	/* Get article data using the provided customer ID */
 	const results: any[] = [];
 
@@ -263,11 +330,11 @@ const createSalesOrder: ResourceHandler = async (context) => {
 		}
 	}
 
-	const bodyPedidoVenta = {
+	const bodyPedidoVenta: Record<string, any> = {
 		Bonificacion: {
-			IdBonificacion: discountId,
+			IdBonificacion: resolvedDiscount.discountId,
 		},
-		PorcentajeDescuento: discountPercentage,
+		PorcentajeDescuento: resolvedDiscount.percentage,
 		PedidoVentaArticulos: results,
 		Cliente: {
 			IdCliente: Number(customerId),
@@ -520,6 +587,9 @@ const createSale: ResourceHandler = async (context) => {
 	const priceListId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'priceListId', itemIndex),
 	);
+	const discountId = helperFns.getResourceLocatorValue(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'discountId', itemIndex, ''),
+	);
 
 	type SaleArticleInput = {
 		ID: number;
@@ -628,6 +698,15 @@ const createSale: ResourceHandler = async (context) => {
 	if (!articlesArray?.length)
 		throw new NodeOperationError(executeFunctions.getNode(), 'Article IDs is required.');
 
+	const resolvedDiscount = await resolveRequiredDiscount(
+		executeFunctions,
+		centumUrl,
+		headers,
+		itemIndex,
+		customerId,
+		discountId,
+	);
+
 	// When the sale is cash-based, validate the required fields
 	if (isCashSale === true) {
 		if (cashValueId == null)
@@ -682,6 +761,7 @@ const createSale: ResourceHandler = async (context) => {
 	// 2) Build the sale request body
 	const bodyVenta: any = {
 		NumeroDocumento: { PuntoVenta: Number(pointOfSaleNumber) },
+		Bonificacion: { IdBonificacion: resolvedDiscount.discountId },
 		EsContado: Boolean(isCashSale),
 		Cliente: { IdCliente: Number(customerId) },
 		CondicionVenta: { IdCondicionVenta: Number(salesConditionId) },
@@ -690,6 +770,7 @@ const createSale: ResourceHandler = async (context) => {
 		Vendedor: { IdVendedor: Number(sellerId) },
 		ListaPrecio: { IdListaPrecio: Number(priceListId) },
 		VentaArticulos: saleItemsWithQuantity,
+		PorcentajeDescuento: resolvedDiscount.percentage,
 	};
 
 	// 3) Calculate the sale total in CENTUM before assigning cash values
