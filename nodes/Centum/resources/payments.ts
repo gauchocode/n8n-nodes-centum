@@ -359,14 +359,56 @@ const listPayments: ResourceHandler = async (context) => {
 			return [executeFunctions.helpers.returnJsonArray(payment)];
 		}
 
-		const response = await helperFns.apiRequest<any>(`${centumUrl}/Cobros/FiltrosCobro`, {
-			context: executeFunctions,
-			debugItemIndex: itemIndex,
-			method: 'POST',
-			headers,
-			body,
-		});
-		return [executeFunctions.helpers.returnJsonArray(response)];
+		const httpSettings = helperFns.getHttpSettings.call(executeFunctions, itemIndex);
+		const itemsPerPage = Math.max(1, Number(httpSettings.itemsPerPage ?? 100));
+		const pageInterval = Math.max(0, Number(httpSettings.pageInterval ?? 1000));
+		const payments: any[] = [];
+		let currentPage = Math.max(1, Number(httpSettings.pageNumber ?? 1));
+		let response: any;
+		let totalItems = 0;
+
+		while (true) {
+			response = await helperFns.apiRequest<any>(`${centumUrl}/Cobros/FiltrosCobro`, {
+				context: executeFunctions,
+				debugItemIndex: itemIndex,
+				method: 'POST',
+				headers,
+				body,
+				queryParams: {
+					numeroPagina: currentPage,
+					cantidadItemsPorPagina: itemsPerPage,
+				},
+			});
+
+			const cobros = response?.Cobros ?? {};
+			const pageItems = Array.isArray(cobros.Items) ? cobros.Items : [];
+			payments.push(...pageItems);
+			totalItems = Number(cobros.CantidadTotalItems ?? totalItems);
+
+			const reachedEnd =
+				pageItems.length === 0 ||
+				pageItems.length < itemsPerPage ||
+				(totalItems > 0 && payments.length >= totalItems);
+
+			if (reachedEnd) {
+				break;
+			}
+
+			await new Promise((resolve) => setTimeout(resolve, pageInterval));
+			currentPage += 1;
+		}
+
+		return [
+			executeFunctions.helpers.returnJsonArray({
+				...(response ?? {}),
+				Cobros: {
+					...(response?.Cobros ?? {}),
+					Items: payments,
+					CantidadTotalItems: totalItems || payments.length,
+					Pagina: null,
+				},
+			}),
+		];
 	} catch (error) {
 		if (error instanceof NodeApiError) {
 			throw error;

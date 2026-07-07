@@ -2082,7 +2082,7 @@ export const HttpOptions: INodeProperties[] = [
 		],
 		displayOptions: {
 			show: {
-				resource: ['clientes', 'articulos'],
+				resource: ['clientes', 'articulos', 'cobros'],
 				operation: ['Get', 'GetDatosGenerales', 'GetVenta'],
 			},
 		},
