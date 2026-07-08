@@ -417,13 +417,10 @@ const listPayments: ResourceHandler = async (context) => {
 
 		return [
 			executeFunctions.helpers.returnJsonArray({
-				...(response ?? {}),
-				Cobros: {
-					...(response?.Cobros ?? {}),
-					Items: outputItems,
-					CantidadTotalItems: totalItems || outputItems.length,
-					Pagina: pagination === 'all' ? null : (response?.Cobros?.Pagina ?? startingPage),
-				},
+				...(response?.Cobros ?? {}),
+				Items: outputItems,
+				CantidadTotalItems: totalItems || outputItems.length,
+				Pagina: pagination === 'all' ? null : (response?.Cobros?.Pagina ?? startingPage),
 			}),
 		];
 	} catch (error) {

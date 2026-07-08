@@ -1026,14 +1026,14 @@ const fieldDefinitions: INodeProperties[] = [
 		noDataExpression: true,
 		options: [
 			{
-				name: 'Full Response (Legacy)',
+				name: 'Items Wrapper',
 				value: 'fullResponse',
-				description: 'Return one item with Cobros.Items, preserving existing workflows',
+				description: 'Return one item with Items, CantidadTotalItems, and Pagina at the root',
 			},
 			{
-				name: 'Cobros As N8n Items',
+				name: 'Cobros As Items',
 				value: 'items',
-				description: 'Return each cobro as a separate n8n item',
+				description: 'Return each cobro as a separate item',
 			},
 		],
 		description: 'How to return payments in the n8n output',
