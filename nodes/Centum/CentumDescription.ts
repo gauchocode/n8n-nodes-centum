@@ -1019,6 +1019,27 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['cobros'], operation: ['Get'] } },
 	},
 	{
+		displayName: 'Output Format',
+		name: 'paymentsOutputFormat',
+		type: 'options',
+		default: 'fullResponse',
+		noDataExpression: true,
+		options: [
+			{
+				name: 'Full Response (Legacy)',
+				value: 'fullResponse',
+				description: 'Return one item with Cobros.Items, preserving existing workflows',
+			},
+			{
+				name: 'Cobros as n8n Items',
+				value: 'items',
+				description: 'Return each cobro as a separate n8n item',
+			},
+		],
+		description: 'How to return payments in the n8n output',
+		displayOptions: { show: { resource: ['cobros'], operation: ['Get'] } },
+	},
+	{
 		displayName: 'Compra.IdCompra',
 		name: 'purchaseId',
 		type: 'number',

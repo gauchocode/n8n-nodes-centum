@@ -311,6 +311,12 @@ const listPayments: ResourceHandler = async (context) => {
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'customerId', itemIndex),
 	);
 	const paymentId = helperFns.getNodeParameterOrThrow(executeFunctions, 'paymentId', itemIndex);
+	const outputFormat = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'paymentsOutputFormat',
+		itemIndex,
+		'fullResponse',
+	) as string;
 	const fromDate = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'startDate',
@@ -360,12 +366,15 @@ const listPayments: ResourceHandler = async (context) => {
 		}
 
 		const httpSettings = helperFns.getHttpSettings.call(executeFunctions, itemIndex);
+		const pagination = httpSettings.pagination ?? 'custom';
 		const itemsPerPage = Math.max(1, Number(httpSettings.itemsPerPage ?? 100));
 		const pageInterval = Math.max(0, Number(httpSettings.pageInterval ?? 1000));
 		const payments: any[] = [];
-		let currentPage = Math.max(1, Number(httpSettings.pageNumber ?? 1));
+		const startingPage = Math.max(1, Number(httpSettings.pageNumber ?? 1));
+		let currentPage = startingPage;
 		let response: any;
 		let totalItems = 0;
+		let currentPageItems: any[] = [];
 
 		while (true) {
 			response = await helperFns.apiRequest<any>(`${centumUrl}/Cobros/FiltrosCobro`, {
@@ -382,10 +391,12 @@ const listPayments: ResourceHandler = async (context) => {
 
 			const cobros = response?.Cobros ?? {};
 			const pageItems = Array.isArray(cobros.Items) ? cobros.Items : [];
+			currentPageItems = pageItems;
 			payments.push(...pageItems);
 			totalItems = Number(cobros.CantidadTotalItems ?? totalItems);
 
 			const reachedEnd =
+				pagination !== 'all' ||
 				pageItems.length === 0 ||
 				pageItems.length < itemsPerPage ||
 				(totalItems > 0 && payments.length >= totalItems);
@@ -398,14 +409,20 @@ const listPayments: ResourceHandler = async (context) => {
 			currentPage += 1;
 		}
 
+		const outputItems = pagination === 'all' ? payments : currentPageItems;
+
+		if (outputFormat === 'items') {
+			return [executeFunctions.helpers.returnJsonArray(outputItems)];
+		}
+
 		return [
 			executeFunctions.helpers.returnJsonArray({
 				...(response ?? {}),
 				Cobros: {
 					...(response?.Cobros ?? {}),
-					Items: payments,
-					CantidadTotalItems: totalItems || payments.length,
-					Pagina: null,
+					Items: outputItems,
+					CantidadTotalItems: totalItems || outputItems.length,
+					Pagina: pagination === 'all' ? null : (response?.Cobros?.Pagina ?? startingPage),
 				},
 			}),
 		];
