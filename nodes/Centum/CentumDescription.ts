@@ -1031,7 +1031,7 @@ const fieldDefinitions: INodeProperties[] = [
 				description: 'Return one item with Cobros.Items, preserving existing workflows',
 			},
 			{
-				name: 'Cobros as n8n Items',
+				name: 'Cobros As N8n Items',
 				value: 'items',
 				description: 'Return each cobro as a separate n8n item',
 			},
