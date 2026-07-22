@@ -203,7 +203,7 @@ const listSuppliers: ResourceHandler = async (context) => {
 		Object.entries({
 			codigo: code,
 			razonSocial: businessName,
-			Cuit: cuit,
+			cuit,
 			activo,
 		}).filter(([, value]) => {
 			// Debug: log each parameter
