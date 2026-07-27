@@ -1124,6 +1124,16 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: { show: { resource: ['compras'], operation: ['Create'] } },
 	},
 	{
+		displayName: 'Referencia',
+		name: 'reference',
+		type: 'string',
+		default: '',
+		placeholder: '157',
+		description:
+			'Optional referenced document number. Required by CENTUM for Nota de Crédito Electrónica MiPyMEs.',
+		displayOptions: { show: { resource: ['ventas'], operation: ['Create'] } },
+	},
+	{
 		displayName: 'TipoComprobante.IdTipoComprobante',
 		name: 'voucherTypeId',
 		type: 'string',

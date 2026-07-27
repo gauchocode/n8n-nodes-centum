@@ -590,6 +590,12 @@ const createSale: ResourceHandler = async (context) => {
 	const discountId = helperFns.getResourceLocatorValue(
 		helperFns.getNodeParameterOrThrow(executeFunctions, 'discountId', itemIndex, ''),
 	);
+	const referenceRaw = String(
+		helperFns.getNodeParameterOrThrow(executeFunctions, 'reference', itemIndex, ''),
+	).trim();
+	const normalizedReference = referenceRaw.includes('-')
+		? (referenceRaw.split('-').pop() ?? '').trim()
+		: referenceRaw;
 
 	type SaleArticleInput = {
 		ID: number;
@@ -697,6 +703,21 @@ const createSale: ResourceHandler = async (context) => {
 		throw new NodeOperationError(executeFunctions.getNode(), 'Price list ID is required.');
 	if (!articlesArray?.length)
 		throw new NodeOperationError(executeFunctions.getNode(), 'Article IDs is required.');
+	if (tipoComprobanteVenta === 41) {
+		if (!normalizedReference) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				'Referencia is required for Nota de Crédito Electrónica MiPyMEs.',
+			);
+		}
+
+		if (!/^\d{1,8}$/.test(normalizedReference)) {
+			throw new NodeOperationError(
+				executeFunctions.getNode(),
+				'Referencia must be a numeric document number with up to 8 digits.',
+			);
+		}
+	}
 
 	const resolvedDiscount = await resolveRequiredDiscount(
 		executeFunctions,
@@ -772,6 +793,10 @@ const createSale: ResourceHandler = async (context) => {
 		VentaArticulos: saleItemsWithQuantity,
 		PorcentajeDescuento: resolvedDiscount.percentage,
 	};
+
+	if (normalizedReference) {
+		bodyVenta.Referencia = normalizedReference;
+	}
 
 	// 3) Calculate the sale total in CENTUM before assigning cash values
 	if (isCashSale === true) {
