@@ -658,13 +658,27 @@ const createSale: ResourceHandler = async (context) => {
 		};
 	});
 
-	const fromDate = helperFns.getNodeParameterOrThrow(
+	const documentDate = helperFns.getNodeParameterOrThrow(
 		executeFunctions,
 		'startDate',
 		itemIndex,
 		'',
 	) as string;
-	const formattedFromDate = String(fromDate).split('T')[0];
+	const formattedDocumentDate = String(documentDate).split('T')[0];
+	const postingDate = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'postingDate',
+		itemIndex,
+		'',
+	) as string;
+	const formattedPostingDate = String(postingDate).split('T')[0];
+	const dueDate = helperFns.getNodeParameterOrThrow(
+		executeFunctions,
+		'dueDate',
+		itemIndex,
+		'',
+	) as string;
+	const formattedDueDate = String(dueDate).split('T')[0];
 
 	// Conditional fields may not exist when isCashSale is false
 	const cashValueId = helperFns.getNodeParameterOrThrow(
@@ -701,6 +715,8 @@ const createSale: ResourceHandler = async (context) => {
 		throw new NodeOperationError(executeFunctions.getNode(), 'Customer ID is required.');
 	if (!priceListId)
 		throw new NodeOperationError(executeFunctions.getNode(), 'Price list ID is required.');
+	if (!formattedDocumentDate)
+		throw new NodeOperationError(executeFunctions.getNode(), 'Document date is required.');
 	if (!articlesArray?.length)
 		throw new NodeOperationError(executeFunctions.getNode(), 'Article IDs is required.');
 	if (tipoComprobanteVenta === 41) {
@@ -743,7 +759,7 @@ const createSale: ResourceHandler = async (context) => {
 		try {
 			const articleBody: any = {
 				IdCliente: customerId,
-				FechaDocumento: formattedFromDate,
+				FechaDocumento: formattedDocumentDate,
 			};
 
 			articleBody.Ids = [articleInput.ID];
@@ -782,6 +798,7 @@ const createSale: ResourceHandler = async (context) => {
 	// 2) Build the sale request body
 	const bodyVenta: any = {
 		NumeroDocumento: { PuntoVenta: Number(pointOfSaleNumber) },
+		FechaDocumento: `${formattedDocumentDate}T00:00:00`,
 		Bonificacion: { IdBonificacion: resolvedDiscount.discountId },
 		EsContado: Boolean(isCashSale),
 		Cliente: { IdCliente: Number(customerId) },
@@ -793,6 +810,14 @@ const createSale: ResourceHandler = async (context) => {
 		VentaArticulos: saleItemsWithQuantity,
 		PorcentajeDescuento: resolvedDiscount.percentage,
 	};
+
+	if (formattedPostingDate) {
+		bodyVenta.FechaImputacion = `${formattedPostingDate}T00:00:00`;
+	}
+
+	if (formattedDueDate) {
+		bodyVenta.FechaVencimiento = `${formattedDueDate}T00:00:00`;
+	}
 
 	if (normalizedReference) {
 		bodyVenta.Referencia = normalizedReference;

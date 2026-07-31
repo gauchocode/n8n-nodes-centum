@@ -420,6 +420,20 @@ const fieldDefinitions: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'FechaDocumento',
+		name: 'startDate',
+		type: 'dateTime',
+		required: true,
+		default: '',
+		description: 'Document date used to create the sales voucher',
+		displayOptions: {
+			show: {
+				resource: ['ventas'],
+				operation: ['Create'],
+			},
+		},
+	},
+	{
 		displayName: 'FechaDocumentoDesde',
 		name: 'startDate',
 		type: 'dateTime',
@@ -427,7 +441,7 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['ventas'],
-				operation: ['Create', 'GetConsulta', 'GetEstadisticas'],
+				operation: ['GetConsulta', 'GetEstadisticas'],
 			},
 		},
 	},
@@ -512,6 +526,19 @@ const fieldDefinitions: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['cobros'],
+				operation: ['Create'],
+			},
+		},
+	},
+	{
+		displayName: 'FechaImputacion',
+		name: 'postingDate',
+		type: 'dateTime',
+		default: '',
+		description: 'Optional posting date for the sales voucher',
+		displayOptions: {
+			show: {
+				resource: ['ventas'],
 				operation: ['Create'],
 			},
 		},
@@ -657,7 +684,7 @@ const fieldDefinitions: INodeProperties[] = [
 		default: '',
 		description: 'Document due date',
 		displayOptions: {
-			show: { resource: ['remitosCompra'], operation: ['Create'] },
+			show: { resource: ['remitosCompra', 'ventas'], operation: ['Create'] },
 		},
 	},
 	{
