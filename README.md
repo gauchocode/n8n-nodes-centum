@@ -16,6 +16,8 @@ The node is built to be extensible, making it easy to add new operations for spe
 | Centum URL                          | Text (URL)   | https://plataformaX.centum.com.ar:23990/BLX                   | Yes        |
 | ----------------------------------- | ------------ | ------------------------------------------------------------- | ---------- |
 
+The credential test generates a short-lived Centum access token and performs an authenticated `GET /Paises` request. A successful response confirms the URL, consumer ID, and public access key.
+
 ## Available Operations
 
 **69 operations organized into 32 resources:**

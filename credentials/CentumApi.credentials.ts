@@ -1,4 +1,11 @@
-import type { ICredentialTestRequest, ICredentialType, INodeProperties } from 'n8n-workflow';
+import type {
+	IAuthenticate,
+	ICredentialTestRequest,
+	ICredentialType,
+	INodeProperties,
+} from 'n8n-workflow';
+
+import { buildCentumHeaders } from '../nodes/Centum/helpers/functions';
 
 export class CentumApi implements ICredentialType {
 	name = 'centumApi';
@@ -33,14 +40,45 @@ export class CentumApi implements ICredentialType {
 		},
 	];
 
-	// Centum authentication requires a short-lived SHA1 token generated from the
-	// current timestamp and a random nonce, so the standard credential test can only
-	// validate endpoint reachability rather than full credential correctness.
+	authenticate: IAuthenticate = async (credentials, requestOptions) => ({
+		...requestOptions,
+		headers: {
+			...requestOptions.headers,
+			...buildCentumHeaders(
+				credentials.consumerApiPublicId as string | number,
+				String(credentials.publicAccessKey),
+			),
+		},
+	});
+
 	test: ICredentialTestRequest = {
 		request: {
 			baseURL: '={{$credentials.centumUrl}}',
-			url: '/',
+			url: '/Paises',
 			method: 'GET',
 		},
+		rules: [
+			{
+				type: 'responseCode',
+				properties: {
+					value: 401,
+					message: 'Invalid Public Access Key or Consumer API Public ID.',
+				},
+			},
+			{
+				type: 'responseCode',
+				properties: {
+					value: 403,
+					message: 'The configured Centum API consumer is not authorized.',
+				},
+			},
+			{
+				type: 'responseCode',
+				properties: {
+					value: 404,
+					message: 'The Base URL does not point to a valid Centum API tenant.',
+				},
+			},
+		],
 	};
 }
