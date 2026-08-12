@@ -36,7 +36,8 @@ export class CentumApi implements ICredentialType {
 			type: 'string',
 			default: 'https://plataforma1.centum.com.ar:23990/BL2',
 			required: true,
-			description: 'Base URL for the Centum API tenant.',
+			description:
+				'Base URL for the Centum API tenant. Trailing slashes are removed automatically.',
 		},
 	];
 

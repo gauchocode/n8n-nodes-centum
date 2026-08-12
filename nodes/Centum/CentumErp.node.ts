@@ -20,6 +20,7 @@ import {
 	buildCentumHeaders,
 	getErrorDescription,
 	getResourceLocatorValue,
+	normalizeCentumBaseUrl,
 } from './helpers/functions';
 import { resourceHandlerGroups } from './resources';
 import type { CentumApiCredentials, CentumHeaders } from './resources/types';
@@ -545,7 +546,7 @@ async function fetchLoadOptionData(
 	const credentials = (await context.getCredentials(
 		'centumApi',
 	)) as unknown as CentumApiCredentials;
-	const centumUrl = String(credentials.centumUrl);
+	const centumUrl = normalizeCentumBaseUrl(credentials.centumUrl);
 	const headers = buildCentumHeaders(
 		credentials.consumerApiPublicId as string | number,
 		String(credentials.publicAccessKey),
@@ -729,7 +730,7 @@ export class CentumErp implements INodeType {
 		const centumApiCredentials = (await this.getCredentials(
 			'centumApi',
 		)) as unknown as CentumApiCredentials;
-		const centumUrl = String(centumApiCredentials.centumUrl);
+		const centumUrl = normalizeCentumBaseUrl(centumApiCredentials.centumUrl);
 		const consumerApiPublicId = centumApiCredentials.consumerApiPublicId as string | number;
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];

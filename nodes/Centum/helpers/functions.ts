@@ -770,6 +770,31 @@ export function buildCentumHeaders(
 	};
 }
 
+export function normalizeCentumBaseUrl(value: unknown): string {
+	const baseUrl = String(value ?? '').trim().replace(/\/+$/, '');
+
+	if (!baseUrl) {
+		throw new Error('Centum Base URL is required.');
+	}
+
+	let parsedUrl: URL;
+	try {
+		parsedUrl = new URL(baseUrl);
+	} catch {
+		throw new Error('Centum Base URL must be a valid URL.');
+	}
+
+	if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+		throw new Error('Centum Base URL must use HTTP or HTTPS.');
+	}
+
+	if (parsedUrl.search || parsedUrl.hash) {
+		throw new Error('Centum Base URL must not include query parameters or fragments.');
+	}
+
+	return baseUrl;
+}
+
 export function getResourceLocatorValue(value: unknown): string {
 	if (value === undefined || value === null) {
 		return '';
