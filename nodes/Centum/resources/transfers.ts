@@ -14,7 +14,7 @@ function normalizeTransferArticles(
 	executeFunctions: Parameters<ResourceHandler>[0]['executeFunctions'],
 	itemIndex: number,
 	rawArticles: unknown,
-): Array<{ IdArticulo: number; Cantidad: number }> {
+): Array<{ Articulo: { IdArticulo: number }; Cantidad: number }> {
 	const parsedArticles =
 		typeof rawArticles === 'string'
 			? (JSON.parse(rawArticles) as TransferArticleInput[])
@@ -49,7 +49,9 @@ function normalizeTransferArticles(
 		}
 
 		return {
-			IdArticulo: articleId,
+			Articulo: {
+				IdArticulo: articleId,
+			},
 			Cantidad: quantity,
 		};
 	});
