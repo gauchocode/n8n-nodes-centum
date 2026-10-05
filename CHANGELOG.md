@@ -1,8 +1,12 @@
 ## [Unreleased]
 
+- No unreleased changes yet.
+
+## [1.0.24] - 2026-10-05
+
 ### Fixed
 
-- fix(transfers): send transfer order articles as nested `Articulo` objects (`OrdenTraspasoItems[].Articulo.IdArticulo`) instead of a flat `IdArticulo`, matching the CENTUM API item contract and the pattern already used by stock adjustments. The flat shape failed with `OrdenTraspasoItemNoValidoException` ("Debe haber al menos un artículo asignado").
+- fix(transfers): reference the article in transfer order items via `IdItem`, per the API's `OrdenTraspasoItem_Models` schema (`idItem` + `cantidad`). Both the original flat `IdArticulo` and the nested `Articulo.IdArticulo` shape (1.0.23) were silently discarded by the binder and failed with `OrdenTraspasoItemNoValidoException` ("Debe haber al menos un artículo asignado").
 
 ## [1.0.22] - 2026-08-12
 
