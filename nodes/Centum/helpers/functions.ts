@@ -28,6 +28,7 @@ import {
 	NodeParameterValueType,
 } from 'n8n-workflow';
 import type { CentumHeaders } from '../resources/types';
+import { withHttpDiagnostics } from './httpDiagnostics';
 
 type PurchaseArticleLookup = {
 	IdArticulo?: number;
@@ -1106,48 +1107,55 @@ export async function apiGetRequest<T = any>(
 		});
 	}
 
-	const response = await fetch(finalUrl, {
-		method,
-		headers: { ...requestHeaders },
-	});
+	return withHttpDiagnostics(
+		finalUrl,
+		{
+			method,
+			headers: { ...requestHeaders },
+		},
+		{ context, debug: shouldDebug, itemIndex: debugItemIndex, privateKey: headers.publicAccessKey },
+		async (response, setPhase) => {
+			const responseText = await response.text();
 
-	const responseText = await response.text();
+			if (shouldDebug) {
+				logDebugMessage(context, '[Centum debug] Response', {
+					url: finalUrl,
+					status: response.status,
+					statusText: response.statusText,
+					contentType: response.headers.get('content-type') || '',
+					bodyLength: responseText.length,
+					body: responseText,
+				});
+			}
 
-	if (shouldDebug) {
-		logDebugMessage(context, '[Centum debug] Response', {
-			url: finalUrl,
-			status: response.status,
-			statusText: response.statusText,
-			contentType: response.headers.get('content-type') || '',
-			bodyLength: responseText.length,
-			body: responseText,
-		});
-	}
+			if (!response.ok) {
+				setPhase('http');
+				safeThrowApi(
+					context,
+					`GET request failed with status ${response.status}`,
+					responseText || response.statusText,
+					response.status,
+					debugItemIndex,
+				);
+			}
 
-	if (!response.ok) {
-		safeThrowApi(
-			context,
-			`GET request failed with status ${response.status}`,
-			responseText || response.statusText,
-			response.status,
-			debugItemIndex,
-		);
-	}
+			setPhase('parse');
+			const data = responseText.trim() ? JSON.parse(responseText) : {};
+			const allItems = extractItems<T>(data, itemsField);
 
-	const data = responseText.trim() ? JSON.parse(responseText) : {};
-	const allItems = extractItems<T>(data, itemsField);
+			// Return all items when pagination is disabled or set to 'all'
+			if (pagination === 'all' || !itemsPerPage) {
+				return allItems;
+			}
 
-	// Return all items when pagination is disabled or set to 'all'
-	if (pagination === 'all' || !itemsPerPage) {
-		return allItems;
-	}
+			// Internal pagination: split the array into chunks
+			const requestedItemsPerPage = itemsPerPage;
+			const startIndex = ((pageNumber || 1) - 1) * requestedItemsPerPage;
+			const endIndex = startIndex + requestedItemsPerPage;
 
-	// Internal pagination: split the array into chunks
-	const requestedItemsPerPage = itemsPerPage;
-	const startIndex = ((pageNumber || 1) - 1) * requestedItemsPerPage;
-	const endIndex = startIndex + requestedItemsPerPage;
-
-	return allItems.slice(startIndex, endIndex);
+			return allItems.slice(startIndex, endIndex);
+		},
+	);
 }
 
 // POST without pagination, with explicit validation
@@ -1193,7 +1201,9 @@ export async function apiPostRequest<T = any>(
 	};
 
 	if (shouldDebug) {
-		const debugSettings = context ? getDebugSettings.call(context, options.debugItemIndex ?? 0) : {};
+		const debugSettings = context
+			? getDebugSettings.call(context, options.debugItemIndex ?? 0)
+			: {};
 		logDebugMessage(context, '[Centum debug] Request', {
 			url: finalUrl,
 			method: 'POST',
@@ -1204,36 +1214,49 @@ export async function apiPostRequest<T = any>(
 		});
 	}
 
-	const response = await fetch(finalUrl, fetchOptions);
-	const responseText = await response.text();
-
-	if (shouldDebug) {
-		logDebugMessage(context, '[Centum debug] Response', {
-			url: finalUrl,
-			status: response.status,
-			statusText: response.statusText,
-			contentType: response.headers.get('content-type') || '',
-			bodyLength: responseText.length,
-			body: responseText,
-		});
-	}
-
-	if (!response.ok) {
-		if (shouldDebug) {
-			logDebugErrorRequestBody(context, finalUrl, 'POST', body);
-		}
-
-		safeThrowApi(
+	return withHttpDiagnostics(
+		finalUrl,
+		fetchOptions,
+		{
 			context,
-			`POST request failed with status ${response.status}`,
-			responseText || response.statusText,
-			response.status,
-			debugItemIndex,
-		);
-	}
+			debug: shouldDebug,
+			itemIndex: debugItemIndex,
+			privateKey: headers.publicAccessKey,
+		},
+		async (response, setPhase) => {
+			const responseText = await response.text();
 
-	const data = responseText.trim() ? JSON.parse(responseText) : {};
-	return [data];
+			if (shouldDebug) {
+				logDebugMessage(context, '[Centum debug] Response', {
+					url: finalUrl,
+					status: response.status,
+					statusText: response.statusText,
+					contentType: response.headers.get('content-type') || '',
+					bodyLength: responseText.length,
+					body: responseText,
+				});
+			}
+
+			if (!response.ok) {
+				if (shouldDebug) {
+					logDebugErrorRequestBody(context, finalUrl, 'POST', body);
+				}
+
+				setPhase('http');
+				safeThrowApi(
+					context,
+					`POST request failed with status ${response.status}`,
+					responseText || response.statusText,
+					response.status,
+					debugItemIndex,
+				);
+			}
+
+			setPhase('parse');
+			const data = responseText.trim() ? JSON.parse(responseText) : {};
+			return [data];
+		},
+	);
 }
 
 // POST paginado (igual que GET pero usando body)
@@ -1292,7 +1315,9 @@ export async function apiPostRequestPaginated<T = any>(
 			body: JSON.stringify(body),
 		};
 		if (shouldDebug) {
-			const debugSettings = context ? getDebugSettings.call(context, options.debugItemIndex ?? 0) : {};
+			const debugSettings = context
+				? getDebugSettings.call(context, options.debugItemIndex ?? 0)
+				: {};
 			logDebugMessage(context, '[Centum debug] Request', {
 				url: finalUrl,
 				method: 'POST',
@@ -1302,33 +1327,46 @@ export async function apiPostRequestPaginated<T = any>(
 				...(debugSettings.includeRequestBody ? { body } : {}),
 			});
 		}
-		const response = await fetch(finalUrl, fetchOptions);
-		const responseText = await response.text();
-		if (shouldDebug) {
-			logDebugMessage(context, '[Centum debug] Response', {
-				url: finalUrl,
-				status: response.status,
-				statusText: response.statusText,
-				contentType: response.headers.get('content-type') || '',
-				bodyLength: responseText.length,
-				body: responseText,
-			});
-		}
-		if (!response.ok) {
-			if (shouldDebug) {
-				logDebugErrorRequestBody(context, finalUrl, 'POST', body);
-			}
-
-			safeThrowApi(
+		const pageItems = await withHttpDiagnostics(
+			finalUrl,
+			fetchOptions,
+			{
 				context,
-				`POST error on page ${currentPage} with status ${response.status}`,
-				responseText || response.statusText,
-				response.status,
-				options.debugItemIndex,
-			);
-		}
-		const data = responseText.trim() ? JSON.parse(responseText) : {};
-		const pageItems = extractItems<T>(data, itemsField);
+				debug: shouldDebug,
+				itemIndex: options.debugItemIndex,
+				privateKey: headers.publicAccessKey,
+			},
+			async (response, setPhase) => {
+				const responseText = await response.text();
+				if (shouldDebug) {
+					logDebugMessage(context, '[Centum debug] Response', {
+						url: finalUrl,
+						status: response.status,
+						statusText: response.statusText,
+						contentType: response.headers.get('content-type') || '',
+						bodyLength: responseText.length,
+						body: responseText,
+					});
+				}
+				if (!response.ok) {
+					if (shouldDebug) {
+						logDebugErrorRequestBody(context, finalUrl, 'POST', body);
+					}
+
+					setPhase('http');
+					safeThrowApi(
+						context,
+						`POST error on page ${currentPage} with status ${response.status}`,
+						responseText || response.statusText,
+						response.status,
+						options.debugItemIndex,
+					);
+				}
+				setPhase('parse');
+				const data = responseText.trim() ? JSON.parse(responseText) : {};
+				return extractItems<T>(data, itemsField);
+			},
+		);
 		allItems.push(...pageItems);
 		const processingDuration = Date.now() - totalStart;
 		const nextPage = pageItems.length >= requestedItemsPerPage;
@@ -1453,77 +1491,90 @@ export async function apiRequest<T>(
 	}
 
 	try {
-		const response = await fetch(finalUrl, fetchOptions);
+		return await withHttpDiagnostics(
+			finalUrl,
+			fetchOptions,
+			{
+				context: effectiveContext,
+				debug: shouldDebug,
+				itemIndex: options.debugItemIndex,
+				privateKey: headers.publicAccessKey,
+			},
+			async (response, setPhase) => {
+				if (responseType === 'arraybuffer') {
+					if (!response.ok) {
+						const errorText = await response.text();
 
-		if (responseType === 'arraybuffer') {
-			if (!response.ok) {
-				const errorText = await response.text();
+						if (shouldDebug) {
+							logDebugErrorRequestBody(effectiveContext, finalUrl, method, body);
+						}
+
+						setPhase('http');
+						safeThrowApi(
+							effectiveContext,
+							errorText || response.statusText || `Request failed with status ${response.status}`,
+							'Centum API request failed',
+							response.status,
+							options.debugItemIndex,
+						);
+					}
+
+					return (await response.arrayBuffer()) as any;
+				}
+
+				const rawText = await response.text();
 
 				if (shouldDebug) {
-					logDebugErrorRequestBody(effectiveContext, finalUrl, method, body);
+					logDebugMessage(effectiveContext, '[Centum debug] Response', {
+						url: finalUrl,
+						status: response.status,
+						statusText: response.statusText,
+						contentType: response.headers.get('content-type') || '',
+						bodyLength: rawText.length,
+						body: rawText,
+					});
 				}
 
-				safeThrowApi(
-					effectiveContext,
-					errorText || response.statusText || `Request failed with status ${response.status}`,
-					'Centum API request failed',
-					response.status,
-					options.debugItemIndex,
-				);
-			}
+				if (!response.ok) {
+					const contentType = response.headers.get('content-type') || '';
+					const status = response.status;
 
-			return (await response.arrayBuffer()) as any;
-		}
+					if (shouldDebug) {
+						logDebugErrorRequestBody(effectiveContext, finalUrl, method, body);
+					}
 
-		const rawText = await response.text();
+					setPhase('http');
+					let errorData: ApiErrorBody | string = rawText;
+					if (contentType.includes('application/json')) {
+						try {
+							errorData = JSON.parse(rawText) as ApiErrorBody;
+						} catch {
+							errorData = rawText;
+						}
+					}
 
-		if (shouldDebug) {
-			logDebugMessage(effectiveContext, '[Centum debug] Response', {
-				url: finalUrl,
-				status: response.status,
-				statusText: response.statusText,
-				contentType: response.headers.get('content-type') || '',
-				bodyLength: rawText.length,
-				body: rawText,
-			});
-		}
+					const messageText =
+						typeof errorData === 'object'
+							? errorData.message || errorData.Message || errorData.detail || errorData.Detail
+							: rawText;
 
-		if (!response.ok) {
-			const contentType = response.headers.get('content-type') || '';
-			const status = response.status;
-
-			if (shouldDebug) {
-				logDebugErrorRequestBody(effectiveContext, finalUrl, method, body);
-			}
-
-			let errorData: ApiErrorBody | string = rawText;
-			if (contentType.includes('application/json')) {
-				try {
-					errorData = JSON.parse(rawText) as ApiErrorBody;
-				} catch {
-					errorData = rawText;
+					safeThrowApi(
+						effectiveContext,
+						messageText || `Request failed with status ${status}`,
+						'Centum API request failed',
+						status,
+						options.debugItemIndex,
+					);
 				}
-			}
 
-			const messageText =
-				typeof errorData === 'object'
-					? errorData.message || errorData.Message || errorData.detail || errorData.Detail
-					: rawText;
+				if (!rawText.trim()) {
+					return {} as T;
+				}
 
-			safeThrowApi(
-				effectiveContext,
-				messageText || `Request failed with status ${status}`,
-				'Centum API request failed',
-				status,
-				options.debugItemIndex,
-			);
-		}
-
-		if (!rawText.trim()) {
-			return {} as T;
-		}
-
-		return JSON.parse(rawText) as T;
+				setPhase('parse');
+				return JSON.parse(rawText) as T;
+			},
+		);
 	} catch (error) {
 		if (effectiveContext) {
 			effectiveContext.logger?.error?.('API request failed', { error });

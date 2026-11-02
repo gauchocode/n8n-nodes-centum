@@ -1,6 +1,19 @@
 ## [Unreleased]
 
-- No unreleased changes yet.
+### Fixed
+
+- Preserve structured transport causes in single-string HTTP diagnostic logs,
+  correlated by execution, node, item and request. Record actual HTTP status and
+  allowlisted response headers before body consumption, including body-read failures.
+- Add sanitized, bounded metadata alongside the existing logs in the four shared
+  HTTP clients. Preserve all debug options, `includeRequestBody`, response/error
+  body dumps and original header redaction. Keep requests, retries, outputs and
+  exception semantics unchanged.
+- Add offline regression tests for DNS/TLS/timeouts, HTTP responses, body failures,
+  structured-log redaction, pagination, diagnostic logger failures, unchanged
+  continue-on-fail output and exact legacy debug payloads/conditions.
+- Guard diagnostic initialization and emit minimal fallback records when metadata
+  extraction fails; redact entire URL tokens including embedded quote characters.
 
 ## [1.0.24] - 2026-10-05
 

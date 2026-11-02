@@ -241,6 +241,111 @@ docker compose run publish
 3. Restart n8n.
 4. Add the `Centum` node to a workflow and test with valid Centum credentials.
 
+## HTTP diagnostics
+
+The shared `apiRequest`, `apiGetRequest`, `apiPostRequest` and
+`apiPostRequestPaginated` clients emit single-line JSON prefixed with
+`[Centum HTTP]`. The JSON is part of the log message, so log transports that
+discard metadata still retain the original transport cause. In queue mode, look
+in the worker logs, not only the main n8n container. These records are additional:
+existing `[Centum debug]` logs and debug options retain their original behavior.
+The following fields and redaction guarantees apply only to `[Centum HTTP]`.
+
+- `request` and successful `response` events respect **Enable Debug Logging** and
+  **Debug Endpoint Contains**. HTTP error responses and `failure` events are logged
+  at error level even when debug is off. Logging does not add retries.
+- Every HTTP call has a unique `request_id`; retries and pagination calls get new
+  IDs. Correlate them with `execution_id`, `node` and zero-based `item_index`.
+  `request_id` is not a retry-attempt number. `origin` contains only scheme/host/port.
+- `response` is emitted immediately after headers arrive, before reading the body.
+  `http_status` is the actual response status, never a synthetic 500. Only
+  `content-type` (media type), `retry-after` and `x-request-id` are allowlisted.
+- `failure.phase` distinguishes `request` (fetch rejected), `body` (body reading),
+  `http` (non-success status) and `parse` (JSON decoding/item extraction).
+  A pre-response failure has `response_received: false`, `http_status: null` and
+  empty response headers. A body failure can have `http_status: 200`.
+- Transport errors retain explicit `name`, sanitized `message`, `code`, `errno`,
+  `syscall`, nested `cause` and `AggregateError.errors`. Depth, breadth and text
+  length are bounded; cycles are marked `truncated`. No arbitrary error fields or
+  stacks are dumped. After a response arrives, free-text error messages are omitted
+  because API errors and parser messages can contain business data; codes remain.
+- `duration_ms` is elapsed time at the event: time to headers for `response`, time
+  to failure for `failure`. DNS/TLS attribution requires an actual cause code; a
+  generic `fetch failed` is not classified as DNS by assumption.
+- If URL/context/header/error metadata cannot be read, a minimal record is emitted
+  with `diagnostic_incomplete: true`, the event, phase, response presence and any
+  status already obtained. No exception text from the diagnostic failure is logged.
+  Initialization failures use fail-closed redaction; if UUID creation fails,
+  `request_id` is null. Failures writing these new records are swallowed;
+  no logging code can guarantee delivery when the log transport itself is unavailable.
+
+Example failure (illustrative):
+
+```json
+{
+  "event": "failure",
+  "request_id": "a-per-request-uuid",
+  "execution_id": "123",
+  "node": "Get Choferes",
+  "item_index": 0,
+  "method": "GET",
+  "origin": "https://centum.example:23990",
+  "phase": "request",
+  "duration_ms": 5014,
+  "response_received": false,
+  "http_status": null,
+  "response_headers": {},
+  "error": {
+    "name": "TypeError",
+    "message": "fetch failed",
+    "cause": { "code": "EAI_AGAIN", "syscall": "getaddrinfo" }
+  }
+}
+```
+
+The new diagnostics omit request headers, URL paths/query/userinfo and all request
+and response bodies. Known request credentials and query values are redacted from
+transport messages. Existing node outputs, error messages, continue-on-fail
+behavior and requests are unchanged; diagnostics do not add an `error_details`
+output field or a database record.
+
+### Existing debug options (unchanged)
+
+- **Enable Debug Logging** and **Debug Endpoint Contains** still gate the original
+  `[Centum debug]` request, response and error-request-body logs.
+- **Include Request Body** still controls body inclusion in the normal request
+  debug record. Response debug records still contain the complete text body,
+  regardless of that option. Request headers retain their original redaction.
+- As before, a non-success HTTP response logs the request body when debug is
+  enabled and the endpoint matches, even if **Include Request Body** is off
+  (`apiRequest` when a body is defined, and both POST helpers).
+- Binary `apiRequest` responses retain their original behavior: no response-body
+  debug dump; HTTP failures still log a defined request body under the same gate.
+- The original `API request failed` error/metadata log and legacy logger behavior
+  are preserved. The new observer does not sanitize or suppress legacy records.
+
+Legacy debug logs can contain complete URLs and business data. Their verbosity
+and conditions have not changed; the new structured-log redaction guarantees do
+not apply to them.
+
+Standalone image downloads, credential tests and dropdown requests are not
+instrumented by this patch. This change improves future evidence; it neither fixes
+DNS availability nor reconstructs causes missing from historical logs.
+
+### Offline regression checks
+
+The tests mock `fetch`; they require no Centum credentials or live service. To use
+the existing build image with current source and tests mounted read-only:
+
+```bash
+docker compose run --rm --no-deps \
+  -v "$PWD/nodes:/app/nodes:ro" -v "$PWD/tests:/app/tests:ro" \
+  build sh -lc 'rm -rf dist/* && pnpm exec tsc --incremental false && pnpm exec gulp build:icons && node --test tests/http-diagnostics.test.cjs'
+```
+
+This validates a local build only. Publishing and installing a new node version on
+the main n8n service and its workers are separate, explicitly approved operations.
+
 ## Support
 
 For issues or questions:
